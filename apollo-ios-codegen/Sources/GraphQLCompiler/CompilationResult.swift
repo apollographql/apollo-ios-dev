@@ -539,7 +539,7 @@ public final class CompilationResult: Sendable, JavaScriptObjectDecodable {
       self.documentation = documentation
     }
 
-    static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {      
+    static func fromJSValue(_ jsValue: JSValue, bridge: JavaScriptBridge) -> Self {
       return self.init(
         name: jsValue["name"],
         alias: jsValue["alias"],

@@ -25,13 +25,15 @@ class ApolloSQLiteDatabaseBehaviorTests: XCTestCase {
   private func dropSQLiteTable(dbURL: URL, tableName: String) throws {
     var db: OpaquePointer?
     let flags = SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX | SQLITE_OPEN_URI
-    if sqlite3_open_v2(dbURL.path, &db, flags, nil) != SQLITE_OK {
-      throw SQLiteError.open(path: dbURL.path)
+    let result = sqlite3_open_v2(dbURL.path, &db, flags, nil)
+    if result != SQLITE_OK {
+      throw SQLiteError.open(path: dbURL.path, resultCode: result)
     }
     
     let sql = "DROP TABLE IF EXISTS \(tableName)"
-    if sqlite3_exec(db, sql, nil, nil, nil) != SQLITE_OK {
-      throw SQLiteError.execution(message: "Failed to drop table: \(tableName)")
+    let execResult = sqlite3_exec(db, sql, nil, nil, nil)
+    if execResult != SQLITE_OK {
+      throw SQLiteError.execution(message: "Failed to drop table: \(tableName)", resultCode: execResult)
     }
   }
 }

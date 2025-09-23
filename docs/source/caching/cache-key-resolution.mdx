@@ -8,7 +8,9 @@ The normalized cache computes a **cache key** for each object that is stored in 
 
 > To learn more, read about how the cache [normalizes objects by cache key](./introduction#normalizing-objects-by-cache-key).
 
-For most use cases, you can configure cache keys declaratively using the methods described on this page. For advanced use cases not supported by declarative cache keys, you can configure cache keys [programmatically](./programmatic-cache-keys).
+The `@typePolicy` and `@fieldPolicy` directives are intended to be used together. The `@typePolicy` directive applies to types in your schema and derives cache keys from fields on a fetched object when writing to the cache. The `@fieldPolicy` directive applies to fields that have arguments on types in your schema and derives cache keys from the values of the field's arguments when reading an object from the cache.
+
+For most use cases, you can configure cache keys declaratively using the methods described on this page. For advanced use cases not supported by declarative cache keys, you can use [programmatic cache key configuration](./programmatic-cache-keys). When executing an operation, the library first checks for programmatic cache keys, then for directive-based cache keys, and finally falls back to the default implementation.
 
 ## Schema extensions
 
@@ -87,3 +89,126 @@ This is possible if:
   A) A type is added to your schema after code generation is executed and that type implements two different interfaces with different type policies
 
   B) Implementation of an interface is added to an existing type which already implements an interface with a different type policy
+
+## The `@fieldPolicy` directive
+
+The `@fieldPolicy` directive enables you to specify how cache keys should be resolved when querying a field with arguments. In practice, field policies should be thought of as applied to a specific field with arguments on a type in your schema. Because directives cannot be added to fields in schema extensions, you can apply the `@fieldPolicy` directive to `Object` and `Interface` types in your schema and provide a field name for the policy to be applied to.
+
+When fetching a field with an argument, you can use a field policy to configure an expected cache key for the object that is derived from the values of the field's arguments. Field policies are designed to be used in combination with type policies. When the cache key for an object derived by the type policy is the same as the one derived by the field policy, the field can use the cached object.
+
+
+### Directive usage
+
+The `@fieldPolicy` directive has two arguments: `forField` and `keyArgs`. Use `forField` to provide the name of the field you're adding the policy to. Use `keyArgs` to specify which input arguments of that field to use for resolving cache keys and in what order. The format of the resolved cache key is the same as with `@typePolicy`: `{type name}:{value}`. When multiple key arguments are present, they are joined with a `+` separator.
+
+Given a type like this:
+```graphql
+type Query {
+  allAnimals(species: String!): Animal!
+}
+
+type Animal {
+  id: ID!
+  name: String!
+  species: String!
+}
+```
+
+Apply this field policy as follows:
+```graphql
+extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "species")
+```
+
+This results in resolved cache keys that look like `Animal:Lion` or `Animal:Tiger`.
+
+#### Multiple key arguments
+
+When you have multiple key arguments, provide them to the directive as a space-delimited string. For example, for a type like this:
+```graphql
+type Query {
+  allAnimals(species: String!, habitat: String!): Animal!
+}
+
+type Animal {
+  id: ID!
+  name: String!
+  species: String!
+  habitat: String!
+}
+```
+
+Apply this field policy as follows:
+```graphql
+extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "species habitat")
+```
+
+This results in resolved cache keys that look like `Animal:Lion+Savanna`.
+
+You can control the order of arguments in the cache key by changing their order in the directive, which results in a cache key of `Animal:Savanna+Lion`:
+```graphql
+extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "habitat species")
+```
+
+#### List arguments
+
+The `@fieldPolicy` directive supports fields that return a list. When using lists, note the following requirements:
+
+- If a field has a list return type, it must contain exactly one list input parameter.
+- Conversely, if a field has a list input parameter, it must return a list.
+- Nested lists are not supported.
+- Partial cache hits are not supported, so every cache key created from the input parameters must have a cache hit or the cache read will fail.
+
+If you need to apply a field policy to a field that is not supported by these restrictions, you can use [programmatic field policy configuration](./programmatic-cache-keys#programmatic-field-policy-usage).
+
+With a field like this:
+```graphql
+type Query {
+  allAnimals(species: [String!], habitat: String!): [Animal!]
+}
+
+type Animal {
+  id: ID!
+  name: String!
+  species: String!
+  habitat: String!
+}
+```
+
+Apply this field policy like this:
+```graphql
+extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "species habitat")
+```
+
+If your inputs are `["Lion", "Elephant"]` and `Savanna`, your cache keys are `Animal:Lion+Savanna` and `Animal:Elephant+Savanna`. These
+are used to retrieve objects from the cache and populate the list to return from the field.
+
+#### Object arguments
+
+You can use an _Input Object_ as the type for your input parameters on a field. In these cases, use dot notation to traverse
+the object's structure for the value to use in your cache key.
+
+With a type like this:
+```graphql
+type Query {
+  allAnimals(input: QueryInput!): Animal!
+}
+
+type Animal {
+  id: ID!
+  name: String!
+  species: String!
+  habitat: String!
+}
+
+input QueryInput {
+  id: ID!
+  species: String!
+}
+```
+
+Apply a field policy as follows:
+```graphql
+extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "input.species")
+```
+
+This results in cache keys such as `Animal:Lion` or `Animal:Elephant`.
