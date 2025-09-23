@@ -106,6 +106,7 @@
     {
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport",
+        "doc:\/\/Apollo\/s8CopyableP",
         "doc:\/\/Apollo\/documentation\/Apollo\/UploadingNetworkTransport"
       ],
       "kind" : "relationships",
@@ -123,12 +124,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:sendEnhancedClientAwareness:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/additionalHeaders",
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/autoPersistQueries",
@@ -142,6 +147,8 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/constructRequest(for:cachePolicy:contextIdentifier:context:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/constructUploadRequest(for:with:context:manualBoundary:)",
@@ -150,6 +157,7 @@
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/NetworkTransport-Implementations",
@@ -1325,6 +1333,11 @@
   "title" : "UploadingNetworkTransport",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/uploadingnetworktransport"
+},
+"doc://Apollo/s8CopyableP": {
+  "identifier" : "doc:\/\/Apollo\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
 }
 }
 }

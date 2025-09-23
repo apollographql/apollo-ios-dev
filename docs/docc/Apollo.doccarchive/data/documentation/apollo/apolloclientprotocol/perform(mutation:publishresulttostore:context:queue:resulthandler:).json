@@ -145,16 +145,12 @@
       },
       {
         "kind" : "text",
-        "text" : ">?) -> (any "
+        "text" : ">?) -> any "
       },
       {
         "kind" : "typeIdentifier",
         "preciseIdentifier" : "s:6Apollo11CancellableP",
         "text" : "Cancellable"
-      },
-      {
-        "kind" : "text",
-        "text" : ")"
       }
     ],
     "modules" : [
@@ -303,7 +299,7 @@
             },
             {
               "kind" : "text",
-              "text" : ">?) -> (any "
+              "text" : ">?) -> any "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Cancellable",
@@ -313,7 +309,7 @@
             },
             {
               "kind" : "text",
-              "text" : ") "
+              "text" : " "
             },
             {
               "kind" : "keyword",
@@ -393,7 +389,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] A context that is being passed through the request chain. Should default to ",
+                  "text" : "[Optional] A context that is being passed through the request chain. Should default to ",
                   "type" : "text"
                 },
                 {
@@ -670,16 +666,12 @@
     },
     {
       "kind" : "text",
-      "text" : ">?) -> (any "
+      "text" : ">?) -> any "
     },
     {
       "kind" : "typeIdentifier",
       "preciseIdentifier" : "s:6Apollo11CancellableP",
       "text" : "Cancellable"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/perform(mutation:publishResultToStore:context:queue:resultHandler:)",

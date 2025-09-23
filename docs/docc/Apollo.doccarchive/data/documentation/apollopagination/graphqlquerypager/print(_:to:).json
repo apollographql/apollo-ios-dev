@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/Publisher-Implementations"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager"
       ]
     ]
   },
@@ -318,17 +317,6 @@
   "title" : "GraphQLQueryPager",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/graphqlquerypager"
-},
-"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/Publisher-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/Publisher-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Publisher Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/publisher-implementations"
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/print(_:to:)": {
   "abstract" : [

@@ -98,19 +98,24 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/init(client:shouldInvalidateClientOnDeinit:store:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/additionalErrorInterceptor(for:)-5e08v",
+        "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/additionalErrorInterceptor(for:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/interceptors(for:)"
       ],
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/InterceptorProvider-Implementations"
@@ -191,7 +196,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/defaultinterceptorprovider\/interceptorprovider-implementations"
 },
-"doc://Apollo/documentation/Apollo/DefaultInterceptorProvider/additionalErrorInterceptor(for:)-5e08v": {
+"doc://Apollo/documentation/Apollo/DefaultInterceptorProvider/additionalErrorInterceptor(for:)": {
   "abstract" : [
 
   ],
@@ -246,12 +251,12 @@
       "text" : ")?"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/additionalErrorInterceptor(for:)-5e08v",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/additionalErrorInterceptor(for:)",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "additionalErrorInterceptor(for:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/defaultinterceptorprovider\/additionalerrorinterceptor(for:)-5e08v"
+  "url" : "\/documentation\/apollo\/defaultinterceptorprovider\/additionalerrorinterceptor(for:)"
 },
 "doc://Apollo/documentation/Apollo/DefaultInterceptorProvider/init(client:shouldInvalidateClientOnDeinit:store:)": {
   "abstract" : [

@@ -99,6 +99,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaCustomization\/CustomSchemaTypeName\/enum(name:cases:)",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaCustomization\/CustomSchemaTypeName\/inputObject(name:fields:)",
@@ -107,6 +109,8 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaCustomization\/CustomSchemaTypeName\/init(from:)",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaCustomization\/CustomSchemaTypeName\/init(stringLiteral:)"
@@ -114,17 +118,20 @@
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaCustomization\/CustomSchemaTypeName\/encode(to:)"
       ],
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaCustomization\/CustomSchemaTypeName\/Equatable-Implementations",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaCustomization\/CustomSchemaTypeName\/ExpressibleByExtendedGraphemeClusterLiteral-Implementations",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaCustomization\/CustomSchemaTypeName\/ExpressibleByUnicodeScalarLiteral-Implementations"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaCustomization\/CustomSchemaTypeName\/ExpressibleByStringLiteral-Implementations"
       ],
       "title" : "Default Implementations"
     }
@@ -290,16 +297,16 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/schemacustomization\/customschematypename\/expressiblebyextendedgraphemeclusterliteral-implementations"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/SchemaCustomization/CustomSchemaTypeName/ExpressibleByUnicodeScalarLiteral-Implementations": {
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/SchemaCustomization/CustomSchemaTypeName/ExpressibleByStringLiteral-Implementations": {
   "abstract" : [
 
   ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaCustomization\/CustomSchemaTypeName\/ExpressibleByUnicodeScalarLiteral-Implementations",
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaCustomization\/CustomSchemaTypeName\/ExpressibleByStringLiteral-Implementations",
   "kind" : "article",
   "role" : "collectionGroup",
-  "title" : "ExpressibleByUnicodeScalarLiteral Implementations",
+  "title" : "ExpressibleByStringLiteral Implementations",
   "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/schemacustomization\/customschematypename\/expressiblebyunicodescalarliteral-implementations"
+  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/schemacustomization\/customschematypename\/expressiblebystringliteral-implementations"
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/SchemaCustomization/CustomSchemaTypeName/encode(to:)": {
   "abstract" : [

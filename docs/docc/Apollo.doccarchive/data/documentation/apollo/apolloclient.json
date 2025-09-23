@@ -97,7 +97,8 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol",
+        "doc:\/\/Apollo\/s8CopyableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -114,6 +115,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(networkTransport:store:sendEnhancedClientAwareness:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/init(url:sendEnhancedClientAwareness:)"
@@ -121,24 +124,31 @@
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/store"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/watch(query:cachePolicy:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)"
       ],
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientError"
       ],
       "title" : "Enumerations"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientProtocol-Implementations"
@@ -665,6 +675,11 @@
   "title" : "ApolloClientProtocol",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclientprotocol"
+},
+"doc://Apollo/s8CopyableP": {
+  "identifier" : "doc:\/\/Apollo\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
 }
 }
 }

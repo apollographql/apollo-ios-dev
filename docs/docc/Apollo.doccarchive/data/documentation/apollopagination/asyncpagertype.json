@@ -82,6 +82,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Associated-Types",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/InitialQuery",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/PaginatedQuery"
@@ -89,6 +91,8 @@
       "title" : "Associated Types"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/canLoadNext",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/canLoadPrevious"
@@ -96,6 +100,8 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/fetch()",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType\/loadAll(fetchFromInitialPage:)",

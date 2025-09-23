@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/InflectionRule",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/InflectionRule\/Equatable-Implementations"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/InflectionRule"
       ]
     ]
   },
@@ -307,17 +306,6 @@
   "title" : "!=(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/inflectionrule\/!=(_:_:)"
-},
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/InflectionRule/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/InflectionRule\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/inflectionrule\/equatable-implementations"
 }
 }
 }

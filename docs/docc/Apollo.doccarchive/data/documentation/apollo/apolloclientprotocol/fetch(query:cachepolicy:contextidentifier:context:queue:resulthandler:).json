@@ -161,16 +161,12 @@
       },
       {
         "kind" : "text",
-        "text" : ">?) -> (any "
+        "text" : ">?) -> any "
       },
       {
         "kind" : "typeIdentifier",
         "preciseIdentifier" : "s:6Apollo11CancellableP",
         "text" : "Cancellable"
-      },
-      {
-        "kind" : "text",
-        "text" : ")"
       }
     ],
     "modules" : [
@@ -338,7 +334,7 @@
             },
             {
               "kind" : "text",
-              "text" : ">?) -> (any "
+              "text" : ">?) -> any "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Cancellable",
@@ -348,7 +344,7 @@
             },
             {
               "kind" : "text",
-              "text" : ") "
+              "text" : " "
             },
             {
               "kind" : "keyword",
@@ -412,21 +408,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "A dispatch queue on which the result handler will be called. Should default to the main queue.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "queue"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "[optional] A unique identifier for this request, to help with deduping cache hits for watchers. Should default to ",
+                  "text" : "[Optional] A unique identifier for this request, to help with deduping cache hits for watchers. Should default to ",
                   "type" : "text"
                 },
                 {
@@ -448,7 +430,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] A context that is being passed through the request chain. Should default to ",
+                  "text" : "[Optional] A context that is being passed through the request chain. Should default to ",
                   "type" : "text"
                 },
                 {
@@ -470,7 +452,21 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] A closure that is called when query results are available or when an error occurs.",
+                  "text" : "A dispatch queue on which the result handler will be called. Should default to the main queue.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "queue"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "[Optional] A closure that is called when query results are available or when an error occurs.",
                   "type" : "text"
                 }
               ],
@@ -728,16 +724,12 @@
     },
     {
       "kind" : "text",
-      "text" : ">?) -> (any "
+      "text" : ">?) -> any "
     },
     {
       "kind" : "typeIdentifier",
       "preciseIdentifier" : "s:6Apollo11CancellableP",
       "text" : "Cancellable"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/fetch(query:cachePolicy:contextIdentifier:context:queue:resultHandler:)",

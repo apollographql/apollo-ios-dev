@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransport",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransport\/WebSocketClientDelegate-Implementations"
+        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransport"
       ]
     ]
   },
@@ -292,17 +291,6 @@
   "title" : "WebSocketTransport",
   "type" : "topic",
   "url" : "\/documentation\/apollowebsocket\/websockettransport"
-},
-"doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransport/WebSocketClientDelegate-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransport\/WebSocketClientDelegate-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "WebSocketClientDelegate Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollowebsocket\/websockettransport\/websocketclientdelegate-implementations"
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransport/websocketDidDisconnect(socket:error:)": {
   "abstract" : [

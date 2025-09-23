@@ -18,8 +18,7 @@
       [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Reverse",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Reverse\/Equatable-Implementations"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Reverse"
       ]
     ]
   },
@@ -333,17 +332,6 @@
   "title" : "!=(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/offsetpagination\/reverse\/!=(_:_:)"
-},
-"doc://ApolloPagination/documentation/ApolloPagination/OffsetPagination/Reverse/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Reverse\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/offsetpagination\/reverse\/equatable-implementations"
 }
 }
 }

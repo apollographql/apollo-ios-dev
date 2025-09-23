@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/Record",
-        "doc:\/\/Apollo\/documentation\/Apollo\/Record\/Equatable-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/Record"
       ]
     ]
   },
@@ -307,17 +306,6 @@
   "title" : "!=(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/record\/!=(_:_:)"
-},
-"doc://Apollo/documentation/Apollo/Record/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Record\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/record\/equatable-implementations"
 }
 }
 }

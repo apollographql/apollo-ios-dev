@@ -224,12 +224,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/init(client:query:refetchOnFailedUpdates:context:callbackQueue:resultHandler:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/query",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/refetchOnFailedUpdates"
@@ -237,6 +241,8 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/cancel()",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/refetch(cachePolicy:)",

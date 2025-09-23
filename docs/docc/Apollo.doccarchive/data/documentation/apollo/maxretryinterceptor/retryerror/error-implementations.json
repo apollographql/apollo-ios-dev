@@ -33,6 +33,7 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Properties",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/RetryError\/localizedDescription"
@@ -65,6 +66,10 @@
     {
       "code" : "HTTPRequest",
       "type" : "codeVoice"
+    },
+    {
+      "text" : " with optional exponential backoff support",
+      "type" : "text"
     }
   ],
   "fragments" : [

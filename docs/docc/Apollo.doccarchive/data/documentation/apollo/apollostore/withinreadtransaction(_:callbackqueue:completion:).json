@@ -332,7 +332,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] The callback queue to use to perform the completion block on. Will perform on the current queue if not provided. Defaults to nil.",
+                  "text" : "[Optional] The callback queue to use to perform the completion block on. Will perform on the current queue if not provided. Defaults to nil.",
                   "type" : "text"
                 }
               ],
@@ -346,7 +346,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] The completion block to perform when the read transaction completes. Defaults to nil.",
+                  "text" : "[Optional] The completion block to perform when the read transaction completes. Defaults to nil.",
                   "type" : "text"
                 }
               ],

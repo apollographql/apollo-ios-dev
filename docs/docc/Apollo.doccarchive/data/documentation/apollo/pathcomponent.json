@@ -98,6 +98,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent\/field(_:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent\/index(_:)"
@@ -105,6 +107,7 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent\/Equatable-Implementations"

@@ -245,7 +245,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] The response parsed into the ",
+                  "text" : "[Optional] The response parsed into the ",
                   "type" : "text"
                 },
                 {

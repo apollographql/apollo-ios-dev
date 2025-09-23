@@ -18,8 +18,7 @@
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/Equatable-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field"
       ]
     ]
   },
@@ -374,17 +373,6 @@
   "title" : "!=(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selection\/field\/!=(_:_:)"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/Selection/Field/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selection\/field\/equatable-implementations"
 }
 }
 }

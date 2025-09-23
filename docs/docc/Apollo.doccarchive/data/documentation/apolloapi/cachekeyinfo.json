@@ -437,6 +437,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheKeyInfo\/init(id:uniqueKeyGroup:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheKeyInfo\/init(jsonValue:uniqueKeyGroup:)"
@@ -444,6 +446,8 @@
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheKeyInfo\/id",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheKeyInfo\/uniqueKeyGroup"

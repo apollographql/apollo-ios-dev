@@ -33,6 +33,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Classes",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager"
@@ -40,6 +42,8 @@
       "title" : "Classes"
     },
     {
+      "anchor" : "Protocols",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncPagerType",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType",
@@ -48,12 +52,16 @@
       "title" : "Protocols"
     },
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput"
       ],
       "title" : "Structures"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination",

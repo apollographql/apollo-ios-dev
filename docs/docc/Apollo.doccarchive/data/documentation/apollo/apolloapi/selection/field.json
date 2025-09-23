@@ -108,6 +108,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/Selection\/Field\/cacheKey(with:)"
       ],

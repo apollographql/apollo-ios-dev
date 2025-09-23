@@ -95,6 +95,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError\/couldNotParseIncrementalJSON(json:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError\/couldNotParseToJSON(data:)",
@@ -104,12 +106,15 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError\/errorDescription"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError\/Error-Implementations",

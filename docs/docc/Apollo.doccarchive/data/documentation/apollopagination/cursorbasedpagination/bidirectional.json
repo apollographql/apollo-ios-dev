@@ -103,12 +103,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Bidirectional\/init(hasNext:endCursor:hasPrevious:startCursor:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Bidirectional\/canLoadNext",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Bidirectional\/canLoadPrevious",
@@ -120,6 +124,7 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Bidirectional\/Equatable-Implementations"

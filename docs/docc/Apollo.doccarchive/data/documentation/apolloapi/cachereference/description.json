@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference\/CustomStringConvertible-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference"
       ]
     ]
   },
@@ -220,17 +219,6 @@
   "title" : "CacheReference",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/cachereference"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/CacheReference/CustomStringConvertible-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference\/CustomStringConvertible-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "CustomStringConvertible Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/cachereference\/customstringconvertible-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/CacheReference/description": {
   "abstract" : [

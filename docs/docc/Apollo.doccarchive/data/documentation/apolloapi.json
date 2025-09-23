@@ -111,6 +111,7 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Schema-Types",
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Interface",
@@ -121,6 +122,7 @@
       "title" : "Schema Types"
     },
     {
+      "anchor" : "Scalar-Types",
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/AnyScalarType",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ScalarType",
@@ -129,6 +131,7 @@
       "title" : "Scalar Types"
     },
     {
+      "anchor" : "JSON-Conversion",
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONValue",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONObject",
@@ -140,6 +143,8 @@
       "title" : "JSON Conversion"
     },
     {
+      "anchor" : "Protocols",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/AnyHashableConvertible",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CompositeInlineFragment",
@@ -168,6 +173,8 @@
       "title" : "Protocols"
     },
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheKeyInfo",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference",
@@ -178,11 +185,14 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ListData",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ObjectData",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OperationDefinition",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OperationDocument"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OperationDocument",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ResponsePath"
       ],
       "title" : "Structures"
     },
     {
+      "anchor" : "Operators",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/!=(_:_:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/__(_:_:)"
@@ -190,8 +200,11 @@
       "title" : "Operators"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DocumentType",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/FieldPolicy",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationType",
@@ -202,6 +215,8 @@
       "title" : "Enumerations"
     },
     {
+      "anchor" : "Extended-Modules",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift"
       ],
@@ -875,6 +890,37 @@
   "title" : "EnumType",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/enumtype"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/FieldPolicy": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "FieldPolicy"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/FieldPolicy",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "FieldPolicy"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "FieldPolicy",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/fieldpolicy"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Fragment": {
   "abstract" : [
@@ -2222,6 +2268,40 @@
   "title" : "ParentType",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/parenttype"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/ResponsePath": {
+  "abstract" : [
+    {
+      "text" : "Represents a list of string components joined into a path using a reverse linked list.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ResponsePath"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ResponsePath",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ResponsePath"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ResponsePath",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/responsepath"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/RootSelectionSet": {
   "abstract" : [

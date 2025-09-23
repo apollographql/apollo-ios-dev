@@ -138,6 +138,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred\/projectedValue",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred\/state-swift.property",
@@ -146,6 +148,8 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred\/State-swift.enum"
       ],

@@ -106,7 +106,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "is the binary data of the certificate",
+                  "text" : "Is the binary data of the certificate",
                   "type" : "text"
                 }
               ],
@@ -128,7 +128,7 @@
         {
           "inlineContent" : [
             {
-              "text" : "a representation security object to be used with",
+              "text" : "A representation security object to be used with",
               "type" : "text"
             }
           ],

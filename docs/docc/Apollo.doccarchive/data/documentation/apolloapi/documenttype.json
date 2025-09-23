@@ -39,7 +39,12 @@
       }
     ],
     "platforms" : [
-
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "renamed" : "OperationDocument",
+        "unavailable" : false
+      }
     ],
     "role" : "symbol",
     "roleHeading" : "Enumeration",
@@ -85,6 +90,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DocumentType\/automaticallyPersisted(operationIdentifier:definition:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/DocumentType\/notPersisted(definition:)",

@@ -110,12 +110,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/isCancelled"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/cancel()",
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/handleErrorAsync(_:request:response:completion:)",

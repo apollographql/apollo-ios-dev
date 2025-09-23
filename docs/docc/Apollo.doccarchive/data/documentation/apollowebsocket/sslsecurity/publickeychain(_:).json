@@ -140,7 +140,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "is the trust to lookup the certificate chain and extract the public keys",
+                  "text" : "Is the trust to lookup the certificate chain and extract the public keys",
                   "type" : "text"
                 }
               ],
@@ -162,7 +162,7 @@
         {
           "inlineContent" : [
             {
-              "text" : "the public keys from the certifcate chain for the trust",
+              "text" : "The public keys from the certifcate chain for the trust",
               "type" : "text"
             }
           ],

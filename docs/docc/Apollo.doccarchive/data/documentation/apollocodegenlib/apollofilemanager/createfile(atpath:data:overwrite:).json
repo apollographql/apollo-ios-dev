@@ -260,7 +260,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] Data to write to the file path.",
+                  "text" : "[Optional] Data to write to the file path.",
                   "type" : "text"
                 }
               ],

@@ -89,6 +89,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/RootSelectionSet\/init(data:variables:)-5dodp",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/RootSelectionSet\/init(data:variables:)-7xsfq"

@@ -187,7 +187,12 @@
       }
     ],
     "platforms" : [
-
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "renamed" : "init(schemaNamespace:input:output:options:experimentalFeatures:schemaDownload:operationManifest:)",
+        "unavailable" : false
+      }
     ],
     "role" : "symbol",
     "roleHeading" : "Initializer",

@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONDecodingError",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONDecodingError\/Error-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONDecodingError"
       ]
     ]
   },
@@ -261,17 +260,6 @@
   "title" : "JSONDecodingError",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/jsondecodingerror"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/JSONDecodingError/Error-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONDecodingError\/Error-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Error Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/jsondecodingerror\/error-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/JSONDecodingError/localizedDescription": {
   "abstract" : [

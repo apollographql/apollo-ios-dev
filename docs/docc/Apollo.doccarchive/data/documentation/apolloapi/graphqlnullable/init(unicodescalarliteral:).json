@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/ExpressibleByUnicodeScalarLiteral-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable"
       ]
     ]
   },
@@ -288,17 +287,6 @@
   "title" : "GraphQLNullable",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqlnullable"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLNullable/ExpressibleByUnicodeScalarLiteral-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/ExpressibleByUnicodeScalarLiteral-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ExpressibleByUnicodeScalarLiteral Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqlnullable\/expressiblebyunicodescalarliteral-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLNullable/init(unicodeScalarLiteral:)": {
   "abstract" : [

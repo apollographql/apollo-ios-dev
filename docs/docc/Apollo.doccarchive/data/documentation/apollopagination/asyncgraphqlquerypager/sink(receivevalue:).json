@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/Publisher-Implementations"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager"
       ]
     ]
   },
@@ -85,7 +84,7 @@
       },
       {
         "kind" : "text",
-        "text" : ": (("
+        "text" : ": ("
       },
       {
         "kind" : "typeIdentifier",
@@ -111,7 +110,7 @@
       },
       {
         "kind" : "text",
-        "text" : ")) -> "
+        "text" : ") -> "
       },
       {
         "kind" : "typeIdentifier",
@@ -203,7 +202,7 @@
             },
             {
               "kind" : "text",
-              "text" : " (("
+              "text" : " ("
             },
             {
               "kind" : "typeIdentifier",
@@ -229,7 +228,7 @@
             },
             {
               "kind" : "text",
-              "text" : ")) -> "
+              "text" : ") -> "
             },
             {
               "kind" : "typeIdentifier",
@@ -309,17 +308,6 @@
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager"
 },
-"doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager/Publisher-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/Publisher-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Publisher Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager\/publisher-implementations"
-},
 "doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager/sink(receiveValue:)": {
   "abstract" : [
 
@@ -379,7 +367,7 @@
     },
     {
       "kind" : "text",
-      "text" : ": (("
+      "text" : ": ("
     },
     {
       "kind" : "typeIdentifier",
@@ -405,7 +393,7 @@
     },
     {
       "kind" : "text",
-      "text" : ")) -> "
+      "text" : ") -> "
     },
     {
       "kind" : "typeIdentifier",

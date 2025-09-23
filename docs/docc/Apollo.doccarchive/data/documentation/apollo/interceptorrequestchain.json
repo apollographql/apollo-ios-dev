@@ -107,12 +107,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorRequestChain\/init(interceptors:callbackQueue:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorRequestChain\/additionalErrorHandler",
         "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorRequestChain\/isCancelled"
@@ -120,6 +124,8 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorRequestChain\/cancel()",
         "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorRequestChain\/handleErrorAsync(_:request:response:completion:)",
@@ -132,6 +138,8 @@
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorRequestChain\/ChainError"
       ],

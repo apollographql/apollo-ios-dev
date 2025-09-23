@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/ExpressibleByExtendedGraphemeClusterLiteral-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable"
       ]
     ]
   },
@@ -288,17 +287,6 @@
   "title" : "GraphQLNullable",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqlnullable"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLNullable/ExpressibleByExtendedGraphemeClusterLiteral-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/ExpressibleByExtendedGraphemeClusterLiteral-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ExpressibleByExtendedGraphemeClusterLiteral Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqlnullable\/expressiblebyextendedgraphemeclusterliteral-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLNullable/init(extendedGraphemeClusterLiteral:)": {
   "abstract" : [

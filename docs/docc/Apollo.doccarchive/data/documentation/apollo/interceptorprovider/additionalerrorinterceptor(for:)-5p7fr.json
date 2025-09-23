@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorProvider",
-        "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorProvider\/additionalErrorInterceptor(for:)-4nida"
+        "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorProvider"
       ]
     ]
   },
@@ -290,81 +289,6 @@
   "title" : "InterceptorProvider",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/interceptorprovider"
-},
-"doc://Apollo/documentation/Apollo/InterceptorProvider/additionalErrorInterceptor(for:)-4nida": {
-  "abstract" : [
-    {
-      "text" : "Provides an additional error interceptor for any additional handling of errors",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "before returning to the UI, such as logging.",
-      "type" : "text"
-    }
-  ],
-  "defaultImplementations" : 1,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "additionalErrorInterceptor"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "genericParameter",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "for"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ") -> (any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo0A16ErrorInterceptorP",
-      "text" : "ApolloErrorInterceptor"
-    },
-    {
-      "kind" : "text",
-      "text" : ")?"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorProvider\/additionalErrorInterceptor(for:)-4nida",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "additionalErrorInterceptor(for:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/interceptorprovider\/additionalerrorinterceptor(for:)-4nida"
 },
 "doc://Apollo/documentation/Apollo/InterceptorProvider/additionalErrorInterceptor(for:)-5p7fr": {
   "abstract" : [

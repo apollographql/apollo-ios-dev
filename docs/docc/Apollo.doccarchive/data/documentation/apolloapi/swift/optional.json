@@ -87,7 +87,8 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableValue",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONEncodable",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OutputTypeConvertible",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSetEntityValue"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSetEntityValue",
+        "doc:\/\/ApolloAPI\/s8CopyableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -104,6 +105,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Optional\/init(jsonValue:)"
       ],
@@ -446,7 +449,7 @@
         "type" : "text"
       },
       {
-        "code" : "JSONEncodable",
+        "code" : "AnyScalarType",
         "type" : "codeVoice"
       },
       {
@@ -771,6 +774,11 @@
   "title" : "init(jsonValue:)",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/swift\/optional\/init(jsonvalue:)"
+},
+"doc://ApolloAPI/s8CopyableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
 }
 }
 }

@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/Error-Implementations"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError"
       ]
     ]
   },
@@ -209,17 +208,6 @@
   "title" : "PaginationError",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/paginationerror"
-},
-"doc://ApolloPagination/documentation/ApolloPagination/PaginationError/Error-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/Error-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Error Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/paginationerror\/error-implementations"
 },
 "doc://ApolloPagination/documentation/ApolloPagination/PaginationError/localizedDescription": {
   "abstract" : [

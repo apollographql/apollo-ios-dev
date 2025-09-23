@@ -106,12 +106,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloInterceptor\/id"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloInterceptor\/interceptAsync(chain:request:response:completion:)"
       ],
@@ -631,6 +635,10 @@
     {
       "code" : "HTTPRequest",
       "type" : "codeVoice"
+    },
+    {
+      "text" : " with optional exponential backoff support",
+      "type" : "text"
     }
   ],
   "fragments" : [

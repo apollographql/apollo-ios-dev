@@ -82,6 +82,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SSLCert\/init(data:)",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SSLCert\/init(key:)"

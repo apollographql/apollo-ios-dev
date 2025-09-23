@@ -18,8 +18,7 @@
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/Error",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/Error\/Equatable-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/Error"
       ]
     ]
   },
@@ -347,17 +346,6 @@
   "title" : "!=(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore\/error\/!=(_:_:)"
-},
-"doc://Apollo/documentation/Apollo/ApolloStore/Error/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/Error\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/apollostore\/error\/equatable-implementations"
 }
 }
 }

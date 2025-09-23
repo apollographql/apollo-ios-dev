@@ -86,12 +86,14 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransport(_:didDisconnectWithError:)-5zb09",
+        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransport(_:didDisconnectWithError:)",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransport(_:didReceivePingData:)",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransport(_:didReceivePongData:)",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransportDidConnect(_:)-3mjf7",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransportDidReconnect(_:)-43yds"
+        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransportDidConnect(_:)",
+        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransportDidReconnect(_:)"
       ],
       "title" : "Instance Methods"
     }
@@ -176,7 +178,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollowebsocket\/websockettransportdelegate"
 },
-"doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransportDelegate/webSocketTransport(_:didDisconnectWithError:)-5zb09": {
+"doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransportDelegate/webSocketTransport(_:didDisconnectWithError:)": {
   "abstract" : [
 
   ],
@@ -225,13 +227,13 @@
       "text" : ")?)"
     }
   ],
-  "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransport(_:didDisconnectWithError:)-5zb09",
+  "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransport(_:didDisconnectWithError:)",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
   "title" : "webSocketTransport(_:didDisconnectWithError:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollowebsocket\/websockettransportdelegate\/websockettransport(_:diddisconnectwitherror:)-5zb09"
+  "url" : "\/documentation\/apollowebsocket\/websockettransportdelegate\/websockettransport(_:diddisconnectwitherror:)"
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransportDelegate/webSocketTransport(_:didReceivePingData:)": {
   "abstract" : [
@@ -343,7 +345,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollowebsocket\/websockettransportdelegate\/websockettransport(_:didreceivepongdata:)"
 },
-"doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransportDelegate/webSocketTransportDidConnect(_:)-3mjf7": {
+"doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransportDelegate/webSocketTransportDidConnect(_:)": {
   "abstract" : [
 
   ],
@@ -375,15 +377,15 @@
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransportDidConnect(_:)-3mjf7",
+  "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransportDidConnect(_:)",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
   "title" : "webSocketTransportDidConnect(_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollowebsocket\/websockettransportdelegate\/websockettransportdidconnect(_:)-3mjf7"
+  "url" : "\/documentation\/apollowebsocket\/websockettransportdelegate\/websockettransportdidconnect(_:)"
 },
-"doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransportDelegate/webSocketTransportDidReconnect(_:)-43yds": {
+"doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransportDelegate/webSocketTransportDidReconnect(_:)": {
   "abstract" : [
 
   ],
@@ -415,13 +417,13 @@
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransportDidReconnect(_:)-43yds",
+  "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransportDidReconnect(_:)",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
   "title" : "webSocketTransportDidReconnect(_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollowebsocket\/websockettransportdelegate\/websockettransportdidreconnect(_:)-43yds"
+  "url" : "\/documentation\/apollowebsocket\/websockettransportdelegate\/websockettransportdidreconnect(_:)"
 }
 }
 }

@@ -33,6 +33,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Extended-Classes",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/FileHandle",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/URLSession"
@@ -40,6 +42,8 @@
       "title" : "Extended Classes"
     },
     {
+      "anchor" : "Extended-Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/URL"
       ],

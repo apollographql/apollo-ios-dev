@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport",
-        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/clientName-689z0"
+        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport"
       ]
     ]
   },
@@ -216,45 +215,6 @@
   "title" : "clientName",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/networktransport\/clientname-3npzv"
-},
-"doc://Apollo/documentation/Apollo/NetworkTransport/clientName-689z0": {
-  "abstract" : [
-    {
-      "text" : "The name of the client to send as a header value.",
-      "type" : "text"
-    }
-  ],
-  "defaultImplementations" : 1,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "clientName"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/clientName-689z0",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "clientName",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/networktransport\/clientname-689z0"
 }
 }
 }
