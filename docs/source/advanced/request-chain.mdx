@@ -239,12 +239,13 @@ If you are using a response format other than JSON or that differs from the Grap
 
 ## Request retries
 
-To retry a request, throw a `RequestChain.Retry` error:
+Any interceptor can trigger a request retry by throwing a `RequestChain.Retry` error. When a `RequestChain` receives a thrown `Retry` error, it will restart from the beginning of the [request chain flow](#request-chain-flow) using the `request` provided by the error. This allows the request to be modified to correct errors that may be causing the failure prior to beginning again.
 
-```swift
-// In any interceptor's .mapErrors() closure
-throw RequestChain<Request>.Retry(request: modifiedRequest)
-```
+### Preventing infinite retry loops
+
+If a retried request continues to fail, an interceptor that throws a `Retry` error may continue to throw `Retry` errors indefinitely, creating an infinite loop. To prevent this use a `MaxRetryInterceptor`. The `DefaultInterceptorProvider` includes a `MaxRetryInterceptor` with a default limit of 3 retries. When creating custom `InterceptorProvider` implementations, it is highly recommended to include a `MaxRetryInterceptor` early in the GraphQL interceptor chain.
+
+If you are not using `MaxRetryInterceptor`, any interceptor that throws `Retry` errors must maintain state to ensure it does not trigger retries infinitely.
 
 ## Error handling
 
@@ -285,74 +286,3 @@ struct ReauthenticationInterceptor: GraphQLInterceptor {
   }
 }
 ```
-
-**Important:** Always use a `MaxRetryInterceptor` to prevent infinite retry loops.
-
-## Network fetching
-
-Network fetching is now managed by an [`ApolloURLSession`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollourlsession), which `URLSession` conforms to by default:
-
-```swift
-let urlSession = URLSession.shared // Conforms to ApolloURLSession
-let networkTransport = RequestChainNetworkTransport(
-  interceptorProvider: customProvider,
-  endpointURL: url,
-  urlSession: urlSession
-)
-```
-
-## Migration from 1.x
-
-### Key changes from 1.x
-
-1. **Discrete interceptor types** replace the single `ApolloInterceptor`
-2. **Bi-directional flow** - requests go down, responses come back up
-3. **Stream-based processing** supports multi-part responses
-4. **Async/await support** throughout the interceptor framework
-5. **No more `NetworkFetchInterceptor`** - networking handled by `ApolloURLSession`
-6. **Error handling via `.mapErrors()`** instead of `ApolloErrorInterceptor`
-
-### Converting 1.x interceptors
-
-**1.x ApolloInterceptor:**
-```swift
-// 1.x approach
-class MyInterceptor: ApolloInterceptor {
-  func interceptAsync<Operation: GraphQLOperation>(
-    chain: RequestChain,
-    request: HTTPRequest<Operation>,
-    response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
-  ) {
-    // Modify request or response
-    chain.proceedAsync(request: request, response: response, interceptor: self, completion: completion)
-  }
-}
-```
-
-**2.0 GraphQLInterceptor:**
-```swift
-// 2.0 approach
-struct MyInterceptor: GraphQLInterceptor {
-  func intercept<Request: GraphQLRequest>(
-    request: Request,
-    next: @escaping NextGraphQLInterceptorFunction<Request>
-  ) -> InterceptorResultStream<Request> {
-
-    // Pre-flight: modify request
-    let modifiedRequest = modifyRequest(request)
-
-    // Post-flight: modify response using stream operations
-    return next(modifiedRequest)
-      .map { result in
-        return modifyResult(result)
-      }
-      .mapErrors { error in
-        // Handle errors
-        throw error
-      }
-  }
-}
-```
-
-For detailed migration guidance, see the [Apollo iOS 2.0 migration guide](./../migrations/2.0).
