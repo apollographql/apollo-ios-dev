@@ -109,7 +109,7 @@ The singular `ApolloInterceptor` that was used to handle any step of the request
   - After network response can inspect the `HTTPURLResponse` (readonly) and mutate the actual raw response `Data` **prior to parsing**
 - `CacheInterceptor`
   - Handles read/write of cache data
-  - Read currently runs before `GraphQLInterceptors` (not sure if that is the desired behavior, we should discuss)
+  - Read currently runs before `GraphQLInterceptors`
   - Write runs after parsing
 - `ResponseParsingInterceptor`
   - Handles the parsing of the response Data into the `GraphQLResponse`
