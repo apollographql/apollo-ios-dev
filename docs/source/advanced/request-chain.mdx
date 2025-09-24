@@ -115,7 +115,7 @@ Each `GraphQLInterceptor` will have it's `intercept(request:next:)` function cal
 **Post-Flight**
 After response data is fetched and parsed, the `ParsedResult` will be emitted by the `InterceptorResultStream` returned by the call to the `next` closure. The `ParsedResult` is passed back up the interceptor chain in reverse order such that the first interceptor called will be the last to receive the response. The response may be inspected or modified by using the mapping functions of `NonCopyableAsyncThrowingStream`. The interceptor must then return the stream to continue through the `RequestChain`.
 
-**Example - Request logging interceptor:**
+#### Example - Request logging interceptor
 ```swift
 struct RequestLoggingInterceptor: GraphQLInterceptor {
   let logger: Logger
@@ -143,7 +143,7 @@ struct RequestLoggingInterceptor: GraphQLInterceptor {
 }
 ```
 
-**Example - Authentication header interceptor:**
+#### Example - Authentication header interceptor
 ```swift
 struct AuthHeaderInterceptor: GraphQLInterceptor {
   let authToken: String
@@ -178,7 +178,7 @@ The response `Data` of the `HTTPResponse/chunks` may be inspected or modified by
 
 [`CacheInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/cacheinterceptor) implementations handle cache read and write operations with custom logic beyond what's available through [type/field policies](./../caching/cache-key-resolution). A `CacheInterceptor` must provide two functions, `readCacheData(from store: request:)` and `writeCacheData(to store: request: response)`.
 
-**Example - Custom cache validation interceptor:**
+#### Example - Custom cache validation interceptor
 ```swift
 struct ValidatingCacheInterceptor: CacheInterceptor {
 
@@ -237,31 +237,6 @@ The default [`JSONResponseParsingInterceptor`](https://www.apollographql.com/doc
 
 If you are using a response format other than JSON or that differs from the GraphQL specification, you may need to provide a custom `ResponseParsingInterceptor`.
 
-## Error handling
-
-
-```swift
-class AuthenticationInterceptor: GraphQLInterceptor {
-  func intercept<Request: GraphQLRequest>(
-    request: Request,
-    next: @escaping NextGraphQLInterceptorFunction<Request>
-  ) -> InterceptorResultStream<Request> {
-
-    // Add authentication headers
-    let authenticatedRequest = addAuthHeaders(to: request)
-
-    return next(authenticatedRequest)
-      .mapErrors { error in
-        if let authError = error as? AuthenticationError {
-          // Handle authentication errors
-          throw RequestChain<Request>.Retry(request: refreshedRequest)
-        }
-        throw error // Re-throw other errors
-      }
-  }
-}
-```
-
 ## Request retries
 
 To retry a request, throw a `RequestChain.Retry` error:
@@ -269,6 +244,46 @@ To retry a request, throw a `RequestChain.Retry` error:
 ```swift
 // In any interceptor's .mapErrors() closure
 throw RequestChain<Request>.Retry(request: modifiedRequest)
+```
+
+## Error handling
+
+Both pre-flight and post-flight errors can be handled using custom `GraphQLInterceptor`s. An interceptor can use the `mapErrors(_:)` function of the `InterceptorResultStream` returned by calling the `next` closure. This will catch any errors thrown in later steps of the `RequestChain`, including:
+
+- Pre-flight errors thrown by `GraphQLInterceptor`s later in the `RequestChain`.
+- Networking errors thrown by the `ApolloURLSession` or `HTTPInterceptor`s in the `RequestChain`.
+- Parsing errors thrown by the `ResponseParsingInterceptor` of the `RequestChain`.
+- Post-flight errors thrown by `GraphQLInterceptor`s later in the request chain.
+
+Your `mapErrors(_:)` closure may rethrow the same error or a different error, which will then be passed up through the rest of the request chain. If possible, you may recover from the error by constructing and returning a `ParsedResult`. Returning `nil` will suppress the error and terminate the `RequestChain`'s stream without emitting a result.
+
+It is not required that every interceptor implement error handling. A `GraphQLInterceptor` that does not call `mapErrors(_:)` will be skipped if an error is emitted.
+
+#### Example - Re-authentication interceptor
+
+In this example, when an `AuthencticationError` is thrown, the interceptor will attempt to refresh the user's auth token and then retry the request.
+
+```swift
+struct ReauthenticationInterceptor: GraphQLInterceptor {
+  let authManager: AuthenticationManager
+
+  func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: @escaping NextGraphQLInterceptorFunction<Request>
+  ) -> InterceptorResultStream<Request> {
+    return await next(request)
+      .mapErrors { error in
+        if let authError = error as? AuthenticationError {
+          // Handle authentication errors by refreshing an auth token and then retrying the request
+          let newAuthToken = try await authManager.refreshUserToken()
+          var refreshedRequest = request
+          refreshedRequest.additionalHeaders["Authorization": "Bearer \(newAuthToken)"]
+          throw RequestChain<Request>.Retry(request: refreshedRequest)
+        }
+        throw error // Re-throw other errors
+      }
+  }
+}
 ```
 
 **Important:** Always use a `MaxRetryInterceptor` to prevent infinite retry loops.
