@@ -1,5 +1,5 @@
 import XCTest
-@testable import Apollo
+@testable @_spi(Execution) import Apollo
 @testable @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 @_spi(Execution) import ApolloInternalTestHelpers
 import Nimble
@@ -1163,5 +1163,68 @@ class SelectionSet_EquatableTests: XCTestCase {
     // then
     expect(selectionSet1).toNot(equal(selectionSet2))
     expect(selectionSet1.hashValue).toNot(equal(selectionSet2.hashValue))
+  }
+
+  // MARK: - Integration Tests
+
+  func test__equatable__givenQueryResponseFetchedFromStore()
+    async throws
+  {
+    // given
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
+      override class var __selections: [Selection] {
+        [
+          .field("hero", Hero.self)
+        ]
+      }
+      var hero: Hero { __data["hero"] }
+
+      class Hero: MockSelectionSet, @unchecked Sendable {
+        override class var __selections: [Selection] {
+          [
+            .field("__typename", String.self),
+            .field("name", String.self),
+            .field("friend", Friend.self),
+          ]
+        }
+        var friend: Friend { __data["friend"] }
+
+        class Friend: MockSelectionSet, @unchecked Sendable {
+          override class var __selections: [Selection] {
+            [
+              .field("__typename", String.self),
+              .field("name", String.self),
+            ]
+          }
+          var name: String { __data["name"] }
+        }
+      }
+    }
+
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    try await store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("hero")],
+      "hero": [
+        "__typename": "Droid",
+        "name": "R2-D2",
+        "friend": CacheReference("1000"),
+      ],
+      "1000": ["__typename": "Human", "name": "Luke Skywalker"],
+    ])
+
+    let expected = try await GivenSelectionSet(data: [
+      "hero": [
+        "__typename": "Droid",
+        "name": "R2-D2",
+        "friend": ["__typename": "Human", "name": "Luke Skywalker"]
+      ]
+    ])
+
+    // when
+    let query = MockQuery<GivenSelectionSet>()
+
+    let response = try await store.load(query)
+
+    expect(response!.data).to(equal(expected))
   }
 }
