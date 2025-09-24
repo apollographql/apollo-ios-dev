@@ -1,0 +1,101 @@
+---
+title: Apollo iOS 2.0 Migration Guide
+---
+
+## Introduction
+
+Apollo iOS 2.0 represents a major evolution of the library, redesigned from the ground up to take full advantage of Swift's modern concurrency model. This release introduces significant breaking changes that require careful migration planning, but provides substantial improvements in type safety, performance, and developer experience.
+
+### What's new in 2.0
+
+Apollo iOS 2.0 brings several foundational changes:
+
+- **Swift Concurrency First**: Complete reimplementation using `async/await` and structured concurrency
+- **Streamlined APIs**: Simplified client APIs with clearer separation of concerns and more precise type safety
+- **Modern Swift Features**: Full adoption of Swift 6 with strict concurrency enabled
+
+### Breaking changes overview
+
+This migration involves significant API changes across several areas:
+
+1. **ApolloClient API**: Complete redesign using `async/await` instead of callback-based APIs
+2. **Cache Policies**: Split into discrete types with specific return signatures
+3. **Request Interceptors**: New framework with separate interceptor types for different request phases
+4. **Sendable Types**: Most types now conform to `Sendable` with associated constraints
+5. **CocoaPods Support Removed**: Swift Package Manager and Xcode projects only
+
+### Limitations
+
+#### No web socket support
+The initial release of 2.0 will not support web sockets. Subscriptions over HTTP are supported by `RequestChainNetworkTransport`.
+
+A new implementation of the `ApolloWebSocket` target will be published in a future version as soon as possible. If your application requires web sockets, you should not upgrade to 2.0 until the new web socket implementation is released.
+
+### Migration strategy
+
+Apollo iOS 2.0 migration follows a two-phase approach designed to minimize disruption while ensuring all functionality is properly updated.
+
+#### Phase 1: Advanced APIs (breaking changes)
+
+Some APIs have fundamentally changed to support the new structured concurrency model and cannot maintain backward compatibility. You must update these implementations before proceeding with the rest of your migration.
+
+These changes include:
+
+- Various changes to request/response models
+- `RequestChain` configuration via custom `Interceptors`
+- Custom `NetworkTransport` implementations
+- Custom `NormalizedCache` implementations
+
+#### Phase 2: Common APIs (deprecated, incremental updates)
+
+Once the advanced API changes have been made, the most commonly used APIs for fetching data via `ApolloClient` have been deprecated instead of removed completely. This allows you to:
+
+- **Compile and run** your application with the deprecated APIs while planning your migration
+- **Update incrementally** - migrate one query, mutation, or subscription at a time
+- **Verify behavior** at each step to ensure correctness before proceeding
+- **Deploy intermediate states** if needed during a gradual rollout
+
+While we recommend that you update these deprecated APIs to the new versions ASAP, you can do so incrementally while still compiling your application and verifying behavior. You should update these APIs as soon as possible to take advantage of the use of `async/await` and increased type safety of the return types for these APIs.
+
+The remainder of this guide provides detailed instructions for migrating each aspect of your Apollo iOS integration.
+
+## `RequestChain` configuration
+
+The `RequestChain` and interceptor framework has been completely reimagined. The new version supports `async/await` and provides the ability to interact with the request at each step within the chain more safely with more explicit APIs.
+
+If you are providing your own custom `InterceptorProvider` with your own interceptors, you will need to modify your code to utilize these new APIs.
+
+The singular `ApolloInterceptor` that was used to handle any step of the request chain has been broken up into discrete interceptor types for different portions of request execution. Additionally, requests are sent down the request chain pre-flight and then back up the chain post-flight, allowing each interceptors to interact with both the request and response in a type-safe way.
+
+#### Interceptors Types
+
+`ApolloInterceptor` has been separated into 4 different interceptor types.
+
+- `GraphQLInterceptor`
+  - Can inspect and mutate the `GraphQLRequest` and `GraphQLResponse`
+- `HTTPInterceptor`
+  - Can inspect and mutate the `URLRequest`
+  - After network response can inspect the `HTTPURLResponse` (readonly) and mutate the actual raw response `Data` **prior to parsing**
+- `CacheInterceptor`
+  - Handles read/write of cache data
+  - Read currently runs before `GraphQLInterceptors` (not sure if that is the desired behavior, we should discuss)
+  - Write runs after parsing
+- `ResponseParsingInterceptor`
+  - Handles the parsing of the response Data into the `GraphQLResponse`
+
+`NetworkFetchInterceptor` is no longer used, as the network fetch is managed by the `ApolloURLSession`. See the section on `ApolloURLSession` for more information.
+
+#### Request Chain Flow
+
+Requests are now processed by the `RequestChain` using the following flow:
+
+- `GraphQLInterceptors` receive and may mutate `Request`
+- Cache read executed via `CacheInterceptor` if necessary (based on cache policy)
+- `GraphQLRequest.toURLRequest()` called to obtain `URLRequest`
+- `HTTPInterceptors` receive and may mutate `URLRequest`
+- `ApolloURLSession` handles networking with `URLRequest`
+- `HTTPInterceptors` receive stream of `HTTPResponse` objects for each chunk & may mutate raw chunk `Data` stream
+- `ResponseParsingInterceptor` receives `HTTPResponse` and parses data chunks into stream of `GraphQLResponse`
+- `GraphQLInterceptors` receive and may mutate `GraphQLResponse` with parsed `GraphQLResult` and (possibly) cache records.
+- Cache write executed via `CacheInterceptor` if necessary (based on cache policy)
+- `GraphQLResponse` emitted out to `NetworkTransport`
