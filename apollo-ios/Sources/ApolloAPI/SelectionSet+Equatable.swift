@@ -1,0 +1,289 @@
+public extension SelectionSet {
+
+  typealias FieldValue = any Hashable
+
+  /// Creates a hash using a narrowly scoped algorithm that only combines fields in the underlying data
+  /// that are relevant to the `SelectionSet`. This ensures that hashes for a fragment do not
+  /// consider fields that are not included in the fragment, even if they are present in the data.
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(self.fieldsForEquality())
+  }
+
+  /// Checks for equality using a narrowly scoped algorithm that only compares fields in the underlying data
+  /// that are relevant to the `SelectionSet`. This ensures that equality checks for a fragment do not
+  /// consider fields that are not included in the fragment, even if they are present in the data.
+  static func ==(lhs: Self, rhs: Self) -> Bool {
+    return Self.equatableCheck(
+      lhs.fieldsForEquality(),
+      rhs.fieldsForEquality()
+    )
+  }
+
+  @inlinable
+  internal static func equatableCheck<T: Hashable>(
+    _ lhs: [T: any Hashable],
+    _ rhs: [T: any Hashable]
+  ) -> Bool {
+    guard lhs.keys == rhs.keys else { return false }
+
+    return lhs.allSatisfy {
+      guard let rhsValue = rhs[$0.key],
+            equatableCheck($0.value, rhsValue) else {
+        return false
+      }
+      return true
+    }
+  }
+
+  @inlinable
+  internal static func equatableCheck<T: Hashable>(
+    _ lhs: T,
+    _ rhs: any Hashable
+  ) -> Bool {
+    lhs == rhs as? T
+  }
+
+  private func fieldsForEquality() -> [String: FieldValue] {
+    var fields: [String: FieldValue] = [:]
+    if let asTypeCase = self as? any InlineFragment {
+      self.addFulfilledSelections(of: type(of: asTypeCase.asRootEntityType), to: &fields)
+
+    } else {
+      self.addFulfilledSelections(of: type(of: self), to: &fields)
+
+    }
+
+    return fields
+  }
+
+  private func addFulfilledSelections(
+    of selectionSetType: any SelectionSet.Type,
+    to fields: inout [String: FieldValue]
+  ) {
+    guard self.__data.fragmentIsFulfilled(selectionSetType) else {
+      return
+    }
+
+    for selection in selectionSetType.__selections {
+      switch selection {
+      case let .field(field):
+        add(field: field, to: &fields)
+
+      case let .inlineFragment(typeCase):
+        self.addFulfilledSelections(of: typeCase, to: &fields)
+
+      case let .conditional(_, selections):
+        self.addConditionalSelections(selections, to: &fields)
+
+      case let .fragment(fragmentType):
+        self.addFulfilledSelections(of: fragmentType, to: &fields)
+
+      case let .deferred(_, fragmentType, _):
+        self.addFulfilledSelections(of: fragmentType, to: &fields)
+      }
+    }
+  }
+
+  private func add(
+    field: Selection.Field,
+    to fields: inout [String: FieldValue]
+  ) {
+    guard let fieldData = self.__data._data[field.responseKey] else {
+      return
+    }
+    addData(for: field.type)
+
+    /// This function is responsible for recovering the type data we lose by using `AnyHashable` in `DataDict`.
+    /// The type data is needed for equality and dealing with the nuance of `Optional` types wrapped by `AnyHashable`.
+    func addData(for type: Selection.Field.OutputType, inList: Bool = false) {
+      switch type {
+      case let .scalar(scalarType):
+        switch scalarType {
+        case is String.Type:
+          if field.type.isNullable {
+            if inList {
+              fields[field.responseKey] = fieldData as? [String?]
+            } else {
+              fields[field.responseKey] = fieldData as? String?
+            }
+          } else {
+            if inList {
+              fields[field.responseKey] = fieldData as? [String]
+            } else {
+              fields[field.responseKey] = fieldData as? String
+            }
+          }
+
+        case is Int.Type:
+          if field.type.isNullable {
+            if inList {
+              fields[field.responseKey] = fieldData as? [Int?]
+            } else {
+              fields[field.responseKey] = fieldData as? Int?
+            }
+          } else {
+            if inList {
+              fields[field.responseKey] = fieldData as? [Int]
+            } else {
+              fields[field.responseKey] = fieldData as? Int
+            }
+          }
+
+        case is Bool.Type:
+          if field.type.isNullable {
+            if inList {
+              fields[field.responseKey] = fieldData as? [Bool?]
+            } else {
+              fields[field.responseKey] = fieldData as? Bool?
+            }
+          } else {
+            if inList {
+              fields[field.responseKey] = fieldData as? [Bool]
+            } else {
+              fields[field.responseKey] = fieldData as? Bool
+            }
+          }
+
+        case is Float.Type:
+          if field.type.isNullable {
+            if inList {
+              fields[field.responseKey] = fieldData as? [Float?]
+            } else {
+              fields[field.responseKey] = fieldData as? Float?
+            }
+          } else {
+            if inList {
+              fields[field.responseKey] = fieldData as? [Float]
+            } else {
+              fields[field.responseKey] = fieldData as? Float
+            }
+          }
+
+        case is Double.Type:
+          if field.type.isNullable {
+            if inList {
+              fields[field.responseKey] = fieldData as? [Double?]
+            } else {
+              fields[field.responseKey] = fieldData as? Double?
+            }
+          } else {
+            if inList {
+              fields[field.responseKey] = fieldData as? [Double]
+            } else {
+              fields[field.responseKey] = fieldData as? Double
+            }
+          }
+
+        default: fields[field.responseKey] = fieldData
+        }
+
+      case .customScalar:
+        fields[field.responseKey] = fieldData
+
+      case let .nonNull(innerType):
+        addData(for: innerType, inList: inList)
+
+      case let .list(innerType):
+        addData(for: innerType, inList: true)
+
+      case let .object(selectionSetType):
+        switch inList {
+        case false:
+          guard let objectData = fieldData as? DataDict else {
+            preconditionFailure("Expected object data for object field: \(field)")
+          }
+          fields[field.responseKey] = selectionSetType.init(_dataDict: objectData)
+
+        case true:
+          guard let listData = fieldData as? [FieldValue] else {
+            preconditionFailure("Expected list data for field: \(field)")
+          }
+
+          fields[field.responseKey] = convertElements(of: listData, to: selectionSetType) as FieldValue
+        }
+      }
+    }
+  }
+
+  private func convertElements(
+    of list: [FieldValue],
+    to selectionSetType: any RootSelectionSet.Type
+  ) -> [FieldValue] {
+    if let dataDictList = list as? [DataDict] {
+      return dataDictList.map { selectionSetType.init(_dataDict: $0) }
+    }
+
+    if let nestedList = list as? [[FieldValue]] {
+      return nestedList.map { self.convertElements(of: $0, to: selectionSetType) as FieldValue }
+    }
+
+    preconditionFailure("Expected list data to contain objects.")
+  }
+
+  private func addConditionalSelections(
+    _ selections: [Selection],
+    to fields: inout [String: FieldValue]
+  ) {
+    for selection in selections {
+      switch selection {
+      case let .inlineFragment(typeCase):
+        self.addFulfilledSelections(of: typeCase, to: &fields)
+
+      case let .fragment(fragment):
+        self.addFulfilledSelections(of: fragment, to: &fields)
+
+      case let .deferred(_, fragment, _):
+        self.addFulfilledSelections(of: fragment, to: &fields)
+
+      case let .conditional(_, selections):
+        addConditionalSelections(selections, to: &fields)
+
+      case .field:
+        assertionFailure("Conditional selections should not directly include fields. They should use an InlineFragment instead.")
+      }
+    }
+  }
+
+}
+
+extension Hasher {
+
+  @inlinable
+  public mutating func combine(_ optionalJSONValue: (any Hashable)?) {
+    if let value = optionalJSONValue {
+      self.combine(1 as UInt8)
+      self.combine(value)
+    } else {
+      // This mimics the implementation of combining a nil optional from the Swift language core
+      // Source reference at:
+      // https://github.com/swiftlang/swift/blob/main/stdlib/public/core/Optional.swift#L590
+      self.combine(0 as UInt8)
+    }
+  }
+
+  @inlinable
+  public mutating func combine<T: Hashable>(
+    _ dictionary: [T: any Hashable]
+  ) {
+    // From Dictionary's Hashable implementation
+    var commutativeHash = 0
+    for (key, value) in dictionary {
+      var elementHasher = self
+      elementHasher.combine(key)
+      elementHasher.combine(AnyHashable(value))
+      commutativeHash ^= elementHasher.finalize()
+    }
+    self.combine(commutativeHash)
+  }
+
+  @inlinable
+  public mutating func combine<T: Hashable>(
+    _ dictionary: [T: any Hashable]?
+  ) {
+    if let value = dictionary {
+      self.combine(value)
+    } else {
+      self.combine(Optional<[T: any Hashable]>.none)
+    }
+  }
+}
