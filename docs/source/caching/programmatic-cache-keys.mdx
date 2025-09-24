@@ -205,4 +205,51 @@ Programmatic cache key resolution has a few notable quirks and limitations you s
 
 2. The `object` passed to this function represents data for an object in a specific operation model, not a type in your schema. This means that [aliased fields](https://spec.graphql.org/draft/#sec-Field-Alias) will be keyed on their alias name, not the name of the field on the schema type.
 
-3. The `object` parameter of this function is an ``ObjectData`` struct that wraps the underlying object data. Because cache key resolution is performed both on raw JSON (from a network response) and `SelectionSet` model data (when writing to the cache directly), the underlying data will have different formats. The ``ObjectData`` wrapper is used to normalize this data to a consistent format in this context.
+3. The `object` parameter of this function is an `ObjectData` struct that wraps the underlying object data. Because cache key resolution is performed both on raw JSON (from a network response) and `SelectionSet` model data (when writing to the cache directly), the underlying data will have different formats. The `ObjectData` wrapper is used to normalize this data to a consistent format in this context.
+
+## Programmatic field policy usage
+
+When fetching a field with an argument, you can use a field policy to configure an expected cache key for the object that is derived from the values of the field's arguments. Field policies can be applied using the [`@fieldPolicy` directive](./cache-key-resolution#the-fieldpolicy-directive) or programmatically.
+
+To add programmatic field policies, extend your existing `SchemaConfiguration` to conform to the `FieldPolicy.Provider` protocol.
+The protocol requires you to implement two functions: one for fields that return a single instance and one for fields that return a list.
+
+```swift
+static func cacheKey(
+  for field: FieldPolicy.Field,
+  inputData: FieldPolicy.InputData,
+  path: ResponsePath
+) -> CacheKeyInfo? {
+  // Assuming we've already checked to know we are operating on a field 'hero(heroInput: HeroInput): Hero'.
+  // Below is how you can work with the 'FieldPolicy.InputData' to access argument values for creating a cache key.
+  guard let heroInput: FieldPolicy.InputData = inputData["heroInput"],
+  let name = heroInput["name"] as? String,
+  let factionID = heroInput["factionID"] as? Int else {
+    return nil
+  }
+
+  return CacheKeyInfo(id: "\(name)+\(factionID)")
+}
+
+static func cacheKeyList(
+  for listField: Field,
+  inputData: InputData,
+  path: ResponsePath
+) -> [CacheKeyInfo]? {
+  // Assuming we've already checked to know we are operating on a field 'heroes(heroInput: HeroInput): [Hero]'.
+  // Below is how you can work with the 'FieldPolicy.InputData' to access argument values for creating a list of cache keys.
+  guard let heroInput: FieldPolicy.InputData = inputData["heroInput"],
+  let names: FieldPolicy.InputListData = heroInput["names"],
+  let factionID = heroInput["factionID"] as? Int else {
+    return nil
+  }
+
+  var keys = [CacheKeyInfo]()
+  for i in 0..<names.count {
+    if let name = names[i] as? String {
+      keys.append(CacheKeyInfo(id: "\(name)+\(factionID)"))
+    }
+  }
+  return keys
+}
+```
