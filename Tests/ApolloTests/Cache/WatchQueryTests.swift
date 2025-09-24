@@ -3,7 +3,7 @@
 import Nimble
 import XCTest
 
-@testable import Apollo
+@testable @_spi(Execution) import Apollo
 
 class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
@@ -65,7 +65,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Initial fetch from server
     let serverRequestExpectation =
-    await server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
+      await server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -77,7 +77,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
       }
 
     let initialWatcherResultExpectation =
-    await resultObserver.expectation(
+      await resultObserver.expectation(
         description: "Watcher received initial result from server"
       ) { result in
         try XCTAssertSuccessResult(result) { graphQLResult in
@@ -98,7 +98,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Refetch from server
     let refetchServerRequestExpectation =
-    await server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
+      await server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -156,7 +156,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Initial fetch from server
     let serverRequestExpectation =
-    await server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
+      await server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -188,7 +188,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Fetch same query from server returning changed data
     let refetchServerRequestExpectation =
-    await server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
+      await server.expect(MockQuery<SimpleMockSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -247,7 +247,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Initial fetch from server
     let serverRequestExpectation =
-    await server.expect(MockQuery<GivenMockSelectionSet>.self) { request in
+      await server.expect(MockQuery<GivenMockSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -279,7 +279,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Fetch same query from server with different argument
     let secondServerRequestExpectation =
-    await server.expect(MockQuery<GivenMockSelectionSet>.self) { request in
+      await server.expect(MockQuery<GivenMockSelectionSet>.self) { request in
         expect(request.operation.__variables?["episode"] as? String).to(equal("JEDI"))
 
         return [
@@ -477,7 +477,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Initial fetch from server
     let serverRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsNameSelectionSet>.self) { request in
+      await server.expect(MockQuery<HeroAndFriendsNameSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -516,7 +516,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Fetch overlapping query from server
     let secondServerRequestExpectation =
-    await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
+      await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -632,7 +632,8 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
     addTeardownBlock { watcher.cancel() }
 
     // Initial fetch from server
-    let serverRequestExpectation = await server.expect(MockQuery<HeroAndFriendsNameSelectionSet>.self) { @Sendable request in
+    let serverRequestExpectation = await server.expect(MockQuery<HeroAndFriendsNameSelectionSet>.self) {
+      @Sendable request in
       [
         "data": [
           "hero": [
@@ -672,7 +673,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Fetch other query with list of updated keys from server
     let secondServerRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsIdsSelectionSet>.self) { @Sendable request in
+      await server.expect(MockQuery<HeroAndFriendsIdsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -793,7 +794,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Initial fetch from server
     let serverRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
+      await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -833,7 +834,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Fetch other query with list of updated keys from server
     let secondServerRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsIDsSelectionSet>.self) { @Sendable request in
+      await server.expect(MockQuery<HeroAndFriendsIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -851,7 +852,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
       }
 
     let refetchServerRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
+      await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -982,7 +983,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Initial fetch from server
     let serverRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
+      await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -1022,7 +1023,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Fetch other query with list of updated keys from server
     let secondServerRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsIDsSelectionSet>.self) { @Sendable request in
+      await server.expect(MockQuery<HeroAndFriendsIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -1122,7 +1123,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Initial fetch from server
     let serverRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsNamesSelectionSet>.self) { request in
+      await server.expect(MockQuery<HeroAndFriendsNamesSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -1429,7 +1430,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Initial fetch from server
     let serverRequestExpectation =
-    await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
+      await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -1462,7 +1463,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
     // Fetch same query concurrently 10 times
     let numberOfFetches = 10
     let secondServerRequestExpectation =
-    await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
+      await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -1544,7 +1545,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Initial fetch from server
     let serverRequestExpectation =
-    await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
+      await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -1577,7 +1578,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
     // Fetch same query concurrently 10 times
     let numberOfFetches = 10
     let secondServerRequestExpectation =
-    await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
+      await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
         [
           "data": [
             "hero": [
@@ -1854,7 +1855,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Initial fetch from server
     let serverRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
+      await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -1907,7 +1908,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Fetch other query from server
     let secondServerRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
+      await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [
@@ -2006,7 +2007,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
     let resultObserver = makeResultObserver(for: watchedQuery)
 
     var watcher: GraphQLQueryWatcher<MockQuery<HeroAndFriendsNameWithIDsSelectionSet>>? =
-    await GraphQLQueryWatcher(
+      await GraphQLQueryWatcher(
         client: client,
         query: watchedQuery,
         resultHandler: resultObserver.handler
@@ -2016,7 +2017,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
 
     // Initial fetch from server
     let serverRequestExpectation =
-    await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
+      await server.expect(MockQuery<HeroAndFriendsNameWithIDsSelectionSet>.self) { @Sendable request in
         [
           "data": [
             "hero": [

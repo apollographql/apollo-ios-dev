@@ -97,9 +97,6 @@ public final class MockNetworkTransport: NetworkTransport {
       return (stream, httpResponse)
     }
 
-    public func invalidateAndCancel() {
-    }
-
   }
 
 }

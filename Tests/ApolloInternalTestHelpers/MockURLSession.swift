@@ -17,8 +17,5 @@ public struct MockURLSession: ApolloURLSession {
   ) async throws -> (any AsyncChunkSequence, URLResponse) {
     try await session.chunks(for: request)
   }
-
-  public func invalidateAndCancel() {	
-    session.invalidateAndCancel()
-  }
+  
 }
