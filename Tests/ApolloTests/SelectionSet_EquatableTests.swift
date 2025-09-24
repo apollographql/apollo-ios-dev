@@ -773,7 +773,6 @@ class SelectionSet_EquatableTests: XCTestCase {
     expect(selectionSet1.hashValue).to(equal(selectionSet2.hashValue))
   }
 
-
   func test__equatable__childObject__differentValues_returns_false() {
     // when
     let selectionSet1 = Hero(_dataDict: DataDict(
@@ -1226,5 +1225,53 @@ class SelectionSet_EquatableTests: XCTestCase {
     let response = try await store.load(query)
 
     expect(response!.data).to(equal(expected))
+  }
+
+  // MARK: - Null/nil tests
+
+  func test__equatable__optionalChildObject__isNullOnBoth_returns_true() {
+    // when
+    let selectionSet1 = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Character",
+        "height": NSNull()
+      ],
+      fulfilledFragments: Hero.__fulfilledFragmentIds
+    ))
+
+    let selectionSet2 = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Character",
+        "height": NSNull()
+      ],
+      fulfilledFragments: Hero.__fulfilledFragmentIds
+    ))
+
+    // then
+    expect(selectionSet1).to(equal(selectionSet2))
+    expect(selectionSet1.hashValue).to(equal(selectionSet2.hashValue))
+  }
+
+  func test__equatable__optionalChildObject__isNullAndNil_returns_true() {
+    // when
+    let selectionSet1 = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Character",
+        "height": NSNull()
+      ],
+      fulfilledFragments: Hero.__fulfilledFragmentIds
+    ))
+
+    let selectionSet2 = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Character",
+        "height": nil
+      ],
+      fulfilledFragments: Hero.__fulfilledFragmentIds
+    ))
+
+    // then
+    expect(selectionSet1).to(equal(selectionSet2))
+    expect(selectionSet1.hashValue).to(equal(selectionSet2.hashValue))
   }
 }
