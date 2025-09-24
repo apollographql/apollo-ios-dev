@@ -46,7 +46,7 @@ public actor GraphQLQueryWatcher<Query: GraphQLQuery>: ApolloStoreSubscriber {
 
   /// Designated initializer
   ///
-  /// The watcher will not begin watching for updates on the query until an initial fetch it triggered and completes.
+  /// The watcher will not begin watching for updates on the query until an initial fetch is triggered and completes.
   /// The initial fetch provides the watcher the data to watch for changes. A fetch must be triggered after the watcher
   /// is initialized using any of the `fetch` methods provided by the ``GraphQLQueryWatcher``. Once the initial result
   /// is returned, the watcher has begun watching for changes.

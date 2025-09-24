@@ -26,7 +26,7 @@ public protocol ApolloStoreSubscriber: AnyObject, Sendable {
 /// unsupported and can result in undefined behavior, data races, and crashes.
 /// The store uses an internal read/write lock to protect against concurrent write access to the ``NormalizedCache``.
 /// This means that the ``NormalizedCache`` implementation does not need to manage thread safety. If a cache is used
-/// with multiple ``ApolloStore`` instances, no guaruntees about thread safety can be made.
+/// with multiple ``ApolloStore`` instances, no guarantees about thread safety can be made.
 public final class ApolloStore: Sendable {
   private let readerWriterLock = AsyncReadWriteLock()
 
@@ -89,7 +89,7 @@ public final class ApolloStore: Sendable {
     return token
   }
 
-  /// Unsubscribes from notifications  for changes to the store's cache data.
+  /// Unsubscribes from notifications for changes to the store's cache data.
   ///
   /// - Parameters:
   ///    - subscriptionToken: An opaque token for the subscriber that was provided via `subscribe(_:)`.

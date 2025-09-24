@@ -9,7 +9,7 @@ import ApolloAPI
 /// # Interacting with Multiple GraphQL Endpoints
 /// An ``ApolloClient`` is connected to a ``NetworkTransport`` and ``ApolloStore`` that it uses to conduct network
 /// operations and read/write cache data. When working with multiple GraphQL endpoints, it is highly reccommended that
-/// you create a seperate ``ApolloClient`` for each endpoint. ``ApolloStore`` and it's underlying ``NormalizedCache``
+/// you create a separate ``ApolloClient`` for each endpoint. ``ApolloStore`` and it's underlying ``NormalizedCache``
 /// only support caching data for a single GraphQL endpoint, otherwise data corruption or other unexpected behaviors
 /// may occur.
 public final class ApolloClient: Sendable {
@@ -112,38 +112,6 @@ public final class ApolloClient: Sendable {
   }
 
   // MARK: - Fetch Query
-
-  // MARK: Fetch Query w/Fetch Behavior
-  
-  /// Fetches a `GraphQLQuery` using a provided ``FetchBehavior``.
-  ///
-  /// This function returns an ``AsyncThrowingStream`` of results to handle operations that return multiple responses.
-  /// An operation may return multiple response if the ``FetchBehavior`` is ``FetchBehavior/CacheAndNetwork`` or
-  /// the query has an incremental response format (such as a query using `@defer`). It is recommended that you use the
-  /// `fetch` functions that take a `cachePolicy` instead. These functions use overloads to return a stream of results
-  /// only for operations that are known to return multiple responses, otherwise they will return a single result
-  /// asynchronously.
-  ///
-  /// - Parameters:
-  ///   - query: The `GraphQLQuery` to fetch.
-  ///   - fetchBehavior: The ``FetchBehavior`` to use for this request.
-  ///   Determines if fetching will include cache/network fetches.
-  ///   - requestConfiguration: A ``RequestConfiguration`` to use for this request. Defaults to `nil`. If `nil` the
-  ///   receiver's ``ApolloClient/defaultRequestConfiguration`` will be used.
-  /// - Returns: An ``AsyncThrowingStream`` of `GraphQLResponse` results for the query.
-  public func fetch<Query: GraphQLQuery>(
-    query: Query,
-    fetchBehavior: FetchBehavior = FetchBehavior.CacheFirst,
-    requestConfiguration: RequestConfiguration? = nil
-  ) throws -> AsyncThrowingStream<GraphQLResponse<Query>, any Swift.Error> {
-    return try doInClientContext {
-      return try self.networkTransport.send(
-        query: query,
-        fetchBehavior: fetchBehavior,
-        requestConfiguration: requestConfiguration ?? self.defaultRequestConfiguration
-      )
-    }
-  }
 
   // MARK: Single Response Format
 
@@ -268,6 +236,40 @@ public final class ApolloClient: Sendable {
       return nil
     } catch ApolloClient.Error.noResults {
       return nil
+    }
+  }
+
+  // MARK: Fetch Query w/Fetch Behavior
+
+  /// Fetches a `GraphQLQuery` using a provided ``FetchBehavior``.
+  ///
+  /// This function always returns an ``AsyncThrowingStream`` of results to handle those operations that return
+  /// multiple responses. An operation may return multiple response if the ``FetchBehavior`` is
+  /// ``FetchBehavior/CacheAndNetwork`` or the query has an incremental response format
+  /// (such as a query using `@defer`).
+  ///
+  /// It is recommended that you use the `fetch` functions that take a `cachePolicy` instead of a `fetchBehavior`. Those
+  /// functions use overloads to return a stream of results only for operations that are known to return multiple
+  /// responses, otherwise they will return a single result asynchronously.
+  ///
+  /// - Parameters:
+  ///   - query: The `GraphQLQuery` to fetch.
+  ///   - fetchBehavior: The ``FetchBehavior`` to use for this request.
+  ///   Determines if fetching will include cache/network fetches.
+  ///   - requestConfiguration: A ``RequestConfiguration`` to use for this request. Defaults to `nil`. If `nil` the
+  ///   receiver's ``ApolloClient/defaultRequestConfiguration`` will be used.
+  /// - Returns: An ``AsyncThrowingStream`` of `GraphQLResponse` results for the query.
+  public func fetch<Query: GraphQLQuery>(
+    query: Query,
+    fetchBehavior: FetchBehavior = FetchBehavior.CacheFirst,
+    requestConfiguration: RequestConfiguration? = nil
+  ) throws -> AsyncThrowingStream<GraphQLResponse<Query>, any Swift.Error> {
+    return try doInClientContext {
+      return try self.networkTransport.send(
+        query: query,
+        fetchBehavior: fetchBehavior,
+        requestConfiguration: requestConfiguration ?? self.defaultRequestConfiguration
+      )
     }
   }
 

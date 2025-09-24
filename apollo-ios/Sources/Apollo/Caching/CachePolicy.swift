@@ -42,7 +42,7 @@ public enum CachePolicy: Sendable, Hashable {
 }
 
 // MARK: - Fetch Behavior Conversion
-extension CachePolicy.Query.SingleResponse {  
+extension CachePolicy.Query.SingleResponse {
   public func toFetchBehavior() -> FetchBehavior {
     switch self {
     case .cacheFirst:

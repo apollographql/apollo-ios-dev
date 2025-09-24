@@ -19,7 +19,7 @@ public struct AsyncHTTPResponseChunkSequence: AsyncChunkSequence {
   /// Designated Initializer
   ///
   /// - Parameter bytes: The response byte stream to be seperated into multi-part chunks. Must be the result of an
-  /// HTTP `URLRequest` to ensure that `bytes.task.response` is a `HTTPURLResponse`.
+  /// HTTP `URLRequest` to ensure that `bytes.task.response` is an `HTTPURLResponse`.
   public init(_ bytes: URLSession.AsyncBytes) {
     self.bytes = bytes
   }
