@@ -67,3 +67,4 @@ This is the apollo-ios-dev repository, a development environment for the Apollo 
 - **CLI Tests**: Command-line interface validation
 
 Use Xcode test plans for organized test execution. All test targets have corresponding schemes that execute one or more test plans.
+- For the migration guide its okay to differentiate between apollo ios 1 and 2.0. In other parts of the documentation, write the docs for the 2.0 version ignoring the 1.0 version
