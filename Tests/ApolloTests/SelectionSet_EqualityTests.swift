@@ -655,4 +655,40 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(initializerHero).notTo(equal(dataDictHero))
   }
 
+  func test__equality__scalar_givenDataDictValueOfDifferentTypeThatCannotCastToFieldType_shouldNotBeEqual() throws {
+    // given
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("fieldValue", String?.self)
+      ]}
+
+      public var fieldValue: String? { __data["fieldValue"] }
+
+      convenience init(
+        fieldValue: String?
+      ) {
+        self.init(_dataDict: DataDict(data: [
+          "__typename": "Hero",
+          "fieldValue": fieldValue
+        ], fulfilledFragments: [ObjectIdentifier(Self.self)]))
+      }
+    }
+
+    // when
+    let initializerHero = Hero(fieldValue: nil) // Muse be `nil` to test `as?` equality type cast behavior
+    let dataDictHero = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Hero",
+        "stringValue": 2 as Int
+      ],
+      fulfilledFragments: [ObjectIdentifier(Hero.self)]
+    ))
+
+    // then
+    expect(initializerHero).notTo(equal(dataDictHero))
+  }
+
 }
