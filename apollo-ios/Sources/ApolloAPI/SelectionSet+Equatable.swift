@@ -88,7 +88,7 @@ public extension SelectionSet {
     field: Selection.Field,
     to fields: inout [String: FieldValue]
   ) {
-    guard let fieldData = self.__data._data[field.responseKey] else {
+    guard let fieldData = self.__data._data[field.responseKey]?.base as? FieldValue else {
       return
     }
     addData(for: field.type)
@@ -97,87 +97,7 @@ public extension SelectionSet {
     /// The type data is needed for equality and dealing with the nuance of `Optional` types wrapped by `AnyHashable`.
     func addData(for type: Selection.Field.OutputType, inList: Bool = false) {
       switch type {
-      case let .scalar(scalarType):
-        switch scalarType {
-        case is String.Type:
-          if field.type.isNullable {
-            if inList {
-              fields[field.responseKey] = fieldData as? [String?]
-            } else {
-              fields[field.responseKey] = fieldData as? String?
-            }
-          } else {
-            if inList {
-              fields[field.responseKey] = fieldData as? [String]
-            } else {
-              fields[field.responseKey] = fieldData as? String
-            }
-          }
-
-        case is Int.Type:
-          if field.type.isNullable {
-            if inList {
-              fields[field.responseKey] = fieldData as? [Int?]
-            } else {
-              fields[field.responseKey] = fieldData as? Int?
-            }
-          } else {
-            if inList {
-              fields[field.responseKey] = fieldData as? [Int]
-            } else {
-              fields[field.responseKey] = fieldData as? Int
-            }
-          }
-
-        case is Bool.Type:
-          if field.type.isNullable {
-            if inList {
-              fields[field.responseKey] = fieldData as? [Bool?]
-            } else {
-              fields[field.responseKey] = fieldData as? Bool?
-            }
-          } else {
-            if inList {
-              fields[field.responseKey] = fieldData as? [Bool]
-            } else {
-              fields[field.responseKey] = fieldData as? Bool
-            }
-          }
-
-        case is Float.Type:
-          if field.type.isNullable {
-            if inList {
-              fields[field.responseKey] = fieldData as? [Float?]
-            } else {
-              fields[field.responseKey] = fieldData as? Float?
-            }
-          } else {
-            if inList {
-              fields[field.responseKey] = fieldData as? [Float]
-            } else {
-              fields[field.responseKey] = fieldData as? Float
-            }
-          }
-
-        case is Double.Type:
-          if field.type.isNullable {
-            if inList {
-              fields[field.responseKey] = fieldData as? [Double?]
-            } else {
-              fields[field.responseKey] = fieldData as? Double?
-            }
-          } else {
-            if inList {
-              fields[field.responseKey] = fieldData as? [Double]
-            } else {
-              fields[field.responseKey] = fieldData as? Double
-            }
-          }
-
-        default: fields[field.responseKey] = fieldData
-        }
-
-      case .customScalar:
+      case .scalar, .customScalar:
         fields[field.responseKey] = fieldData
 
       case let .nonNull(innerType):
