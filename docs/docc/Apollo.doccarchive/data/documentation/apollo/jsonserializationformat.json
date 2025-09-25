@@ -90,6 +90,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Type-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/JSONSerializationFormat\/deserialize(data:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/JSONSerializationFormat\/serialize(value:)-5ftc9",

@@ -18,8 +18,7 @@
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLFile",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLFile\/GraphQLFileError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLFile\/GraphQLFileError\/Error-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLFile\/GraphQLFileError"
       ]
     ]
   },
@@ -247,17 +246,6 @@
   "title" : "GraphQLFile.GraphQLFileError",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlfile\/graphqlfileerror"
-},
-"doc://Apollo/documentation/Apollo/GraphQLFile/GraphQLFileError/Error-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLFile\/GraphQLFileError\/Error-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Error Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlfile\/graphqlfileerror\/error-implementations"
 },
 "doc://Apollo/documentation/Apollo/GraphQLFile/GraphQLFileError/localizedDescription": {
   "abstract" : [

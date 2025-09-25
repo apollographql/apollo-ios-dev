@@ -82,6 +82,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SSLSettings\/cipherSuites",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SSLSettings\/desiredTrustHostname",

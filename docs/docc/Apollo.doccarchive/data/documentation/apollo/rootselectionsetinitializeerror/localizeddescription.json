@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RootSelectionSetInitializeError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RootSelectionSetInitializeError\/Error-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RootSelectionSetInitializeError"
       ]
     ]
   },
@@ -212,17 +211,6 @@
   "title" : "RootSelectionSetInitializeError",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/rootselectionsetinitializeerror"
-},
-"doc://Apollo/documentation/Apollo/RootSelectionSetInitializeError/Error-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RootSelectionSetInitializeError\/Error-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Error Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/rootselectionsetinitializeerror\/error-implementations"
 },
 "doc://Apollo/documentation/Apollo/RootSelectionSetInitializeError/localizedDescription": {
   "abstract" : [

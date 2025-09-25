@@ -1,0 +1,614 @@
+{
+  "abstract" : [
+    {
+      "text" : "A configuration object that defines behavior for retry logic and exponential backoff.",
+      "type" : "text"
+    }
+  ],
+  "hierarchy" : {
+    "paths" : [
+      [
+        "doc:\/\/Apollo\/documentation\/Apollo",
+        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor"
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "s:6Apollo19MaxRetryInterceptorC13ConfigurationV",
+    "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "struct"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "Configuration"
+      }
+    ],
+    "modules" : [
+      {
+        "name" : "Apollo"
+      }
+    ],
+    "navigatorTitle" : [
+      {
+        "kind" : "identifier",
+        "text" : "Configuration"
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Structure",
+    "symbolKind" : "struct",
+    "title" : "MaxRetryInterceptor.Configuration"
+  },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "struct"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "Configuration"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    }
+  ],
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "topicSections" : [
+    {
+      "anchor" : "Initializers",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration\/init(maxRetries:baseDelay:multiplier:maxDelay:enableExponentialBackoff:enableJitter:)"
+      ],
+      "title" : "Initializers"
+    },
+    {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration\/baseDelay",
+        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration\/enableExponentialBackoff",
+        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration\/enableJitter",
+        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration\/maxDelay",
+        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration\/maxRetries",
+        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration\/multiplier"
+      ],
+      "title" : "Instance Properties"
+    }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/maxretryinterceptor\/configuration"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://Apollo/documentation/Apollo": {
+  "abstract" : [
+    {
+      "text" : "A Strongly typed, Swift-first, GraphQL client.",
+      "type" : "text"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "Apollo",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo"
+},
+"doc://Apollo/documentation/Apollo/MaxRetryInterceptor": {
+  "abstract" : [
+    {
+      "text" : "An interceptor to enforce a maximum number of retries of any ",
+      "type" : "text"
+    },
+    {
+      "code" : "HTTPRequest",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " with optional exponential backoff support",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "class"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "MaxRetryInterceptor"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "MaxRetryInterceptor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "MaxRetryInterceptor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/maxretryinterceptor"
+},
+"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/Configuration": {
+  "abstract" : [
+    {
+      "text" : "A configuration object that defines behavior for retry logic and exponential backoff.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Configuration"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Configuration"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "MaxRetryInterceptor.Configuration",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/maxretryinterceptor\/configuration"
+},
+"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/Configuration/baseDelay": {
+  "abstract" : [
+    {
+      "text" : "Initial delay in seconds for exponential backoff. Defaults to ",
+      "type" : "text"
+    },
+    {
+      "code" : "0.3",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "baseDelay"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:@T@NSTimeInterval",
+      "text" : "TimeInterval"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration\/baseDelay",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "baseDelay",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/maxretryinterceptor\/configuration\/basedelay"
+},
+"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/Configuration/enableExponentialBackoff": {
+  "abstract" : [
+    {
+      "text" : "Whether to enable exponential backoff delays between retries. Defaults to ",
+      "type" : "text"
+    },
+    {
+      "code" : "false",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "enableExponentialBackoff"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration\/enableExponentialBackoff",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "enableExponentialBackoff",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/maxretryinterceptor\/configuration\/enableexponentialbackoff"
+},
+"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/Configuration/enableJitter": {
+  "abstract" : [
+    {
+      "text" : "Whether to add jitter to delays to prevent thundering herd problems. Defaults to ",
+      "type" : "text"
+    },
+    {
+      "code" : "true",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "enableJitter"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration\/enableJitter",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "enableJitter",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/maxretryinterceptor\/configuration\/enablejitter"
+},
+"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/Configuration/init(maxRetries:baseDelay:multiplier:maxDelay:enableExponentialBackoff:enableJitter:)": {
+  "abstract" : [
+    {
+      "text" : "Designated initializer",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "maxRetries"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Si",
+      "text" : "Int"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "baseDelay"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:@T@NSTimeInterval",
+      "text" : "TimeInterval"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "multiplier"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sd",
+      "text" : "Double"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "maxDelay"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:@T@NSTimeInterval",
+      "text" : "TimeInterval"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "enableExponentialBackoff"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "enableJitter"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration\/init(maxRetries:baseDelay:multiplier:maxDelay:enableExponentialBackoff:enableJitter:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(maxRetries:baseDelay:multiplier:maxDelay:enableExponentialBackoff:enableJitter:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/maxretryinterceptor\/configuration\/init(maxretries:basedelay:multiplier:maxdelay:enableexponentialbackoff:enablejitter:)"
+},
+"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/Configuration/maxDelay": {
+  "abstract" : [
+    {
+      "text" : "Maximum delay cap in seconds to prevent excessive wait times. Defaults to ",
+      "type" : "text"
+    },
+    {
+      "code" : "20.0",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "maxDelay"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:@T@NSTimeInterval",
+      "text" : "TimeInterval"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration\/maxDelay",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "maxDelay",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/maxretryinterceptor\/configuration\/maxdelay"
+},
+"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/Configuration/maxRetries": {
+  "abstract" : [
+    {
+      "text" : "Maximum number of retries allowed. Defaults to ",
+      "type" : "text"
+    },
+    {
+      "code" : "3",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "maxRetries"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Si",
+      "text" : "Int"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration\/maxRetries",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "maxRetries",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/maxretryinterceptor\/configuration\/maxretries"
+},
+"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/Configuration/multiplier": {
+  "abstract" : [
+    {
+      "text" : "Multiplier for exponential backoff calculation. Defaults to ",
+      "type" : "text"
+    },
+    {
+      "code" : "2.0",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "multiplier"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sd",
+      "text" : "Double"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration\/multiplier",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "multiplier",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/maxretryinterceptor\/configuration\/multiplier"
+}
+}
+}

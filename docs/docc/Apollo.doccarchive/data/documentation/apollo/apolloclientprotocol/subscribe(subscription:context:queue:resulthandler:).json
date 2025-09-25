@@ -333,7 +333,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] A context that is being passed through the request chain. Should default to ",
+                  "text" : "[Optional] A context that is being passed through the request chain. Should default to ",
                   "type" : "text"
                 },
                 {
@@ -349,20 +349,6 @@
             }
           ],
           "name" : "context"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "The HTTP Method to be used.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "fetchHTTPMethod"
         },
         {
           "content" : [

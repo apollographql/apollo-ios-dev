@@ -19,8 +19,7 @@
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/WSError",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/WSError\/ErrorType",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/WSError\/ErrorType\/Equatable-Implementations"
+        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/WSError\/ErrorType"
       ]
     ]
   },
@@ -389,17 +388,6 @@
   "title" : "!=(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollowebsocket\/websocket\/wserror\/errortype\/!=(_:_:)"
-},
-"doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocket/WSError/ErrorType/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/WSError\/ErrorType\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollowebsocket\/websocket\/wserror\/errortype\/equatable-implementations"
 }
 }
 }

@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketError",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketError\/Error-Implementations"
+        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketError"
       ]
     ]
   },
@@ -244,17 +243,6 @@
   "title" : "WebSocketError",
   "type" : "topic",
   "url" : "\/documentation\/apollowebsocket\/websocketerror"
-},
-"doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketError/Error-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketError\/Error-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Error Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollowebsocket\/websocketerror\/error-implementations"
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketError/localizedDescription": {
   "abstract" : [

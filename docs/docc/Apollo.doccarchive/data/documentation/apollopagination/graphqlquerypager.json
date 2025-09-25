@@ -110,6 +110,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/init(client:initialQuery:watcherDispatchQueue:extractInitialPageInfo:extractNextPageInfo:pageResolver:)",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/init(client:watcherDispatchQueue:initialQuery:extractPageInfo:pageResolver:)-1dfxm",
@@ -119,6 +121,8 @@
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/canLoadNext",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/canLoadPrevious",
@@ -128,6 +132,8 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/fetch(callbackQueue:completion:)",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/loadAll(fetchFromInitialPage:callbackQueue:completion:)",
@@ -141,6 +147,8 @@
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Type-Aliases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/Failure",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/Output"
@@ -148,6 +156,7 @@
       "title" : "Type Aliases"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/Publisher-Implementations"

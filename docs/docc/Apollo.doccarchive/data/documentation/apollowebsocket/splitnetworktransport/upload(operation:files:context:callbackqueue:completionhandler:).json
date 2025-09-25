@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SplitNetworkTransport",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SplitNetworkTransport\/UploadingNetworkTransport-Implementations"
+        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SplitNetworkTransport"
       ]
     ]
   },
@@ -512,17 +511,6 @@
   "title" : "SplitNetworkTransport",
   "type" : "topic",
   "url" : "\/documentation\/apollowebsocket\/splitnetworktransport"
-},
-"doc://ApolloWebSocket/documentation/ApolloWebSocket/SplitNetworkTransport/UploadingNetworkTransport-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SplitNetworkTransport\/UploadingNetworkTransport-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "UploadingNetworkTransport Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollowebsocket\/splitnetworktransport\/uploadingnetworktransport-implementations"
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/SplitNetworkTransport/upload(operation:files:context:callbackQueue:completionHandler:)": {
   "abstract" : [

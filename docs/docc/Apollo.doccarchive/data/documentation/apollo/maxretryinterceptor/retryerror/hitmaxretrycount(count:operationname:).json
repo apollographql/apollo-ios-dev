@@ -189,6 +189,10 @@
     {
       "code" : "HTTPRequest",
       "type" : "codeVoice"
+    },
+    {
+      "text" : " with optional exponential backoff support",
+      "type" : "text"
     }
   ],
   "fragments" : [

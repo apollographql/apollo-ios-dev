@@ -33,9 +33,10 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/init(extendedGraphemeClusterLiteral:)"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/init(unicodeScalarLiteral:)"
       ],
       "title" : "Initializers"
     }
@@ -168,7 +169,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selection\/condition"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Selection/Condition/init(extendedGraphemeClusterLiteral:)": {
+"doc://ApolloAPI/documentation/ApolloAPI/Selection/Condition/init(unicodeScalarLiteral:)": {
   "abstract" : [
 
   ],
@@ -195,7 +196,7 @@
         "type" : "text"
       },
       {
-        "code" : "Self.StringLiteralType",
+        "code" : "Self.UnicodeScalarLiteralType",
         "type" : "codeVoice"
       },
       {
@@ -215,7 +216,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "extendedGraphemeClusterLiteral"
+      "text" : "unicodeScalarLiteral"
     },
     {
       "kind" : "text",
@@ -231,20 +232,20 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s26ExpressibleByStringLiteralP0cD4TypeQa",
-      "text" : "StringLiteralType"
+      "preciseIdentifier" : "s:s43ExpressibleByExtendedGraphemeClusterLiteralP0cdeF4TypeQa",
+      "text" : "ExtendedGraphemeClusterLiteralType"
     },
     {
       "kind" : "text",
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/init(extendedGraphemeClusterLiteral:)",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/init(unicodeScalarLiteral:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(extendedGraphemeClusterLiteral:)",
+  "title" : "init(unicodeScalarLiteral:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selection\/condition\/init(extendedgraphemeclusterliteral:)"
+  "url" : "\/documentation\/apolloapi\/selection\/condition\/init(unicodescalarliteral:)"
 }
 }
 }

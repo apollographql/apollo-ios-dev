@@ -98,7 +98,8 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/6Apollo16NetworkTransportP",
-        "doc:\/\/ApolloWebSocket\/6Apollo25UploadingNetworkTransportP"
+        "doc:\/\/ApolloWebSocket\/6Apollo25UploadingNetworkTransportP",
+        "doc:\/\/ApolloWebSocket\/s8CopyableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -115,12 +116,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SplitNetworkTransport\/init(uploadingNetworkTransport:webSocketNetworkTransport:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SplitNetworkTransport\/clientName",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SplitNetworkTransport\/clientVersion"
@@ -128,6 +133,7 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SplitNetworkTransport\/NetworkTransport-Implementations",
@@ -392,6 +398,11 @@
   "title" : "init(uploadingNetworkTransport:webSocketNetworkTransport:)",
   "type" : "topic",
   "url" : "\/documentation\/apollowebsocket\/splitnetworktransport\/init(uploadingnetworktransport:websocketnetworktransport:)"
+},
+"doc://ApolloWebSocket/s8CopyableP": {
+  "identifier" : "doc:\/\/ApolloWebSocket\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
 }
 }
 }

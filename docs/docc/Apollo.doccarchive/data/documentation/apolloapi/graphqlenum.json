@@ -182,6 +182,7 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONEncodable",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OutputTypeConvertible",
         "doc:\/\/ApolloAPI\/s12CaseIterableP",
+        "doc:\/\/ApolloAPI\/s8CopyableP",
         "doc:\/\/ApolloAPI\/SQ",
         "doc:\/\/ApolloAPI\/SH",
         "doc:\/\/ApolloAPI\/SY"
@@ -201,18 +202,21 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Operators",
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/==(_:_:)-n7qo",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/==(_:_:)-88en",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/==(_:_:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/!=(_:_:)-4co00",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/!=(_:_:)-9dudu",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/!=(_:_:)-9dudu",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/!=(_:_:)",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/!=(_:_:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/~=(_:_:)"
       ],
       "title" : "Operators"
     },
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/case(_:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/unknown(_:)"
@@ -220,6 +224,8 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/init(_:)-41gki",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/init(_:)-82xe0",
@@ -228,6 +234,8 @@
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/rawValue-swift.property",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/value"
@@ -235,18 +243,23 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Type-Aliases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/RawValue-swift.typealias"
       ],
       "title" : "Type Aliases"
     },
     {
+      "anchor" : "Type-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/allCases"
       ],
       "title" : "Type Properties"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/Equatable-Implementations",
@@ -718,69 +731,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqlenum"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLEnum/!=(_:_:)-4co00": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "!="
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Self"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Self"
-    },
-    {
-      "kind" : "text",
-      "text" : ") -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sb",
-      "text" : "Bool"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/!=(_:_:)-4co00",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "!=(_:_:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqlenum\/!=(_:_:)-4co00"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLEnum/!=(_:_:)-9dudu": {
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLEnum/!=(_:_:)": {
   "abstract" : [
 
   ],
@@ -876,12 +827,74 @@
       "text" : "Bool"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/!=(_:_:)-9dudu",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/!=(_:_:)",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "!=(_:_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqlenum\/!=(_:_:)-9dudu"
+  "url" : "\/documentation\/apolloapi\/graphqlenum\/!=(_:_:)"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLEnum/!=(_:_:)-4co00": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "!="
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Self"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Self"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/!=(_:_:)-4co00",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "!=(_:_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqlenum\/!=(_:_:)-4co00"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLEnum/==(_:_:)-88en": {
   "abstract" : [
@@ -1995,6 +2008,11 @@
 "doc://ApolloAPI/s12CaseIterableP": {
   "identifier" : "doc:\/\/ApolloAPI\/s12CaseIterableP",
   "title" : "Swift.CaseIterable",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8CopyableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8CopyableP",
+  "title" : "Swift.Copyable",
   "type" : "unresolvable"
 }
 }

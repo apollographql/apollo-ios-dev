@@ -18,8 +18,7 @@
       [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Glob",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Glob\/MatchError",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Glob\/MatchError\/LocalizedError-Implementations"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Glob\/MatchError"
       ]
     ]
   },
@@ -254,17 +253,6 @@
   "title" : "Glob.MatchError",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/glob\/matcherror"
-},
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/Glob/MatchError/LocalizedError-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Glob\/MatchError\/LocalizedError-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "LocalizedError Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/glob\/matcherror\/localizederror-implementations"
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/Glob/MatchError/recoverySuggestion": {
   "abstract" : [

@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/ExpressibleByArrayLiteral-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue"
       ]
     ]
   },
@@ -243,17 +242,6 @@
   "title" : "InputValue",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/inputvalue"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/InputValue/ExpressibleByArrayLiteral-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/ExpressibleByArrayLiteral-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ExpressibleByArrayLiteral Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/inputvalue\/expressiblebyarrayliteral-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/InputValue/init(arrayLiteral:)": {
   "abstract" : [

@@ -400,7 +400,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] An async closure used to compute the operation",
+                  "text" : "[Optional] An async closure used to compute the operation",
                   "type" : "text"
                 },
                 {

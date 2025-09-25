@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError\/Error-Implementations"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError"
       ]
     ]
   },
@@ -241,17 +240,6 @@
   "title" : "SQLiteError",
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/sqliteerror"
-},
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteError/Error-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteError\/Error-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Error Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqliteerror\/error-implementations"
 },
 "doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteError/localizedDescription": {
   "abstract" : [

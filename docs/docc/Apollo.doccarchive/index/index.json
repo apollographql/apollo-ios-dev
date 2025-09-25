@@ -1,4 +1,7 @@
 {
+  "includedArchiveIdentifiers" : [
+    "Apollo"
+  ],
   "interfaceLanguages" : {
     "swift" : [
       {
@@ -149,22 +152,22 @@
                   },
                   {
                     "path" : "\/documentation\/apollo\/apolloclient\/fetch(query:cachepolicy:context:queue:resulthandler:)",
-                    "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> (any Cancellable)",
+                    "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> any Cancellable",
                     "type" : "method"
                   },
                   {
                     "path" : "\/documentation\/apollo\/apolloclient\/fetch(query:cachepolicy:contextidentifier:context:queue:resulthandler:)",
-                    "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> (any Cancellable)",
+                    "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> any Cancellable",
                     "type" : "method"
                   },
                   {
                     "path" : "\/documentation\/apollo\/apolloclient\/perform(mutation:publishresulttostore:context:queue:resulthandler:)",
-                    "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> (any Cancellable)",
+                    "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> any Cancellable",
                     "type" : "method"
                   },
                   {
                     "path" : "\/documentation\/apollo\/apolloclient\/perform(mutation:publishresulttostore:contextidentifier:context:queue:resulthandler:)",
-                    "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, contextIdentifier: UUID?, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> (any Cancellable)",
+                    "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, contextIdentifier: UUID?, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> any Cancellable",
                     "type" : "method"
                   },
                   {
@@ -174,7 +177,7 @@
                   },
                   {
                     "path" : "\/documentation\/apollo\/apolloclient\/upload(operation:files:context:queue:resulthandler:)",
-                    "title" : "func upload<Operation>(operation: Operation, files: [GraphQLFile], context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Operation.Data>?) -> (any Cancellable)",
+                    "title" : "func upload<Operation>(operation: Operation, files: [GraphQLFile], context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Operation.Data>?) -> any Cancellable",
                     "type" : "method"
                   },
                   {
@@ -452,7 +455,7 @@
                 "type" : "groupMarker"
               },
               {
-                "path" : "\/documentation\/apollo\/defaultinterceptorprovider\/additionalerrorinterceptor(for:)-5e08v",
+                "path" : "\/documentation\/apollo\/defaultinterceptorprovider\/additionalerrorinterceptor(for:)",
                 "title" : "func additionalErrorInterceptor<Operation>(for: Operation) -> (any ApolloErrorInterceptor)?",
                 "type" : "method"
               },
@@ -1147,8 +1150,67 @@
           {
             "children" : [
               {
+                "title" : "Structures",
+                "type" : "groupMarker"
+              },
+              {
+                "children" : [
+                  {
+                    "title" : "Initializers",
+                    "type" : "groupMarker"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/maxretryinterceptor\/configuration\/init(maxretries:basedelay:multiplier:maxdelay:enableexponentialbackoff:enablejitter:)",
+                    "title" : "init(maxRetries: Int, baseDelay: TimeInterval, multiplier: Double, maxDelay: TimeInterval, enableExponentialBackoff: Bool, enableJitter: Bool)",
+                    "type" : "init"
+                  },
+                  {
+                    "title" : "Instance Properties",
+                    "type" : "groupMarker"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/maxretryinterceptor\/configuration\/basedelay",
+                    "title" : "let baseDelay: TimeInterval",
+                    "type" : "property"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/maxretryinterceptor\/configuration\/enableexponentialbackoff",
+                    "title" : "let enableExponentialBackoff: Bool",
+                    "type" : "property"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/maxretryinterceptor\/configuration\/enablejitter",
+                    "title" : "let enableJitter: Bool",
+                    "type" : "property"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/maxretryinterceptor\/configuration\/maxdelay",
+                    "title" : "let maxDelay: TimeInterval",
+                    "type" : "property"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/maxretryinterceptor\/configuration\/maxretries",
+                    "title" : "let maxRetries: Int",
+                    "type" : "property"
+                  },
+                  {
+                    "path" : "\/documentation\/apollo\/maxretryinterceptor\/configuration\/multiplier",
+                    "title" : "let multiplier: Double",
+                    "type" : "property"
+                  }
+                ],
+                "path" : "\/documentation\/apollo\/maxretryinterceptor\/configuration",
+                "title" : "MaxRetryInterceptor.Configuration",
+                "type" : "struct"
+              },
+              {
                 "title" : "Initializers",
                 "type" : "groupMarker"
+              },
+              {
+                "path" : "\/documentation\/apollo\/maxretryinterceptor\/init(configuration:)",
+                "title" : "init(configuration: MaxRetryInterceptor.Configuration)",
+                "type" : "init"
               },
               {
                 "path" : "\/documentation\/apollo\/maxretryinterceptor\/init(maxretriesallowed:)",
@@ -1894,22 +1956,22 @@
               },
               {
                 "path" : "\/documentation\/apollo\/apolloclientprotocol\/fetch(query:cachepolicy:context:queue:resulthandler:)",
-                "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> (any Cancellable)",
+                "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> any Cancellable",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/apolloclientprotocol\/fetch(query:cachepolicy:contextidentifier:context:queue:resulthandler:)",
-                "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> (any Cancellable)",
+                "title" : "func fetch<Query>(query: Query, cachePolicy: CachePolicy, contextIdentifier: UUID?, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Query.Data>?) -> any Cancellable",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/apolloclientprotocol\/perform(mutation:publishresulttostore:context:queue:resulthandler:)",
-                "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> (any Cancellable)",
+                "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> any Cancellable",
                 "type" : "method"
               },
               {
                 "path" : "\/documentation\/apollo\/apolloclientprotocol\/perform(mutation:publishresulttostore:contextidentifier:context:queue:resulthandler:)",
-                "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, contextIdentifier: UUID?, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> (any Cancellable)",
+                "title" : "func perform<Mutation>(mutation: Mutation, publishResultToStore: Bool, contextIdentifier: UUID?, context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Mutation.Data>?) -> any Cancellable",
                 "type" : "method"
               },
               {
@@ -1919,7 +1981,7 @@
               },
               {
                 "path" : "\/documentation\/apollo\/apolloclientprotocol\/upload(operation:files:context:queue:resulthandler:)",
-                "title" : "func upload<Operation>(operation: Operation, files: [GraphQLFile], context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Operation.Data>?) -> (any Cancellable)",
+                "title" : "func upload<Operation>(operation: Operation, files: [GraphQLFile], context: (any RequestContext)?, queue: DispatchQueue, resultHandler: GraphQLResultHandler<Operation.Data>?) -> any Cancellable",
                 "type" : "method"
               },
               {
@@ -2025,7 +2087,7 @@
                     "type" : "groupMarker"
                   }
                 ],
-                "path" : "\/documentation\/apollo\/interceptorprovider\/additionalerrorinterceptor(for:)-4nida",
+                "path" : "\/documentation\/apollo\/interceptorprovider\/additionalerrorinterceptor(for:)",
                 "title" : "func additionalErrorInterceptor<Operation>(for: Operation) -> (any ApolloErrorInterceptor)?",
                 "type" : "method"
               },
@@ -2059,7 +2121,7 @@
                     "type" : "groupMarker"
                   }
                 ],
-                "path" : "\/documentation\/apollo\/networktransport\/clientname-689z0",
+                "path" : "\/documentation\/apollo\/networktransport\/clientname",
                 "title" : "var clientName: String",
                 "type" : "property"
               },
@@ -2077,7 +2139,7 @@
                     "type" : "groupMarker"
                   }
                 ],
-                "path" : "\/documentation\/apollo\/networktransport\/clientversion-9p2ue",
+                "path" : "\/documentation\/apollo\/networktransport\/clientversion",
                 "title" : "var clientVersion: String",
                 "type" : "property"
               },
@@ -2196,7 +2258,7 @@
                     "type" : "groupMarker"
                   }
                 ],
-                "path" : "\/documentation\/apollo\/requestbodycreator\/requestbody(for:sendquerydocument:autopersistquery:)-1ddq1",
+                "path" : "\/documentation\/apollo\/requestbodycreator\/requestbody(for:sendquerydocument:autopersistquery:)",
                 "title" : "func requestBody<Operation>(for: Operation, sendQueryDocument: Bool, autoPersistQuery: Bool) -> JSONEncodableDictionary",
                 "type" : "method"
               }
@@ -3134,6 +3196,11 @@
                 "type" : "property"
               },
               {
+                "path" : "\/documentation\/apollo\/graphqlresult\/dependentkeys",
+                "title" : "let dependentKeys: Set<CacheKey>?",
+                "type" : "property"
+              },
+              {
                 "path" : "\/documentation\/apollo\/graphqlresult\/errors",
                 "title" : "let errors: [GraphQLError]?",
                 "type" : "property"
@@ -3986,145 +4053,6 @@
             "type" : "struct"
           },
           {
-            "children" : [
-              {
-                "title" : "Operators",
-                "type" : "groupMarker"
-              },
-              {
-                "path" : "\/documentation\/apollo\/responsepath\/+(_:_:)-33jrx",
-                "title" : "static func + <T>(ResponsePath, T) -> ResponsePath",
-                "type" : "op"
-              },
-              {
-                "path" : "\/documentation\/apollo\/responsepath\/+(_:_:)-4k3co",
-                "title" : "static func + (ResponsePath, ResponsePath.Key) -> ResponsePath",
-                "type" : "op"
-              },
-              {
-                "path" : "\/documentation\/apollo\/responsepath\/+(_:_:)-4qdcw",
-                "title" : "static func + (ResponsePath, ResponsePath) -> ResponsePath",
-                "type" : "op"
-              },
-              {
-                "title" : "Initializers",
-                "type" : "groupMarker"
-              },
-              {
-                "path" : "\/documentation\/apollo\/responsepath\/init(_:)",
-                "title" : "init(ResponsePath.Key)",
-                "type" : "init"
-              },
-              {
-                "path" : "\/documentation\/apollo\/responsepath\/init(arrayliteral:)",
-                "title" : "init(arrayLiteral: ResponsePath.Key...)",
-                "type" : "init"
-              },
-              {
-                "title" : "Instance Properties",
-                "type" : "groupMarker"
-              },
-              {
-                "path" : "\/documentation\/apollo\/responsepath\/isempty",
-                "title" : "var isEmpty: Bool",
-                "type" : "property"
-              },
-              {
-                "path" : "\/documentation\/apollo\/responsepath\/joined",
-                "title" : "var joined: String",
-                "type" : "property"
-              },
-              {
-                "title" : "Instance Methods",
-                "type" : "groupMarker"
-              },
-              {
-                "path" : "\/documentation\/apollo\/responsepath\/append(_:)",
-                "title" : "func append(ResponsePath.Key)",
-                "type" : "method"
-              },
-              {
-                "path" : "\/documentation\/apollo\/responsepath\/appending(_:)",
-                "title" : "func appending(ResponsePath.Key) -> ResponsePath",
-                "type" : "method"
-              },
-              {
-                "path" : "\/documentation\/apollo\/responsepath\/toarray()",
-                "title" : "func toArray() -> [String]",
-                "type" : "method"
-              },
-              {
-                "title" : "Type Aliases",
-                "type" : "groupMarker"
-              },
-              {
-                "path" : "\/documentation\/apollo\/responsepath\/key",
-                "title" : "ResponsePath.Key",
-                "type" : "typealias"
-              },
-              {
-                "title" : "Default Implementations",
-                "type" : "groupMarker"
-              },
-              {
-                "children" : [
-                  {
-                    "title" : "Instance Properties",
-                    "type" : "groupMarker"
-                  },
-                  {
-                    "path" : "\/documentation\/apollo\/responsepath\/description",
-                    "title" : "var description: String",
-                    "type" : "property"
-                  }
-                ],
-                "path" : "\/documentation\/apollo\/responsepath\/customstringconvertible-implementations",
-                "title" : "CustomStringConvertible Implementations",
-                "type" : "symbol"
-              },
-              {
-                "children" : [
-                  {
-                    "title" : "Operators",
-                    "type" : "groupMarker"
-                  },
-                  {
-                    "path" : "\/documentation\/apollo\/responsepath\/!=(_:_:)",
-                    "title" : "static func != (Self, Self) -> Bool",
-                    "type" : "op"
-                  },
-                  {
-                    "path" : "\/documentation\/apollo\/responsepath\/==(_:_:)",
-                    "title" : "static func == (ResponsePath, ResponsePath) -> Bool",
-                    "type" : "op"
-                  }
-                ],
-                "path" : "\/documentation\/apollo\/responsepath\/equatable-implementations",
-                "title" : "Equatable Implementations",
-                "type" : "symbol"
-              },
-              {
-                "children" : [
-                  {
-                    "title" : "Instance Methods",
-                    "type" : "groupMarker"
-                  },
-                  {
-                    "path" : "\/documentation\/apollo\/responsepath\/hash(into:)",
-                    "title" : "func hash(into: inout Hasher)",
-                    "type" : "method"
-                  }
-                ],
-                "path" : "\/documentation\/apollo\/responsepath\/hashable-implementations",
-                "title" : "Hashable Implementations",
-                "type" : "symbol"
-              }
-            ],
-            "path" : "\/documentation\/apollo\/responsepath",
-            "title" : "ResponsePath",
-            "type" : "struct"
-          },
-          {
             "title" : "Functions",
             "type" : "groupMarker"
           },
@@ -4560,13 +4488,13 @@
       {
         "path" : "\/documentation\/index",
         "title" : "Apollo iOS",
-        "type" : "article"
+        "type" : "module"
       }
     ]
   },
   "schemaVersion" : {
     "major" : 0,
     "minor" : 1,
-    "patch" : 1
+    "patch" : 2
   }
 }

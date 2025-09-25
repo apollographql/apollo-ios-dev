@@ -18,8 +18,7 @@
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor",
-        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError\/LocalizedError-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError"
       ]
     ]
   },
@@ -251,17 +250,6 @@
   "title" : "MultipartResponseParsingInterceptor.ParsingError",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror"
-},
-"doc://Apollo/documentation/Apollo/MultipartResponseParsingInterceptor/ParsingError/LocalizedError-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError\/LocalizedError-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "LocalizedError Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/multipartresponseparsinginterceptor\/parsingerror\/localizederror-implementations"
 },
 "doc://Apollo/documentation/Apollo/MultipartResponseParsingInterceptor/ParsingError/failureReason": {
   "abstract" : [

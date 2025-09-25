@@ -114,6 +114,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationInfo\/canLoadNext",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationInfo\/canLoadPrevious"

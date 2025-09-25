@@ -53,7 +53,12 @@
       }
     ],
     "platforms" : [
-
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "message" : "Query strings are now always in single line format.",
+        "unavailable" : false
+      }
     ],
     "role" : "symbol",
     "roleHeading" : "Case",

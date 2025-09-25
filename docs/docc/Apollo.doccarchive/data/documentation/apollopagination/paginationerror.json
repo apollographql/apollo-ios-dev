@@ -93,6 +93,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/cancellation",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/loadInProgress",
@@ -104,6 +106,7 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationError\/Error-Implementations"

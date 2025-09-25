@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData",
-        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/Equatable-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData"
       ]
     ]
   },
@@ -312,17 +311,6 @@
   "title" : "==(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/multipartformdata\/==(_:_:)"
-},
-"doc://Apollo/documentation/Apollo/MultipartFormData/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/multipartformdata\/equatable-implementations"
 }
 }
 }

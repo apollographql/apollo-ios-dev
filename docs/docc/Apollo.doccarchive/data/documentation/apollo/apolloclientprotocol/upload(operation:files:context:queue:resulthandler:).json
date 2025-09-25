@@ -144,16 +144,12 @@
       },
       {
         "kind" : "text",
-        "text" : ">?) -> (any "
+        "text" : ">?) -> any "
       },
       {
         "kind" : "typeIdentifier",
         "preciseIdentifier" : "s:6Apollo11CancellableP",
         "text" : "Cancellable"
-      },
-      {
-        "kind" : "text",
-        "text" : ")"
       }
     ],
     "modules" : [
@@ -304,7 +300,7 @@
             },
             {
               "kind" : "text",
-              "text" : ">?) -> (any "
+              "text" : ">?) -> any "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Cancellable",
@@ -314,7 +310,7 @@
             },
             {
               "kind" : "text",
-              "text" : ") "
+              "text" : " "
             },
             {
               "kind" : "keyword",
@@ -386,7 +382,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] A context that is being passed through the request chain. Should default to ",
+                  "text" : "[Optional] A context that is being passed through the request chain. Should default to ",
                   "type" : "text"
                 },
                 {
@@ -416,36 +412,6 @@
             }
           ],
           "name" : "queue"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "The completion handler to execute when the request completes or errors. Note that an error will be returned If your ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "networkTransport",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : " does not also conform to ",
-                  "type" : "text"
-                },
-                {
-                  "code" : "UploadingNetworkTransport",
-                  "type" : "codeVoice"
-                },
-                {
-                  "text" : ".",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "completionHandler"
         }
       ]
     },
@@ -679,16 +645,12 @@
     },
     {
       "kind" : "text",
-      "text" : ">?) -> (any "
+      "text" : ">?) -> any "
     },
     {
       "kind" : "typeIdentifier",
       "preciseIdentifier" : "s:6Apollo11CancellableP",
       "text" : "Cancellable"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol\/upload(operation:files:context:queue:resultHandler:)",

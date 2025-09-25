@@ -18,8 +18,7 @@
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient",
-        "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/URLSessionClientError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/URLSessionClientError\/Error-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/URLSessionClientError"
       ]
     ]
   },
@@ -255,17 +254,6 @@
   "title" : "URLSessionClient.URLSessionClientError",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/urlsessionclient\/urlsessionclienterror"
-},
-"doc://Apollo/documentation/Apollo/URLSessionClient/URLSessionClientError/Error-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/URLSessionClientError\/Error-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Error Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/urlsessionclient\/urlsessionclienterror\/error-implementations"
 },
 "doc://Apollo/documentation/Apollo/URLSessionClient/URLSessionClientError/localizedDescription": {
   "abstract" : [

@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLHTTPRequestError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLHTTPRequestError\/Error-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLHTTPRequestError"
       ]
     ]
   },
@@ -215,17 +214,6 @@
   "title" : "GraphQLHTTPRequestError",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlhttprequesterror"
-},
-"doc://Apollo/documentation/Apollo/GraphQLHTTPRequestError/Error-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLHTTPRequestError\/Error-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Error Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlhttprequesterror\/error-implementations"
 },
 "doc://Apollo/documentation/Apollo/GraphQLHTTPRequestError/localizedDescription": {
   "abstract" : [

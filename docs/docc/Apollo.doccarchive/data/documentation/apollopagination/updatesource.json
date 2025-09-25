@@ -93,6 +93,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource\/cache",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource\/server"
@@ -100,6 +102,7 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource\/Equatable-Implementations"

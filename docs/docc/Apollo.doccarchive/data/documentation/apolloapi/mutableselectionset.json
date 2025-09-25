@@ -113,16 +113,20 @@
   ],
   "topicSections" : [
     {
-      "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableSelectionSet\/fragments"
-      ],
-      "title" : "Instance Properties"
-    },
-    {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableSelectionSet\/mutateIfFulfilled(_:_:)"
       ],
       "title" : "Instance Methods"
+    },
+    {
+      "anchor" : "Default-Implementations",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableSelectionSet\/SelectionSet-Implementations"
+      ],
+      "title" : "Default Implementations"
     }
   ],
   "variants" : [
@@ -263,79 +267,16 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/mutableselectionset"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/MutableSelectionSet/fragments": {
+"doc://ApolloAPI/documentation/ApolloAPI/MutableSelectionSet/SelectionSet-Implementations": {
   "abstract" : [
 
   ],
-  "conformance" : {
-    "availabilityPrefix" : [
-      {
-        "text" : "Available when",
-        "type" : "text"
-      }
-    ],
-    "conformancePrefix" : [
-      {
-        "text" : "Conforms when",
-        "type" : "text"
-      }
-    ],
-    "constraints" : [
-      {
-        "code" : "Fragments",
-        "type" : "codeVoice"
-      },
-      {
-        "text" : " conforms to ",
-        "type" : "text"
-      },
-      {
-        "code" : "FragmentContainer",
-        "type" : "codeVoice"
-      },
-      {
-        "text" : ".",
-        "type" : "text"
-      }
-    ]
-  },
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "fragments"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Self"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI12SelectionSetP9FragmentsQa",
-      "text" : "Fragments"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableSelectionSet\/fragments",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "fragments",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableSelectionSet\/SelectionSet-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "SelectionSet Implementations",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/mutableselectionset\/fragments"
+  "url" : "\/documentation\/apolloapi\/mutableselectionset\/selectionset-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/MutableSelectionSet/mutateIfFulfilled(_:_:)": {
   "abstract" : [

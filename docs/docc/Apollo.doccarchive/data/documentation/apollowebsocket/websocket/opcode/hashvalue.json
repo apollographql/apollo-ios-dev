@@ -18,8 +18,7 @@
       [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/OpCode",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/OpCode\/RawRepresentable-Implementations"
+        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/OpCode"
       ]
     ]
   },
@@ -283,17 +282,6 @@
   "title" : "WebSocket.OpCode",
   "type" : "topic",
   "url" : "\/documentation\/apollowebsocket\/websocket\/opcode"
-},
-"doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocket/OpCode/RawRepresentable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/OpCode\/RawRepresentable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "RawRepresentable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollowebsocket\/websocket\/opcode\/rawrepresentable-implementations"
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocket/OpCode/hashValue": {
   "abstract" : [

@@ -33,12 +33,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Extended-Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary"
       ],
       "title" : "Extended Structures"
     },
     {
+      "anchor" : "Extended-Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Optional"
       ],

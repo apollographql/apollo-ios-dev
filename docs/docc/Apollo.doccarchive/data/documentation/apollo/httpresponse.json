@@ -114,6 +114,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/Apollo\/s8CopyableP",
         "doc:\/\/Apollo\/SQ",
         "doc:\/\/Apollo\/SH"
       ],
@@ -132,12 +133,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/init(response:rawData:parsedResponse:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/cacheRecords",
         "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/httpResponse",
@@ -148,6 +153,7 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/Equatable-Implementations",
@@ -617,6 +623,11 @@
   "title" : "rawData",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/httpresponse\/rawdata"
+},
+"doc://Apollo/s8CopyableP": {
+  "identifier" : "doc:\/\/Apollo\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
 }
 }
 }

@@ -252,7 +252,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] The content type of this part. Defaults to nil.",
+                  "text" : "[Optional] The content type of this part. Defaults to nil.",
                   "type" : "text"
                 }
               ],
@@ -266,7 +266,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] The name of the file for this part. Defaults to nil.",
+                  "text" : "[Optional] The name of the file for this part. Defaults to nil.",
                   "type" : "text"
                 }
               ],

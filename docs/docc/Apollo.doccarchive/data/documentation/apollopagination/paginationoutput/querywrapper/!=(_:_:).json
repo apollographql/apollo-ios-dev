@@ -18,8 +18,7 @@
       [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput\/QueryWrapper",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput\/QueryWrapper\/Equatable-Implementations"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput\/QueryWrapper"
       ]
     ]
   },
@@ -384,17 +383,6 @@
   "title" : "!=(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/paginationoutput\/querywrapper\/!=(_:_:)"
-},
-"doc://ApolloPagination/documentation/ApolloPagination/PaginationOutput/QueryWrapper/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PaginationOutput\/QueryWrapper\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/paginationoutput\/querywrapper\/equatable-implementations"
 }
 }
 }

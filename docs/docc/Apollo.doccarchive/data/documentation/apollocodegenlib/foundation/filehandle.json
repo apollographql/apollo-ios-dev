@@ -82,6 +82,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/ApolloCodegenLib\/s8CopyableP",
         "doc:\/\/ApolloCodegenLib\/s16TextOutputStreamP"
       ],
       "kind" : "relationships",
@@ -99,6 +100,7 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/FileHandle\/TextOutputStream-Implementations"
@@ -191,6 +193,11 @@
 "doc://ApolloCodegenLib/s16TextOutputStreamP": {
   "identifier" : "doc:\/\/ApolloCodegenLib\/s16TextOutputStreamP",
   "title" : "Swift.TextOutputStream",
+  "type" : "unresolvable"
+},
+"doc://ApolloCodegenLib/s8CopyableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s8CopyableP",
+  "title" : "Swift.Copyable",
   "type" : "unresolvable"
 }
 }

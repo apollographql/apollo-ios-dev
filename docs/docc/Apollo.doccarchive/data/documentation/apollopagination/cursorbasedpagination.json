@@ -96,6 +96,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Bidirectional",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Forward",

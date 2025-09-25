@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource\/Equatable-Implementations"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource"
       ]
     ]
   },
@@ -301,17 +300,6 @@
   "title" : "!=(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/updatesource\/!=(_:_:)"
-},
-"doc://ApolloPagination/documentation/ApolloPagination/UpdateSource/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/UpdateSource\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/updatesource\/equatable-implementations"
 }
 }
 }

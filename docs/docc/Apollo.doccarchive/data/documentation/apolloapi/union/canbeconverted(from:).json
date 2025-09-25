@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Union",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Union\/ParentType-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Union"
       ]
     ]
   },
@@ -301,17 +300,6 @@
   "title" : "Union",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/union"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/Union/ParentType-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Union\/ParentType-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ParentType Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/union\/parenttype-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Union/canBeConverted(from:)": {
   "abstract" : [

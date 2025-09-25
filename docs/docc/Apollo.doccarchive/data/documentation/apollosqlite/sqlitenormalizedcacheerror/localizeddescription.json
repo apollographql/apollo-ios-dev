@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError\/Error-Implementations"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError"
       ]
     ]
   },
@@ -241,17 +240,6 @@
   "title" : "SQLiteNormalizedCacheError",
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/sqlitenormalizedcacheerror"
-},
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteNormalizedCacheError/Error-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError\/Error-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Error Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitenormalizedcacheerror\/error-implementations"
 },
 "doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteNormalizedCacheError/localizedDescription": {
   "abstract" : [

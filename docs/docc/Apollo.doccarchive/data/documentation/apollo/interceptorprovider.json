@@ -98,8 +98,10 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorProvider\/additionalErrorInterceptor(for:)-4nida",
+        "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorProvider\/additionalErrorInterceptor(for:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorProvider\/interceptors(for:)"
       ],
       "title" : "Instance Methods"
@@ -201,7 +203,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/interceptorprovider"
 },
-"doc://Apollo/documentation/Apollo/InterceptorProvider/additionalErrorInterceptor(for:)-4nida": {
+"doc://Apollo/documentation/Apollo/InterceptorProvider/additionalErrorInterceptor(for:)": {
   "abstract" : [
     {
       "text" : "Provides an additional error interceptor for any additional handling of errors",
@@ -268,13 +270,13 @@
       "text" : ")?"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorProvider\/additionalErrorInterceptor(for:)-4nida",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorProvider\/additionalErrorInterceptor(for:)",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
   "title" : "additionalErrorInterceptor(for:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/interceptorprovider\/additionalerrorinterceptor(for:)-4nida"
+  "url" : "\/documentation\/apollo\/interceptorprovider\/additionalerrorinterceptor(for:)"
 },
 "doc://Apollo/documentation/Apollo/InterceptorProvider/interceptors(for:)": {
   "abstract" : [

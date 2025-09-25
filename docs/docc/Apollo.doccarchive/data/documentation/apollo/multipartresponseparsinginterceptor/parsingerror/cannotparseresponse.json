@@ -46,7 +46,12 @@
       }
     ],
     "platforms" : [
-
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "message" : "Use the more specific `missingMultipartBoundary` and `invalidMultipartProtocol` errors instead.",
+        "unavailable" : false
+      }
     ],
     "role" : "symbol",
     "roleHeading" : "Case",

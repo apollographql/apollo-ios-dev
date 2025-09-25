@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet\/CustomStringConvertible-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet"
       ]
     ]
   },
@@ -182,17 +181,6 @@
   "title" : "RecordSet",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/recordset"
-},
-"doc://Apollo/documentation/Apollo/RecordSet/CustomStringConvertible-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet\/CustomStringConvertible-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "CustomStringConvertible Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/recordset\/customstringconvertible-implementations"
 },
 "doc://Apollo/documentation/Apollo/RecordSet/description": {
   "abstract" : [

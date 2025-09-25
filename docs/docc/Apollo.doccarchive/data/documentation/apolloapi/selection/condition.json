@@ -99,6 +99,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Operators",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/!(_:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/&&(_:_:)-21jgl",
@@ -109,6 +111,8 @@
       "title" : "Operators"
     },
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/value(_:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/variable(name:inverted:)"
@@ -116,6 +120,8 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/init(booleanLiteral:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/init(stringLiteral:)",
@@ -124,12 +130,16 @@
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/evaluate(with:)"
       ],
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Type-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/if(_:)-4vwki",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/if(_:)-tr8e"
@@ -137,11 +147,12 @@
       "title" : "Type Methods"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/Equatable-Implementations",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/ExpressibleByExtendedGraphemeClusterLiteral-Implementations",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/ExpressibleByUnicodeScalarLiteral-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/ExpressibleByStringLiteral-Implementations"
       ],
       "title" : "Default Implementations"
     }
@@ -569,16 +580,16 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selection\/condition\/expressiblebyextendedgraphemeclusterliteral-implementations"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Selection/Condition/ExpressibleByUnicodeScalarLiteral-Implementations": {
+"doc://ApolloAPI/documentation/ApolloAPI/Selection/Condition/ExpressibleByStringLiteral-Implementations": {
   "abstract" : [
 
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/ExpressibleByUnicodeScalarLiteral-Implementations",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Condition\/ExpressibleByStringLiteral-Implementations",
   "kind" : "article",
   "role" : "collectionGroup",
-  "title" : "ExpressibleByUnicodeScalarLiteral Implementations",
+  "title" : "ExpressibleByStringLiteral Implementations",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selection\/condition\/expressiblebyunicodescalarliteral-implementations"
+  "url" : "\/documentation\/apolloapi\/selection\/condition\/expressiblebystringliteral-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Selection/Condition/__(_:_:)-752lr": {
   "abstract" : [

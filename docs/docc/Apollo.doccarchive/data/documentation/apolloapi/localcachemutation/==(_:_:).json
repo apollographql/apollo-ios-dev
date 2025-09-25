@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/LocalCacheMutation",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/LocalCacheMutation\/Equatable-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/LocalCacheMutation"
       ]
     ]
   },
@@ -339,17 +338,6 @@
   "title" : "==(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/localcachemutation\/==(_:_:)"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/LocalCacheMutation/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/LocalCacheMutation\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/localcachemutation\/equatable-implementations"
 }
 }
 }

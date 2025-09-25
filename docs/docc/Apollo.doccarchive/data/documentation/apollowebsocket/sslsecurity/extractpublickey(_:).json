@@ -140,7 +140,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "is the certificate to pull the public key from",
+                  "text" : "Is the certificate to pull the public key from",
                   "type" : "text"
                 }
               ],
@@ -162,7 +162,7 @@
         {
           "inlineContent" : [
             {
-              "text" : "a public key",
+              "text" : "A public key",
               "type" : "text"
             }
           ],

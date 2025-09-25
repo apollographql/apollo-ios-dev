@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/ParentType-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object"
       ]
     ]
   },
@@ -259,17 +258,6 @@
   "title" : "Object",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/object"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/Object/ParentType-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object\/ParentType-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ParentType Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/object\/parenttype-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Object/canBeConverted(from:)": {
   "abstract" : [

@@ -162,6 +162,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PageExtractionData\/initial(_:_:)",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PageExtractionData\/paginated(_:_:)"

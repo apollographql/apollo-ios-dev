@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport",
-        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/clientVersion-9p2ue"
+        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport"
       ]
     ]
   },
@@ -216,45 +215,6 @@
   "title" : "clientVersion",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/networktransport\/clientversion-8yya"
-},
-"doc://Apollo/documentation/Apollo/NetworkTransport/clientVersion-9p2ue": {
-  "abstract" : [
-    {
-      "text" : "The version of the client to send as a header value.",
-      "type" : "text"
-    }
-  ],
-  "defaultImplementations" : 1,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "clientVersion"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport\/clientVersion-9p2ue",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "clientVersion",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/networktransport\/clientversion-9p2ue"
 }
 }
 }

@@ -119,6 +119,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableRootSelectionSet\/mutateIfFulfilled(_:_:)"
       ],

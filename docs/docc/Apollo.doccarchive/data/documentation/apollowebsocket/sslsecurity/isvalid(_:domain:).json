@@ -166,7 +166,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "is the serverTrust to validate",
+                  "text" : "Is the serverTrust to validate",
                   "type" : "text"
                 }
               ],
@@ -180,7 +180,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "is the CN domain to validate",
+                  "text" : "Is the CN domain to validate",
                   "type" : "text"
                 }
               ],
@@ -202,7 +202,7 @@
         {
           "inlineContent" : [
             {
-              "text" : "if the key was successfully validated",
+              "text" : "If the key was successfully validated",
               "type" : "text"
             }
           ],

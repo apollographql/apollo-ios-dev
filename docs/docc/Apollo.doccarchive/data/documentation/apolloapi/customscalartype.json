@@ -241,6 +241,7 @@
   ],
   "seeAlsoSections" : [
     {
+      "anchor" : "Scalar-Types",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/AnyScalarType",

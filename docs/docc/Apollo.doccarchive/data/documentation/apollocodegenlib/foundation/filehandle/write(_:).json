@@ -18,8 +18,7 @@
       [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/FileHandle",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/FileHandle\/TextOutputStream-Implementations"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/FileHandle"
       ]
     ]
   },
@@ -207,17 +206,6 @@
   "title" : "FileHandle",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/foundation\/filehandle"
-},
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/Foundation/FileHandle/TextOutputStream-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/FileHandle\/TextOutputStream-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "TextOutputStream Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/foundation\/filehandle\/textoutputstream-implementations"
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/Foundation/FileHandle/write(_:)": {
   "abstract" : [

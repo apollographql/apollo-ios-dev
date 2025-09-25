@@ -18,8 +18,7 @@
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
         "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor",
-        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/RetryError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/RetryError\/LocalizedError-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/RetryError"
       ]
     ]
   },
@@ -196,6 +195,10 @@
     {
       "code" : "HTTPRequest",
       "type" : "codeVoice"
+    },
+    {
+      "text" : " with optional exponential backoff support",
+      "type" : "text"
     }
   ],
   "fragments" : [
@@ -255,17 +258,6 @@
   "title" : "MaxRetryInterceptor.RetryError",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/maxretryinterceptor\/retryerror"
-},
-"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/RetryError/LocalizedError-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/RetryError\/LocalizedError-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "LocalizedError Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/maxretryinterceptor\/retryerror\/localizederror-implementations"
 },
 "doc://Apollo/documentation/Apollo/MaxRetryInterceptor/RetryError/failureReason": {
   "abstract" : [

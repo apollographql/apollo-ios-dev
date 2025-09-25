@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPRequest",
-        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPRequest\/CustomDebugStringConvertible-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPRequest"
       ]
     ]
   },
@@ -214,17 +213,6 @@
   "title" : "HTTPRequest",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/httprequest"
-},
-"doc://Apollo/documentation/Apollo/HTTPRequest/CustomDebugStringConvertible-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPRequest\/CustomDebugStringConvertible-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "CustomDebugStringConvertible Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/httprequest\/customdebugstringconvertible-implementations"
 },
 "doc://Apollo/documentation/Apollo/HTTPRequest/debugDescription": {
   "abstract" : [

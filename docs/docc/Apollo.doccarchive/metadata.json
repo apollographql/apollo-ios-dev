@@ -1,6 +1,6 @@
 {
   "bundleDisplayName" : "Apollo",
-  "bundleIdentifier" : "Apollo",
+  "bundleID" : "Apollo",
   "schemaVersion" : {
     "major" : 0,
     "minor" : 1,

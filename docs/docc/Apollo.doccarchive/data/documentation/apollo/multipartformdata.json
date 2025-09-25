@@ -89,6 +89,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/Apollo\/s8CopyableP",
         "doc:\/\/Apollo\/SQ",
         "doc:\/\/Apollo\/SH"
       ],
@@ -107,6 +108,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/init()",
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/init(boundary:)"
@@ -114,12 +117,16 @@
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/boundary"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/appendPart(data:name:contentType:filename:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/appendPart(inputStream:contentLength:name:contentType:filename:)",
@@ -129,6 +136,7 @@
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/Equatable-Implementations",
@@ -669,6 +677,11 @@
   "title" : "init(boundary:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/multipartformdata\/init(boundary:)"
+},
+"doc://Apollo/s8CopyableP": {
+  "identifier" : "doc:\/\/Apollo\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
 }
 }
 }

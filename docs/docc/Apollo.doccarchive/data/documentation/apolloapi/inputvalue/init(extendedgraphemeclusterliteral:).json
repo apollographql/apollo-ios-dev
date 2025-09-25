@@ -5,7 +5,7 @@
       "type" : "text"
     },
     {
-      "code" : "ExpressibleByExtendedGraphemeClusterLiteral.init(extendedGraphemeClusterLiteral:)",
+      "code" : "ExpressibleByStringLiteral.init(extendedGraphemeClusterLiteral:)",
       "type" : "codeVoice"
     },
     {
@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/ExpressibleByExtendedGraphemeClusterLiteral-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue"
       ]
     ]
   },
@@ -293,17 +292,6 @@
   "title" : "InputValue",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/inputvalue"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/InputValue/ExpressibleByExtendedGraphemeClusterLiteral-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/ExpressibleByExtendedGraphemeClusterLiteral-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ExpressibleByExtendedGraphemeClusterLiteral Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/inputvalue\/expressiblebyextendedgraphemeclusterliteral-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/InputValue/init(extendedGraphemeClusterLiteral:)": {
   "abstract" : [

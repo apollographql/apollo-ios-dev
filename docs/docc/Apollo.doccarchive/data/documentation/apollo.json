@@ -61,6 +61,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Classes",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
@@ -86,6 +88,8 @@
       "title" : "Classes"
     },
     {
+      "anchor" : "Protocols",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloErrorInterceptor",
@@ -105,6 +109,8 @@
       "title" : "Protocols"
     },
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloRequestBodyCreator",
         "doc:\/\/Apollo\/documentation\/Apollo\/AutomaticPersistedQueryInterceptor",
@@ -120,12 +126,13 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor",
         "doc:\/\/Apollo\/documentation\/Apollo\/Record",
         "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ResponsePath"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseCodeInterceptor"
       ],
       "title" : "Structures"
     },
     {
+      "anchor" : "Functions",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/unzip(_:)-1e6mu",
         "doc:\/\/Apollo\/documentation\/Apollo\/unzip(_:)-33e77"
@@ -133,6 +140,8 @@
       "title" : "Functions"
     },
     {
+      "anchor" : "Type-Aliases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/CacheKey",
         "doc:\/\/Apollo\/documentation\/Apollo\/DidChangeKeysFunc",
@@ -141,6 +150,8 @@
       "title" : "Type Aliases"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
         "doc:\/\/Apollo\/documentation\/Apollo\/Constants",
@@ -152,6 +163,8 @@
       "title" : "Enumerations"
     },
     {
+      "anchor" : "Extended-Modules",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI",
         "doc:\/\/Apollo\/documentation\/Apollo\/Swift"
@@ -1609,6 +1622,10 @@
     {
       "code" : "HTTPRequest",
       "type" : "codeVoice"
+    },
+    {
+      "text" : " with optional exponential backoff support",
+      "type" : "text"
     }
   ],
   "fragments" : [
@@ -2186,40 +2203,6 @@
   "title" : "ResponseCodeInterceptor",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/responsecodeinterceptor"
-},
-"doc://Apollo/documentation/Apollo/ResponsePath": {
-  "abstract" : [
-    {
-      "text" : "Represents a list of string components joined into a path using a reverse linked list.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "struct"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "ResponsePath"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponsePath",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "ResponsePath"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "ResponsePath",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/responsepath"
 },
 "doc://Apollo/documentation/Apollo/RootSelectionSetInitializeError": {
   "abstract" : [

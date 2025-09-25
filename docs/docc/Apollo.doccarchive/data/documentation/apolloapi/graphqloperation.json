@@ -112,37 +112,46 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Associated-Types",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/Data"
       ],
       "title" : "Associated Types"
     },
     {
+      "anchor" : "Type-Aliases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/Variables"
       ],
       "title" : "Type Aliases"
     },
     {
+      "anchor" : "Type-Properties",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredFragments-51xzf",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredFragments",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/definition",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/document",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/hasDeferredFragments",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationDocument",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationIdentifier",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationName",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType-14lsi"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType"
       ],
       "title" : "Type Properties"
     },
     {
+      "anchor" : "Type-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredSelectionSetType(for:withLabel:atFieldPath:)"
       ],
       "title" : "Type Methods"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/Equatable-Implementations",
@@ -377,7 +386,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqloperation\/variables"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/deferredFragments-51xzf": {
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/deferredFragments": {
   "abstract" : [
 
   ],
@@ -426,13 +435,13 @@
       "text" : ".Type]?"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredFragments-51xzf",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredFragments",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
   "title" : "deferredFragments",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqloperation\/deferredfragments-51xzf"
+  "url" : "\/documentation\/apolloapi\/graphqloperation\/deferredfragments"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/deferredSelectionSetType(for:withLabel:atFieldPath:)": {
   "abstract" : [
@@ -801,7 +810,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqloperation\/operationname"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/operationType-14lsi": {
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/operationType": {
   "abstract" : [
 
   ],
@@ -837,13 +846,13 @@
       "text" : "GraphQLOperationType"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType-14lsi",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
   "title" : "operationType",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqloperation\/operationtype-14lsi"
+  "url" : "\/documentation\/apolloapi\/graphqloperation\/operationtype"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLQuery": {
   "abstract" : [

@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/Equatable-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError"
       ]
     ]
   },
@@ -307,17 +306,6 @@
   "title" : "!=(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlerror\/!=(_:_:)"
-},
-"doc://Apollo/documentation/Apollo/GraphQLError/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror\/equatable-implementations"
 }
 }
 }

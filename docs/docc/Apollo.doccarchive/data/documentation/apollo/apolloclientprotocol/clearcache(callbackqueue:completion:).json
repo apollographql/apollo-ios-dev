@@ -233,7 +233,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] A completion closure to execute when clearing has completed. Should default to nil.",
+                  "text" : "[Optional] A completion closure to execute when clearing has completed. Should default to nil.",
                   "type" : "text"
                 }
               ],

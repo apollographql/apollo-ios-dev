@@ -116,6 +116,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/UploadingNetworkTransport\/upload(operation:files:context:callbackQueue:completionHandler:)"
       ],

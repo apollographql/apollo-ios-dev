@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/RawRepresentable-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum"
       ]
     ]
   },
@@ -314,17 +313,6 @@
   "title" : "GraphQLEnum",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqlenum"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLEnum/RawRepresentable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLEnum\/RawRepresentable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "RawRepresentable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqlenum\/rawrepresentable-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLEnum/hashValue": {
   "abstract" : [

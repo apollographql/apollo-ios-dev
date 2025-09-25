@@ -313,6 +313,16 @@
   "sections" : [
 
   ],
+  "topicSections" : [
+    {
+      "anchor" : "Initializers",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/RootSelectionSet\/init(_:)"
+      ],
+      "title" : "Initializers"
+    }
+  ],
   "variants" : [
     {
       "paths" : [
@@ -508,6 +518,43 @@
   "title" : "RootSelectionSet",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/rootselectionset"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/RootSelectionSet/init(_:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/RootSelectionSet\/init(_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/rootselectionset\/init(_:)"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/SelectionSet": {
   "abstract" : [

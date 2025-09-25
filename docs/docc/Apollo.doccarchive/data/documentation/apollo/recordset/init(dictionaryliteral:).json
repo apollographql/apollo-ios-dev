@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet\/ExpressibleByDictionaryLiteral-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet"
       ]
     ]
   },
@@ -324,17 +323,6 @@
   "title" : "RecordSet",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/recordset"
-},
-"doc://Apollo/documentation/Apollo/RecordSet/ExpressibleByDictionaryLiteral-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet\/ExpressibleByDictionaryLiteral-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ExpressibleByDictionaryLiteral Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/recordset\/expressiblebydictionaryliteral-implementations"
 },
 "doc://Apollo/documentation/Apollo/RecordSet/init(dictionaryLiteral:)": {
   "abstract" : [

@@ -93,6 +93,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred\/State-swift.enum\/fulfilled(_:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred\/State-swift.enum\/notExecuted",
@@ -101,6 +103,7 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Deferred\/State-swift.enum\/Equatable-Implementations"

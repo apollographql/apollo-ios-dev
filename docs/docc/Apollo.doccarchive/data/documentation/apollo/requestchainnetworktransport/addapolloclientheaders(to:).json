@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/NetworkTransport-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport"
       ]
     ]
   },
@@ -261,17 +260,6 @@
   "title" : "RequestChainNetworkTransport",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestchainnetworktransport"
-},
-"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/NetworkTransport-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/NetworkTransport-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "NetworkTransport Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/networktransport-implementations"
 },
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/addApolloClientHeaders(to:)": {
   "abstract" : [

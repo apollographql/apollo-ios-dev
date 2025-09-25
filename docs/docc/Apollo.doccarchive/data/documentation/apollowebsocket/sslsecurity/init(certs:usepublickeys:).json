@@ -141,7 +141,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "is the certificates or public keys to use",
+                  "text" : "Is the certificates or public keys to use",
                   "type" : "text"
                 }
               ],
@@ -155,7 +155,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "is to specific if the publicKeys or certificates should be used for SSL pinning validation",
+                  "text" : "Is to specific if the publicKeys or certificates should be used for SSL pinning validation",
                   "type" : "text"
                 }
               ],
@@ -177,7 +177,7 @@
         {
           "inlineContent" : [
             {
-              "text" : "a representation security object to be used with",
+              "text" : "A representation security object to be used with",
               "type" : "text"
             }
           ],

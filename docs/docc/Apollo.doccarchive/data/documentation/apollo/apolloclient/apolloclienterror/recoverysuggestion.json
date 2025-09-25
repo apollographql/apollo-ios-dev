@@ -18,8 +18,7 @@
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientError\/LocalizedError-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientError"
       ]
     ]
   },
@@ -267,17 +266,6 @@
   "title" : "ApolloClient.ApolloClientError",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclient\/apolloclienterror"
-},
-"doc://Apollo/documentation/Apollo/ApolloClient/ApolloClientError/LocalizedError-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientError\/LocalizedError-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "LocalizedError Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/apolloclienterror\/localizederror-implementations"
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/ApolloClientError/recoverySuggestion": {
   "abstract" : [

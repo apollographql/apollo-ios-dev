@@ -89,6 +89,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Operators",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/Swift\/Dictionary\/+=(_:_:)"
       ],

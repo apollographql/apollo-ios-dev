@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestBodyCreator",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestBodyCreator\/requestBody(for:sendQueryDocument:autoPersistQuery:)-1ddq1"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestBodyCreator"
       ]
     ]
   },
@@ -316,111 +315,6 @@
   "title" : "RequestBodyCreator",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestbodycreator"
-},
-"doc://Apollo/documentation/Apollo/RequestBodyCreator/requestBody(for:sendQueryDocument:autoPersistQuery:)-1ddq1": {
-  "abstract" : [
-    {
-      "text" : "Creates a ",
-      "type" : "text"
-    },
-    {
-      "code" : "JSONEncodableDictionary",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " out of the passed-in operation",
-      "type" : "text"
-    }
-  ],
-  "defaultImplementations" : 1,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "requestBody"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "genericParameter",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "for"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "sendQueryDocument"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sb",
-      "text" : "Bool"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "autoPersistQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sb",
-      "text" : "Bool"
-    },
-    {
-      "kind" : "text",
-      "text" : ") -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI23JSONEncodableDictionarya",
-      "text" : "JSONEncodableDictionary"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestBodyCreator\/requestBody(for:sendQueryDocument:autoPersistQuery:)-1ddq1",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "requestBody(for:sendQueryDocument:autoPersistQuery:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestbodycreator\/requestbody(for:sendquerydocument:autopersistquery:)-1ddq1"
 },
 "doc://Apollo/documentation/Apollo/RequestBodyCreator/requestBody(for:sendQueryDocument:autoPersistQuery:)-79e0u": {
   "abstract" : [

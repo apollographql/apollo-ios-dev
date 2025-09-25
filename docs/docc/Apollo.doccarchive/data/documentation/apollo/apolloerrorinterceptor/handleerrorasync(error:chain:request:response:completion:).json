@@ -470,7 +470,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] The response, if one was received",
+                  "text" : "[Optional] The response, if one was received",
                   "type" : "text"
                 }
               ],

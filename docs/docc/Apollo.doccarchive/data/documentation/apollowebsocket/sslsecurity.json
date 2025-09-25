@@ -92,6 +92,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SSLSecurity\/init(certs:usePublicKeys:)",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SSLSecurity\/init(usePublicKeys:)"
@@ -99,6 +101,8 @@
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SSLSecurity\/validateEntireChain",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SSLSecurity\/validatedDN"
@@ -106,6 +110,8 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SSLSecurity\/certificateChain(_:)",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SSLSecurity\/extractPublicKey(_:)",

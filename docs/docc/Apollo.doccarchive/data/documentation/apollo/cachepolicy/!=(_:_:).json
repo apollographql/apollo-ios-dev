@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
-        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/Equatable-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy"
       ]
     ]
   },
@@ -307,17 +306,6 @@
   "title" : "!=(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/cachepolicy\/!=(_:_:)"
-},
-"doc://Apollo/documentation/Apollo/CachePolicy/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/cachepolicy\/equatable-implementations"
 }
 }
 }

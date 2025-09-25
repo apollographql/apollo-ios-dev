@@ -18,8 +18,7 @@
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/Equatable-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions"
       ]
     ]
   },
@@ -385,17 +384,6 @@
   "title" : "!=(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selection\/conditions\/!=(_:_:)"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/Selection/Conditions/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selection\/conditions\/equatable-implementations"
 }
 }
 }

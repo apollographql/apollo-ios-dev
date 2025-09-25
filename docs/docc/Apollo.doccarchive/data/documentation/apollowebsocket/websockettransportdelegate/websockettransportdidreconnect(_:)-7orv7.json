@@ -3,8 +3,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransportDidReconnect(_:)-43yds"
+        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate"
       ]
     ]
   },
@@ -233,46 +232,6 @@
   "title" : "WebSocketTransportDelegate",
   "type" : "topic",
   "url" : "\/documentation\/apollowebsocket\/websockettransportdelegate"
-},
-"doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransportDelegate/webSocketTransportDidReconnect(_:)-43yds": {
-  "abstract" : [
-
-  ],
-  "defaultImplementations" : 1,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "webSocketTransportDidReconnect"
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:15ApolloWebSocket0bC9TransportC",
-      "text" : "WebSocketTransport"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransportDidReconnect(_:)-43yds",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "webSocketTransportDidReconnect(_:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apollowebsocket\/websockettransportdelegate\/websockettransportdidreconnect(_:)-43yds"
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransportDelegate/webSocketTransportDidReconnect(_:)-7orv7": {
   "abstract" : [

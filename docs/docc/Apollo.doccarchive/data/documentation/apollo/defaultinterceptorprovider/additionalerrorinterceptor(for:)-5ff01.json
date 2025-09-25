@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider",
-        "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/InterceptorProvider-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider"
       ]
     ]
   },
@@ -290,17 +289,6 @@
   "title" : "DefaultInterceptorProvider",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/defaultinterceptorprovider"
-},
-"doc://Apollo/documentation/Apollo/DefaultInterceptorProvider/InterceptorProvider-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/DefaultInterceptorProvider\/InterceptorProvider-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "InterceptorProvider Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/defaultinterceptorprovider\/interceptorprovider-implementations"
 },
 "doc://Apollo/documentation/Apollo/DefaultInterceptorProvider/additionalErrorInterceptor(for:)-5ff01": {
   "abstract" : [

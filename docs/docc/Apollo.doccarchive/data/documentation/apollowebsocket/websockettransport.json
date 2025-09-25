@@ -82,6 +82,7 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/6Apollo16NetworkTransportP",
+        "doc:\/\/ApolloWebSocket\/s8CopyableP",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketClientDelegate"
       ],
       "kind" : "relationships",
@@ -99,18 +100,24 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransport\/Configuration"
       ],
       "title" : "Structures"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransport\/init(websocket:store:config:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransport\/clientName",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransport\/clientVersion",
@@ -120,6 +127,8 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransport\/closeConnection()",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransport\/handleConnection()",
@@ -135,6 +144,7 @@
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransport\/NetworkTransport-Implementations",
@@ -1054,6 +1064,11 @@
   "title" : "updateHeaderValues(_:reconnectIfConnected:)",
   "type" : "topic",
   "url" : "\/documentation\/apollowebsocket\/websockettransport\/updateheadervalues(_:reconnectifconnected:)"
+},
+"doc://ApolloWebSocket/s8CopyableP": {
+  "identifier" : "doc:\/\/ApolloWebSocket\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
 }
 }
 }

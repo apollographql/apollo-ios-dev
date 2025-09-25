@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet\/CustomDebugStringConvertible-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet"
       ]
     ]
   },
@@ -182,17 +181,6 @@
   "title" : "RecordSet",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/recordset"
-},
-"doc://Apollo/documentation/Apollo/RecordSet/CustomDebugStringConvertible-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RecordSet\/CustomDebugStringConvertible-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "CustomDebugStringConvertible Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/recordset\/customdebugstringconvertible-implementations"
 },
 "doc://Apollo/documentation/Apollo/RecordSet/debugDescription": {
   "abstract" : [

@@ -18,8 +18,7 @@
       [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/OperationType",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/OperationType\/RawRepresentable-Implementations"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/OperationType"
       ]
     ]
   },
@@ -298,17 +297,6 @@
   "title" : "OperationDescriptor.OperationType",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/operationdescriptor\/operationtype"
-},
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/OperationDescriptor/OperationType/RawRepresentable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/OperationDescriptor\/OperationType\/RawRepresentable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "RawRepresentable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/operationdescriptor\/operationtype\/rawrepresentable-implementations"
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/OperationDescriptor/OperationType/hash(into:)": {
   "abstract" : [

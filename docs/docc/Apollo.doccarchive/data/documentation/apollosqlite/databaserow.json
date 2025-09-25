@@ -82,6 +82,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/DatabaseRow\/init(cacheKey:storedInfo:)"
       ],

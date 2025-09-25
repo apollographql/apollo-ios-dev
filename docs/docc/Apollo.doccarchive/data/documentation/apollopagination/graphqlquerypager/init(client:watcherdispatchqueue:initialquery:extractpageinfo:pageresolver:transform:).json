@@ -646,20 +646,6 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "The query to call for the first page of pagination. May be a separate type of query than the pagination query.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "initialQuery"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
                   "text" : "The queue that the underlying ",
                   "type" : "text"
                 },
@@ -684,6 +670,20 @@
             }
           ],
           "name" : "watcherDispatchQueue"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The query to call for the first page of pagination. May be a separate type of query than the pagination query.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "initialQuery"
         },
         {
           "content" : [

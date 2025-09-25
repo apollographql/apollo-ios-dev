@@ -128,6 +128,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/ApolloAPI\/s8CopyableP",
         "doc:\/\/ApolloAPI\/SQ",
         "doc:\/\/ApolloAPI\/s25ExpressibleByArrayLiteralP",
         "doc:\/\/ApolloAPI\/s27ExpressibleByBooleanLiteralP",
@@ -154,6 +155,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/list(_:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/null",
@@ -164,6 +167,7 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/Equatable-Implementations",
@@ -174,7 +178,6 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/ExpressibleByFloatLiteral-Implementations",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/ExpressibleByIntegerLiteral-Implementations",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/ExpressibleByStringLiteral-Implementations",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/ExpressibleByUnicodeScalarLiteral-Implementations",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/Hashable-Implementations"
       ],
       "title" : "Default Implementations"
@@ -426,17 +429,6 @@
   "title" : "ExpressibleByStringLiteral Implementations",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/inputvalue\/expressiblebystringliteral-implementations"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/InputValue/ExpressibleByUnicodeScalarLiteral-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/ExpressibleByUnicodeScalarLiteral-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ExpressibleByUnicodeScalarLiteral Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/inputvalue\/expressiblebyunicodescalarliteral-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/InputValue/Hashable-Implementations": {
   "abstract" : [
@@ -855,6 +847,11 @@
 "doc://ApolloAPI/s43ExpressibleByExtendedGraphemeClusterLiteralP": {
   "identifier" : "doc:\/\/ApolloAPI\/s43ExpressibleByExtendedGraphemeClusterLiteralP",
   "title" : "Swift.ExpressibleByExtendedGraphemeClusterLiteral",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8CopyableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8CopyableP",
+  "title" : "Swift.Copyable",
   "type" : "unresolvable"
 },
 "http://spec.graphql.org/October2021/#sec-Input-Values": {

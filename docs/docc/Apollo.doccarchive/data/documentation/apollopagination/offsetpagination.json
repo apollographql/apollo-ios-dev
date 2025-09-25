@@ -82,6 +82,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Bidirectional",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Forward",
