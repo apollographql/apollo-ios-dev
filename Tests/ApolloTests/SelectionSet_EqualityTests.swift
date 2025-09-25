@@ -96,7 +96,7 @@ class SelectionSet_EqualityTests: XCTestCase {
       ) {
         self.init(_dataDict: DataDict(data: [
           "__typename": "Hero",
-          "fieldValue": stringValue
+          "stringValue": stringValue
         ], fulfilledFragments: [ObjectIdentifier(Self.self)]))
       }
     }
@@ -204,7 +204,7 @@ class SelectionSet_EqualityTests: XCTestCase {
       ) {
         self.init(_dataDict: DataDict(data: [
           "__typename": "Hero",
-          "fieldValue": stringValue
+          "stringValue": stringValue
         ], fulfilledFragments: [ObjectIdentifier(Self.self)]))
       }
     }
@@ -384,7 +384,7 @@ class SelectionSet_EqualityTests: XCTestCase {
       ) {
         self.init(_dataDict: DataDict(data: [
           "__typename": "Hero",
-          "intValue": boolValue
+          "boolValue": boolValue
         ], fulfilledFragments: [ObjectIdentifier(Self.self)]))
       }
     }
@@ -682,7 +682,7 @@ class SelectionSet_EqualityTests: XCTestCase {
     let dataDictHero = Hero(_dataDict: DataDict(
       data: [
         "__typename": "Hero",
-        "stringValue": 2 as Int
+        "fieldValue": 2 as Int
       ],
       fulfilledFragments: [ObjectIdentifier(Hero.self)]
     ))
