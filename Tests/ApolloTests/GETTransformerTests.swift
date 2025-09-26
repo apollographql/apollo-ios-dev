@@ -4,7 +4,6 @@ import Nimble
 import ApolloAPI
 import ApolloInternalTestHelpers
 
-//
 class GETTransformerTests: XCTestCase {
   private var requestBodyCreator: ApolloRequestBodyCreator!
   private static let url = TestURL.mockPort8080.url
