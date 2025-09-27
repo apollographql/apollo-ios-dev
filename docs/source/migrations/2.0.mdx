@@ -35,7 +35,7 @@ A new implementation of the `ApolloWebSocket` target will be published in a futu
 
 Apollo iOS 2.0 migration follows a two-phase approach designed to minimize disruption while ensuring all functionality is properly updated.
 
-#### Phase 1: Advanced APIs (breaking changes)
+#### Phase 1: Breaking changes
 
 Some APIs have fundamentally changed to support the new structured concurrency model and cannot maintain backward compatibility. You must update these implementations before proceeding with the rest of your migration.
 
@@ -46,7 +46,7 @@ These changes include:
 - Custom `NetworkTransport` implementations
 - Custom `NormalizedCache` implementations
 
-#### Phase 2: Common APIs (deprecated, incremental updates)
+#### Phase 2: Incrementally update `ApolloClient` API usage
 
 Once the advanced API changes have been made, the most commonly used APIs for fetching data via `ApolloClient` have been deprecated instead of removed completely. This allows you to:
 

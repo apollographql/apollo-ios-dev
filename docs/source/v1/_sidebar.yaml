@@ -3,9 +3,9 @@ switcher:
   versions:
     - label: v2
       latest: true
-      href: ./
+      href: ../
     - label: v1
-      href: ./v1
+      href: ../v1
 items:
   - label: Introduction
     href: "."
