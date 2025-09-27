@@ -172,52 +172,22 @@ In 1.x, all custom logic was implemented using the `ApolloInterceptor` protocol.
 
 #### Step 2: Update your InterceptorProvider
 
-1.x InterceptorProvider:
+Once your interceptors are refactored for the new APIs, update your `InterceptorProvider`.
+
+The `InterceptorProvider` methods provide default implementations that use the `DefaultInterceptorProvider` values. This means you only need to override the methods that you would like to provide custom interceptors for.
+
+**It is strongly recommended that you include the default GraphQL and HTTP interceptors provided by `DefaultInterceptorProvider.shared`.**
+
+`DefaultInterceptorProvider` has been changed to a `final` class to support `Sendable`. If you were previously subclassing `DefaultInterceptorProvider` you will need to access it inside of your `InterceptorProvider` instead.
+
 ```swift
-// 1.x approach
-class CustomInterceptorProvider: InterceptorProvider {
-  private let store: ApolloStore
-  private let client: URLSessionClient
-
-  init(store: ApolloStore, client: URLSessionClient) {
-    self.store = store
-    self.client = client
-  }
-
-  func interceptors<Operation: GraphQLOperation>(for operation: Operation) -> [ApolloInterceptor] {
-    return [
-      MaxRetryInterceptor(),
-      CacheReadInterceptor(store: self.store),
-      AuthInterceptor(),
-      CustomHeaderInterceptor(),
-      LoggingInterceptor(),
-      NetworkFetchInterceptor(client: self.client),
-      ResponseCodeInterceptor(),
-      JSONResponseParsingInterceptor(),
-      AutomaticPersistedQueryInterceptor(),
-      CacheWriteInterceptor(store: self.store)
-    ]
-  }
-}
-```
-
-2.0 InterceptorProvider:
-```swift
-// 2.0 approach
 struct CustomInterceptorProvider: InterceptorProvider {
-  private let store: ApolloStore
-
-  init(store: ApolloStore) {
-    self.store = store
-  }
 
   // Provide GraphQL interceptors (pre/post-flight GraphQL processing)
   func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any GraphQLInterceptor] {
-    return [
-      MaxRetryInterceptor(),
+     return DefaultInterceptorProvider.shared.graphQLInterceptors(for: operation) + [
       AuthInterceptor(token: getCurrentToken()),
-      LoggingInterceptor(),
-      AutomaticPersistedQueryInterceptor()
+      LoggingInterceptor()
     ]
   }
 
@@ -228,72 +198,11 @@ struct CustomInterceptorProvider: InterceptorProvider {
 
   // Provide HTTP interceptors (URLRequest/HTTPResponse processing)
   func httpInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any HTTPInterceptor] {
-    return [
-      CustomHeaderInterceptor(),
-      ResponseCodeInterceptor()
+    return DefaultInterceptorProvider.shared.httpInterceptors(for: operation) + [
+      CustomHeaderInterceptor()
     ]
   }
-
-  // Provide response parser (HTTP data → GraphQL response)
-  func responseParser<Operation: GraphQLOperation>(for operation: Operation) -> any ResponseParsingInterceptor {
-    return JSONResponseParsingInterceptor()
-  }
 }
 ```
 
-#### Using your converted InterceptorProvider
-
-Once converted, use your provider with `RequestChainNetworkTransport`:
-
-```swift
-let store = ApolloStore(cache: InMemoryNormalizedCache())
-let customProvider = CustomInterceptorProvider(store: store)
-
-let networkTransport = RequestChainNetworkTransport(
-  interceptorProvider: customProvider,
-  endpointURL: URL(string: "https://api.example.com/graphql")!,
-  urlSession: URLSession.shared
-)
-
-let apolloClient = ApolloClient(networkTransport: networkTransport, store: store)
-```
-
-#### Migration checklist
-
-When converting your interceptor provider:
-
-- [ ] **Categorize each interceptor** by its primary function
-- [ ] **Convert to appropriate type**: GraphQL, HTTP, Cache, or ResponseParsing
-- [ ] **Update async patterns**: Replace callbacks with `async/await` and streams
-- [ ] **Handle errors properly**: Use `.mapErrors()` instead of completion handlers
-- [ ] **Test thoroughly**: Verify that request/response flow works as expected
-- [ ] **Remove `NetworkFetchInterceptor`**: This is now handled by `ApolloURLSession`
-
-For detailed information on implementing custom interceptors, see the [Request Chain Customization documentation](./advanced/request-chain).
-
-**2.0 GraphQLInterceptor:**
-```swift
-// 2.0 approach
-struct MyInterceptor: GraphQLInterceptor {
-  func intercept<Request: GraphQLRequest>(
-    request: Request,
-    next: @escaping NextGraphQLInterceptorFunction<Request>
-  ) -> InterceptorResultStream<Request> {
-
-    // Pre-flight: modify request
-    let modifiedRequest = modifyRequest(request)
-
-    // Post-flight: modify response using stream operations
-    return next(modifiedRequest)
-      .map { result in
-        return modifyResult(result)
-      }
-      .mapErrors { error in
-        // Handle errors
-        throw error
-      }
-  }
-}
-```
-
-For detailed migration guidance, see the [Apollo iOS 2.0 migration guide](./../migrations/2.0).
+In this example, we are not providing an implementation of `responseParser(for operation:)`, so the default `JSONResponseParsingInterceptor` will be used.
