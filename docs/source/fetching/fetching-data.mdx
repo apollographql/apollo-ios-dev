@@ -124,42 +124,38 @@ Because GraphQL supports nullability, you have compile-time type safety. If the 
 
 > For more information on how to fetch type-safe data, learn about [type conditions](./type-conditions#accessing-conditional-response-data).
 
-## Operation result handling
+## Operation fetching
 
-The result of executing an operation is a Swift [`Result`](https://developer.apple.com/documentation/swift/result) whose `.success` case contains a [`GraphQLResult<Data>`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/graphqlresult) where `Data` is the generated root `Data` struct of the operation that was executed.
-
-You can call `try result.get().data` to obtain the `Data` object from the result. If you would like to handle error's or inspect the result's metadata, you can `switch` on the result like this:
+The result of executing an operation is a `GraphQLResponse<Operation>`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/graphqlresponse) the response's `data` property provides the generated root `Data` struct of the `Operation` that was executed.
 
 ```swift
-apollo.fetch(query: HeroNameQuery()) { result in
-  switch result {
-  case .success(let graphQLResult):
-    if let name = graphQLResult.data?.hero?.name {
-      print(name) // Luke Skywalker
-    } else if let errors = graphQLResult.errors {
-      // GraphQL errors
-      print(errors)
-    }
-  case .failure(let error):
-    // Network or response format errors
-    print(error)
-  }
-}
+let response = try await apollo.fetch(query: HeroNameQuery())
+let heroName = response.data?.hero?.name
 ```
-> **Note:** An operation can be successful, but the `GraphQLResult` may still include `GraphQLErrors`. See [Error Handling](./fetching/../error-handling) for more information.
 
-## Handling operation results in the background
+<Note>
 
-By default, Apollo will deliver operation results **on the main thread**, which is probably what you want if you're using them to update the UI.
+An operation can be successful, but the `GraphQLResult` may still include `GraphQLErrors`. See [Error Handling](./fetching/../error-handling) for more information.
 
-If you want your result handler to be called on a background queue, the `fetch(query:)`, `perform(mutation:)` and `subscribe(subscription:)` functions take an optional `queue:` parameter.
+</Note>
+
+### Single vs multi-response fetching
+
+Most GraphQL operations will only return a single response value. However some, like queries using `@defer` and subscription operations will return multiple results. Additionally, when using the `.cacheAndNetwork` cache policy, multiple results will be be returned.
+
+Apollo iOS can determine if an operation will return multiple results at compile-time. For operations that return a single result, `ApolloClient.fetch` will return a single `GraphQLResponse`. For those that return multiple results, it returns an `AsyncThrowingStream` of responses.
 
 ```swift
-apollo.fetch(
-  query: HeroNameQuery(),
-  queue: DispatchQueue.global(qos: .background),
-) { result in
- ...  // Will be called on a background queue
+// Single response
+let response = try await client.fetch(query: query, cachePolicy: .cacheFirst)
+let response = try await client.fetch(query: query, cachePolicy: .networkFirst)
+let response = try await client.fetch(query: query, cachePolicy: .networkOnly)
+
+// Multiple responses
+let responses = try client.fetch(query: query, cachePolicy: .cacheAndNetwork)
+
+for try await response in responses {
+  // Handle response
 }
 ```
 
