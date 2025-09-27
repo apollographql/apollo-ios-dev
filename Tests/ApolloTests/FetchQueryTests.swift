@@ -20,7 +20,7 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
   override func setUp() async throws {
     try await super.setUp()
 
-    store = try await makeTestStore()    
+    store = try await makeTestStore()
 
     server = MockGraphQLServer()
     let networkTransport = MockNetworkTransport(mockServer: server, store: store)
