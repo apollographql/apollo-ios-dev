@@ -48,7 +48,7 @@ These changes include:
 
 #### Phase 2: Incrementally update `ApolloClient` API usage
 
-Once the advanced API changes have been made, the most commonly used APIs for fetching data via `ApolloClient` have been deprecated instead of removed completely. This allows you to:
+The most commonly used APIs for fetching data via `ApolloClient` have been deprecated instead of removed completely. Once the breaking changes have been resolved, this allows you to:
 
 - **Compile and run** your application with the deprecated APIs while planning your migration
 - **Update incrementally** - migrate one query, mutation, or subscription at a time
@@ -59,17 +59,37 @@ While we recommend that you update these deprecated APIs to the new versions ASA
 
 The remainder of this guide provides detailed instructions for migrating each aspect of your Apollo iOS integration.
 
+## `ApolloURLSession`
+
+In Apollo iOS 1.0 a `URLSessionClient` that managed an internal `URLSession` was used to handle network operations. In 2.0, this is replaced by the [`ApolloURLSession`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollourlsession) protocol. `URLSession` conforms to this procotol by default. This allows you to provide your own `URLSession` to the `RequestChainNetworkTransport`. You can configure this `URLSession` as needed and provide your own delegates to it.
+
+```swift
+let urlSession = URLSession.shared // Conforms to ApolloURLSession
+urlSession.delegate = self
+let networkTransport = RequestChainNetworkTransport(
+  interceptorProvider: DefaultInterceptorProvider.shared,
+  endpointURL: url,
+  urlSession: urlSession
+)
+```
+
 ## `RequestChain` configuration
 
 The `RequestChain` and interceptor framework has been completely reimagined. The new version supports `async/await` and provides the ability to interact with the request at each step within the chain more safely with more explicit APIs.
 
 If you are providing your own custom `InterceptorProvider` with your own interceptors, you will need to modify your code to utilize these new APIs.
 
-The singular `ApolloInterceptor` that was used to handle any step of the request chain has been broken up into discrete interceptor types for different portions of request execution. Additionally, requests are sent down the request chain pre-flight and then back up the chain post-flight, allowing each interceptors to interact with both the request and response in a type-safe way.
+This migration guide provides an overview of the changes. For detailed documentation on the new request chain, see the [Request Chain Configuration documentation](./advanced/request-chain).
 
-#### Interceptors Types
+### Key Concepts
 
-`ApolloInterceptor` has been separated into 4 different interceptor types.
+Before migrating your `InterceptorProvider` to 2.0, we recommend you familiarize yourself with these key changes to the Request Chain.
+
+#### 1. Discreet Interceptors Types
+
+The singular `ApolloInterceptor` protocol that was used to handle any step of the request chain has been broken up into discrete interceptor types for different portions of request execution. This provides a cleaner, more type-safe API for interacting with the request and response at different stages of the RequestChain.
+
+The four interceptor types are:
 
 - `GraphQLInterceptor`
   - Can inspect and mutate the `GraphQLRequest` and `GraphQLResponse`
@@ -87,6 +107,8 @@ The singular `ApolloInterceptor` that was used to handle any step of the request
 
 #### Request Chain Flow
 
+In 1.0, interceptors were called once in sequential order. In 2.0, requests are now sent down the request chain pre-flight and then back up the chain post-flight, allowing each interceptor to interact with both the request and response in a type-safe way.
+
 Requests are now processed by the `RequestChain` using the following flow:
 
 - `GraphQLInterceptors` receive and may mutate `Request`
@@ -100,32 +122,9 @@ Requests are now processed by the `RequestChain` using the following flow:
 - Cache write executed via `CacheInterceptor` if necessary (based on cache policy)
 - `GraphQLResponse` emitted out to `NetworkTransport`
 
+### Converting 1.x interceptor providers
 
-## Network fetching
-
-Network fetching is now managed by an [`ApolloURLSession`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollourlsession), which `URLSession` conforms to by default:
-
-```swift
-let urlSession = URLSession.shared // Conforms to ApolloURLSession
-let networkTransport = RequestChainNetworkTransport(
-  interceptorProvider: customProvider,
-  endpointURL: url,
-  urlSession: urlSession
-)
-```
-
-## Migration from 1.x
-
-### Key changes from 1.x
-
-1. **Discrete interceptor types** replace the single `ApolloInterceptor`
-2. **Bi-directional flow** - requests go down, responses come back up
-3. **Stream-based processing** supports multi-part responses
-4. **Async/await support** throughout the interceptor framework
-5. **No more `NetworkFetchInterceptor`** - networking handled by `ApolloURLSession`
-6. **Error handling via `.mapErrors()`** instead of `ApolloErrorInterceptor`
-
-### Converting 1.x interceptors
+To convert your existing custom `InterceptorProvider` to 2.0,
 
 **1.x ApolloInterceptor:**
 ```swift
