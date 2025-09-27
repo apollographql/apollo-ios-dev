@@ -59,7 +59,7 @@ While we recommend that you update these deprecated APIs to the new versions ASA
 
 The remainder of this guide provides detailed instructions for migrating each aspect of your Apollo iOS integration.
 
-## `ApolloURLSession`
+## `URLSessionClient` -> `ApolloURLSession`
 
 In Apollo iOS 1.0 a `URLSessionClient` that managed an internal `URLSession` was used to handle network operations. In 2.0, this is replaced by the [`ApolloURLSession`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollourlsession) protocol. `URLSession` conforms to this procotol by default. This allows you to provide your own `URLSession` to the `RequestChainNetworkTransport`. You can configure this `URLSession` as needed and provide your own delegates to it.
 
@@ -73,6 +73,12 @@ let networkTransport = RequestChainNetworkTransport(
 )
 ```
 
+## `RequestContext` -> Task Local Values
+
+In Apollo iOS 1.x, you could provide an arbitrary `RequestContext` when initiating a GraphQL operation. This could be accessed by custom interceptors or `NetworkTransport` implementations.
+
+2.0 deprecates `RequestContext` in favor of using Swift 6's `@TaskLocal` values. For more information on using `@TaskLocal` values with your network configuration, see our [Request Chain `@TaskLocal` values documentation](./../advanced/request-chain#dependency-injection-via-tasklocal-values).
+
 ## `RequestChain` configuration
 
 The `RequestChain` and interceptor framework has been completely reimagined. The new version supports `async/await` and provides the ability to interact with the request at each step within the chain more safely with more explicit APIs.
@@ -81,11 +87,9 @@ If you are providing your own custom `InterceptorProvider` with your own interce
 
 This migration guide provides an overview of the changes. For detailed documentation on the new request chain, see the [Request Chain Configuration documentation](./advanced/request-chain).
 
-### Key Concepts
-
 Before migrating your `InterceptorProvider` to 2.0, we recommend you familiarize yourself with these key changes to the Request Chain.
 
-#### 1. Discreet Interceptors Types
+### Discreet Interceptors Types
 
 The singular `ApolloInterceptor` protocol that was used to handle any step of the request chain has been broken up into discrete interceptor types for different portions of request execution. This provides a cleaner, more type-safe API for interacting with the request and response at different stages of the RequestChain.
 
@@ -105,7 +109,7 @@ The four interceptor types are:
 
 `NetworkFetchInterceptor` is no longer used, as the network fetch is managed by the `ApolloURLSession`. See the section on `ApolloURLSession` for more information.
 
-#### Request Chain Flow
+### Request Chain Flow
 
 In 1.0, interceptors were called once in sequential order. In 2.0, requests are now sent down the request chain pre-flight and then back up the chain post-flight, allowing each interceptor to interact with both the request and response in a type-safe way.
 
@@ -122,19 +126,17 @@ Requests are now processed by the `RequestChain` using the following flow:
 - Cache write executed via `CacheInterceptor` if necessary (based on cache policy)
 - `GraphQLResponse` emitted out to `NetworkTransport`
 
-#### Error Handling
+### Error Handling
 
 The `ApolloErrorInterceptor` has been removed from 2.0. Instead, any `GraphQLInterceptor` can intercept errors by calling the `mapErrors` function of the `InterceptorResultStream`. Errors can even be intercepted by multiple interceptors that perform different error handling logic.
 
 For more information on error handling see the [Request Chain error handling documentation](./../advanced/request-chain#error-handling).
 
-#### Retrying Requests
+### Retrying Requests
 
 In 1.0, you could retry a `RequestChain`'s request by calling `chain.retry(request:completion)`. In Apollo iOS 2.0, interceptors no longer have access to the `RequestChain` itself. Instead, interceptors can trigger a retry by throwing a `RequestChain.Retry` error.
 
 For more information on retrying see the [Request Chain request retries documentation](./../advanced/request-chain#request-retries).
-
-#### Task Local Values
 
 ### Converting 1.x interceptor providers
 

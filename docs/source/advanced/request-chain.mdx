@@ -308,3 +308,169 @@ struct ReauthenticationInterceptor: GraphQLInterceptor {
 
 ## Dependency injection via `TaskLocal` values
 
+Apollo iOS takes full advantage of Swift 6 structured concurrency, enabling you to use `@TaskLocal` values to pass context and dependencies between interceptors in a request chain. This provides a clean way to share information across the entire request lifecycle without explicitly passing values through each interceptor.
+
+When a `RequestChain` is kicked off, the entire request chain runs within the same task context. Any `@TaskLocal` values set before the request begins are accessible to all interceptors throughout the chain execution. Interceptors can also set `@TaskLocal` values that will be accessible for the remainder of the request chain's execution.
+
+<Note>
+
+`@TaskLocal` values rely on child task inheritance. Interceptors may run call their `next` functions or return from within a child `Task`, but you should avoid using `Task.detached` as this will create a new async context and `@TaskLocal` values will not be passed through the chain.
+
+</Note>
+
+### Example: Request tracing with correlation IDs
+
+Here's how to use `@TaskLocal` for request correlation across interceptors:
+
+**1. Define the TaskLocal value:**
+
+You may define a `@TaskLocal` value anywhere you would like. In this example, we define a `@TaskLocal` value in a `TracingInterceptor`.
+
+```swift
+struct TracingInterceptor: GraphQLInterceptor {
+  @TaskLocal
+  static var correlationId: String?
+
+  // ...
+}
+```
+
+**2. Set the value:**
+
+The `@TaskLocal` value can be set by the interceptor before continuing with the request chain.
+
+```swift
+struct TracingInterceptor: GraphQLInterceptor {
+  @TaskLocal
+  static var correlationId: String?
+
+  func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: NextInterceptorFunction<Request>
+  ) async throws -> InterceptorResultStream<Request> {
+    let correlationId = UUID().uuidString
+
+    return try await TracingInterceptor.$correlationId.withValue(correlationId) {
+      return await next(request)
+    }
+  }
+}
+```
+
+Alternatively, other parts of your application can set `@TaskLocal` values prior to beginning the request. These values will be accessible by any interceptors in the request chain.
+
+```swift
+let correlationId = UUID().uuidString
+
+try await TracingInterceptor.$correlationId.withValue(correlationId) {
+  let result = try await apolloClient.fetch(query: query, cachePolicy: cachePolicy)
+}
+```
+
+**3. Access the value in interceptors:**
+
+Once the `@TaskLocal` value is set, it can be accessed by any interceptor in the request chain.
+
+```swift
+struct CorrelatedOperationInterceptor: GraphQLInterceptor {
+  func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: NextInterceptorFunction<Request>
+  ) async throws -> InterceptorResultStream<Request> {
+    return await next(request)
+      .map { result in
+        let correlationId = TracingInterceptor.correlationId ?? "unknown"
+        print("🔍 [Trace: \(correlationId)] Request completed successfully")
+        return result
+      }
+  }
+}
+```
+
+### Example: User context sharing
+
+For applications that need user context throughout the request chain:
+
+**1. Define user context:**
+
+```swift
+struct UserContext {
+  let userId: String
+  let tenantId: String
+  let permissions: Set<String>
+}
+
+extension TaskLocal where Value == UserContext? {
+  @TaskLocal
+  static var userContext: UserContext?
+}
+```
+
+**2. Set context when making authenticated requests:**
+
+```swift
+struct AuthenticatedApolloClient {
+  private let apolloClient: ApolloClient
+
+  func fetchAsUser<Query: GraphQLQuery>(
+    query: Query,
+    userContext: UserContext,
+    cachePolicy: CachePolicy = .default
+  ) async throws -> GraphQLResponse<Query.Data> {
+
+    return try await TaskLocal.$userContext.withValue(userContext) {
+      return try await apolloClient.fetch(query: query, cachePolicy: cachePolicy)
+    }
+  }
+}
+```
+
+**3. Use context in interceptors:**
+
+```swift
+struct AuthorizationInterceptor: GraphQLInterceptor {
+  func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: NextInterceptorFunction<Request>
+  ) async throws -> InterceptorResultStream<Request> {
+
+    guard let userContext = TaskLocal.userContext else {
+      throw AuthError.noUserContext
+    }
+
+    // Add user context to request
+    var authenticatedRequest = request
+    authenticatedRequest.additionalHeaders["X-User-ID"] = userContext.userId
+    authenticatedRequest.additionalHeaders["X-Tenant-ID"] = userContext.tenantId
+
+    return await next(authenticatedRequest)
+      .mapErrors { error in
+        // Log error with user context
+        print("Request failed for user \(userContext.userId): \(error)")
+        throw error
+      }
+  }
+}
+
+struct AuditInterceptor: GraphQLInterceptor {
+  func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: NextInterceptorFunction<Request>
+  ) async throws -> InterceptorResultStream<Request> {
+
+    return await next(request)
+      .map { result in
+        // Audit successful operations
+        if let userContext = TaskLocal.userContext {
+          auditLog.record(
+            operation: request.operation.operationName ?? "unknown",
+            userId: userContext.userId,
+            tenantId: userContext.tenantId,
+            timestamp: Date()
+          )
+        }
+        return result
+      }
+  }
+}
+```
