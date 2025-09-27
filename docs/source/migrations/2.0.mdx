@@ -122,25 +122,136 @@ Requests are now processed by the `RequestChain` using the following flow:
 - Cache write executed via `CacheInterceptor` if necessary (based on cache policy)
 - `GraphQLResponse` emitted out to `NetworkTransport`
 
+#### Error Handling
+
+The `ApolloErrorInterceptor` has been removed from 2.0. Instead, any `GraphQLInterceptor` can intercept errors by calling the `mapErrors` function of the `InterceptorResultStream`. Errors can even be intercepted by multiple interceptors that perform different error handling logic.
+
+For more information on error handling see the [Request Chain error handling documentation](./../advanced/request-chain#error-handling).
+
+#### Retrying Requests
+
+In 1.0, you could retry a `RequestChain`'s request by calling `chain.retry(request:completion)`. In Apollo iOS 2.0, interceptors no longer have access to the `RequestChain` itself. Instead, interceptors can trigger a retry by throwing a `RequestChain.Retry` error.
+
+For more information on retrying see the [Request Chain request retries documentation](./../advanced/request-chain#request-retries).
+
+#### Task Local Values
+
 ### Converting 1.x interceptor providers
 
-To convert your existing custom `InterceptorProvider` to 2.0,
+Converting your existing custom `InterceptorProvider` to 2.0 requires two main steps:
 
-**1.x ApolloInterceptor:**
+1. **Refactor existing interceptors** to use one of the four new discrete interceptor types
+2. **Update your `InterceptorProvider`** to conform to the new protocol structure
+
+#### Step 1: Refactor existing interceptors
+
+In 1.x, all custom logic was implemented using the `ApolloInterceptor` protocol. In 2.0, you need to choose the appropriate interceptor type based on what your interceptor does. See the linked documentation for each interceptor type for more information on how to implement them.
+
+- **[`GraphQLInterceptor`](./../advanced/request-chain#graphqlinterceptor):** Provides access to the `GraphQLRequest` and the parsed `GraphQLResponse`. Most interceptors from 1.0 should use this type.
+- **[`HTTPInterceptor`](./../advanced/request-chain#httpinterceptor):** Provides access to the `HTTPURLResponse` and the raw data stream of the network response.
+- **[`CacheInterceptor`](./../advanced/request-chain#cacheinterceptor):** To implement custom caching logic use a `CacheInterceptor`.
+- **[`ResponseParsingInterceptor`](./../advanced/request-chain#responseparsinginterceptor):** Parses raw response data into a `GraphQLResponse` and set of records for writing to the cache.
+
+#### Step 2: Update your InterceptorProvider
+
+1.x InterceptorProvider:
 ```swift
 // 1.x approach
-class MyInterceptor: ApolloInterceptor {
-  func interceptAsync<Operation: GraphQLOperation>(
-    chain: RequestChain,
-    request: HTTPRequest<Operation>,
-    response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
-  ) {
-    // Modify request or response
-    chain.proceedAsync(request: request, response: response, interceptor: self, completion: completion)
+class CustomInterceptorProvider: InterceptorProvider {
+  private let store: ApolloStore
+  private let client: URLSessionClient
+
+  init(store: ApolloStore, client: URLSessionClient) {
+    self.store = store
+    self.client = client
+  }
+
+  func interceptors<Operation: GraphQLOperation>(for operation: Operation) -> [ApolloInterceptor] {
+    return [
+      MaxRetryInterceptor(),
+      CacheReadInterceptor(store: self.store),
+      AuthInterceptor(),
+      CustomHeaderInterceptor(),
+      LoggingInterceptor(),
+      NetworkFetchInterceptor(client: self.client),
+      ResponseCodeInterceptor(),
+      JSONResponseParsingInterceptor(),
+      AutomaticPersistedQueryInterceptor(),
+      CacheWriteInterceptor(store: self.store)
+    ]
   }
 }
 ```
+
+2.0 InterceptorProvider:
+```swift
+// 2.0 approach
+struct CustomInterceptorProvider: InterceptorProvider {
+  private let store: ApolloStore
+
+  init(store: ApolloStore) {
+    self.store = store
+  }
+
+  // Provide GraphQL interceptors (pre/post-flight GraphQL processing)
+  func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any GraphQLInterceptor] {
+    return [
+      MaxRetryInterceptor(),
+      AuthInterceptor(token: getCurrentToken()),
+      LoggingInterceptor(),
+      AutomaticPersistedQueryInterceptor()
+    ]
+  }
+
+  // Provide cache interceptor (cache read/write operations)
+  func cacheInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> any CacheInterceptor {
+    return CustomCacheInterceptor()
+  }
+
+  // Provide HTTP interceptors (URLRequest/HTTPResponse processing)
+  func httpInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any HTTPInterceptor] {
+    return [
+      CustomHeaderInterceptor(),
+      ResponseCodeInterceptor()
+    ]
+  }
+
+  // Provide response parser (HTTP data → GraphQL response)
+  func responseParser<Operation: GraphQLOperation>(for operation: Operation) -> any ResponseParsingInterceptor {
+    return JSONResponseParsingInterceptor()
+  }
+}
+```
+
+#### Using your converted InterceptorProvider
+
+Once converted, use your provider with `RequestChainNetworkTransport`:
+
+```swift
+let store = ApolloStore(cache: InMemoryNormalizedCache())
+let customProvider = CustomInterceptorProvider(store: store)
+
+let networkTransport = RequestChainNetworkTransport(
+  interceptorProvider: customProvider,
+  endpointURL: URL(string: "https://api.example.com/graphql")!,
+  urlSession: URLSession.shared
+)
+
+let apolloClient = ApolloClient(networkTransport: networkTransport, store: store)
+```
+
+#### Migration checklist
+
+When converting your interceptor provider:
+
+- [ ] **Categorize each interceptor** by its primary function
+- [ ] **Convert to appropriate type**: GraphQL, HTTP, Cache, or ResponseParsing
+- [ ] **Update async patterns**: Replace callbacks with `async/await` and streams
+- [ ] **Handle errors properly**: Use `.mapErrors()` instead of completion handlers
+- [ ] **Test thoroughly**: Verify that request/response flow works as expected
+- [ ] **Remove `NetworkFetchInterceptor`**: This is now handled by `ApolloURLSession`
+
+For detailed information on implementing custom interceptors, see the [Request Chain Customization documentation](./advanced/request-chain).
 
 **2.0 GraphQLInterceptor:**
 ```swift

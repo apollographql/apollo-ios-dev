@@ -107,13 +107,22 @@ To add custom functionality to your request chain, you can implement custom inte
 
 ### GraphQLInterceptor
 
-[`GraphQLInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/graphqlinterceptor) implementations can perform pre-flight work on the `GraphQLRequest` and post-flight work on the parsed response data.
+[`GraphQLInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/graphqlinterceptor) requires you to implement the `intercept(request: next:)` function to perform pre-flight work on the `GraphQLRequest` and post-flight work on the parsed response data.
 
-**Pre-Flight**
-Each `GraphQLInterceptor` will have it's `intercept(request:next:)` function called in sequential order prior to fetching the request. The interceptor may inspect or modify the provided `request`, which must then be passed into the `next` closure to continue through the `RequestChain`
+The `intercept` function works as follows:
 
-**Post-Flight**
-After response data is fetched and parsed, the `ParsedResult` will be emitted by the `InterceptorResultStream` returned by the call to the `next` closure. The `ParsedResult` is passed back up the interceptor chain in reverse order such that the first interceptor called will be the last to receive the response. The response may be inspected or modified by using the mapping functions of `NonCopyableAsyncThrowingStream`. The interceptor must then return the stream to continue through the `RequestChain`.
+- Pre-flight
+  - You may execute any custom pre-flight logic.
+- Call `next(request)`
+  - You must call the provided `next` closure, passing in either the original request or a modified version.
+  - This request will be sent to the next interceptor.
+- Post-flight
+  - The `next` closure returns an `InterceptorResultStream`, which will emit results after the network fetch and parsing.
+    - For multi-part responses (subscriptions and queries using `@defer`), this will emit multiple results, otherwise it will only emit a single result and then terminate.
+  - To execute post-flight logic, `map` the result stream. Each time the stream receives a result, it will be passed into the `map` closure.
+  - The `map` closure can return the original result or a modified version.
+- Return the stream
+  - When finished, your interceptor must return the `InterceptorResultStream`, which will be passed back up the chain to the previous interceptor.
 
 #### Example - Request logging interceptor
 ```swift
@@ -164,15 +173,25 @@ struct AuthHeaderInterceptor: GraphQLInterceptor {
 
 ### HTTPInterceptor
 
-[`HTTPInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/httpinterceptor) implementations can  perform pre-flight work on the `URLRequest` and post-flight work on the `HTTPResponse`, including the raw response `Data` stream of the response's `HTTPResponse.chunks`.
+[`HTTPInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/httpinterceptor) requires you to implement the `intercept(request: next:)` function to perform pre-flight work on the `URLRequest` and post-flight work on the `HTTPResponse`, including the raw response `Data` stream.
 
-**Pre-Flight**
-After the `RequestChain` proceeds through the `GraphQLInterceptor`s provided by it's `InterceptorProvider`, it will call `GraphQLRequest/toURLRequest()` on the final `GraphQLRequest`. Each `HTTPInterceptor` provided by the `InterceptorProvider` will then have it's `intercept(request:next:)` function called in sequential order prior to fetching the request. When this function is called, the interceptor may inspect or modify the provided `request`, which must then be passed into the `next` closure to continue through the `RequestChain`
+After the `RequestChain` proceeds through the `GraphQLInterceptor`s provided by it's `InterceptorProvider`, it will call `GraphQLRequest/toURLRequest()` on the final `GraphQLRequest`. Each `HTTPInterceptor` provided by the `InterceptorProvider` will then have it's `intercept(request:next:)` function called in sequential order prior to fetching the request.
 
-**Post-Flight**
-After the `ApolloURLSession` receives an initial response, an `HTTPResponse` will be returned by the call to the `next` closure. As raw response data is received, the raw chunk `Data` is passed back up the interceptor chain in reverse order such that the first `HTTPInterceptor` called will be the last to receive the response.
+The `intercept` function works as follows:
 
-The response `Data` of the `HTTPResponse/chunks` may be inspected or modified by using the `HTTPResponse/mapChunks(_:)` function of the `HTTPResponse`. The interceptor must then return the mapped `HTTPResponse` to continue through the `RequestChain`.
+- Pre-flight
+  - You may execute any custom pre-flight logic.
+- Call `next(request)`
+  - You must call the provided `next` closure, passing in either the original request or a modified version.
+  - This request will be sent to the next interceptor.
+- Post-flight
+  - The `next` closure returns an `HTTPResponse`, which provides the `HTTPURLResponse` headers and a `chunks` stream that will emit the raw response data chunks as they are received.
+    - For multi-part responses (subscriptions and queries using `@defer`), this will emit multiple results, otherwise it will only emit a single result and then terminate.
+  - You may inspect the response headers at this point.
+  - To execute post-flight logic on the response data, call `response.mapChunks` to intercept the data stream.
+  - The `mapChunks` closure can return the original data stream or a modified version.
+- Return the `HTTPResponse`
+  - When finished, your interceptor must return the `HTTPResponse`, which will be passed back up the chain to the previous `HTTPInterceptor`.
 
 ### CacheInterceptor
 
@@ -286,3 +305,6 @@ struct ReauthenticationInterceptor: GraphQLInterceptor {
   }
 }
 ```
+
+## Dependency injection via `TaskLocal` values
+
