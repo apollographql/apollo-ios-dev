@@ -4,6 +4,7 @@ title: The Codegen CLI
 
 import SPMInstallCLI from "../../shared/cli-install/spm.mdx"
 import SPMXcodeInstallCLI from "../../shared/cli-install/spm-xcode.mdx"
+import PodsInstallCLI from "../../shared/cli-install/pods.mdx"
 
 The Codegen CLI provides a command line tool that streamlines the process of running code generation. The CLI can be ran manually from Terminal (or any other shell program) or can be called into from bash scripts.
 
@@ -19,7 +20,7 @@ The Codegen CLI has three primary commands:
 
 ## Installation
 
-When Apollo iOS is included as a dependency through Swift Package Manager (SPM), the CLI is built and packaged with the dependency automatically. This ensures you always have a valid version of the CLI for the version of Apollo iOS you are using and you never have to worry about installation or updates.
+When Apollo iOS is included as a dependency through Swift Package Manager (SPM) or Cocoapods, the CLI is built and packaged with the dependency automatically. This ensures you always have a valid version of the CLI for the version of Apollo iOS you are using and you never have to worry about installation or updates.
 
 To learn how to run the Codegen CLI with your chosen package manager, open the appropriate section:
 
@@ -35,6 +36,11 @@ To learn how to run the Codegen CLI with your chosen package manager, open the a
 
 </ExpansionPanel>
 
+<ExpansionPanel title="Cocoapods">
+
+<PodsInstallCLI />
+
+</ExpansionPanel>
 
 <ExpansionPanel title="Pre-built Binary">
 
@@ -50,7 +56,7 @@ After downloading the binary, you can run the Codegen CLI from the directory whe
 
 <ExpansionPanel title="Build it Yourself">
 
-If you are not using SPM and do not want to use the pre-built CLI binary, you can compile the CLI manually. Once you've cloned the Apollo iOS git repo, use Terminal to go into that cloned directory and run the following command:
+If you are not using SPM or Cocoapods, and do not want to use the pre-built CLI binary, you can compile the CLI manually. Once you've cloned the Apollo iOS git repo, use Terminal to go into that cloned directory and run the following command:
 
 ```bash
 make build-cli
