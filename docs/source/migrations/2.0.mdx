@@ -64,7 +64,7 @@ These changes include:
 
 **Phase 2: Incrementally update `ApolloClient` API usage**
 
-The most commonly used APIs for fetching data via `ApolloClient` have been deprecated instead of removed completely. Once the breaking changes have been resolved, this allows you to:
+The most commonly used APIs for fetching data via `ApolloClient` have been deprecated instead of removed completely. These APIs have been updated to conform to `Sendable`, so you will need to resolve thread-safety issues. But once breaking changes have been resolved, this allows you to:
 
 - **Compile and run** your application with the deprecated APIs while planning your migration
 - **Update incrementally** - migrate one query, mutation, or subscription at a time
@@ -206,3 +206,41 @@ struct CustomInterceptorProvider: InterceptorProvider {
 ```
 
 In this example, we are not providing an implementation of `responseParser(for operation:)`, so the default `JSONResponseParsingInterceptor` will be used.
+
+## Minor Breaking Changes
+
+Apollo iOS 2.0 introduces a number of minor breaking changes that may affect your migration depending on your API usage.
+
+### Sendable conformance and thread safety
+
+Apollo iOS 2.0 adopts Swift 6's strict concurrency model and most types in the library now conform to `Sendable`. This ensures that Apollo iOS operations are safe to use across different threads and with Swift's structured concurrency model. We recommend migrating to the new `async/await` fetch APIs to take full advantage of these safety improvements.
+
+In order to provide `Sendable` conformance and full thread safety, some types have been converted from `class` to `struct` types.
+
+Most core Apollo iOS types now conform to `Sendable`, including:
+
+- `ApolloClient`
+- `ApolloStore`
+- `CachePolicy` types
+- `RequestConfiguration`
+- `NetworkTransport` implementations
+- Generated operation and fragment models
+- Interceptor types
+- `HTTPResponse`
+- `GraphQLResponse`
+
+### `GraphQLResponse` & `GraphQLResult`
+
+Apollo iOS 1.0 exposed both a `GraphQLResponse` and `GraphQLResult` model. The `GraphQLResponse` was mostly used internally for parsing of response data, while `GraphQLResult` was the response model for a GraphQL request exposed to the user.
+
+In 2.0, the legacy `GraphQLResponse` model has been removed and `GraphQLResult` has been renamed to `GraphQLResponse`. Additionally, the new response model is generic over the operation instead of the response data. This allows access to type information about the GraphQL operation as well as it's response data.
+
+Code referencing the `GraphQLResult` directly will need to be refactored to reference the new `GraphQLResponse` instead.
+
+If you were using the old `GraphQLResponse` for manual response parsing, use `JSONResponseParser` instead.
+
+### Cache misses no longer throw errors
+
+When a cache miss occurred in Apollo iOS 1.0, the `ApolloStore` would throw an error (usually a `JSONDecodingError.missingValue`). In 2.0, cache misses result in a `nil` value being returned. Errors are only thrown if there is an issue with the cache such as invalid data or a disk I/O failure.
+
+Cache read methods on `ApolloStore` and in `ReadTransaction`s have been updated to return `Optional` results. You may need to update cache transation usage to adjust for this new behavior.
