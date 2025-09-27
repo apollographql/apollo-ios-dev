@@ -167,29 +167,39 @@ Apollo iOS uses a [normalized cache](./../caching/introduction#what-is-a-normali
 
 `ApolloClient`'s `fetch(query:)` method takes an optional `cachePolicy` that allows you to specify when results should be fetched from the server, and when data should be loaded from the local cache.
 
-By default, each request uses the `.returnCacheDataElseFetch` cache policy, which means data will be loaded from the cache when available, and fetched from the server otherwise.
+**`.cacheFirst`** - *(Default Value)*
 
-The cache polices which you can specify are:
+Return data from the cache if available, else fetch results from the server.
 
-- **`.fetchIgnoringCacheData`**
-  - Always fetch from the server, but still store results to the cache.
-- **`.fetchIgnoringCacheCompletely`**
-- Always fetch from the server, and do not store results from the cache.
-  - If you're not using the cache at all, this method is preferred to `fetchIgnoringCacheData` for performance reasons.
-- **`.returnCacheDataAndFetch`**
-  - Return data from the cache if its available; *then* perform a fetch to see if there are any updates; store results in the cache.
-  - This is useful if you are [watching queries](./queries#watching-queries), since those will be updated when the call to the server returns.
-- **`.returnCacheDataDontFetch`**
-  - Return data from the cache; never fetch from the server.
-  - This policy will return an error if cached data is not available.
-- **`.returnCacheDataElseFetch`**  - *(Default Value)*
-  - Return data from the cache if its available; if cache data is missing or incomplete, fetch data from the server and store results in the cache.
-  - This is the most common use case, and is the most performant method if your data is not expected to change.
-  - If you do not need to check for updates to data once it's been fetched, you should usually use this cache policy.
+**`.networkFirst`**
 
-> If you're interested in returning cached data after a failed fetch, the current recommended approach is to use an `additionalErrorInterceptor` on your interceptor chain to examine if the error is one it makes sense to show old data for rather than something that needs to be passed on to the user, and then retrying with a `.returnCacheDataDontFetch` retry policy. An example of this setup can be found in the [Cache-dependent interceptor tests](https://github.com/apollographql/apollo-ios-dev/blob/main/Tests/ApolloTests/Cache/CacheDependentInterceptorTests.swift).
+Attempt to fetch results from the server, if failed, return data from the cache if available.
 
-For more information on how result data is stored in the cache data or how to configure the normalized cache, see the [Caching documentation](./../caching/introduction).
+**`.networkOnly`**
+
+Fetch results from the server, do not attempt to read data from the cache.
+<Note>
+
+By default the results will still be written to the cache for future use. To prevent results from being cached, use `RequestConfiguration.writeResultsToCache`.
+
+</Note>
+
+**`.cacheOnly`**
+
+Return data from the cache if available, do not attempt to fetch results from the server.
+Returns `nil` if cached data is not available.
+
+**`.cacheAndNetwork`**
+
+Return data from the cache if available, and always fetch results from the server.
+
+Request using this cache policy may emit multiple responses: first from the cache (if available), then from the network.
+
+> For more information on how result data is stored in the cache or how to configure the normalized cache, see the [Caching documentation](./../caching/introduction).
+
+## Request Configuration
+
+
 
 ## Using `GET` instead of `POST` for queries
 
