@@ -197,8 +197,53 @@ Request using this cache policy may emit multiple responses: first from the cach
 
 > For more information on how result data is stored in the cache or how to configure the normalized cache, see the [Caching documentation](./../caching/introduction).
 
-## Request Configuration
+## Request configuration
 
+`RequestConfiguration` allows you to customize various aspects of individual requests. All `ApolloClient` request methods (`fetch`, `perform`, `upload`, `subscribe`) accept an optional `requestConfiguration` parameter.
+
+### Default request configuration
+
+When you create an `ApolloClient`, you can provide a `defaultRequestConfiguration` that will be used for all requests unless a custom configuration is provided:
+
+```swift
+let defaultConfig = RequestConfiguration(
+  requestTimeout: 30.0,
+  writeResultsToCache: true
+)
+
+let client = ApolloClient(
+  networkTransport: networkTransport,
+  store: store,
+  defaultRequestConfiguration: defaultConfig
+)
+```
+
+### Configuration options
+
+`RequestConfiguration` provides the following options:
+
+- **`requestTimeout`** (optional): The timeout interval for network requests. If not specified, the default timeout from the underlying `URLSession` is used.
+- **`writeResultsToCache`**: Whether to write operation results to the cache. Defaults to `true`.
+
+### Using custom request configurations
+
+You can override the default configuration for individual requests:
+
+```swift
+// Custom configuration for a specific request
+let customConfig = RequestConfiguration(
+  requestTimeout: 10.0,
+  writeResultsToCache: false
+)
+
+let response = try await client.fetch(
+  query: MyQuery(),
+  cachePolicy: .networkOnly,
+  requestConfiguration: customConfig
+)
+```
+
+This is useful when you need different timeout values for different operations or when you want to prevent certain operations from writing to the cache.
 
 
 ## Using `GET` instead of `POST` for queries
@@ -207,4 +252,8 @@ By default, Apollo constructs queries and sends them to your graphql endpoint us
 
 If you want Apollo to use `GET` instead, pass `true` to the optional `useGETForQueries` parameter when setting up your `RequestChainNetworkTransport`. This will set up all queries conforming to `GraphQLQuery` sent through the HTTP transport to use `GET`.
 
->**NOTE:** This is a toggle which affects all queries sent through that client, so if you need to have certain queries go as `POST` and certain ones go as `GET`, you will likely have to swap out the `RequestChainNetworkTransport`.
+<Note>
+
+This is a toggle which affects all queries sent through that client, so if you need to have certain queries go as `POST` and certain ones go as `GET`, you can use a custom interceptor to change the value on a per-request basis. See [Implementing custom interceptors](./../advanced/request-chain#implementing-custom-interceptors)
+
+</Note>
