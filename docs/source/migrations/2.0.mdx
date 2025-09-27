@@ -22,11 +22,27 @@ This migration involves significant API changes across several areas:
 2. **Cache Policies**: Split into discrete types with specific return signatures
 3. **Request Interceptors**: New framework with separate interceptor types for different request phases
 4. **Sendable Types**: Most types now conform to `Sendable` with associated constraints
-5. **CocoaPods Support Removed**: Swift Package Manager and Xcode projects only
 
 ### Limitations
 
-#### No web socket support
+**Minimum Deployment Targets**
+
+Apollo iOS 2.0 drops support for older deployment targets. The minimum deployment targets are now:
+
+- iOS 15.0+
+- macOS 12.0+
+- tvOS 15.0+
+- watchOS 8.0+
+- visionOS 1.0+
+
+**CocoaPods Support Removed**
+
+Cocoapods support is no longer available in Apollo iOS 2.0. The library is available via Swift Package Manager or as .xcframeworks built using the [Apollo iOS XCFramework Repo](https://github.com/apollographql/apollo-ios-xcframework).
+
+Code generation of Cocoapods modules is no longer supported.
+
+**Web socket support (Coming Soon)**
+
 The initial release of 2.0 will not support web sockets. Subscriptions over HTTP are supported by `RequestChainNetworkTransport`.
 
 A new implementation of the `ApolloWebSocket` target will be published in a future version as soon as possible. If your application requires web sockets, you should not upgrade to 2.0 until the new web socket implementation is released.
@@ -35,7 +51,7 @@ A new implementation of the `ApolloWebSocket` target will be published in a futu
 
 Apollo iOS 2.0 migration follows a two-phase approach designed to minimize disruption while ensuring all functionality is properly updated.
 
-#### Phase 1: Breaking changes
+**Phase 1: Breaking changes**
 
 Some APIs have fundamentally changed to support the new structured concurrency model and cannot maintain backward compatibility. You must update these implementations before proceeding with the rest of your migration.
 
@@ -46,7 +62,7 @@ These changes include:
 - Custom `NetworkTransport` implementations
 - Custom `NormalizedCache` implementations
 
-#### Phase 2: Incrementally update `ApolloClient` API usage
+**Phase 2: Incrementally update `ApolloClient` API usage**
 
 The most commonly used APIs for fetching data via `ApolloClient` have been deprecated instead of removed completely. Once the breaking changes have been resolved, this allows you to:
 
