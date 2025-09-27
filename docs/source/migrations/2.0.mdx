@@ -75,6 +75,20 @@ While we recommend that you update these deprecated APIs to the new versions ASA
 
 The remainder of this guide provides detailed instructions for migrating each aspect of your Apollo iOS integration.
 
+## Codegen Configuration
+
+Apollo iOS 2.0 removes a number of obsolete options from the codegen configuration. Your configuration will need to be updated to remove these options as well.
+
+If you are using a JSON codegen configuration file, you may get an error when attempting to run codegen. If using the `ApolloCodegenLib` directly in Swift, your configuration may not compile.
+
+The following changes have been made to the codegen configuration:
+
+- **`OutputOptions.cocoapodsCompatibleImportStatements`**: CocoaPods support has been completely removed.
+- **`OutputOptions.markOperationDefinitionsAsFinal`**: Generated GraphQL operation and local cache mutation class types are always `final` now to support `Sendable` conformance. Subclassing `GraphQLOperations` is no longer permitted.
+- **`OutputOptions.apqs`**: The legacy `APQConfig` has been replaced by `operationDocumentFormat`. Update your configuration to use `OperationDocumentFormat.operationId` instead of `APQConfig.persistedOperationsOnly`.
+- **`SchemaTypesFileOutput.ModuleType.swiftPackageManager`**: This deprecated case has been removed. Use `.swiftPackage(apolloSDKDependency: .default)` instead.
+
+
 ## `URLSessionClient` -> `ApolloURLSession`
 
 In Apollo iOS 1.0 a `URLSessionClient` that managed an internal `URLSession` was used to handle network operations. In 2.0, this is replaced by the [`ApolloURLSession`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollourlsession) protocol. `URLSession` conforms to this procotol by default. This allows you to provide your own `URLSession` to the `RequestChainNetworkTransport`. You can configure this `URLSession` as needed and provide your own delegates to it.
