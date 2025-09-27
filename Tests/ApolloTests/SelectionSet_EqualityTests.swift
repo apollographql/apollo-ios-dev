@@ -691,4 +691,68 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(initializerHero).notTo(equal(dataDictHero))
   }
 
+  // MARK: - Null/nil tests
+
+  func test__equatable__optionalChildObject__isNullOnBoth_returns_true() {
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("name", String?.self)
+      ]}
+    }
+
+    // when
+    let selectionSet1 = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Hero",
+        "name": NSNull()
+      ],
+      fulfilledFragments: [ObjectIdentifier(Hero.self)]
+    ))
+
+    let selectionSet2 = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Hero",
+        "name": NSNull()
+      ],
+      fulfilledFragments: [ObjectIdentifier(Hero.self)]
+    ))
+
+    // then
+    expect(selectionSet1).to(equal(selectionSet2))
+  }
+
+  func test__equatable__optionalChildObject__isNullAndNil_returns_true() {
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("name", String?.self)
+      ]}
+    }
+
+    // when
+    let selectionSet1 = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Hero",
+        "name": NSNull()
+      ],
+      fulfilledFragments: [ObjectIdentifier(Hero.self)]
+    ))
+
+    let selectionSet2 = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Hero",
+        "name": nil
+      ],
+      fulfilledFragments: [ObjectIdentifier(Hero.self)]
+    ))
+
+    // then
+    expect(selectionSet1).to(equal(selectionSet2))
+  }
+
 }

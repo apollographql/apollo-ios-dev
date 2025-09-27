@@ -1,3 +1,5 @@
+import Foundation
+
 public extension SelectionSet {
 
   typealias FieldValue = any Hashable
@@ -88,13 +90,17 @@ public extension SelectionSet {
     field: Selection.Field,
     to fields: inout [String: FieldValue]
   ) {
-    guard let fieldData = self.__data._data[field.responseKey]?.base as? FieldValue else {
-      return
-    }
+     let nullableFieldData = self.__data._data[field.responseKey].asNullable
+     let fieldData: FieldValue
+     switch nullableFieldData {
+     case let .some(value):
+       fieldData = value
+     case .none, .null:
+       return
+     }
+
     addData(for: field.type)
 
-    /// This function is responsible for recovering the type data we lose by using `AnyHashable` in `DataDict`.
-    /// The type data is needed for equality and dealing with the nuance of `Optional` types wrapped by `AnyHashable`.
     func addData(for type: Selection.Field.OutputType, inList: Bool = false) {
       switch type {
       case .scalar, .customScalar:
@@ -204,6 +210,38 @@ extension Hasher {
       self.combine(value)
     } else {
       self.combine(Optional<[T: any Hashable]>.none)
+    }
+  }
+}
+
+fileprivate protocol AnyOptional {}
+
+@_spi(Internal)
+extension Optional: AnyOptional { }
+
+fileprivate extension Optional {
+
+  /// Converts the optional to a `GraphQLNullable.
+  ///
+  /// - Double nested optional (ie. `Optional.some(nil)`) -> `GraphQLNullable.null`.
+  /// - `Optional.none` -> `GraphQLNullable.none`
+  /// - `Optional.some` -> `GraphQLNullable.some`
+  var asNullable: GraphQLNullable<Wrapped> {
+    unwrapAsNullable()
+  }
+
+  private func unwrapAsNullable(nullIfNil: Bool = false) -> GraphQLNullable<Wrapped> {
+    switch self {
+    case .none: return nullIfNil ? .null : .none
+
+    case .some(let value as any AnyOptional):
+      return (value as! Self).unwrapAsNullable(nullIfNil: true)
+
+    case .some(is NSNull):
+      return .null
+
+    case .some(let value):
+      return .some(value)
     }
   }
 }
