@@ -691,6 +691,76 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(initializerHero).notTo(equal(dataDictHero))
   }
 
+  // MARK: - Integration Tests
+
+  func test__equatable__givenQueryResponseFetchedFromStore()
+  async throws
+  {
+    // given
+    class GivenSelectionSet: MockSelectionSet {
+      override class var __selections: [Selection] {
+        [
+          .field("hero", Hero.self)
+        ]
+      }
+      var hero: Hero { __data["hero"] }
+
+      class Hero: MockSelectionSet {
+        override class var __selections: [Selection] {
+          [
+            .field("__typename", String.self),
+            .field("name", String.self),
+            .field("friend", Friend.self),
+          ]
+        }
+        var friend: Friend { __data["friend"] }
+
+        class Friend: MockSelectionSet {
+          override class var __selections: [Selection] {
+            [
+              .field("__typename", String.self),
+              .field("name", String.self),
+            ]
+          }
+          var name: String { __data["name"] }
+        }
+      }
+    }
+
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("hero")],
+      "hero": [
+        "__typename": "Droid",
+        "name": "R2-D2",
+        "friend": CacheReference("1000"),
+      ],
+      "1000": ["__typename": "Human", "name": "Luke Skywalker"],
+    ])
+
+    let expected = try GivenSelectionSet(data: [
+      "hero": [
+        "__typename": "Droid",
+        "name": "R2-D2",
+        "friend": ["__typename": "Human", "name": "Luke Skywalker"]
+      ]
+    ])
+
+    // when
+    let updateCompletedExpectation = expectation(description: "Update completed")
+
+    store.load(MockQuery<GivenSelectionSet>()) { result in
+      defer { updateCompletedExpectation.fulfill() }
+
+      XCTAssertSuccessResult(result)
+      let responseData = try! result.get().data
+
+      expect(responseData).to(equal(expected))
+    }
+
+    await fulfillment(of: [updateCompletedExpectation], timeout: 1.0)
+  }
+
   // MARK: - Null/nil tests
 
   func test__equatable__optionalChildObject__isNullOnBoth_returns_true() {
