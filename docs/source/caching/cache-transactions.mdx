@@ -12,7 +12,7 @@ The `ApolloStore` has APIs for accessing the cache via both `ReadTransaction` an
 
 ## Reading cache data
 
-You can read data from the local cache directly with [`ApolloStore.withinReadTransaction(_:callbackQueue:completion:)`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/withinreadtransaction(_:callbackqueue:completion:)). The transaction block provides a [`ReadTransaction`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readtransaction).
+You can read data from the local cache directly with [`ApolloStore.withinReadTransaction(_:)`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/withinreadtransaction(_:)). The transaction block provides a [`ReadTransaction`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readtransaction).
 
 A [`ReadTransaction`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readtransaction) can be used to read any of your [generated GraphQL queries or fragments](./../fetching/fetching-data#generated-operation-models).
 
@@ -47,7 +47,7 @@ Task {
 
 ## Writing cache data
 
-You can write data to the local cache with [`ApolloStore.withinReadWriteTransaction(_:callbackQueue:completion:)`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/withinreadwritetransaction(_:callbackqueue:completion:)). The transaction block provides a [`ReadWriteTransaction`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readwritetransaction). In addition the the ability to write data to the cache, [`ReadWriteTransaction`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readwritetransaction) has all of the functionality of a `ReadTransaction`. To write data to the cache, you'll need to define a [`LocalCacheMutation`](#defining-local-cache-mutations).
+You can write data to the local cache with [`ApolloStore.withinReadWriteTransaction(_:)`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/withinreadwritetransaction(_:)). The transaction block provides a [`ReadWriteTransaction`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readwritetransaction). In addition to the ability to write data to the cache, [`ReadWriteTransaction`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readwritetransaction) has all of the functionality of a `ReadTransaction`. To write data to the cache, you'll need to define a [`LocalCacheMutation`](#defining-local-cache-mutations).
 
 ### Defining local cache mutations
 
