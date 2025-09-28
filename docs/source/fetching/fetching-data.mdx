@@ -133,6 +133,8 @@ let response = try await apollo.fetch(query: HeroNameQuery())
 let heroName = response.data?.hero?.name
 ```
 
+> For more information on executing each operation type, see the documentation on [Queries](./queries), [Mutations](./mutations), and [Subscriptions](./subscriptions).
+
 <Note>
 
 An operation can be successful, but the `GraphQLResult` may still include `GraphQLErrors`. See [Error Handling](./fetching/../error-handling) for more information.
@@ -158,44 +160,6 @@ for try await response in responses {
   // Handle response
 }
 ```
-
-## Fetching locally cached data
-
-Apollo iOS uses a [normalized cache](./../caching/introduction#what-is-a-normalized-cache) to store your GraphQL response data locally. This allows you to retrieve operation data that has been previously fetched without waiting for an additional network request. You can configure how your fetch requests interact with the cache using cache policies.
-
-### Cache policies
-
-`ApolloClient`'s `fetch(query:)` method takes an optional `cachePolicy` that allows you to specify when results should be fetched from the server, and when data should be loaded from the local cache.
-
-**`.cacheFirst`** - *(Default Value)*
-
-Return data from the cache if available, else fetch results from the server.
-
-**`.networkFirst`**
-
-Attempt to fetch results from the server, if failed, return data from the cache if available.
-
-**`.networkOnly`**
-
-Fetch results from the server, do not attempt to read data from the cache.
-<Note>
-
-By default the results will still be written to the cache for future use. To prevent results from being cached, use `RequestConfiguration.writeResultsToCache`.
-
-</Note>
-
-**`.cacheOnly`**
-
-Return data from the cache if available, do not attempt to fetch results from the server.
-Returns `nil` if cached data is not available.
-
-**`.cacheAndNetwork`**
-
-Return data from the cache if available, and always fetch results from the server.
-
-Request using this cache policy may emit multiple responses: first from the cache (if available), then from the network.
-
-> For more information on how result data is stored in the cache or how to configure the normalized cache, see the [Caching documentation](./../caching/introduction).
 
 ## Request configuration
 

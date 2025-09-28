@@ -12,14 +12,56 @@ After defining and generating a query model, as outlined in ["Defining operation
 
 For more information on fetching GraphQL operations see ["Fetching Data"](./fetching-data).
 
+## Fetching locally cached queries
+
+Apollo iOS uses a [normalized cache](./../caching/introduction#what-is-a-normalized-cache) to store your GraphQL response data locally. This allows you to retrieve operation data that has been previously fetched without waiting for an additional network request. You can configure how your fetch requests interact with the cache using cache policies.
+
+### Cache policies
+
+`ApolloClient`'s `fetch(query:)` method takes an optional `cachePolicy` that allows you to specify when results should be fetched from the server, and when data should be loaded from the local cache.
+
+**`.cacheFirst`** - *(Default Value)*
+
+Return data from the cache if available, else fetch results from the server.
+
+**`.networkFirst`**
+
+Attempt to fetch results from the server, if failed, return data from the cache if available.
+
+**`.networkOnly`**
+
+Fetch results from the server, do not attempt to read data from the cache.
+<Note>
+
+By default the results will still be written to the cache for future use. To prevent results from being cached, use `RequestConfiguration.writeResultsToCache`.
+
+</Note>
+
+**`.cacheOnly`**
+
+Return data from the cache if available, do not attempt to fetch results from the server.
+Returns `nil` if cached data is not available.
+
+**`.cacheAndNetwork`**
+
+Return data from the cache if available, and always fetch results from the server.
+
+Request using this cache policy may emit multiple responses: first from the cache (if available), then from the network.
+
+> For more information on how result data is stored in the cache or how to configure the normalized cache, see the [Caching documentation](./../caching/introduction).
+
 ## Watching queries
 
 Queries can also be watched with `ApolloClient.watch(query:)`. Watching a query is very similar to fetching a query. The main difference is that you don't just receive an initial result, but your result handler will be invoked whenever relevant data in the cache changes:
 
 ```swift
 let watcher = apollo.watch(query: HeroNameQuery()) { result in
-  guard let data = try? result.get().data else { return }
-  print(data.hero?.name) // Luke Skywalker
+  do {
+    let response = try result.get()
+    print(response.data?.hero?.name) // Luke Skywalker
+  } catch {
+    print("Error watching query: \(error)")
+  }
 }
 ```
 
