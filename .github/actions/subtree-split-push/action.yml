@@ -24,10 +24,11 @@ runs:
     env:
       PR_TITLE: ${{ inputs.pr-title }}
     run: |
+      echo "git: $(git --version)"
       git fetch ${{ inputs.remote }} ${{ inputs.target-branch }}
-      sh git-subtree.sh pull -P ${{ inputs.subtree }} --squash -m "pull: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - $PR_TITLE" ${{ inputs.remote }} ${{ inputs.target-branch }} 
-      splitResult=$(sh git-subtree.sh -P ${{ inputs.subtree }} split --squash --rejoin -m "split: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - $PR_TITLE")
+      git subtree pull -P ${{ inputs.subtree }} --squash -m "pull: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - $PR_TITLE" ${{ inputs.remote }} ${{ inputs.target-branch }}
+      splitResult=$(git subtree -P ${{ inputs.subtree }} split --squash --rejoin -m "split: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - $PR_TITLE")
       if [ ! -z "$splitResult" ]
       then
-        sh git-subtree.sh push -P ${{ inputs.subtree }} ${{ inputs.remote }} ${{ inputs.target-branch }}
+        git subtree push -P ${{ inputs.subtree }} ${{ inputs.remote }} ${{ inputs.target-branch }}
       fi
