@@ -93,28 +93,28 @@ jobs:
       matrix:
         include:
           # macOS_current
-          - destination: platform=macOS,arch=x86_64
+          - destination: platform=macOS,arch=arm64
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
             name: Apollo Unit Tests - macOS
             run-js-tests: false
             should-run: ${{ needs.changes.outputs.ios }}
           # Codegen CLI Test
-          - destination: platform=macOS,arch=x86_64
+          - destination: platform=macOS,arch=arm64
             scheme: CodegenCLITests
             test-plan: CodegenCLITestPlan
             name: Codegen CLI Unit Tests - macOS
             run-js-tests: false
             should-run: ${{ needs.changes.outputs.codegen }}
           # CodegenLib Test
-          - destination: platform=macOS,arch=x86_64
+          - destination: platform=macOS,arch=arm64
             scheme: ApolloCodegenTests
             test-plan: Apollo-Codegen-CITestPlan
             name: Codegen Lib Unit Tests - macOS
             run-js-tests: true
             should-run: ${{ needs.changes.outputs.codegen }}
           # ApolloPagination Tests
-          - destination: platform=macOS,arch=x86_64
+          - destination: platform=macOS,arch=arm64
             scheme: ApolloPaginationTests
             test-plan: Apollo-PaginationTestPlan
             name: ApolloPagination Unit Tests - macOS
