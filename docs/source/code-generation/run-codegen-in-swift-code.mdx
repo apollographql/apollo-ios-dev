@@ -67,8 +67,7 @@ let configuration = ApolloCodegenConfiguration(
 		queryStringLiteralFormat: .multiline,
 		deprecatedEnumCases: .include,
 		schemaDocumentation: .include,
-		apqs: .disabled,
-		cocoapodsCompatibleImportStatements: false,
+		operationDocumentFormat: .definition,
 		warningsOnDeprecatedUsage: .include,
 		conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies(
 			enumCases: .camelCase

@@ -1,0 +1,476 @@
+---
+title: Request chain customization
+description: Learn how to customize the Apollo iOS request chain via custom interceptors
+---
+
+In Apollo iOS, the [`ApolloClient`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apolloclient) uses a [`NetworkTransport`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/networktransport) object to fetch GraphQL queries from a remote GraphQL server.
+
+The default `NetworkTransport` is the [`RequestChainNetworkTransport`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/requestchainnetworktransport). This network transport uses a structure called a **request chain** to process each operation through a series of discrete interceptor types.
+
+## Request chains
+
+A [`RequestChain`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/requestchain) manages the flow of a GraphQL request through a series of interceptors that handle different aspects of request execution. The request chain separates interceptor responsibilities into discrete types and implements a bi-directional flow where requests are sent "down" the chain and responses are sent back "up" through the chain.
+
+For each individual request, the [`RequestChainNetworkTransport`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/requestchainnetworktransport) creates a `RequestChain` with interceptors provided by an [`InterceptorProvider`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/interceptorprovider). Each `RequestChain` is scoped to a single request and handles its execution.
+
+### Request chain flow
+
+When an operation is executed, a [`RequestChain`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/requestchain) processes the request through the following steps:
+
+- `GraphQLInterceptor`s receive and may mutate the `GraphQLRequest`
+- Cache read executed via `CacheInterceptor` if necessary (based on cache policy)
+- `GraphQLRequest.toURLRequest()` called to obtain `URLRequest`
+- `HTTPInterceptors` receive and may mutate `URLRequest`
+- `ApolloURLSession` handles networking with `URLRequest`
+- `HTTPInterceptors` receive stream of `HTTPResponse` objects for each chunk & may mutate raw chunk `Data` stream
+- `ResponseParsingInterceptor` receives `HTTPResponse` and parses data chunks into stream of `GraphQLResponse`s
+- `GraphQLInterceptor`s receive and may mutate `ParsedResult` with parsed `GraphQLResponse`
+- Cache write executed via `CacheInterceptor` if necessary (based on cache policy)
+- `GraphQLResponse` stream emitted out to `NetworkTransport`
+
+### Response streams
+
+Unlike Apollo iOS 1.x, the 2.0 request chain processes results through streams to support multi-part responses such as subscriptions and operations using `@defer`. For single-response operations, these streams emit one value and then terminate.
+
+## Interceptor types
+
+There are four discrete interceptor types used by the `RequestChain`
+
+#### GraphQLInterceptor
+
+[`GraphQLInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/graphqlinterceptor) handles pre-flight and post-flight work on the `GraphQLRequest` and `GraphQLResponse`.
+
+- **Pre-flight:** Inspect and mutate the `GraphQLRequest` before processing
+- **Post-flight:** Inspect and mutate the `GraphQLResponse` and parsed results
+- **Error handling:** Use `.mapErrors()` to handle errors from subsequent steps
+
+#### HTTPInterceptor
+
+[`HTTPInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/httpinterceptor) handles pre-flight and post-flight work on HTTP requests and responses.
+
+- **Pre-flight:** Inspect and mutate the `URLRequest` before network fetch
+- **Post-flight:** Inspect the `HTTPResponse` and mutate raw response data chunks
+
+#### CacheInterceptor
+
+[`CacheInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/cacheinterceptor) handles cache read and write operations.
+
+These can be used to implement custom cache manipulation beyond what is available using [type/field policies](./../caching/cache-key-resolution).
+
+- **Cache reads:** Called before network fetch (based on cache policy)
+- **Cache writes:** Called after response parsing (based on cache policy)
+
+#### ResponseParsingInterceptor
+
+[`ResponseParsingInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/responseparsinginterceptor) handles parsing response data chunks into `GraphQLResponse` objects.
+
+## Providing custom interceptors to a `RequestChain`
+
+When constructing a request chain for a GraphQL operation, `RequestChainNetworkTransport` passes operations to an object conforming to the [`InterceptorProvider` protocol](https://www.apollographql.com/docs/ios/docc/documentation/apollo/interceptorprovider). To provide custom interceptors to the `RequestChain`, create a custom implementation of the `InterceptorProvider` protocol and initialize your `RequestChainNetworkTransport` with it.
+
+Default implementations of each of the `InterceptorProvider` methods are included. These implementations provide common-sense defaults. It is recommended that you include the default GraphQL and HTTP interceptors provided by `DefaultInterceptorProvider.shared` in your custom interceptor provider as well.
+
+#### Example
+A custom interceptor that adds an `AuthenticationInterceptor` to the GraphQL interceptors could be implemented like this:
+```swift
+struct CustomInterceptorProvider: InterceptorProvider {
+  func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any GraphQLInterceptor] {
+    return DefaultInterceptorProvider.shared.graphQLInterceptors(for: operation) + [
+      CustomAuthenticationInterceptor(),
+    ]
+  }
+}
+```
+
+This interceptor provider will use the default `graphQLInterceptors` and add a `CustomAuthenticationInterceptor` to the end of the list. It does not override the other interceptor provider methods, so it will use the default HTTP, caching and response parsing interceptors.
+
+### Default interceptors
+
+The default interceptors provided by Apollo iOS are:
+
+**GraphQL Interceptors:**
+- [`MaxRetryInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/maxretryinterceptor) - Limits request retries (default: 3 retries)
+- [`AutomaticPersistedQueryInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/automaticpersistedqueryinterceptor) - Handles APQ retry logic
+
+**Cache Interceptor:**
+- [`DefaultCacheInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/defaultcacheinterceptor) - Handles cache reads and writes
+
+**HTTP Interceptors:**
+- [`ResponseCodeInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/responsecodeinterceptor) - Handles HTTP error status codes
+
+**Response Parser:**
+- [`JSONResponseParsingInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/jsonresponseparsinginterceptor) - Parses standard GraphQL JSON responses
+
+## Implementing custom interceptors
+
+To add custom functionality to your request chain, you can implement custom interceptors for any of the four interceptor types. Each interceptor type has a specific protocol to implement and handles different aspects of request processing.
+
+### GraphQLInterceptor
+
+[`GraphQLInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/graphqlinterceptor) requires you to implement the `intercept(request: next:)` function to perform pre-flight work on the `GraphQLRequest` and post-flight work on the parsed response data.
+
+The `intercept` function works as follows:
+
+- Pre-flight
+  - You may execute any custom pre-flight logic.
+- Call `next(request)`
+  - You must call the provided `next` closure, passing in either the original request or a modified version.
+  - This request will be sent to the next interceptor.
+- Post-flight
+  - The `next` closure returns an `InterceptorResultStream`, which will emit results after the network fetch and parsing.
+    - For multi-part responses (subscriptions and queries using `@defer`), this will emit multiple results, otherwise it will only emit a single result and then terminate.
+  - To execute post-flight logic, `map` the result stream. Each time the stream receives a result, it will be passed into the `map` closure.
+  - The `map` closure can return the original result or a modified version.
+- Return the stream
+  - When finished, your interceptor must return the `InterceptorResultStream`, which will be passed back up the chain to the previous interceptor.
+
+#### Example - Request logging interceptor
+```swift
+struct RequestLoggingInterceptor: GraphQLInterceptor {
+  let logger: Logger
+
+  func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: NextInterceptorFunction<Request>
+  ) async throws -> InterceptorResultStream<Request> {
+    // Pre-flight: log the outgoing request
+    logger.log("🚀 Request: \(request.operation.operationName)")
+
+    // Call next interceptor and handle the response stream
+    return await next(request)
+      .map { result in
+        // Post-flight: log the response
+        logger.log("✅ Response received for: \(request.operation.operationName)")
+        return result
+      }
+      .mapErrors { error in
+        // Handle errors from later steps
+        logger.log("❌ Request failed: \(error)")
+        throw error
+      }
+  }
+}
+```
+
+#### Example - Authentication header interceptor
+```swift
+struct AuthHeaderInterceptor: GraphQLInterceptor {
+  let authToken: String
+
+  func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: NextInterceptorFunction<Request>
+  ) async throws -> InterceptorResultStream<Request> {
+    // Pre-flight: add authentication header
+    var authenticatedRequest = request
+    authenticatedRequest.additionalHeaders["Authorization"] = "Bearer \(authToken)"
+
+    // Execute request and handle response
+    return await next(authenticatedRequest)
+  }
+}
+```
+
+### HTTPInterceptor
+
+[`HTTPInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/httpinterceptor) requires you to implement the `intercept(request: next:)` function to perform pre-flight work on the `URLRequest` and post-flight work on the `HTTPResponse`, including the raw response `Data` stream.
+
+After the `RequestChain` proceeds through the `GraphQLInterceptor`s provided by it's `InterceptorProvider`, it will call `GraphQLRequest/toURLRequest()` on the final `GraphQLRequest`. Each `HTTPInterceptor` provided by the `InterceptorProvider` will then have it's `intercept(request:next:)` function called in sequential order prior to fetching the request.
+
+The `intercept` function works as follows:
+
+- Pre-flight
+  - You may execute any custom pre-flight logic.
+- Call `next(request)`
+  - You must call the provided `next` closure, passing in either the original request or a modified version.
+  - This request will be sent to the next interceptor.
+- Post-flight
+  - The `next` closure returns an `HTTPResponse`, which provides the `HTTPURLResponse` headers and a `chunks` stream that will emit the raw response data chunks as they are received.
+    - For multi-part responses (subscriptions and queries using `@defer`), this will emit multiple results, otherwise it will only emit a single result and then terminate.
+  - You may inspect the response headers at this point.
+  - To execute post-flight logic on the response data, call `response.mapChunks` to intercept the data stream.
+  - The `mapChunks` closure can return the original data stream or a modified version.
+- Return the `HTTPResponse`
+  - When finished, your interceptor must return the `HTTPResponse`, which will be passed back up the chain to the previous `HTTPInterceptor`.
+
+### CacheInterceptor
+
+[`CacheInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/cacheinterceptor) implementations handle cache read and write operations with custom logic beyond what's available through [type/field policies](./../caching/cache-key-resolution). A `CacheInterceptor` must provide two functions, `readCacheData(from store: request:)` and `writeCacheData(to store: request: response)`.
+
+#### Example - Custom cache validation interceptor
+```swift
+struct ValidatingCacheInterceptor: CacheInterceptor {
+
+  func readCacheData<Request: GraphQLRequest>(
+    from store: ApolloStore,
+    request: Request
+  ) async throws -> GraphQLResponse<Request.Operation>? {
+    // Try to read from cache
+    guard let cachedResponse = try await store.load(request.operation) else {
+      return nil
+    }
+
+    // Custom validation logic
+    if isCacheDataStale(cachedResponse) {
+      // Return nil to force network fetch
+      return nil
+    }
+
+    return cachedResponse
+  }
+
+  func writeCacheData<Request: GraphQLRequest>(
+    to store: ApolloStore,
+    request: Request,
+    response: ParsedResult<Request.Operation>
+  ) async throws {
+    // Custom write logic with validation
+    guard let records = response.cacheRecords,
+          shouldCache(request: request, response: response) else {
+      return
+    }
+
+    try await store.publish(records: records)
+  }
+
+  private func isCacheDataStale(_ response: GraphQLResponse<some GraphQLOperation>) -> Bool {
+    // Implementation specific cache validation logic
+    return false
+  }
+
+  private func shouldCache<Request: GraphQLRequest>(
+    request: Request,
+    response: ParsedResult<Request.Operation>
+  ) -> Bool {
+    // Implementation specific caching rules
+    return true
+  }
+}
+```
+
+### ResponseParsingInterceptor
+
+[`ResponseParsingInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/responseparsinginterceptor) implementations handle parsing of HTTP response data into `GraphQLResponse` objects.
+
+The default [`JSONResponseParsingInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/jsonresponseparsinginterceptor) parses GraphQL specification compiliant response JSON and supports multi-part responses for subscriptions over HTTP and operations using the `@defer` directive.
+
+If you are using a response format other than JSON or that differs from the GraphQL specification, you may need to provide a custom `ResponseParsingInterceptor`.
+
+## Request retries
+
+Any interceptor can trigger a request retry by throwing a `RequestChain.Retry` error. When a `RequestChain` receives a thrown `Retry` error, it will restart from the beginning of the [request chain flow](#request-chain-flow) using the `request` provided by the error. This allows the request to be modified to correct errors that may be causing the failure prior to beginning again.
+
+### Preventing infinite retry loops
+
+If a retried request continues to fail, an interceptor that throws a `Retry` error may continue to throw `Retry` errors indefinitely, creating an infinite loop. To prevent this use a `MaxRetryInterceptor`. The `DefaultInterceptorProvider` includes a `MaxRetryInterceptor` with a default limit of 3 retries. When creating custom `InterceptorProvider` implementations, it is highly recommended to include a `MaxRetryInterceptor` early in the GraphQL interceptor chain.
+
+If you are not using `MaxRetryInterceptor`, any interceptor that throws `Retry` errors must maintain state to ensure it does not trigger retries infinitely.
+
+## Error handling
+
+Both pre-flight and post-flight errors can be handled using custom `GraphQLInterceptor`s. An interceptor can use the `mapErrors(_:)` function of the `InterceptorResultStream` returned by calling the `next` closure. This will catch any errors thrown in later steps of the `RequestChain`, including:
+
+- Pre-flight errors thrown by `GraphQLInterceptor`s later in the `RequestChain`.
+- Networking errors thrown by the `ApolloURLSession` or `HTTPInterceptor`s in the `RequestChain`.
+- Parsing errors thrown by the `ResponseParsingInterceptor` of the `RequestChain`.
+- Post-flight errors thrown by `GraphQLInterceptor`s later in the request chain.
+
+Your `mapErrors(_:)` closure may rethrow the same error or a different error, which will then be passed up through the rest of the request chain. If possible, you may recover from the error by constructing and returning a `ParsedResult`. Returning `nil` will suppress the error and terminate the `RequestChain`'s stream without emitting a result.
+
+It is not required that every interceptor implement error handling. A `GraphQLInterceptor` that does not call `mapErrors(_:)` will be skipped if an error is emitted.
+
+#### Example - Re-authentication interceptor
+
+In this example, when an `AuthencticationError` is thrown, the interceptor will attempt to refresh the user's auth token and then retry the request.
+
+```swift
+struct ReauthenticationInterceptor: GraphQLInterceptor {
+  let authManager: AuthenticationManager
+
+  func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: @escaping NextGraphQLInterceptorFunction<Request>
+  ) -> InterceptorResultStream<Request> {
+    return await next(request)
+      .mapErrors { error in
+        if let authError = error as? AuthenticationError {
+          // Handle authentication errors by refreshing an auth token and then retrying the request
+          let newAuthToken = try await authManager.refreshUserToken()
+          var refreshedRequest = request
+          refreshedRequest.additionalHeaders["Authorization": "Bearer \(newAuthToken)"]
+          throw RequestChain<Request>.Retry(request: refreshedRequest)
+        }
+        throw error // Re-throw other errors
+      }
+  }
+}
+```
+
+## Dependency injection via `TaskLocal` values
+
+Apollo iOS takes full advantage of Swift 6 structured concurrency, enabling you to use `@TaskLocal` values to pass context and dependencies between interceptors in a request chain. This provides a clean way to share information across the entire request lifecycle without explicitly passing values through each interceptor.
+
+When a `RequestChain` is kicked off, the entire request chain runs within the same task context. Any `@TaskLocal` values set before the request begins are accessible to all interceptors throughout the chain execution. Interceptors can also set `@TaskLocal` values that will be accessible for the remainder of the request chain's execution.
+
+<Note>
+
+`@TaskLocal` values rely on child task inheritance. Interceptors may run call their `next` functions or return from within a child `Task`, but you should avoid using `Task.detached` as this will create a new async context and `@TaskLocal` values will not be passed through the chain.
+
+</Note>
+
+### Example: Request tracing with correlation IDs
+
+Here's how to use `@TaskLocal` for request correlation across interceptors:
+
+**1. Define the TaskLocal value:**
+
+You may define a `@TaskLocal` value anywhere you would like. In this example, we define a `@TaskLocal` value in a `TracingInterceptor`.
+
+```swift
+struct TracingInterceptor: GraphQLInterceptor {
+  @TaskLocal
+  static var correlationId: String?
+
+  // ...
+}
+```
+
+**2. Set the value:**
+
+The `@TaskLocal` value can be set by the interceptor before continuing with the request chain.
+
+```swift
+struct TracingInterceptor: GraphQLInterceptor {
+  @TaskLocal
+  static var correlationId: String?
+
+  func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: NextInterceptorFunction<Request>
+  ) async throws -> InterceptorResultStream<Request> {
+    let correlationId = UUID().uuidString
+
+    return try await TracingInterceptor.$correlationId.withValue(correlationId) {
+      return await next(request)
+    }
+  }
+}
+```
+
+Alternatively, other parts of your application can set `@TaskLocal` values prior to beginning the request. These values will be accessible by any interceptors in the request chain.
+
+```swift
+let correlationId = UUID().uuidString
+
+try await TracingInterceptor.$correlationId.withValue(correlationId) {
+  let result = try await apolloClient.fetch(query: query, cachePolicy: cachePolicy)
+}
+```
+
+**3. Access the value in interceptors:**
+
+Once the `@TaskLocal` value is set, it can be accessed by any interceptor in the request chain.
+
+```swift
+struct CorrelatedOperationInterceptor: GraphQLInterceptor {
+  func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: NextInterceptorFunction<Request>
+  ) async throws -> InterceptorResultStream<Request> {
+    return await next(request)
+      .map { result in
+        let correlationId = TracingInterceptor.correlationId ?? "unknown"
+        print("🔍 [Trace: \(correlationId)] Request completed successfully")
+        return result
+      }
+  }
+}
+```
+
+### Example: User context sharing
+
+For applications that need user context throughout the request chain:
+
+**1. Define user context:**
+
+```swift
+struct UserContext {
+  let userId: String
+  let tenantId: String
+  let permissions: Set<String>
+}
+
+extension TaskLocal where Value == UserContext? {
+  @TaskLocal
+  static var userContext: UserContext?
+}
+```
+
+**2. Set context when making authenticated requests:**
+
+```swift
+struct AuthenticatedApolloClient {
+  private let apolloClient: ApolloClient
+
+  func fetchAsUser<Query: GraphQLQuery>(
+    query: Query,
+    userContext: UserContext,
+    cachePolicy: CachePolicy = .default
+  ) async throws -> GraphQLResponse<Query.Data> {
+
+    return try await TaskLocal.$userContext.withValue(userContext) {
+      return try await apolloClient.fetch(query: query, cachePolicy: cachePolicy)
+    }
+  }
+}
+```
+
+**3. Use context in interceptors:**
+
+```swift
+struct AuthorizationInterceptor: GraphQLInterceptor {
+  func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: NextInterceptorFunction<Request>
+  ) async throws -> InterceptorResultStream<Request> {
+
+    guard let userContext = TaskLocal.userContext else {
+      throw AuthError.noUserContext
+    }
+
+    // Add user context to request
+    var authenticatedRequest = request
+    authenticatedRequest.additionalHeaders["X-User-ID"] = userContext.userId
+    authenticatedRequest.additionalHeaders["X-Tenant-ID"] = userContext.tenantId
+
+    return await next(authenticatedRequest)
+      .mapErrors { error in
+        // Log error with user context
+        print("Request failed for user \(userContext.userId): \(error)")
+        throw error
+      }
+  }
+}
+
+struct AuditInterceptor: GraphQLInterceptor {
+  func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: NextInterceptorFunction<Request>
+  ) async throws -> InterceptorResultStream<Request> {
+
+    return await next(request)
+      .map { result in
+        // Audit successful operations
+        if let userContext = TaskLocal.userContext {
+          auditLog.record(
+            operation: request.operation.operationName ?? "unknown",
+            userId: userContext.userId,
+            tenantId: userContext.tenantId,
+            timestamp: Date()
+          )
+        }
+        return result
+      }
+  }
+}
+```

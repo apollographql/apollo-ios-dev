@@ -1,11 +1,11 @@
 switcher:
   heading: "Apollo iOS"
   versions:
-    - label: v1
+    - label: v2
       latest: true
       href: ./
-    - label: v0.x (legacy)
-      href: ./v0-legacy
+    - label: v1
+      href: ./v1
 items:
   - label: Introduction
     href: "."
@@ -166,7 +166,5 @@ items:
       - label: File Uploads
         href: ./advanced/file-uploads
       - label: Request Chain Customization
-        href: ./advanced/request-pipeline
-      - label: Request Configuration
-        href: ./advanced/request-configuration
+        href: ./advanced/request-chain
 

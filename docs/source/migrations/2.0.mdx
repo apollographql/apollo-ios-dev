@@ -1,0 +1,280 @@
+---
+title: Apollo iOS 2.0 Migration Guide
+---
+
+## Introduction
+
+Apollo iOS 2.0 represents a major evolution of the library, redesigned from the ground up to take full advantage of Swift's modern concurrency model. This release introduces significant breaking changes that require careful migration planning, but provides substantial improvements in type safety, performance, and developer experience.
+
+### What's new in 2.0
+
+Apollo iOS 2.0 brings several foundational changes:
+
+- **Swift Concurrency First**: Complete reimplementation using `async/await` and structured concurrency
+- **Streamlined APIs**: Simplified client APIs with clearer separation of concerns and more precise type safety
+- **Modern Swift Features**: Full adoption of Swift 6 with strict concurrency enabled
+
+### Breaking changes overview
+
+This migration involves significant API changes across several areas:
+
+1. **ApolloClient API**: Complete redesign using `async/await` instead of callback-based APIs
+2. **Cache Policies**: Split into discrete types with specific return signatures
+3. **Request Interceptors**: New framework with separate interceptor types for different request phases
+4. **Sendable Types**: Most types now conform to `Sendable` with associated constraints
+
+### Limitations
+
+**Minimum Deployment Targets**
+
+Apollo iOS 2.0 drops support for older deployment targets. The minimum deployment targets are now:
+
+- iOS 15.0+
+- macOS 12.0+
+- tvOS 15.0+
+- watchOS 8.0+
+- visionOS 1.0+
+
+**CocoaPods Support Removed**
+
+Cocoapods support is no longer available in Apollo iOS 2.0. The library is available via Swift Package Manager or as .xcframeworks built using the [Apollo iOS XCFramework Repo](https://github.com/apollographql/apollo-ios-xcframework).
+
+Code generation of Cocoapods modules is no longer supported.
+
+**Web socket support (Coming Soon)**
+
+The initial release of 2.0 will not support web sockets. Subscriptions over HTTP are supported by `RequestChainNetworkTransport`.
+
+A new implementation of the `ApolloWebSocket` target will be published in a future version as soon as possible. If your application requires web sockets, you should not upgrade to 2.0 until the new web socket implementation is released.
+
+### Migration strategy
+
+Apollo iOS 2.0 migration follows a two-phase approach designed to minimize disruption while ensuring all functionality is properly updated.
+
+**Phase 1: Breaking changes**
+
+Some APIs have fundamentally changed to support the new structured concurrency model and cannot maintain backward compatibility. You must update these implementations before proceeding with the rest of your migration.
+
+These changes include:
+
+- Various changes to request/response models
+- `RequestChain` configuration via custom `Interceptors`
+- Custom `NetworkTransport` implementations
+- Custom `NormalizedCache` implementations
+
+**Phase 2: Incrementally update `ApolloClient` API usage**
+
+The most commonly used APIs for fetching data via `ApolloClient` have been deprecated instead of removed completely. These APIs have been updated to conform to `Sendable`, so you will need to resolve thread-safety issues. But once breaking changes have been resolved, this allows you to:
+
+- **Compile and run** your application with the deprecated APIs while planning your migration
+- **Update incrementally** - migrate one query, mutation, or subscription at a time
+- **Verify behavior** at each step to ensure correctness before proceeding
+- **Deploy intermediate states** if needed during a gradual rollout
+
+While we recommend that you update these deprecated APIs to the new versions ASAP, you can do so incrementally while still compiling your application and verifying behavior. You should update these APIs as soon as possible to take advantage of the use of `async/await` and increased type safety of the return types for these APIs.
+
+The remainder of this guide provides detailed instructions for migrating each aspect of your Apollo iOS integration.
+
+## Codegen Configuration
+
+Apollo iOS 2.0 removes a number of obsolete options from the codegen configuration. Your configuration will need to be updated to remove these options as well.
+
+If you are using a JSON codegen configuration file, you may get an error when attempting to run codegen. If using the `ApolloCodegenLib` directly in Swift, your configuration may not compile.
+
+The following changes have been made to the codegen configuration:
+
+- **`OutputOptions.cocoapodsCompatibleImportStatements`**: CocoaPods support has been completely removed.
+- **`OutputOptions.markOperationDefinitionsAsFinal`**: Generated GraphQL operation and local cache mutation class types are always `final` now to support `Sendable` conformance. Subclassing `GraphQLOperations` is no longer permitted.
+- **`OutputOptions.apqs`**: The legacy `APQConfig` has been replaced by `operationDocumentFormat`. Update your configuration to use `OperationDocumentFormat.operationId` instead of `APQConfig.persistedOperationsOnly`.
+- **`SchemaTypesFileOutput.ModuleType.swiftPackageManager`**: This deprecated case has been removed. Use `.swiftPackage(apolloSDKDependency: .default)` instead.
+
+
+## `URLSessionClient` -> `ApolloURLSession`
+
+In Apollo iOS 1.0 a `URLSessionClient` that managed an internal `URLSession` was used to handle network operations. In 2.0, this is replaced by the [`ApolloURLSession`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollourlsession) protocol. `URLSession` conforms to this procotol by default. This allows you to provide your own `URLSession` to the `RequestChainNetworkTransport`. You can configure this `URLSession` as needed and provide your own delegates to it.
+
+```swift
+let urlSession = URLSession.shared // Conforms to ApolloURLSession
+urlSession.delegate = self
+let networkTransport = RequestChainNetworkTransport(
+  interceptorProvider: DefaultInterceptorProvider.shared,
+  endpointURL: url,
+  urlSession: urlSession
+)
+```
+
+## `RequestContext` -> Task Local Values
+
+In Apollo iOS 1.x, you could provide an arbitrary `RequestContext` when initiating a GraphQL operation. This could be accessed by custom interceptors or `NetworkTransport` implementations.
+
+2.0 deprecates `RequestContext` in favor of using Swift 6's `@TaskLocal` values. For more information on using `@TaskLocal` values with your network configuration, see our [Request Chain `@TaskLocal` values documentation](./../advanced/request-chain#dependency-injection-via-tasklocal-values).
+
+## `RequestChain` configuration
+
+The `RequestChain` and interceptor framework has been completely reimagined. The new version supports `async/await` and provides the ability to interact with the request at each step within the chain more safely with more explicit APIs.
+
+If you are providing your own custom `InterceptorProvider` with your own interceptors, you will need to modify your code to utilize these new APIs.
+
+This migration guide provides an overview of the changes. For detailed documentation on the new request chain, see the [Request Chain Configuration documentation](./advanced/request-chain).
+
+Before migrating your `InterceptorProvider` to 2.0, we recommend you familiarize yourself with these key changes to the Request Chain.
+
+### Discreet Interceptors Types
+
+The singular `ApolloInterceptor` protocol that was used to handle any step of the request chain has been broken up into discrete interceptor types for different portions of request execution. This provides a cleaner, more type-safe API for interacting with the request and response at different stages of the RequestChain.
+
+The four interceptor types are:
+
+- `GraphQLInterceptor`
+  - Can inspect and mutate the `GraphQLRequest` and `GraphQLResponse`
+- `HTTPInterceptor`
+  - Can inspect and mutate the `URLRequest`
+  - After network response can inspect the `HTTPURLResponse` (readonly) and mutate the actual raw response `Data` **prior to parsing**
+- `CacheInterceptor`
+  - Handles read/write of cache data
+  - Read currently runs before `GraphQLInterceptors` (not sure if that is the desired behavior, we should discuss)
+  - Write runs after parsing
+- `ResponseParsingInterceptor`
+  - Handles the parsing of the response Data into the `GraphQLResponse`
+
+`NetworkFetchInterceptor` is no longer used, as the network fetch is managed by the `ApolloURLSession`. See the section on `ApolloURLSession` for more information.
+
+### Request Chain Flow
+
+In 1.0, interceptors were called once in sequential order. In 2.0, requests are now sent down the request chain pre-flight and then back up the chain post-flight, allowing each interceptor to interact with both the request and response in a type-safe way.
+
+Requests are now processed by the `RequestChain` using the following flow:
+
+- `GraphQLInterceptors` receive and may mutate `Request`
+- Cache read executed via `CacheInterceptor` if necessary (based on cache policy)
+- `GraphQLRequest.toURLRequest()` called to obtain `URLRequest`
+- `HTTPInterceptors` receive and may mutate `URLRequest`
+- `ApolloURLSession` handles networking with `URLRequest`
+- `HTTPInterceptors` receive stream of `HTTPResponse` objects for each chunk & may mutate raw chunk `Data` stream
+- `ResponseParsingInterceptor` receives `HTTPResponse` and parses data chunks into stream of `GraphQLResponse`
+- `GraphQLInterceptors` receive and may mutate `GraphQLResponse` with parsed `GraphQLResult` and (possibly) cache records.
+- Cache write executed via `CacheInterceptor` if necessary (based on cache policy)
+- `GraphQLResponse` emitted out to `NetworkTransport`
+
+### Error Handling
+
+The `ApolloErrorInterceptor` has been removed from 2.0. Instead, any `GraphQLInterceptor` can intercept errors by calling the `mapErrors` function of the `InterceptorResultStream`. Errors can even be intercepted by multiple interceptors that perform different error handling logic.
+
+For more information on error handling see the [Request Chain error handling documentation](./../advanced/request-chain#error-handling).
+
+### Retrying Requests
+
+In 1.0, you could retry a `RequestChain`'s request by calling `chain.retry(request:completion)`. In Apollo iOS 2.0, interceptors no longer have access to the `RequestChain` itself. Instead, interceptors can trigger a retry by throwing a `RequestChain.Retry` error.
+
+For more information on retrying see the [Request Chain request retries documentation](./../advanced/request-chain#request-retries).
+
+### Converting 1.x interceptor providers
+
+Converting your existing custom `InterceptorProvider` to 2.0 requires two main steps:
+
+1. **Refactor existing interceptors** to use one of the four new discrete interceptor types
+2. **Update your `InterceptorProvider`** to conform to the new protocol structure
+
+#### Step 1: Refactor existing interceptors
+
+In 1.x, all custom logic was implemented using the `ApolloInterceptor` protocol. In 2.0, you need to choose the appropriate interceptor type based on what your interceptor does. See the linked documentation for each interceptor type for more information on how to implement them.
+
+- **[`GraphQLInterceptor`](./../advanced/request-chain#graphqlinterceptor):** Provides access to the `GraphQLRequest` and the parsed `GraphQLResponse`. Most interceptors from 1.0 should use this type.
+- **[`HTTPInterceptor`](./../advanced/request-chain#httpinterceptor):** Provides access to the `HTTPURLResponse` and the raw data stream of the network response.
+- **[`CacheInterceptor`](./../advanced/request-chain#cacheinterceptor):** To implement custom caching logic use a `CacheInterceptor`.
+- **[`ResponseParsingInterceptor`](./../advanced/request-chain#responseparsinginterceptor):** Parses raw response data into a `GraphQLResponse` and set of records for writing to the cache.
+
+#### Step 2: Update your InterceptorProvider
+
+Once your interceptors are refactored for the new APIs, update your `InterceptorProvider`.
+
+The `InterceptorProvider` methods provide default implementations that use the `DefaultInterceptorProvider` values. This means you only need to override the methods that you would like to provide custom interceptors for.
+
+**It is strongly recommended that you include the default GraphQL and HTTP interceptors provided by `DefaultInterceptorProvider.shared`.**
+
+`DefaultInterceptorProvider` has been changed to a `final` class to support `Sendable`. If you were previously subclassing `DefaultInterceptorProvider` you will need to access it inside of your `InterceptorProvider` instead.
+
+```swift
+struct CustomInterceptorProvider: InterceptorProvider {
+
+  // Provide GraphQL interceptors (pre/post-flight GraphQL processing)
+  func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any GraphQLInterceptor] {
+     return DefaultInterceptorProvider.shared.graphQLInterceptors(for: operation) + [
+      AuthInterceptor(token: getCurrentToken()),
+      LoggingInterceptor()
+    ]
+  }
+
+  // Provide cache interceptor (cache read/write operations)
+  func cacheInterceptor<Operation: GraphQLOperation>(for operation: Operation) -> any CacheInterceptor {
+    return CustomCacheInterceptor()
+  }
+
+  // Provide HTTP interceptors (URLRequest/HTTPResponse processing)
+  func httpInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any HTTPInterceptor] {
+    return DefaultInterceptorProvider.shared.httpInterceptors(for: operation) + [
+      CustomHeaderInterceptor()
+    ]
+  }
+}
+```
+
+In this example, we are not providing an implementation of `responseParser(for operation:)`, so the default `JSONResponseParsingInterceptor` will be used.
+
+## Minor Breaking Changes
+
+Apollo iOS 2.0 introduces a number of minor breaking changes that may affect your migration depending on your API usage.
+
+### Sendable conformance and thread safety
+
+Apollo iOS 2.0 adopts Swift 6's strict concurrency model and most types in the library now conform to `Sendable`. This ensures that Apollo iOS operations are safe to use across different threads and with Swift's structured concurrency model. We recommend migrating to the new `async/await` fetch APIs to take full advantage of these safety improvements.
+
+In order to provide `Sendable` conformance and full thread safety, some types have been converted from `class` to `struct` types.
+
+Most core Apollo iOS types now conform to `Sendable`, including:
+
+- `ApolloClient`
+- `ApolloStore`
+- `CachePolicy` types
+- `RequestConfiguration`
+- `NetworkTransport` implementations
+- Generated operation and fragment models
+- Interceptor types
+- `HTTPResponse`
+- `GraphQLResponse`
+
+### `GraphQLResponse` & `GraphQLResult`
+
+Apollo iOS 1.0 exposed both a `GraphQLResponse` and `GraphQLResult` model. The `GraphQLResponse` was mostly used internally for parsing of response data, while `GraphQLResult` was the response model for a GraphQL request exposed to the user.
+
+In 2.0, the legacy `GraphQLResponse` model has been removed and `GraphQLResult` has been renamed to `GraphQLResponse`. Additionally, the new response model is generic over the operation instead of the response data. This allows access to type information about the GraphQL operation as well as it's response data.
+
+Code referencing the `GraphQLResult` directly will need to be refactored to reference the new `GraphQLResponse` instead.
+
+If you were using the old `GraphQLResponse` for manual response parsing, use `JSONResponseParser` instead.
+
+### Cache misses no longer throw errors
+
+When a cache miss occurred in Apollo iOS 1.0, the `ApolloStore` would throw an error (usually a `JSONDecodingError.missingValue`). In 2.0, cache misses result in a `nil` value being returned. Errors are only thrown if there is an issue with the cache such as invalid data or a disk I/O failure.
+
+Cache read methods on `ApolloStore` and in `ReadTransaction`s have been updated to return `Optional` results. You may need to update cache transation usage to adjust for this new behavior.
+
+### SPI usage
+
+Many of the APIs that are not intended for use general public use are now protected by the `@_spi` attribute. If you are using any of the public APIs that were prefixed with an `_` or marked as **Internal Use Only**, you will need to import the SPI in order to continue using them.
+
+Apollo uses the following SPI categories:
+
+- **Execution** Exposes symbols used by the generated models but not intended for public consumption.
+- **Internal** Exposes symbols used by  `Apollo` and `ApolloAPI` across module boundaries but not intended for public consumption.
+- **Unsafe** Exposes symbols that provide unsafe access to the underlying data of the GraphQL models. The public API provides strongly type access to the data that is guaranteed to be safe. If invalid data is provided to the models by using unsafe APIs you may cause crashes or other undefined behavior.
+
+### `CustomScalarTypes`s
+
+Custom implementations of `CustomScalarType` need to import the `Execution` and `Internal` SPIs. Newly generated custom scalars will have the correct import statement, but existing custom scalars are not overwritten when code generation is ran.
+
+You may see `Type 'MyCustomScalar' does not conform to protocol ...` errors while upgrading. To resolve these, change the import statement in those custom scalar files to:
+
+```swift
+@_spi(Execution) @_spi(Internal) import ApolloAPI
+```
