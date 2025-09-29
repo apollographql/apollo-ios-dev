@@ -104,7 +104,15 @@ public extension SelectionSet {
     func addData(for type: Selection.Field.OutputType, inList: Bool = false) {
       switch type {
       case .scalar, .customScalar:
-        fields[field.responseKey] = fieldData
+        if inList {
+          guard let listData = fieldData as? [AnyHashable] else {
+            preconditionFailure("Expected list data for field: \(field)")
+          }
+
+          fields[field.responseKey] = unwrapAnyHashable(list: listData) as FieldValue
+        } else {
+          fields[field.responseKey] = fieldData
+        }
 
       case let .nonNull(innerType):
         addData(for: innerType, inList: inList)
@@ -144,6 +152,22 @@ public extension SelectionSet {
     }
 
     preconditionFailure("Expected list data to contain objects.")
+  }
+
+  private func unwrapAnyHashable(
+    list: [AnyHashable]
+  ) -> [FieldValue] {
+    if let nestedList = list as? [[AnyHashable]] {
+      return nestedList.map { self.unwrapAnyHashable(list: $0) as FieldValue }
+    }
+
+    return list.map {
+      guard let base = $0.base as? FieldValue else {
+        preconditionFailure("Expected list data to contain objects.")
+      }
+      return base
+    }
+
   }
 
   private func addConditionalSelections(
