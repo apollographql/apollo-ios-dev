@@ -51,13 +51,10 @@ class DefaultInterceptorProviderTests: XCTestCase {
       DefaultInterceptorProviderTests.mockData
     }
 
-    let results = try await client.fetch(query: MockQuery<GivenSelectionSet>()).getAllValues()
+    let graphQLResult = try await client.fetch(query: MockQuery<GivenSelectionSet>())
 
-    expect(results.count).to(equal(1))
-
-    let graphQLResult = results.first
-    XCTAssertEqual(graphQLResult?.source, .server)
-    XCTAssertEqual(graphQLResult?.data?.hero?.name, "R2-D2")
+    XCTAssertEqual(graphQLResult.source, .server)
+    XCTAssertEqual(graphQLResult.data?.hero?.name, "R2-D2")
 
     await fulfillment(of: [expectation])
   }
@@ -82,13 +79,10 @@ class DefaultInterceptorProviderTests: XCTestCase {
     }
     initialLoadExpectation.assertForOverFulfill = false
 
-    let results = try await client.fetch(query: MockQuery<GivenSelectionSet>()).getAllValues()
+    let graphQLResult = try await client.fetch(query: MockQuery<GivenSelectionSet>())
 
-    expect(results.count).to(equal(1))
-    let graphQLResult = results.first
-
-    XCTAssertEqual(graphQLResult?.source, .server)
-    XCTAssertEqual(graphQLResult?.data?.hero?.name, "R2-D2")
+    XCTAssertEqual(graphQLResult.source, .server)
+    XCTAssertEqual(graphQLResult.data?.hero?.name, "R2-D2")
 
     await fulfillment(of: [initialLoadExpectation])
 
