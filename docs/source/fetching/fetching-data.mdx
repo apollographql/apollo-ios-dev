@@ -37,9 +37,13 @@ query HeroName {
 Apollo iOS will generate a `HeroNameQuery` class that you can construct and pass to `ApolloClient.fetch(query:)`:
 
 ```swift
-apollo.fetch(query: HeroNameQuery()) { result in
-  guard let data = try? result.get().data else { return }
-  print(data.hero.name) // Luke Skywalker
+Task {
+  do {
+    let response = try await apollo.fetch(query: HeroNameQuery())
+    print(response.data?.hero?.name) // Luke Skywalker
+  } catch {
+    print("Error fetching hero: \(error)")
+  }
 }
 ```
 
@@ -124,76 +128,91 @@ Because GraphQL supports nullability, you have compile-time type safety. If the 
 
 > For more information on how to fetch type-safe data, learn about [type conditions](./type-conditions#accessing-conditional-response-data).
 
-## Operation result handling
+## Operation fetching
 
-The result of executing an operation is a Swift [`Result`](https://developer.apple.com/documentation/swift/result) whose `.success` case contains a [`GraphQLResult<Data>`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/graphqlresult) where `Data` is the generated root `Data` struct of the operation that was executed.
-
-You can call `try result.get().data` to obtain the `Data` object from the result. If you would like to handle error's or inspect the result's metadata, you can `switch` on the result like this:
+The result of executing an operation is a `GraphQLResponse<Operation>`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/graphqlresponse) the response's `data` property provides the generated root `Data` struct of the `Operation` that was executed.
 
 ```swift
-apollo.fetch(query: HeroNameQuery()) { result in
-  switch result {
-  case .success(let graphQLResult):
-    if let name = graphQLResult.data?.hero?.name {
-      print(name) // Luke Skywalker
-    } else if let errors = graphQLResult.errors {
-      // GraphQL errors
-      print(errors)
-    }
-  case .failure(let error):
-    // Network or response format errors
-    print(error)
-  }
-}
+let response = try await apollo.fetch(query: HeroNameQuery())
+let heroName = response.data?.hero?.name
 ```
-> **Note:** An operation can be successful, but the `GraphQLResult` may still include `GraphQLErrors`. See [Error Handling](./fetching/../error-handling) for more information.
 
-## Handling operation results in the background
+> For more information on executing each operation type, see the documentation on [Queries](./queries), [Mutations](./mutations), and [Subscriptions](./subscriptions).
 
-By default, Apollo will deliver operation results **on the main thread**, which is probably what you want if you're using them to update the UI.
+<Note>
 
-If you want your result handler to be called on a background queue, the `fetch(query:)`, `perform(mutation:)` and `subscribe(subscription:)` functions take an optional `queue:` parameter.
+An operation can be successful, but the `GraphQLResult` may still include `GraphQLErrors`. See [Error Handling](./fetching/../error-handling) for more information.
+
+</Note>
+
+### Single vs multi-response fetching
+
+Most GraphQL operations will only return a single response value. However some, like queries using `@defer` and subscription operations will return multiple results. Additionally, when using the `.cacheAndNetwork` cache policy, multiple results will be be returned.
+
+Apollo iOS can determine if an operation will return multiple results at compile-time. For operations that return a single result, `ApolloClient.fetch` will return a single `GraphQLResponse`. For those that return multiple results, it returns an `AsyncThrowingStream` of responses.
 
 ```swift
-apollo.fetch(
-  query: HeroNameQuery(),
-  queue: DispatchQueue.global(qos: .background),
-) { result in
- ...  // Will be called on a background queue
+// Single response
+let response = try await client.fetch(query: query, cachePolicy: .cacheFirst)
+let response = try await client.fetch(query: query, cachePolicy: .networkFirst)
+let response = try await client.fetch(query: query, cachePolicy: .networkOnly)
+
+// Multiple responses
+let responses = try client.fetch(query: query, cachePolicy: .cacheAndNetwork)
+
+for try await response in responses {
+  // Handle response
 }
 ```
 
-## Fetching locally cached data
+## Request configuration
 
-Apollo iOS uses a [normalized cache](./../caching/introduction#what-is-a-normalized-cache) to store your GraphQL response data locally. This allows you to retrieve operation data that has been previously fetched without waiting for an additional network request. You can configure how your fetch requests interact with the cache using cache policies.
+`RequestConfiguration` allows you to customize various aspects of individual requests. All `ApolloClient` request methods (`fetch`, `perform`, `upload`, `subscribe`) accept an optional `requestConfiguration` parameter.
 
-### Cache policies
+### Default request configuration
 
-`ApolloClient`'s `fetch(query:)` method takes an optional `cachePolicy` that allows you to specify when results should be fetched from the server, and when data should be loaded from the local cache.
+When you create an `ApolloClient`, you can provide a `defaultRequestConfiguration` that will be used for all requests unless a custom configuration is provided:
 
-By default, each request uses the `.returnCacheDataElseFetch` cache policy, which means data will be loaded from the cache when available, and fetched from the server otherwise.
+```swift
+let defaultConfig = RequestConfiguration(
+  requestTimeout: 30.0,
+  writeResultsToCache: true
+)
 
-The cache polices which you can specify are:
+let client = ApolloClient(
+  networkTransport: networkTransport,
+  store: store,
+  defaultRequestConfiguration: defaultConfig
+)
+```
 
-- **`.fetchIgnoringCacheData`**
-  - Always fetch from the server, but still store results to the cache.
-- **`.fetchIgnoringCacheCompletely`**
-- Always fetch from the server, and do not store results from the cache.
-  - If you're not using the cache at all, this method is preferred to `fetchIgnoringCacheData` for performance reasons.
-- **`.returnCacheDataAndFetch`**
-  - Return data from the cache if its available; *then* perform a fetch to see if there are any updates; store results in the cache.
-  - This is useful if you are [watching queries](./queries#watching-queries), since those will be updated when the call to the server returns.
-- **`.returnCacheDataDontFetch`**
-  - Return data from the cache; never fetch from the server.
-  - This policy will return an error if cached data is not available.
-- **`.returnCacheDataElseFetch`**  - *(Default Value)*
-  - Return data from the cache if its available; if cache data is missing or incomplete, fetch data from the server and store results in the cache.
-  - This is the most common use case, and is the most performant method if your data is not expected to change.
-  - If you do not need to check for updates to data once it's been fetched, you should usually use this cache policy.
+### Configuration options
 
-> If you're interested in returning cached data after a failed fetch, the current recommended approach is to use an `additionalErrorInterceptor` on your interceptor chain to examine if the error is one it makes sense to show old data for rather than something that needs to be passed on to the user, and then retrying with a `.returnCacheDataDontFetch` retry policy. An example of this setup can be found in the [Cache-dependent interceptor tests](https://github.com/apollographql/apollo-ios-dev/blob/main/Tests/ApolloTests/Cache/CacheDependentInterceptorTests.swift).
+`RequestConfiguration` provides the following options:
 
-For more information on how result data is stored in the cache data or how to configure the normalized cache, see the [Caching documentation](./../caching/introduction).
+- **`requestTimeout`** (optional): The timeout interval for network requests. If not specified, the default timeout from the underlying `URLSession` is used.
+- **`writeResultsToCache`**: Whether to write operation results to the cache. Defaults to `true`.
+
+### Using custom request configurations
+
+You can override the default configuration for individual requests:
+
+```swift
+// Custom configuration for a specific request
+let customConfig = RequestConfiguration(
+  requestTimeout: 10.0,
+  writeResultsToCache: false
+)
+
+let response = try await client.fetch(
+  query: MyQuery(),
+  cachePolicy: .networkOnly,
+  requestConfiguration: customConfig
+)
+```
+
+This is useful when you need different timeout values for different operations or when you want to prevent certain operations from writing to the cache.
+
 
 ## Using `GET` instead of `POST` for queries
 
@@ -201,4 +220,8 @@ By default, Apollo constructs queries and sends them to your graphql endpoint us
 
 If you want Apollo to use `GET` instead, pass `true` to the optional `useGETForQueries` parameter when setting up your `RequestChainNetworkTransport`. This will set up all queries conforming to `GraphQLQuery` sent through the HTTP transport to use `GET`.
 
->**NOTE:** This is a toggle which affects all queries sent through that client, so if you need to have certain queries go as `POST` and certain ones go as `GET`, you will likely have to swap out the `RequestChainNetworkTransport`.
+<Note>
+
+This is a toggle which affects all queries sent through that client, so if you need to have certain queries go as `POST` and certain ones go as `GET`, you can use a custom interceptor to change the value on a per-request basis. See [Implementing custom interceptors](./../advanced/request-chain#implementing-custom-interceptors) for more information.
+
+</Note>

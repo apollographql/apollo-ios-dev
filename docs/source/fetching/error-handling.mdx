@@ -2,65 +2,45 @@
 title: Error Handling
 ---
 
-Whenever you execute a GraphQL operation with two high-level types of errors can occur:
+Whenever you execute a GraphQL operation, two high-level types of errors can occur:
 
-- **Network errors**: a GraphQL response wasn't received because an error occurred while communicating with your GraphQL server. This might be an SSL error, a socket error because your app is offline, or a 500 or any other HTTP error. When a network error occurs, no data is returned.
+- **Execution errors**: a GraphQL response wasn't received because an error occurred during request execution. This could be a networking error (SSL, socket, HTTP), a client-side error (response parsing failure, invalid cache data), or other execution failures. When an execution error occurs, no data is returned.
 - **GraphQL errors**: a GraphQL response is received, and it contains a non-empty [`errors`](https://spec.graphql.org/draft/#sec-Errors) field. This means the server wasn't able to completely process the query. The response might include partial data if the server was able to process some of the query.
 
-## Network errors
+## Execution errors
 
-The result of executing an operation is a Swift [`Result`](https://developer.apple.com/documentation/swift/result). A network error results in a `.failure(Error)` result for the operation.
-
-You can handle network errors by using a `do/catch` block and calling `try result.get()` or by switching on the `result`.
-
-<CodeColumns cols={2}>
+Execution errors are thrown as exceptions that you can catch in a `do/catch` block. These errors indicate a fatal error and terminate execution of the operation.
 
 ```swift
-apollo.fetch(query: HeroNameQuery()) { result in
-  do {
-    let data = try result.get().data
-    ...
-
-  } catch {
-    // Network error
-    print(error)
-  }
+do {
+  let response = try await apollo.fetch(query: HeroNameQuery())
+  // Handle successful response
+  print(response.data?.hero?.name)
+} catch {
+  // Execution error (networking, parsing, cache, etc.)
+  print("Error executing operation: \(error)")
 }
 ```
-
-```swift
-apollo.fetch(query: HeroNameQuery()) { result in
-  switch result {
-  case .success(let response):
-    ...
-
-  case .failure(let error):
-    // Network error
-    print(error)
-  }
-}
-```
-
-</CodeColumns>
 
 ### Causes
 
-Possible causes of a network error include (but are not limited to):
+Possible causes of an execution error include (but are not limited to):
 
+**Networking errors:**
 * The app is offline or doesn't have access to the network.
 * A DNS error occurred, making it impossible to look up the host.
 * An SSL error occurred (e.g., the server certificate isn't trusted).
 * The connection was closed.
 * The server responded with a non-successful HTTP code.
-* The server didn't respond with valid JSON.
-* The response JSON doesn't satisfy the schema and cannot be parsed.
-* A request was specified as `.returnCacheDataDontFetch` but the data wasn't cached.
 
-Examine the exception for more detailed information about the actual error.
+**Client-side errors:**
+* The response JSON could not be parsed into a valid response model for the operation.
+* File I/O failed while reading cache data.
+* Invalid cache data was encountered.
 
 ## GraphQL errors
 
-Because a response with GraphQL errors might still contain data, a `.failure` result is not returned. Instead, they return a `.success` result containing a [`GraphQLResult`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/graphqlresult) whose `errors` field contains the errors that occurred.
+Because a response with GraphQL errors might still contain data, an execution error is not thrown. Instead, a successful response is returned containing a [`GraphQLResponse`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/graphqlresponse) whose `errors` field contains the errors that occurred.
 
 For example, the following query uses an invalid `id` to look up a `Person`:
 
@@ -102,25 +82,25 @@ The server will send the following response:
 }
 ```
 
-Note that while there are errors, the query successfully returned the title of the film: `A New Hope`. In general, any error while executing an operation [bubbles up](https://spec.graphql.org/draft/#sec-Errors) to the next nullable field. In this case `data?.person` is `nil`. In the worst case, `GraphQLResult.data` may be `nil` if everything else is non-nullable.
+Note that while there are errors, the query successfully returned the title of the film: `A New Hope`. In general, any error while executing an operation [bubbles up](https://spec.graphql.org/draft/#sec-Errors) to the next nullable field. In this case `data?.person` is `nil`. In the worst case, `GraphQLResponse.data` may be `nil` if everything else is non-nullable.
 
-Apollo iOS gives you access to both the `data` and the `errors` in the [`GraphQLResult`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/graphqlresult) class:
+Apollo iOS gives you access to both the `data` and the `errors` in the [`GraphQLResponse`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/graphqlresponse):
 
 ```swift
-apollo.fetch(query: HeroNameQuery()) { result in
-  switch result {
-  case .success(let response):
-    if let errors = response.errors {
-      // GraphQL errors
-    }
+do {
+  let response = try await apollo.fetch(query: FilmAndPersonQuery())
 
-    let film = response.data?.film // Exists
-    let person = response.data?.person // nil
-
-  case .failure(let error):
-    // Network error
-    print(error)
+  if let errors = response.errors {
+    // GraphQL errors - handle these as needed
+    print("GraphQL errors: \(errors)")
   }
+
+  let film = response.data?.film // Exists
+  let person = response.data?.person // nil
+
+} catch {
+  // Execution error (networking, parsing, cache, etc.)
+  print("Error executing operation: \(error)")
 }
 ```
 

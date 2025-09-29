@@ -10,7 +10,7 @@ Apollo iOS supports file uploads via the [GraphQL multipart request specificatio
 
 ### Uploading files with Apollo iOS
 
-Apollo iOS only supports uploads for a single operation, not for batch operations. You can upload multiple files with a single operation if your server supports it, though.
+Apollo iOS only supports uploads for a single operation, not for batch operations. If your server supports it, you can upload multiple files with a single operation.
 
 To upload a file, you need:
 
@@ -45,14 +45,14 @@ guard let fileURL = Bundle.main.url(forResource: "a", withExtension: "txt"),
 }
 
 // Actually upload the file
-client.upload(
-  operation: UploadFileMutation(file: "a"), // <-- `Upload` is a custom scalar that's a `String` under the hood.
-  files: [file]
-) { result in
-  switch result {
-  case .success(let graphQLResult):
-    print("ID: \(graphQLResult.data?.singleUpload.id)")
-  case .failure(let error):
+Task {
+  do {
+    let response = try await client.upload(
+      operation: UploadFileMutation(file: "a"), // <-- `Upload` is a custom scalar that's a `String` under the hood.
+      files: [file]
+    )
+    print("ID: \(response.data?.singleUpload.id)")
+  } catch {
     print("error: \(error)")
   }
 }

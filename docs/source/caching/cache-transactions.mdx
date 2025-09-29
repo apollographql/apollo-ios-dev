@@ -8,37 +8,46 @@ Apollo iOS provides the ability to directly read and update the cache as needed 
 
 The `ApolloStore` has APIs for accessing the cache via both `ReadTransaction` and `ReadWriteTransaction`.
 
-> This article explains how you can access cache data directly. To learn how you can use the cache alongside network requests to fetch data for your GraphQL operations, read our documentation on [fetching locally cached data](./../fetching/fetching-data#fetching-locally-cached-data).
+> This article explains how you can access cache data directly. To learn how you can use the cache alongside network requests to fetch data for your GraphQL operations, read our documentation on [fetching locally cached queries](./../fetching/queries#fetching-locally-cached-queries).
 
 ## Reading cache data
 
-You can read data from the local cache directly with [`ApolloStore.withinReadTransaction(_:callbackQueue:completion:)`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/withinreadtransaction(_:callbackqueue:completion:)). The transaction block provides a [`ReadTransaction`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readtransaction).
+You can read data from the local cache directly with [`ApolloStore.withinReadTransaction(_:)`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/withinreadtransaction(_:)). The transaction block provides a [`ReadTransaction`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readtransaction).
 
 A [`ReadTransaction`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readtransaction) can be used to read any of your [generated GraphQL queries or fragments](./../fetching/fetching-data#generated-operation-models).
 
 ```swift
 // Read from a GraphQL Query
-client.store.withinReadTransaction({ transaction in
-  let data = try transaction.read(
-    query: HeroNameQuery(episode: .jedi)
-  )
-  print(data.hero?.name)
-})
+Task {
+  do {
+    let data = try await client.store.withinReadTransaction { transaction in
+      try transaction.read(query: HeroNameQuery(episode: .jedi))
+    }
+    print(data.hero?.name)
+  } catch {
+    print("Error reading from cache: \(error)")
+  }
+}
 
 // Read from a GraphQL fragment
-client.store.withinReadTransaction({ transaction -> HeroDetails in
-  let data = try transaction.readObject(
-    ofType: HeroDetails.self,
-    withKey: "Hero:123"
-  )
-
-  print(data.hero?.name)
-})
+Task {
+  do {
+    let data: HeroDetails = try await client.store.withinReadTransaction { transaction in
+      try transaction.readObject(
+        ofType: HeroDetails.self,
+        withKey: "Hero:123"
+      )
+    }
+    print(data.hero?.name)
+  } catch {
+    print("Error reading fragment from cache: \(error)")
+  }
+}
 ```
 
 ## Writing cache data
 
-You can write data to the local cache with [`ApolloStore.withinReadWriteTransaction(_:callbackQueue:completion:)`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/withinreadwritetransaction(_:callbackqueue:completion:)). The transaction block provides a [`ReadWriteTransaction`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readwritetransaction). In addition the the ability to write data to the cache, [`ReadWriteTransaction`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readwritetransaction) has all of the functionality of a `ReadTransaction`. To write data to the cache, you'll need to define a [`LocalCacheMutation`](#defining-local-cache-mutations).
+You can write data to the local cache with [`ApolloStore.withinReadWriteTransaction(_:)`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/withinreadwritetransaction(_:)). The transaction block provides a [`ReadWriteTransaction`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readwritetransaction). In addition to the ability to write data to the cache, [`ReadWriteTransaction`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readwritetransaction) has all of the functionality of a `ReadTransaction`. To write data to the cache, you'll need to define a [`LocalCacheMutation`](#defining-local-cache-mutations).
 
 ### Defining local cache mutations
 
@@ -84,18 +93,22 @@ The generated models for your mutations will have mutable fields (`var` instead 
 Once you have generated mutable query models, you can use them with [`ReadWriteTransaction.update()`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/apollostore/readwritetransaction/update(_:_:)).
 
 ```swift title="Local Cache Mutation Update"
-store.withinReadWriteTransaction({ transaction in
-  let cacheMutation = HeroNameLocalCacheMutation(episode: .CLONES)
+Task {
+  do {
+    let queryData = try await store.withinReadWriteTransaction { transaction in
+      let cacheMutation = HeroNameLocalCacheMutation(episode: .CLONES)
 
-  try transaction.update(cacheMutation) { (data: inout HeroNameLocalCacheMutation.Data) in
-    data.hero.name = "General Kenobi"
+      try transaction.update(cacheMutation) { (data: inout HeroNameLocalCacheMutation.Data) in
+        data.hero.name = "General Kenobi"
+      }
+
+      return try transaction.read(query: HeroNameQuery(episode: .jedi))
+    }
+    print(queryData.hero?.name) // "General Kenobi"
+  } catch {
+    print("Error updating cache: \(error)")
   }
-
-  let queryData = try transaction.read(
-    query: HeroNameQuery(episode: .jedi)
-  )
-  print(queryData.hero?.name) // "General Kenobi"
-})
+}
 
 ```
 
@@ -106,20 +119,23 @@ To write data for a mutable fragment, use [`ReadWriteTransaction.updateObject(of
 > For more information on cache keys in the normalized cache, check out our documentation on [normalized cache responses](./introduction#normalizing-responses).
 
 ```swift title="Mutable Fragment Update"
-store.withinReadWriteTransaction({ transaction in
-  try transaction.updateObject(
-    ofType MutableHeroDetails.self,
-    withKey: "Hero:123"
-  ) { (data: inout MutableHeroDetails) in
-    data.hero.name = "General Kenobi"
+Task {
+  do {
+    let queryData = try await store.withinReadWriteTransaction { transaction in
+      try transaction.updateObject(
+        ofType: MutableHeroDetails.self,
+        withKey: "Hero:123"
+      ) { (data: inout MutableHeroDetails) in
+        data.hero.name = "General Kenobi"
+      }
 
-    let queryData = try transaction.read(
-      query: HeroNameQuery(episode: .jedi)
-    )
-
+      return try transaction.read(query: HeroNameQuery(episode: .jedi))
+    }
     print(queryData.hero?.name) // "General Kenobi"
+  } catch {
+    print("Error updating fragment in cache: \(error)")
   }
-})
+}
 ```
 
 ## Deleting cache data
