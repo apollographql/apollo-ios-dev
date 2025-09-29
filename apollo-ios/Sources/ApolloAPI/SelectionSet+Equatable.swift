@@ -90,14 +90,14 @@ public extension SelectionSet {
     field: Selection.Field,
     to fields: inout [String: FieldValue]
   ) {
-     let nullableFieldData = self.__data._data[field.responseKey].asNullable
-     let fieldData: FieldValue
-     switch nullableFieldData {
-     case let .some(value):
-       fieldData = value
-     case .none, .null:
-       return
-     }
+    let nullableFieldData = (self.__data._data[field.responseKey]?.base as? FieldValue).asNullable
+    let fieldData: FieldValue
+    switch nullableFieldData {
+    case let .some(value):
+      fieldData = value
+    case .none, .null:
+      return
+    }
 
     addData(for: field.type)
 
