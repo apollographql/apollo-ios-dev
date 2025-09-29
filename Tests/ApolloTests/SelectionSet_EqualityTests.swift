@@ -7,7 +7,9 @@ import XCTest
 @MainActor
 class SelectionSet_EqualityTests: XCTestCase {
 
-  func test__equality__scalarString_givenOptionalityOpposedDataDictValue_sameValue_shouldBeEqual() throws {
+  // MARK: Scalar tests
+
+  func test__equatable__scalarString_givenOptionalityOpposedDataDictValue_sameValue_shouldBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -41,9 +43,10 @@ class SelectionSet_EqualityTests: XCTestCase {
 
     // then
     expect(initializerHero).to(equal(dataDictHero))
+    expect(initializerHero.hashValue).to(equal(dataDictHero.hashValue))
   }
 
-  func test__equality__scalarString_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual() throws {
+  func test__equatable__scalarString_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -79,7 +82,7 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(initializerHero).notTo(equal(dataDictHero))
   }
 
-  func test__equality__scalarString_givenOptionalityOpposedDataDictValue_nilValue_shouldNotBeEqual() throws {
+  func test__equatable__scalarString_givenOptionalityOpposedDataDictValue_nilValue_shouldNotBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -115,7 +118,7 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(initializerHero).notTo(equal(dataDictHero))
   }
 
-  func test__equality__scalarStringList_givenOptionalityOpposedDataDictValue_sameValue_shouldBeEqual() throws {
+  func test__equatable__scalarStringList_givenOptionalityOpposedDataDictValue_sameValue_shouldBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -149,9 +152,84 @@ class SelectionSet_EqualityTests: XCTestCase {
 
     // then
     expect(initializerHero).to(equal(dataDictHero))
+    expect(initializerHero.hashValue).to(equal(dataDictHero.hashValue))
   }
 
-  func test__equality__scalarStringList_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual() throws {
+  func test__equatable__scalarStringMultidimensionalList_givenOptionalityOpposedDataDictValue_sameValue_shouldBeEqual() throws {
+    // given
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("fieldValue", [[[String?]]].self)
+      ]}
+
+      public var fieldValue: [[[String?]]] { __data["fieldValue"] }
+
+      convenience init(
+        fieldValue: [[[String?]]]
+      ) {
+        self.init(_dataDict: DataDict(data: [
+          "__typename": "Hero",
+          "fieldValue": fieldValue
+        ], fulfilledFragments: [ObjectIdentifier(Self.self)]))
+      }
+    }
+
+    // when
+    let initializerHero = Hero(fieldValue: [[["Han Solo"]]])
+    let dataDictHero = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Hero",
+        "fieldValue": [[["Han Solo"]]]
+      ],
+      fulfilledFragments: [ObjectIdentifier(Hero.self)]
+    ))
+
+    // then
+    expect(initializerHero).to(equal(dataDictHero))
+    expect(initializerHero.hashValue).to(equal(dataDictHero.hashValue))
+  }
+
+  func test__equatable__scalarStringMultidimensionalList_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual() throws {
+    // given
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("fieldValue", [[[String?]]].self)
+      ]}
+
+      public var fieldValue: [[[String?]]] { __data["fieldValue"] }
+
+      convenience init(
+        fieldValue: [[[String?]]]
+      ) {
+        self.init(_dataDict: DataDict(data: [
+          "__typename": "Hero",
+          "fieldValue": fieldValue
+        ], fulfilledFragments: [ObjectIdentifier(Self.self)]))
+      }
+    }
+
+    // when
+    let initializerHero = Hero(fieldValue: [[["Han Solo"]]])
+    let dataDictHero = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Hero",
+        "fieldValue": [[["Luke Skywalker"]]]
+      ],
+      fulfilledFragments: [ObjectIdentifier(Hero.self)]
+    ))
+
+    // then
+    XCTAssertNotEqual(initializerHero, dataDictHero)
+    expect(initializerHero).notTo(equal(dataDictHero))
+  }
+
+  func test__equatable__scalarStringList_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -187,7 +265,7 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(initializerHero).notTo(equal(dataDictHero))
   }
 
-  func test__equality__scalarStringList_givenOptionalityOpposedDataDictValue_nilValue_shouldNotBeEqual() throws {
+  func test__equatable__scalarStringList_givenOptionalityOpposedDataDictValue_nilValue_shouldNotBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -223,7 +301,7 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(initializerHero).notTo(equal(dataDictHero))
   }
 
-  func test__equality__scalarInt_givenOptionalityOpposedDataDictValue_sameValue_shouldBeEqual() throws {
+  func test__equatable__scalarInt_givenOptionalityOpposedDataDictValue_sameValue_shouldBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -257,9 +335,10 @@ class SelectionSet_EqualityTests: XCTestCase {
 
     // then
     expect(initializerHero).to(equal(dataDictHero))
+    expect(initializerHero.hashValue).to(equal(dataDictHero.hashValue))
   }
 
-  func test__equality__scalarInt_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual() throws {
+  func test__equatable__scalarInt_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -295,7 +374,7 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(initializerHero).notTo(equal(dataDictHero))
   }
 
-  func test__equality__scalarInt_givenOptionalityOpposedDataDictValue_nilValue_shouldNotBeEqual() throws {
+  func test__equatable__scalarInt_givenOptionalityOpposedDataDictValue_nilValue_shouldNotBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -331,7 +410,7 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(initializerHero).notTo(equal(dataDictHero))
   }
 
-  func test__equality__scalarBool_givenOptionalityOpposedDataDictValue_sameValue_shouldBeEqual() throws {
+  func test__equatable__scalarBool_givenOptionalityOpposedDataDictValue_sameValue_shouldBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -365,9 +444,10 @@ class SelectionSet_EqualityTests: XCTestCase {
 
     // then
     expect(initializerHero).to(equal(dataDictHero))
+    expect(initializerHero.hashValue).to(equal(dataDictHero.hashValue))
   }
 
-  func test__equality__scalarBool_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual() throws {
+  func test__equatable__scalarBool_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -403,7 +483,7 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(initializerHero).notTo(equal(dataDictHero))
   }
 
-  func test__equality__scalarBool_givenOptionalityOpposedDataDictValue_nilValue_shouldNotBeEqual() throws {
+  func test__equatable__scalarBool_givenOptionalityOpposedDataDictValue_nilValue_shouldNotBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -439,7 +519,7 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(initializerHero).notTo(equal(dataDictHero))
   }
 
-  func test__equality__scalarFloat_givenOptionalityOpposedDataDictValue_sameValue_shouldBeEqual() throws {
+  func test__equatable__scalarFloat_givenOptionalityOpposedDataDictValue_sameValue_shouldBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -473,9 +553,10 @@ class SelectionSet_EqualityTests: XCTestCase {
 
     // then
     expect(initializerHero).to(equal(dataDictHero))
+    expect(initializerHero.hashValue).to(equal(dataDictHero.hashValue))
   }
 
-  func test__equality__scalarFloat_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual() throws {
+  func test__equatable__scalarFloat_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -511,7 +592,7 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(initializerHero).notTo(equal(dataDictHero))
   }
 
-  func test__equality__scalarFloat_givenOptionalityOpposedDataDictValue_nilValue_shouldNotBeEqual() throws {
+  func test__equatable__scalarFloat_givenOptionalityOpposedDataDictValue_nilValue_shouldNotBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -547,7 +628,7 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(initializerHero).notTo(equal(dataDictHero))
   }
 
-  func test__equality__scalarDouble_givenOptionalityOpposedDataDictValue_sameValue_shouldBeEqual() throws {
+  func test__equatable__scalarDouble_givenOptionalityOpposedDataDictValue_sameValue_shouldBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -581,9 +662,10 @@ class SelectionSet_EqualityTests: XCTestCase {
 
     // then
     expect(initializerHero).to(equal(dataDictHero))
+    expect(initializerHero.hashValue).to(equal(dataDictHero.hashValue))
   }
 
-  func test__equality__scalarDouble_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual() throws {
+  func test__equatable__scalarDouble_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -619,7 +701,7 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(initializerHero).notTo(equal(dataDictHero))
   }
 
-  func test__equality__scalarDouble_givenOptionalityOpposedDataDictValue_nilValue_shouldNotBeEqual() throws {
+  func test__equatable__scalarDouble_givenOptionalityOpposedDataDictValue_nilValue_shouldNotBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -655,7 +737,7 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(initializerHero).notTo(equal(dataDictHero))
   }
 
-  func test__equality__scalar_givenDataDictValueOfDifferentTypeThatCannotCastToFieldType_shouldNotBeEqual() throws {
+  func test__equatable__scalar_givenDataDictValueOfDifferentTypeThatCannotCastToFieldType_shouldNotBeEqual() throws {
     // given
     class Hero: MockSelectionSet {
       typealias Schema = MockSchemaMetadata
@@ -689,6 +771,187 @@ class SelectionSet_EqualityTests: XCTestCase {
 
     // then
     expect(initializerHero).notTo(equal(dataDictHero))
+  }
+
+  func test__equatable__customScalar_givenOptionalityOpposedDataDictValue_sameValue_shouldBeEqual() throws {
+    // given
+    typealias GivenCustomScalar = MockCustomScalar<Int64>
+
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("fieldValue", GivenCustomScalar?.self)
+      ]}
+
+      public var fieldValue: GivenCustomScalar? { __data["fieldValue"] }
+
+      convenience init(
+        fieldValue: GivenCustomScalar?
+      ) {
+        self.init(_dataDict: DataDict(data: [
+          "__typename": "Hero",
+          "fieldValue": fieldValue
+        ], fulfilledFragments: [ObjectIdentifier(Self.self)]))
+      }
+    }
+
+    // when
+    let initializerHero = Hero(fieldValue: GivenCustomScalar(value: 989561700))
+    let dataDictHero = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Hero",
+        "fieldValue": GivenCustomScalar(value: 989561700) // non-optional to oppose .field selection type
+      ],
+      fulfilledFragments: [ObjectIdentifier(Hero.self)]
+    ))
+
+    // then
+    expect(initializerHero).to(equal(dataDictHero))
+    expect(initializerHero.hashValue).to(equal(dataDictHero.hashValue))
+  }
+
+  func test__equatable__customScalar_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual() throws {
+    // given
+    typealias GivenCustomScalar = MockCustomScalar<Int64>
+
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("fieldValue", GivenCustomScalar?.self)
+      ]}
+
+      public var fieldValue: GivenCustomScalar? { __data["fieldValue"] }
+
+      convenience init(
+        fieldValue: GivenCustomScalar?
+      ) {
+        self.init(_dataDict: DataDict(data: [
+          "__typename": "Hero",
+          "fieldValue": fieldValue
+        ], fulfilledFragments: [ObjectIdentifier(Self.self)]))
+      }
+    }
+
+    // when
+    let initializerHero = Hero(fieldValue: GivenCustomScalar(value: 989561700))
+    let dataDictHero = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Hero",
+        "fieldValue": GivenCustomScalar(value: 123) // non-optional to oppose .field selection type
+      ],
+      fulfilledFragments: [ObjectIdentifier(Hero.self)]
+    ))
+
+    // then
+    expect(initializerHero).notTo(equal(dataDictHero))
+  }
+
+  func test__equatable__customScalar_givenOptionalityOpposedDataDictValue_nilValue_shouldNotBeEqual() throws {
+    // given
+    typealias GivenCustomScalar = MockCustomScalar<Int64>
+
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("fieldValue", GivenCustomScalar?.self)
+      ]}
+
+      public var fieldValue: GivenCustomScalar? { __data["fieldValue"] }
+
+      convenience init(
+        fieldValue: GivenCustomScalar?
+      ) {
+        self.init(_dataDict: DataDict(data: [
+          "__typename": "Hero",
+          "fieldValue": fieldValue
+        ], fulfilledFragments: [ObjectIdentifier(Self.self)]))
+      }
+    }
+
+    // when
+    let initializerHero = Hero(fieldValue: nil)
+    let dataDictHero = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Hero",
+        "fieldValue": GivenCustomScalar(value: 123) // non-optional to oppose .field selection type
+      ],
+      fulfilledFragments: [ObjectIdentifier(Hero.self)]
+    ))
+
+    // then
+    expect(initializerHero).notTo(equal(dataDictHero))
+  }
+
+  // MARK: - Null/nil tests
+
+  func test__equatable__optionalChildObject__isNullOnBoth_returns_true() {
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("name", String?.self)
+      ]}
+    }
+
+    // when
+    let selectionSet1 = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Hero",
+        "name": NSNull()
+      ],
+      fulfilledFragments: [ObjectIdentifier(Hero.self)]
+    ))
+
+    let selectionSet2 = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Hero",
+        "name": NSNull()
+      ],
+      fulfilledFragments: [ObjectIdentifier(Hero.self)]
+    ))
+
+    // then
+    expect(selectionSet1).to(equal(selectionSet2))
+    expect(selectionSet1.hashValue).to(equal(selectionSet2.hashValue))
+  }
+
+  func test__equatable__optionalChildObject__isNullAndNil_returns_true() {
+    class Hero: MockSelectionSet {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("name", String?.self)
+      ]}
+    }
+
+    // when
+    let selectionSet1 = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Hero",
+        "name": NSNull()
+      ],
+      fulfilledFragments: [ObjectIdentifier(Hero.self)]
+    ))
+
+    let selectionSet2 = Hero(_dataDict: DataDict(
+      data: [
+        "__typename": "Hero",
+        "name": nil
+      ],
+      fulfilledFragments: [ObjectIdentifier(Hero.self)]
+    ))
+
+    // then
+    expect(selectionSet1).to(equal(selectionSet2))
+    expect(selectionSet1.hashValue).to(equal(selectionSet2.hashValue))
   }
 
   // MARK: - Integration Tests
@@ -759,70 +1022,6 @@ class SelectionSet_EqualityTests: XCTestCase {
     }
 
     await fulfillment(of: [updateCompletedExpectation], timeout: 1.0)
-  }
-
-  // MARK: - Null/nil tests
-
-  func test__equatable__optionalChildObject__isNullOnBoth_returns_true() {
-    class Hero: MockSelectionSet {
-      typealias Schema = MockSchemaMetadata
-
-      override class var __selections: [Selection] {[
-        .field("__typename", String.self),
-        .field("name", String?.self)
-      ]}
-    }
-
-    // when
-    let selectionSet1 = Hero(_dataDict: DataDict(
-      data: [
-        "__typename": "Hero",
-        "name": NSNull()
-      ],
-      fulfilledFragments: [ObjectIdentifier(Hero.self)]
-    ))
-
-    let selectionSet2 = Hero(_dataDict: DataDict(
-      data: [
-        "__typename": "Hero",
-        "name": NSNull()
-      ],
-      fulfilledFragments: [ObjectIdentifier(Hero.self)]
-    ))
-
-    // then
-    expect(selectionSet1).to(equal(selectionSet2))
-  }
-
-  func test__equatable__optionalChildObject__isNullAndNil_returns_true() {
-    class Hero: MockSelectionSet {
-      typealias Schema = MockSchemaMetadata
-
-      override class var __selections: [Selection] {[
-        .field("__typename", String.self),
-        .field("name", String?.self)
-      ]}
-    }
-
-    // when
-    let selectionSet1 = Hero(_dataDict: DataDict(
-      data: [
-        "__typename": "Hero",
-        "name": NSNull()
-      ],
-      fulfilledFragments: [ObjectIdentifier(Hero.self)]
-    ))
-
-    let selectionSet2 = Hero(_dataDict: DataDict(
-      data: [
-        "__typename": "Hero",
-        "name": nil
-      ],
-      fulfilledFragments: [ObjectIdentifier(Hero.self)]
-    ))
-
-    // then
-    expect(selectionSet1).to(equal(selectionSet2))
   }
 
 }
