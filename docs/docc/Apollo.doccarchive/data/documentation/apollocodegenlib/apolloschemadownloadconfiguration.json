@@ -81,6 +81,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/ApolloCodegenLib\/s8CopyableP",
         "doc:\/\/ApolloCodegenLib\/s28CustomDebugStringConvertibleP",
         "doc:\/\/ApolloCodegenLib\/Se",
         "doc:\/\/ApolloCodegenLib\/SE",
@@ -101,6 +102,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloadConfiguration\/Default",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloadConfiguration\/HTTPHeader"
@@ -108,6 +111,8 @@
       "title" : "Structures"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloadConfiguration\/init(from:)",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloadConfiguration\/init(using:timeout:headers:outputPath:)"
@@ -115,6 +120,8 @@
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloadConfiguration\/downloadMethod-swift.property",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloadConfiguration\/downloadTimeout",
@@ -125,12 +132,15 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloadConfiguration\/DownloadMethod-swift.enum"
       ],
       "title" : "Enumerations"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloSchemaDownloadConfiguration\/CustomDebugStringConvertible-Implementations",
@@ -722,6 +732,11 @@
 "doc://ApolloCodegenLib/s28CustomDebugStringConvertibleP": {
   "identifier" : "doc:\/\/ApolloCodegenLib\/s28CustomDebugStringConvertibleP",
   "title" : "Swift.CustomDebugStringConvertible",
+  "type" : "unresolvable"
+},
+"doc://ApolloCodegenLib/s8CopyableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s8CopyableP",
+  "title" : "Swift.Copyable",
   "type" : "unresolvable"
 }
 }

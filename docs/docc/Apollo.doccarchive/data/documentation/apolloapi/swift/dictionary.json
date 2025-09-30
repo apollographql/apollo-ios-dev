@@ -86,6 +86,7 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableValue",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONDecodable",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONEncodable",
+        "doc:\/\/ApolloAPI\/s8CopyableP",
         "doc:\/\/ApolloAPI\/s30ExpressibleByDictionaryLiteralP"
       ],
       "kind" : "relationships",
@@ -103,11 +104,12 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary\/_InitializableByDictionaryLiteralElements-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary\/init(_:)"
       ],
-      "title" : "Default Implementations"
+      "title" : "Initializers"
     }
   ],
   "variants" : [
@@ -621,20 +623,83 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/swift\/dictionary"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Swift/Dictionary/_InitializableByDictionaryLiteralElements-Implementations": {
+"doc://ApolloAPI/documentation/ApolloAPI/Swift/Dictionary/init(_:)": {
   "abstract" : [
 
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary\/_InitializableByDictionaryLiteralElements-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "_InitializableByDictionaryLiteralElements Implementations",
+  "conformance" : {
+    "availabilityPrefix" : [
+      {
+        "text" : "Available when",
+        "type" : "text"
+      }
+    ],
+    "conformancePrefix" : [
+      {
+        "text" : "Conforms when",
+        "type" : "text"
+      }
+    ],
+    "constraints" : [
+      {
+        "code" : "Key",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "Hashable",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ".",
+        "type" : "text"
+      }
+    ]
+  },
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "([("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Key"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Value"
+    },
+    {
+      "kind" : "text",
+      "text" : ")])"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary\/init(_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/swift\/dictionary\/_initializablebydictionaryliteralelements-implementations"
+  "url" : "\/documentation\/apolloapi\/swift\/dictionary\/init(_:)"
 },
 "doc://ApolloAPI/s30ExpressibleByDictionaryLiteralP": {
   "identifier" : "doc:\/\/ApolloAPI\/s30ExpressibleByDictionaryLiteralP",
   "title" : "Swift.ExpressibleByDictionaryLiteral",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8CopyableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8CopyableP",
+  "title" : "Swift.Copyable",
   "type" : "unresolvable"
 }
 }

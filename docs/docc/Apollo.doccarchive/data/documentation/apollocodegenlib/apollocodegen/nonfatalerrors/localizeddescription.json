@@ -18,8 +18,7 @@
       [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/NonFatalErrors",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/NonFatalErrors\/Error-Implementations"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/NonFatalErrors"
       ]
     ]
   },
@@ -247,17 +246,6 @@
   "title" : "ApolloCodegen.NonFatalErrors",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegen\/nonfatalerrors"
-},
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/NonFatalErrors/Error-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen\/NonFatalErrors\/Error-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Error Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollocodegen\/nonfatalerrors\/error-implementations"
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/NonFatalErrors/localizedDescription": {
   "abstract" : [

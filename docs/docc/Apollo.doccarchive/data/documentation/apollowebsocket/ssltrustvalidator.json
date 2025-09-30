@@ -92,6 +92,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SSLTrustValidator\/isValid(_:domain:)"
       ],

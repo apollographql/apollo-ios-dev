@@ -97,6 +97,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError\/cannotParseResponse",
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError\/cannotParseResponseData",
@@ -107,12 +109,15 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError\/errorDescription"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseParsingInterceptor\/ParsingError\/Equatable-Implementations",

@@ -93,6 +93,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError\/invalidRecordEncoding(record:)",
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError\/invalidRecordShape(object:)"
@@ -100,6 +102,7 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError\/Error-Implementations"

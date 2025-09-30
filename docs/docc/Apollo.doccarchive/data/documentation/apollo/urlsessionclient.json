@@ -166,7 +166,8 @@
         "doc:\/\/Apollo\/s28CustomDebugStringConvertibleP",
         "doc:\/\/Apollo\/s23CustomStringConvertibleP",
         "doc:\/\/Apollo\/SQ",
-        "doc:\/\/Apollo\/SH"
+        "doc:\/\/Apollo\/SH",
+        "doc:\/\/Apollo\/s8SendableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -183,18 +184,24 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/init(sessionConfiguration:callbackQueue:sessionDescription:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/session"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/cancel(task:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/clear(task:)",
@@ -221,6 +228,8 @@
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Type-Aliases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/Completion",
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/RawCompletion"
@@ -228,6 +237,8 @@
       "title" : "Type Aliases"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/URLSessionClient\/URLSessionClientError"
       ],
@@ -2279,6 +2290,11 @@
 "doc://Apollo/s7CVarArgP": {
   "identifier" : "doc:\/\/Apollo\/s7CVarArgP",
   "title" : "Swift.CVarArg",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }

@@ -1,25 +1,10 @@
 {
-  "abstract" : [
-    {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "_InitializableByDictionaryLiteralElements.init(_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary\/_InitializableByDictionaryLiteralElements-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary"
       ]
     ]
   },
@@ -275,17 +260,6 @@
   "title" : "Dictionary",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/swift\/dictionary"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/Swift/Dictionary/_InitializableByDictionaryLiteralElements-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary\/_InitializableByDictionaryLiteralElements-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "_InitializableByDictionaryLiteralElements Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/swift\/dictionary\/_initializablebydictionaryliteralelements-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Swift/Dictionary/init(_:)": {
   "abstract" : [

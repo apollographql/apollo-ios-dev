@@ -95,6 +95,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/OpCode\/binaryFrame",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/OpCode\/connectionClose",
@@ -106,12 +108,15 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/OpCode\/init(rawValue:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/OpCode\/Equatable-Implementations",

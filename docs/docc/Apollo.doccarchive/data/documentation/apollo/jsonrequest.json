@@ -141,18 +141,24 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Operators",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequest\/==(_:_:)"
       ],
       "title" : "Operators"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequest\/init(operation:graphQLEndpoint:contextIdentifier:clientName:clientVersion:additionalHeaders:cachePolicy:context:autoPersistQueries:useGETForQueries:useGETForPersistedQueryRetry:requestBodyCreator:sendEnhancedClientAwareness:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequest\/autoPersistQueries",
         "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequest\/body",
@@ -165,6 +171,8 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequest\/hash(into:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequest\/toURLRequest()"

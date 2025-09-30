@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager",
-        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/Publisher-Implementations"
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager"
       ]
     ]
   },
@@ -334,17 +333,6 @@
   "title" : "AsyncGraphQLQueryPager",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager"
-},
-"doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager/Publisher-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/AsyncGraphQLQueryPager\/Publisher-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Publisher Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollopagination\/asyncgraphqlquerypager\/publisher-implementations"
 },
 "doc://ApolloPagination/documentation/ApolloPagination/AsyncGraphQLQueryPager/tryAllSatisfy(_:)": {
   "abstract" : [

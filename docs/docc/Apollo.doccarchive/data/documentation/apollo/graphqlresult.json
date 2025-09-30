@@ -114,6 +114,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/Apollo\/s8CopyableP",
         "doc:\/\/Apollo\/SQ",
         "doc:\/\/Apollo\/SH"
       ],
@@ -132,14 +133,19 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/init(data:extensions:errors:source:dependentKeys:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/data",
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/dependentKeys",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/errors",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/extensions",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/source-swift.property"
@@ -147,18 +153,23 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/asJSONDictionary()"
       ],
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/Source-swift.enum"
       ],
       "title" : "Enumerations"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/Equatable-Implementations"
@@ -203,6 +214,64 @@
   "title" : "Apollo",
   "type" : "topic",
   "url" : "\/documentation\/apollo"
+},
+"doc://Apollo/documentation/Apollo/ApolloStoreSubscriber": {
+  "abstract" : [
+    {
+      "text" : "The ",
+      "type" : "text"
+    },
+    {
+      "code" : "ApolloStoreSubscriber",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " provides a means to observe changes to items in the ApolloStore.",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "This protocol is available for advanced use cases only. Most users will prefer using ",
+      "type" : "text"
+    },
+    {
+      "code" : "ApolloClient.watch(query:)",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ApolloStoreSubscriber"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStoreSubscriber",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ApolloStoreSubscriber"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloStoreSubscriber",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostoresubscriber"
 },
 "doc://Apollo/documentation/Apollo/GraphQLResult": {
   "abstract" : [
@@ -420,6 +489,73 @@
   "title" : "data",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlresult\/data"
+},
+"doc://Apollo/documentation/Apollo/GraphQLResult/dependentKeys": {
+  "abstract" : [
+    {
+      "text" : "The cache keys for the fields that were included in this response. Custom ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStoreSubscriber",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : "s can use these",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "keys to understand when changes to the cache would affect the result of a specific response.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "dependentKeys"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sh",
+      "text" : "Set"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo8CacheKeya",
+      "text" : "CacheKey"
+    },
+    {
+      "kind" : "text",
+      "text" : ">?"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/dependentKeys",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "dependentKeys",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlresult\/dependentkeys"
 },
 "doc://Apollo/documentation/Apollo/GraphQLResult/errors": {
   "abstract" : [
@@ -713,6 +849,11 @@
   "title" : "source",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlresult\/source-swift.property"
+},
+"doc://Apollo/s8CopyableP": {
+  "identifier" : "doc:\/\/Apollo\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
 }
 }
 }

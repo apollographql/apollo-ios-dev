@@ -93,12 +93,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadTransaction\/readOnlyCache"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadTransaction\/read(query:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadTransaction\/readObject(ofType:withKey:variables:)"

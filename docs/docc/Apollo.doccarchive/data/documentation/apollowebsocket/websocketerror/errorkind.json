@@ -83,6 +83,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketError\/ErrorKind\/errorResponse",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketError\/ErrorKind\/neitherErrorNorPayloadReceived",

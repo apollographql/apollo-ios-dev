@@ -19,8 +19,7 @@
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/OperationDocumentFormat",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/OperationDocumentFormat\/CodingKeys",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/OperationDocumentFormat\/CodingKeys\/CodingKey-Implementations"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/OperationDocumentFormat\/CodingKeys"
       ]
     ]
   },
@@ -249,17 +248,6 @@
   "title" : "ApolloCodegenConfiguration.OperationDocumentFormat.CodingKeys",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/operationdocumentformat\/codingkeys"
-},
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/OperationDocumentFormat/CodingKeys/CodingKey-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/OperationDocumentFormat\/CodingKeys\/CodingKey-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "CodingKey Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/operationdocumentformat\/codingkeys\/codingkey-implementations"
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/OperationDocumentFormat/CodingKeys/debugDescription": {
   "abstract" : [

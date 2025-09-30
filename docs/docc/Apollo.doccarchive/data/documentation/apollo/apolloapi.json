@@ -33,12 +33,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Extended-Protocols",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/RootSelectionSet"
       ],
       "title" : "Extended Protocols"
     },
     {
+      "anchor" : "Extended-Types",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/Selection"
       ],

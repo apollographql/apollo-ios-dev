@@ -76,6 +76,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/ApolloAPI\/s8CopyableP",
         "doc:\/\/ApolloAPI\/SQ",
         "doc:\/\/ApolloAPI\/SH"
       ],
@@ -94,15 +95,20 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/init(_:alias:type:arguments:)"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/init(_:alias:type:arguments:fieldPolicy:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/alias",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/arguments",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/fieldPolicy",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/name",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/responseKey",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/type"
@@ -110,12 +116,15 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/OutputType"
       ],
       "title" : "Enumerations"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/Equatable-Implementations"
@@ -388,7 +397,54 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selection\/field\/arguments"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/Selection/Field/init(_:alias:type:arguments:)": {
+"doc://ApolloAPI/documentation/ApolloAPI/Selection/Field/fieldPolicy": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "fieldPolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO",
+      "text" : "Selection"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO20FieldPolicyDirectiveV",
+      "text" : "FieldPolicyDirective"
+    },
+    {
+      "kind" : "text",
+      "text" : "?"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/fieldPolicy",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "fieldPolicy",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/selection\/field\/fieldpolicy"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/Selection/Field/init(_:alias:type:arguments:fieldPolicy:)": {
   "abstract" : [
 
   ],
@@ -486,15 +542,41 @@
     },
     {
       "kind" : "text",
-      "text" : "]?)"
+      "text" : "]?, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "fieldPolicy"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO",
+      "text" : "Selection"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9SelectionO20FieldPolicyDirectiveV",
+      "text" : "FieldPolicyDirective"
+    },
+    {
+      "kind" : "text",
+      "text" : "?)"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/init(_:alias:type:arguments:)",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/init(_:alias:type:arguments:fieldPolicy:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(_:alias:type:arguments:)",
+  "title" : "init(_:alias:type:arguments:fieldPolicy:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selection\/field\/init(_:alias:type:arguments:)"
+  "url" : "\/documentation\/apolloapi\/selection\/field\/init(_:alias:type:arguments:fieldpolicy:)"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Selection/Field/name": {
   "abstract" : [
@@ -615,6 +697,11 @@
   "title" : "type",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selection\/field\/type"
+},
+"doc://ApolloAPI/s8CopyableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
 }
 }
 }

@@ -268,20 +268,6 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "The query to load results for",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "query"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
                   "text" : "The completion handler to execute on success or error",
                   "type" : "text"
                 }

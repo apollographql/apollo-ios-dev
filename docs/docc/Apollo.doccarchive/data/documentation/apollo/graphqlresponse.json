@@ -122,6 +122,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/Apollo\/s8CopyableP",
         "doc:\/\/Apollo\/SQ",
         "doc:\/\/Apollo\/SH"
       ],
@@ -140,12 +141,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/init(operation:body:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/parseResult()",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/parseResult(withCachePolicy:)",
@@ -154,6 +159,7 @@
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse\/Equatable-Implementations",
@@ -611,6 +617,11 @@
   "title" : "parseResultFast()",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlresponse\/parseresultfast()"
+},
+"doc://Apollo/s8CopyableP": {
+  "identifier" : "doc:\/\/Apollo\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
 }
 }
 }

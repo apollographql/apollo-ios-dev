@@ -100,6 +100,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/Source-swift.enum\/cache",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/Source-swift.enum\/server"
@@ -107,6 +109,7 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResult\/Source-swift.enum\/Equatable-Implementations"

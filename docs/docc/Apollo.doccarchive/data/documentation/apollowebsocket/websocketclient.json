@@ -110,6 +110,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketClient\/callbackQueue",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketClient\/delegate",
@@ -118,6 +120,8 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketClient\/connect()",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketClient\/disconnect(forceTimeout:)",

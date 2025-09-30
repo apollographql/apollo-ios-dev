@@ -7,6 +7,10 @@
     {
       "code" : "HTTPRequest",
       "type" : "codeVoice"
+    },
+    {
+      "text" : " with optional exponential backoff support",
+      "type" : "text"
     }
   ],
   "hierarchy" : {
@@ -102,24 +106,41 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Structures",
+      "generated" : true,
       "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration"
+      ],
+      "title" : "Structures"
+    },
+    {
+      "anchor" : "Initializers",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/init(configuration:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/init(maxRetriesAllowed:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/id"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/interceptAsync(chain:request:response:completion:)"
       ],
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Enumerations",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/RetryError"
       ],
@@ -197,6 +218,10 @@
     {
       "code" : "HTTPRequest",
       "type" : "codeVoice"
+    },
+    {
+      "text" : " with optional exponential backoff support",
+      "type" : "text"
     }
   ],
   "fragments" : [
@@ -225,6 +250,40 @@
   "title" : "MaxRetryInterceptor",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/maxretryinterceptor"
+},
+"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/Configuration": {
+  "abstract" : [
+    {
+      "text" : "A configuration object that defines behavior for retry logic and exponential backoff.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Configuration"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Configuration"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "MaxRetryInterceptor.Configuration",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/maxretryinterceptor\/configuration"
 },
 "doc://Apollo/documentation/Apollo/MaxRetryInterceptor/RetryError": {
   "abstract" : [
@@ -290,6 +349,56 @@
   "title" : "id",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/maxretryinterceptor\/id"
+},
+"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/init(configuration:)": {
+  "abstract" : [
+    {
+      "text" : "Designated initializer with full configuration support.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "configuration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo19MaxRetryInterceptorC",
+      "text" : "MaxRetryInterceptor"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo19MaxRetryInterceptorC13ConfigurationV",
+      "text" : "Configuration"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/init(configuration:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(configuration:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/maxretryinterceptor\/init(configuration:)"
 },
 "doc://Apollo/documentation/Apollo/MaxRetryInterceptor/init(maxRetriesAllowed:)": {
   "abstract" : [

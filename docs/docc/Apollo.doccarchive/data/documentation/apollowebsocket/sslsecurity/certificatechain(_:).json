@@ -140,7 +140,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "is the trust to lookup the certificate chain for",
+                  "text" : "Is the trust to lookup the certificate chain for",
                   "type" : "text"
                 }
               ],
@@ -162,7 +162,7 @@
         {
           "inlineContent" : [
             {
-              "text" : "the certificate chain for the trust",
+              "text" : "The certificate chain for the trust",
               "type" : "text"
             }
           ],

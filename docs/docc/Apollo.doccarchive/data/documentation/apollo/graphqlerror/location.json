@@ -89,6 +89,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/Location\/column",
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/Location\/line"

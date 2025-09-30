@@ -247,7 +247,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] A unique identifier for the request that kicked off this change, to assist in de-duping cache hits for watchers.",
+                  "text" : "[Optional] A unique identifier for the request that kicked off this change, to assist in de-duping cache hits for watchers.",
                   "type" : "text"
                 }
               ],

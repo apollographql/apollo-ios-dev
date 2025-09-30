@@ -640,6 +640,7 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableValue",
+        "doc:\/\/ApolloAPI\/s8CopyableP",
         "doc:\/\/ApolloAPI\/SQ",
         "doc:\/\/ApolloAPI\/s25ExpressibleByArrayLiteralP",
         "doc:\/\/ApolloAPI\/s27ExpressibleByBooleanLiteralP",
@@ -667,6 +668,7 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/none",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/null",
@@ -675,6 +677,8 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/init(_:)-3syxd",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/init(_:)-7pg3j"
@@ -682,18 +686,23 @@
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/unwrapped"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Subscripts",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/subscript(dynamicMember:)"
       ],
       "title" : "Subscripts"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/Equatable-Implementations",
@@ -1593,6 +1602,11 @@
 "doc://ApolloAPI/s43ExpressibleByExtendedGraphemeClusterLiteralP": {
   "identifier" : "doc:\/\/ApolloAPI\/s43ExpressibleByExtendedGraphemeClusterLiteralP",
   "title" : "Swift.ExpressibleByExtendedGraphemeClusterLiteral",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8CopyableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8CopyableP",
+  "title" : "Swift.Copyable",
   "type" : "unresolvable"
 },
 "http://spec.graphql.org/October2021/#sec-Null-Value": {

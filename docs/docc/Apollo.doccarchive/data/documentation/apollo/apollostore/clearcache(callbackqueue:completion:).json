@@ -240,7 +240,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] A completion block to be called after records are merged into the cache.",
+                  "text" : "[Optional] A completion block to be called after records are merged into the cache.",
                   "type" : "text"
                 }
               ],

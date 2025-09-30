@@ -18,8 +18,7 @@
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
         "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorRequestChain",
-        "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorRequestChain\/ChainError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorRequestChain\/ChainError\/Error-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorRequestChain\/ChainError"
       ]
     ]
   },
@@ -247,17 +246,6 @@
   "title" : "InterceptorRequestChain.ChainError",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/interceptorrequestchain\/chainerror"
-},
-"doc://Apollo/documentation/Apollo/InterceptorRequestChain/ChainError/Error-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorRequestChain\/ChainError\/Error-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Error Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/interceptorrequestchain\/chainerror\/error-implementations"
 },
 "doc://Apollo/documentation/Apollo/InterceptorRequestChain/ChainError/localizedDescription": {
   "abstract" : [

@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/ExpressibleByIntegerLiteral-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue"
       ]
     ]
   },
@@ -242,17 +241,6 @@
   "title" : "InputValue",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/inputvalue"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/InputValue/ExpressibleByIntegerLiteral-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/InputValue\/ExpressibleByIntegerLiteral-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ExpressibleByIntegerLiteral Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/inputvalue\/expressiblebyintegerliteral-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/InputValue/init(integerLiteral:)": {
   "abstract" : [

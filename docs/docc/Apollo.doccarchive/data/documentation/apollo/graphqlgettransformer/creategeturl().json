@@ -109,7 +109,7 @@
         {
           "inlineContent" : [
             {
-              "text" : "[optional] The created get URL or nil if the provided information couldn’t be used to access the appropriate parameters.",
+              "text" : "[Optional] The created get URL or nil if the provided information couldn’t be used to access the appropriate parameters.",
               "type" : "text"
             }
           ],

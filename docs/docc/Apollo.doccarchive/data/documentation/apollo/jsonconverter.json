@@ -82,6 +82,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Type-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/JSONConverter\/convert(_:)-29ctk",
         "doc:\/\/Apollo\/documentation\/Apollo\/JSONConverter\/convert(_:)-4jdtv",
@@ -330,7 +332,15 @@
     },
     {
       "kind" : "text",
-      "text" : "(some "
+      "text" : "("
+    },
+    {
+      "kind" : "keyword",
+      "text" : "some"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "typeIdentifier",

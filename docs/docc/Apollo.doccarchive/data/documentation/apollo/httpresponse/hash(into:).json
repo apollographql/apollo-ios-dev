@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse",
-        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/Hashable-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse"
       ]
     ]
   },
@@ -250,17 +249,6 @@
   "title" : "HTTPResponse",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/httpresponse"
-},
-"doc://Apollo/documentation/Apollo/HTTPResponse/Hashable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/Hashable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Hashable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/httpresponse\/hashable-implementations"
 },
 "doc://Apollo/documentation/Apollo/HTTPResponse/hash(into:)": {
   "abstract" : [

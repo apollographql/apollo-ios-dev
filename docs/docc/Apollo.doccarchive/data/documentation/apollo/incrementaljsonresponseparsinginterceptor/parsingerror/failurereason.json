@@ -18,8 +18,7 @@
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
         "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor",
-        "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError\/LocalizedError-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError"
       ]
     ]
   },
@@ -271,17 +270,6 @@
   "title" : "IncrementalJSONResponseParsingInterceptor.ParsingError",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror"
-},
-"doc://Apollo/documentation/Apollo/IncrementalJSONResponseParsingInterceptor/ParsingError/LocalizedError-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/IncrementalJSONResponseParsingInterceptor\/ParsingError\/LocalizedError-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "LocalizedError Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/incrementaljsonresponseparsinginterceptor\/parsingerror\/localizederror-implementations"
 },
 "doc://Apollo/documentation/Apollo/IncrementalJSONResponseParsingInterceptor/ParsingError/failureReason": {
   "abstract" : [

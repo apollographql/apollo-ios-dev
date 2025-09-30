@@ -92,6 +92,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/TaskData\/completionBlock",
         "doc:\/\/Apollo\/documentation\/Apollo\/TaskData\/rawCompletion"

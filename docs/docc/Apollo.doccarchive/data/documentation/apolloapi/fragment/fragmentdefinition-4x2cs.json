@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Fragment",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Fragment\/fragmentDefinition-3rmj6"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Fragment"
       ]
     ]
   },
@@ -245,53 +244,6 @@
   "title" : "Fragment",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/fragment"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/Fragment/fragmentDefinition-3rmj6": {
-  "abstract" : [
-    {
-      "text" : "The definition of the fragment in GraphQL syntax.",
-      "type" : "text"
-    }
-  ],
-  "defaultImplementations" : 1,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "fragmentDefinition"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s12StaticStringV",
-      "text" : "StaticString"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Fragment\/fragmentDefinition-3rmj6",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "fragmentDefinition",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/fragment\/fragmentdefinition-3rmj6"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Fragment/fragmentDefinition-4x2cs": {
   "abstract" : [

@@ -9,8 +9,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientProtocol-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient"
       ]
     ]
   },
@@ -146,16 +145,12 @@
       },
       {
         "kind" : "text",
-        "text" : ">?) -> (any "
+        "text" : ">?) -> any "
       },
       {
         "kind" : "typeIdentifier",
         "preciseIdentifier" : "s:6Apollo11CancellableP",
         "text" : "Cancellable"
-      },
-      {
-        "kind" : "text",
-        "text" : ")"
       }
     ],
     "modules" : [
@@ -305,7 +300,7 @@
             },
             {
               "kind" : "text",
-              "text" : ">?) -> (any "
+              "text" : ">?) -> any "
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Cancellable",
@@ -315,7 +310,7 @@
             },
             {
               "kind" : "text",
-              "text" : ") "
+              "text" : " "
             },
             {
               "kind" : "keyword",
@@ -379,21 +374,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "A dispatch queue on which the result handler will be called. Should default to the main queue.",
-                  "type" : "text"
-                }
-              ],
-              "type" : "paragraph"
-            }
-          ],
-          "name" : "queue"
-        },
-        {
-          "content" : [
-            {
-              "inlineContent" : [
-                {
-                  "text" : "[optional] A context that is being passed through the request chain. Should default to ",
+                  "text" : "[Optional] A context that is being passed through the request chain. Should default to ",
                   "type" : "text"
                 },
                 {
@@ -415,7 +396,21 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] A closure that is called when query results are available or when an error occurs.",
+                  "text" : "A dispatch queue on which the result handler will be called. Should default to the main queue.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "queue"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "[Optional] A closure that is called when query results are available or when an error occurs.",
                   "type" : "text"
                 }
               ],
@@ -532,17 +527,6 @@
   "title" : "ApolloClient",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloclient"
-},
-"doc://Apollo/documentation/Apollo/ApolloClient/ApolloClientProtocol-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/ApolloClientProtocol-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "ApolloClientProtocol Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloclient\/apolloclientprotocol-implementations"
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/fetch(query:cachePolicy:context:queue:resultHandler:)": {
   "abstract" : [
@@ -675,16 +659,12 @@
     },
     {
       "kind" : "text",
-      "text" : ">?) -> (any "
+      "text" : ">?) -> any "
     },
     {
       "kind" : "typeIdentifier",
       "preciseIdentifier" : "s:6Apollo11CancellableP",
       "text" : "Cancellable"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient\/fetch(query:cachePolicy:context:queue:resultHandler:)",

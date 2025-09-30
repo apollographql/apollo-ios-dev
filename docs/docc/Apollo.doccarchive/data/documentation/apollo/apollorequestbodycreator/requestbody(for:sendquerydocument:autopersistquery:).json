@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloRequestBodyCreator",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloRequestBodyCreator\/RequestBodyCreator-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloRequestBodyCreator"
       ]
     ]
   },
@@ -316,17 +315,6 @@
   "title" : "ApolloRequestBodyCreator",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollorequestbodycreator"
-},
-"doc://Apollo/documentation/Apollo/ApolloRequestBodyCreator/RequestBodyCreator-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloRequestBodyCreator\/RequestBodyCreator-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "RequestBodyCreator Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/apollorequestbodycreator\/requestbodycreator-implementations"
 },
 "doc://Apollo/documentation/Apollo/ApolloRequestBodyCreator/requestBody(for:sendQueryDocument:autoPersistQuery:)": {
   "abstract" : [

@@ -112,12 +112,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/Atomic\/init(wrappedValue:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/Atomic\/projectedValue",
         "doc:\/\/Apollo\/documentation\/Apollo\/Atomic\/wrappedValue"
@@ -125,6 +129,8 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/Atomic\/increment()",
         "doc:\/\/Apollo\/documentation\/Apollo\/Atomic\/mutate(block:)"

@@ -157,7 +157,12 @@
       }
     ],
     "platforms" : [
-
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "renamed" : "proceedAsync(request:response:interceptor:completion:)",
+        "unavailable" : false
+      }
     ],
     "required" : true,
     "role" : "symbol",

@@ -230,12 +230,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OperationDocument\/init(operationIdentifier:definition:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OperationDocument\/definition",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OperationDocument\/operationIdentifier"

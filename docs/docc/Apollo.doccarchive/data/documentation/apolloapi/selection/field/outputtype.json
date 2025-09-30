@@ -85,6 +85,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/ApolloAPI\/s8CopyableP",
         "doc:\/\/ApolloAPI\/SQ",
         "doc:\/\/ApolloAPI\/SH"
       ],
@@ -103,6 +104,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/OutputType\/customScalar(_:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/OutputType\/list(_:)",
@@ -113,6 +116,8 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/OutputType\/isNullable",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/OutputType\/namedType"
@@ -120,6 +125,7 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Field\/OutputType\/Equatable-Implementations",
@@ -630,6 +636,11 @@
   "title" : "Selection.Field.OutputType.scalar(_:)",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selection\/field\/outputtype\/scalar(_:)"
+},
+"doc://ApolloAPI/s8CopyableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
 }
 }
 }

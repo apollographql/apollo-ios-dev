@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/LocalizedError-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError"
       ]
     ]
   },
@@ -186,17 +185,6 @@
   "title" : "GraphQLError",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlerror"
-},
-"doc://Apollo/documentation/Apollo/GraphQLError/LocalizedError-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/LocalizedError-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "LocalizedError Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror\/localizederror-implementations"
 },
 "doc://Apollo/documentation/Apollo/GraphQLError/errorDescription": {
   "abstract" : [

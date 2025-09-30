@@ -167,6 +167,7 @@
   ],
   "seeAlsoSections" : [
     {
+      "anchor" : "JSON-Conversion",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONValue",
@@ -180,12 +181,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Operators",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONDecodingError\/==(_:_:)"
       ],
       "title" : "Operators"
     },
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONDecodingError\/couldNotConvert(value:to:)",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONDecodingError\/missingValue",
@@ -195,18 +200,23 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONDecodingError\/errorDescription"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONDecodingError\/hash(into:)"
       ],
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONDecodingError\/Equatable-Implementations",

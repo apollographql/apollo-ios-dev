@@ -81,6 +81,7 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/Apollo\/s8CopyableP",
         "doc:\/\/Apollo\/s23CustomStringConvertibleP",
         "doc:\/\/Apollo\/SQ",
         "doc:\/\/Apollo\/SH"
@@ -100,12 +101,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/Record\/init(key:_:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/Record\/fields-swift.property",
         "doc:\/\/Apollo\/documentation\/Apollo\/Record\/key"
@@ -113,12 +118,16 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Subscripts",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/Record\/subscript(_:)"
       ],
       "title" : "Subscripts"
     },
     {
+      "anchor" : "Type-Aliases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/Record\/Fields-swift.typealias",
         "doc:\/\/Apollo\/documentation\/Apollo\/Record\/Value"
@@ -126,6 +135,7 @@
       "title" : "Type Aliases"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/Record\/CustomStringConvertible-Implementations",
@@ -474,6 +484,11 @@
 "doc://Apollo/s23CustomStringConvertibleP": {
   "identifier" : "doc:\/\/Apollo\/s23CustomStringConvertibleP",
   "title" : "Swift.CustomStringConvertible",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s8CopyableP": {
+  "identifier" : "doc:\/\/Apollo\/s8CopyableP",
+  "title" : "Swift.Copyable",
   "type" : "unresolvable"
 }
 }

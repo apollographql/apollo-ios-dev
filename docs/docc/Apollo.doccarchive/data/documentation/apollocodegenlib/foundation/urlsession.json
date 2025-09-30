@@ -82,7 +82,8 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/NetworkSession"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/NetworkSession",
+        "doc:\/\/ApolloCodegenLib\/s8CopyableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -99,6 +100,7 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/Foundation\/URLSession\/NetworkSession-Implementations"
@@ -221,6 +223,11 @@
   "title" : "NetworkSession",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/networksession"
+},
+"doc://ApolloCodegenLib/s8CopyableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s8CopyableP",
+  "title" : "Swift.Copyable",
+  "type" : "unresolvable"
 }
 }
 }

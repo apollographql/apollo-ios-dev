@@ -97,12 +97,16 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Forward\/init(offset:canLoadNext:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Forward\/canLoadNext",
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Forward\/canLoadPrevious",
@@ -111,6 +115,7 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/OffsetPagination\/Forward\/Equatable-Implementations"

@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SplitNetworkTransport",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SplitNetworkTransport\/NetworkTransport-Implementations"
+        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SplitNetworkTransport"
       ]
     ]
   },
@@ -258,17 +257,6 @@
   "title" : "SplitNetworkTransport",
   "type" : "topic",
   "url" : "\/documentation\/apollowebsocket\/splitnetworktransport"
-},
-"doc://ApolloWebSocket/documentation/ApolloWebSocket/SplitNetworkTransport/NetworkTransport-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/SplitNetworkTransport\/NetworkTransport-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "NetworkTransport Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollowebsocket\/splitnetworktransport\/networktransport-implementations"
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/SplitNetworkTransport/addApolloClientHeaders(to:)": {
   "abstract" : [

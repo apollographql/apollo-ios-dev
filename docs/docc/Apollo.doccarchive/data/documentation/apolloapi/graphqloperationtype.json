@@ -93,6 +93,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationType\/mutation",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationType\/query",
@@ -101,6 +103,7 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationType\/Equatable-Implementations"

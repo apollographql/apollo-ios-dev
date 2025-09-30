@@ -100,7 +100,7 @@
         {
           "inlineContent" : [
             {
-              "text" : "the URL to the parent folder of the current URL.",
+              "text" : "The URL to the parent folder of the current URL.",
               "type" : "text"
             }
           ],

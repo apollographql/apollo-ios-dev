@@ -3,8 +3,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType-14lsi"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation"
       ]
     ]
   },
@@ -220,50 +219,6 @@
   "title" : "GraphQLOperation",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqloperation"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/operationType-14lsi": {
-  "abstract" : [
-
-  ],
-  "defaultImplementations" : 3,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "operationType"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI20GraphQLOperationTypeO",
-      "text" : "GraphQLOperationType"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType-14lsi",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "operationType",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqloperation\/operationtype-14lsi"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/operationType-90ybj": {
   "abstract" : [

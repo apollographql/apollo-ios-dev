@@ -95,6 +95,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/WSError\/ErrorType\/closeError",
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/WSError\/ErrorType\/invalidSSLError",
@@ -106,6 +108,7 @@
       "title" : "Enumeration Cases"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocket\/WSError\/ErrorType\/Equatable-Implementations"

@@ -407,7 +407,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] The in-progress response object, if received yet",
+                  "text" : "[Optional] The in-progress response object, if received yet",
                   "type" : "text"
                 }
               ],

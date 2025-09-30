@@ -196,7 +196,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] The ",
+                  "text" : "[Optional] The ",
                   "type" : "text"
                 },
                 {
@@ -226,7 +226,7 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[optional] A human-readable string that you can use for debugging purposes.",
+                  "text" : "[Optional] A human-readable string that you can use for debugging purposes.",
                   "type" : "text"
                 }
               ],

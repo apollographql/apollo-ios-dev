@@ -153,6 +153,8 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Operators",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/__(_:_:)-4nx93",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/__(_:_:)-9xr9k"
@@ -160,6 +162,8 @@
       "title" : "Operators"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/init(_:)-4lshs",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/init(_:)-8brl3",
@@ -168,18 +172,23 @@
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/value"
       ],
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/evaluate(with:)"
       ],
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Selection\/Conditions\/Equatable-Implementations"

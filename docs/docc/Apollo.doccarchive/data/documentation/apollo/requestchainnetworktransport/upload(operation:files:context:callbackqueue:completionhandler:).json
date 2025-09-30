@@ -17,8 +17,7 @@
     "paths" : [
       [
         "doc:\/\/Apollo\/documentation\/Apollo",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/UploadingNetworkTransport-Implementations"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport"
       ]
     ]
   },
@@ -605,17 +604,6 @@
   "title" : "RequestChainNetworkTransport",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestchainnetworktransport"
-},
-"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/UploadingNetworkTransport-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/UploadingNetworkTransport-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "UploadingNetworkTransport Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/uploadingnetworktransport-implementations"
 },
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/upload(operation:files:context:callbackQueue:completionHandler:)": {
   "abstract" : [

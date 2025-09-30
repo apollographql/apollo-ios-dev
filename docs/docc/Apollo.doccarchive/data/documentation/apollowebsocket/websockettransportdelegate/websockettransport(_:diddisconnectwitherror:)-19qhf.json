@@ -3,8 +3,7 @@
     "paths" : [
       [
         "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate",
-        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransport(_:didDisconnectWithError:)-5zb09"
+        "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate"
       ]
     ]
   },
@@ -330,63 +329,6 @@
   "title" : "webSocketTransport(_:didDisconnectWithError:)",
   "type" : "topic",
   "url" : "\/documentation\/apollowebsocket\/websockettransportdelegate\/websockettransport(_:diddisconnectwitherror:)-19qhf"
-},
-"doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransportDelegate/webSocketTransport(_:didDisconnectWithError:)-5zb09": {
-  "abstract" : [
-
-  ],
-  "defaultImplementations" : 1,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "webSocketTransport"
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:15ApolloWebSocket0bC9TransportC",
-      "text" : "WebSocketTransport"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "didDisconnectWithError"
-    },
-    {
-      "kind" : "text",
-      "text" : ": (any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s5ErrorP",
-      "text" : "Error"
-    },
-    {
-      "kind" : "text",
-      "text" : ")?)"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloWebSocket\/documentation\/ApolloWebSocket\/WebSocketTransportDelegate\/webSocketTransport(_:didDisconnectWithError:)-5zb09",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "webSocketTransport(_:didDisconnectWithError:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apollowebsocket\/websockettransportdelegate\/websockettransport(_:diddisconnectwitherror:)-5zb09"
 }
 }
 }

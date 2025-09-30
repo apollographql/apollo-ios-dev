@@ -123,6 +123,7 @@
     },
     {
       "identifiers" : [
+        "doc:\/\/Apollo\/s8CopyableP",
         "doc:\/\/Apollo\/s28CustomDebugStringConvertibleP",
         "doc:\/\/Apollo\/SQ",
         "doc:\/\/Apollo\/SH"
@@ -142,18 +143,24 @@
   ],
   "topicSections" : [
     {
+      "anchor" : "Operators",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/HTTPRequest\/==(_:_:)"
       ],
       "title" : "Operators"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/HTTPRequest\/init(graphQLEndpoint:operation:contextIdentifier:contentType:clientName:clientVersion:additionalHeaders:cachePolicy:context:)"
       ],
       "title" : "Initializers"
     },
     {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/HTTPRequest\/additionalHeaders",
         "doc:\/\/Apollo\/documentation\/Apollo\/HTTPRequest\/cachePolicy",
@@ -165,6 +172,8 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/HTTPRequest\/addHeader(name:value:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/HTTPRequest\/hash(into:)",
@@ -174,6 +183,7 @@
       "title" : "Instance Methods"
     },
     {
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/HTTPRequest\/CustomDebugStringConvertible-Implementations",
@@ -1074,6 +1084,11 @@
 "doc://Apollo/s28CustomDebugStringConvertibleP": {
   "identifier" : "doc:\/\/Apollo\/s28CustomDebugStringConvertibleP",
   "title" : "Swift.CustomDebugStringConvertible",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s8CopyableP": {
+  "identifier" : "doc:\/\/Apollo\/s8CopyableP",
+  "title" : "Swift.Copyable",
   "type" : "unresolvable"
 }
 }
