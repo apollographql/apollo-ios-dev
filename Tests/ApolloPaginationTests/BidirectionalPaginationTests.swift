@@ -1,7 +1,7 @@
 import Apollo
-import ApolloAPI
-import ApolloInternalTestHelpers
-import Combine
+@_spi(Unsafe) import ApolloAPI
+@_spi(Unsafe) import ApolloInternalTestHelpers
+@preconcurrency import Combine
 import XCTest
 
 @testable import ApolloPagination
@@ -14,27 +14,25 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     InMemoryTestCacheProvider.self
   }
 
-  var cache: (any NormalizedCache)!
+  var store: ApolloStore!
   var server: MockGraphQLServer!
   var client: ApolloClient!
   var cancellables: [AnyCancellable] = []
 
-  @MainActor
   override func setUp() async throws {
     try await super.setUp()
 
-    cache = try await makeNormalizedCache()
-    let store = ApolloStore(cache: cache)
+    store = try await makeTestStore()
 
     server = MockGraphQLServer()
-    let networkTransport = MockNetworkTransport(server: server, store: store)
+    let networkTransport = MockNetworkTransport(mockServer: server, store: store)
 
     client = ApolloClient(networkTransport: networkTransport, store: store)
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
+    await MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
   }
 
   override func tearDownWithError() throws {
-    cache = nil
+    store = nil
     server = nil
     client = nil
     cancellables.removeAll()
@@ -44,13 +42,12 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
 
   // MARK: - Test Helpers
 
-  private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
+  private func createPager() -> GraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 1, "after": "Y3Vyc29yMw==", "before": GraphQLNullable<String>.null]
-    return AsyncGraphQLQueryPagerCoordinator<Query, Query>(
+    return GraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
-      initialQuery: initialQuery,
-      watcherDispatchQueue: .main,
+      initialQuery: initialQuery,      
       extractPageInfo: { data in
         switch data {
         case .initial(let data, _), .paginated(let data, _):
@@ -69,7 +66,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
           nextQuery.__variables = [
             "id": "2001",
             "first": 1,
-            "after": pageInfo.endCursor,
+            "after": pageInfo.endCursor ?? .null,
             "before": GraphQLNullable<String>.null,
           ]
           return nextQuery
@@ -78,7 +75,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
           previousQuery.__variables = [
             "id": "2001",
             "first": 1,
-            "before": pageInfo.startCursor,
+            "before": pageInfo.startCursor ?? .null,
             "after": GraphQLNullable<String>.null,
           ]
           return previousQuery
@@ -91,7 +88,9 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
 
   func test_fetchMultiplePages_async() async throws {
     let pager = createPager()
-    let serverExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(server: server)
+    let serverExpectation = await Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(
+      server: server
+    )
 
     var results: [Result<PaginationOutput<Query, Query>, any Error>] = []
     let firstPageExpectation = expectation(description: "First page")
@@ -110,7 +109,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
       XCTAssertEqual(output.initialPage?.source, .server)
     }
 
-    let secondPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForLastPage(server: server)
+    let secondPageExpectation = await Mocks.Hero.BidirectionalFriendsQuery.expectationForLastPage(server: server)
     let secondPageFetch = expectation(description: "Second Page")
     secondPageFetch.expectedFulfillmentCount = 2
     subscription = await pager.subscribe(onUpdate: { _ in
@@ -141,7 +140,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     var nextCount = await pager.nextPageVarMap.values.count
     XCTAssertEqual(nextCount, 1)
 
-    let previousPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForPreviousPage(server: server)
+    let previousPageExpectation = await Mocks.Hero.BidirectionalFriendsQuery.expectationForPreviousPage(server: server)
     let previousPageFetch = expectation(description: "Previous Page")
     previousPageFetch.assertForOverFulfill = false
     previousPageFetch.expectedFulfillmentCount = 2
@@ -177,9 +176,11 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
   func test_loadAll_async() async throws {
     let pager = createPager()
 
-    let firstPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(server: server)
-    let previousPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForPreviousPage(server: server)
-    let lastPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForLastPage(server: server)
+    let firstPageExpectation = await Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(
+      server: server
+    )
+    let previousPageExpectation = await Mocks.Hero.BidirectionalFriendsQuery.expectationForPreviousPage(server: server)
+    let lastPageExpectation = await Mocks.Hero.BidirectionalFriendsQuery.expectationForLastPage(server: server)
 
     let loadAllExpectation = expectation(description: "Load all pages")
     await pager.subscribe(onUpdate: { _ in
@@ -206,18 +207,21 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
   // MARK: - GraphQLQueryPager tests
 
   func test_fetchMultiplePages() async throws {
-    let pager = GraphQLQueryPagerCoordinator(pager: createPager())
-    let serverExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(server: server)
+    let pager = createPager()
+    let serverExpectation = await Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(
+      server: server
+    )
 
     var results: [Result<PaginationOutput<Query, Query>, any Error>] = []
     let firstPageExpectation = expectation(description: "First page")
-    var subscription = await pager.publisher.sink { _ in
+    var subscription = await pager.$currentValue.compactMap { $0 }.sink { value in      
       firstPageExpectation.fulfill()
     }
-    pager.fetch()
+    await pager.fetch()
     await fulfillment(of: [serverExpectation, firstPageExpectation], timeout: 1)
     subscription.cancel()
-    var result = try await XCTUnwrapping(await pager.pager.currentValue)
+
+    var result = try await XCTUnwrapping(await pager.currentValue)
     results.append(result)
     XCTAssertSuccessResult(result) { output in
       XCTAssertTrue(output.nextPages.isEmpty)
@@ -226,18 +230,18 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
       XCTAssertEqual(output.initialPage?.source, .server)
     }
 
-    let secondPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForLastPage(server: server)
+    let secondPageExpectation = await Mocks.Hero.BidirectionalFriendsQuery.expectationForLastPage(server: server)
     let secondPageFetch = expectation(description: "Second Page")
     secondPageFetch.expectedFulfillmentCount = 2
-    subscription = await pager.publisher.sink { _ in
+    subscription = await pager.$currentValue.sink { _ in
       secondPageFetch.fulfill()
     }
 
-    pager.loadNext()
+    try await pager.loadNext()
     await fulfillment(of: [secondPageExpectation, secondPageFetch], timeout: 1)
     subscription.cancel()
 
-    result = try await XCTUnwrapping(await pager.pager.currentValue)
+    result = try await XCTUnwrapping(await pager.currentValue)
     results.append(result)
 
     try XCTAssertSuccessResult(result) { output in
@@ -253,19 +257,19 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
       XCTAssertEqual(page.source, .server)
     }
 
-    let previousPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForPreviousPage(server: server)
+    let previousPageExpectation = await Mocks.Hero.BidirectionalFriendsQuery.expectationForPreviousPage(server: server)
     let previousPageFetch = expectation(description: "Previous Page")
     previousPageFetch.assertForOverFulfill = false
     previousPageFetch.expectedFulfillmentCount = 2
-    subscription = await pager.publisher.sink { _ in
+    subscription = await pager.$currentValue.sink { _ in
       previousPageFetch.fulfill()
     }
 
-    pager.loadPrevious()
+    try await pager.loadPrevious()
     await fulfillment(of: [previousPageExpectation, previousPageFetch], timeout: 1)
     subscription.cancel()
 
-    result = try await XCTUnwrapping(await pager.pager.currentValue)
+    result = try await XCTUnwrapping(await pager.currentValue)
     results.append(result)
 
     try XCTAssertSuccessResult(result) { output in
@@ -283,23 +287,25 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
   }
 
   func test_loadAll() async throws {
-    let pager = GraphQLQueryPagerCoordinator(pager: createPager())
+    let pager = createPager()
 
-    let firstPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(server: server)
-    let previousPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForPreviousPage(server: server)
-    let lastPageExpectation = Mocks.Hero.BidirectionalFriendsQuery.expectationForLastPage(server: server)
+    let firstPageExpectation = await Mocks.Hero.BidirectionalFriendsQuery.expectationForFirstFetchInMiddleOfList(
+      server: server
+    )
+    let previousPageExpectation = await Mocks.Hero.BidirectionalFriendsQuery.expectationForPreviousPage(server: server)
+    let lastPageExpectation = await Mocks.Hero.BidirectionalFriendsQuery.expectationForLastPage(server: server)
 
     let loadAllExpectation = expectation(description: "Load all pages")
-    pager.subscribe(onUpdate: { _ in
+    let cancellable = await pager.subscribe(onUpdate: { _ in
       loadAllExpectation.fulfill()
     })
-    pager.loadAll()
+    try await pager.loadAll()
     await fulfillment(
       of: [firstPageExpectation, lastPageExpectation, previousPageExpectation, loadAllExpectation],
       timeout: 5
     )
 
-    let result = try await XCTUnwrapping(try await pager.pager.currentValue?.get())
+    let result = try await XCTUnwrapping(try await pager.currentValue?.get())
     XCTAssertFalse(result.previousPages.isEmpty)
     XCTAssertEqual(result.initialPage?.data?.hero.friendsConnection.friends.count, 1)
     XCTAssertFalse(result.nextPages.isEmpty)
@@ -310,5 +316,6 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
     ).flatMap { $0 } + (result.initialPage?.data?.hero.friendsConnection.friends ?? [])
 
     XCTAssertEqual(Set(friends).count, 3)
+    cancellable.cancel()
   }
 }

@@ -35,15 +35,17 @@ In the generated code for this query the `asUser` type case will be optional, it
 All deferred fragments are annotated with the `@Deferred` property wrapper. This allows you to check the state of any deferred fragment through it's projected value. When the fields of the deferred fragment are received, another response will be returned with all basic fields and `friends` fields too.
 
 ```swift
-client.fetch(query: ExampleQuery()) { result in
-  switch (result) {
-  case let .success(data):
-    if case .fulfilled = data.data?.person.asUser?.fragments.$deferredFriends {
-      print("Query Success! Received all fields.")
-    } else {
-      print("Query Success! Received basic fields only.")
+Task {
+  do {
+    let responses = try client.fetch(query: ExampleQuery())
+    for try await response in responses {
+      if case .fulfilled = response.data?.person.asUser?.fragments.$deferredFriends {
+        print("Query Success! Received all fields.")
+      } else {
+        print("Query Success! Received basic fields only.")
+      }
     }
-  case let .failure(error):
+  } catch {
     print("Query Failure! \(error)")
   }
 }

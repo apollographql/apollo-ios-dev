@@ -100,7 +100,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
     // given
     subject = .mock("VARIABLE", type: .string(), defaultValue: nil)
     
-    let expected = "public var __variables: Variables? { [\"VARIABLE\": variable] }"
+    let expected = "@_spi(Unsafe) public var __variables: Variables? { [\"VARIABLE\": variable] }"
     
     // when
     buildTemplate()
@@ -114,7 +114,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
     // given
     subject = .mock("VariableName", type: .string(), defaultValue: nil)
     
-    let expected = "public var __variables: Variables? { [\"VariableName\": variableName] }"
+    let expected = "@_spi(Unsafe) public var __variables: Variables? { [\"VariableName\": variableName] }"
     
     // when
     buildTemplate()
@@ -141,7 +141,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
           type: .scalar(.integer()),
           defaultValue: nil
         ),
-        "intField: GraphQLNullable<Int>"
+        "intField: GraphQLNullable<Int32>"
       ),
       (
         .mock(
@@ -225,7 +225,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
           type: .scalar(.integer()),
           defaultValue: .int(300)
         ),
-        "intField: GraphQLNullable<Int> = 300"
+        "intField: GraphQLNullable<Int32> = 300"
       ),
       (
         .mock(
@@ -274,7 +274,10 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
           defaultValue: .list([.string("1"), .string("2")])
         ),
         """
-        listField: GraphQLNullable<[String?]> = ["1", "2"]
+        listField: GraphQLNullable<[String?]> = [
+          "1",
+          "2"
+        ]
         """
       ),
       (
@@ -302,11 +305,11 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
       let actual = template.VariableParameter(test.variable).description
 
       // then
-      expect(actual).to(equal(test.expected))
+      expect(actual).to(equalLineByLine(test.expected))
     }
   }
 
-  func test__renderOperationVariableParameter__givenInputFieldType_withDefaultValue__generatesCorrectParametersWithInitializer_withNamespaceWhenRequired() throws {
+  func test__renderOperationVariableParameter__givenInputObjectField_withDefaultValue__generatesCorrectParametersWithInitializer_withNamespaceWhenRequired() throws {
     // given
     let variable: CompilationResult.VariableDefinition = .mock(
       "inputField",
@@ -350,6 +353,105 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
 
       // then
       expect(actual).to(equal(test.expected))
+    }
+  }
+
+  func test__renderOperationVariableParameter__givenListOfInputObjectsField_withSingleDefaultValue__generatesCorrectParametersWithInitializer_withNamespaceWhenRequired() throws {
+    // given
+    let variable: CompilationResult.VariableDefinition = .mock(
+      "inputField",
+      type: .list(
+        .inputObject(.mock(
+          "InnerInputObject",
+          fields: [
+            .mock("innerStringField", type: .scalar(.string()), defaultValue: nil)
+          ]
+        ))
+      ),
+    defaultValue: .list([.object(["innerStringField": .string("Value")])])
+    )
+
+    let expectedWithNamespace = """
+      inputField: GraphQLNullable<[TestSchema.InnerInputObject?]> = [TestSchema.InnerInputObject(innerStringField: "Value")]
+      """
+
+    let expectedNoNamespace = """
+      inputField: GraphQLNullable<[InnerInputObject?]> = [InnerInputObject(innerStringField: "Value")]
+      """
+
+    let tests: [(config: ApolloCodegenConfiguration.FileOutput, expected: String)] = [
+      (.mock(moduleType: .swiftPackage(), operations: .relative(subpath: nil)), expectedWithNamespace),
+      (.mock(moduleType: .swiftPackage(), operations: .absolute(path: "custom")), expectedWithNamespace),
+      (.mock(moduleType: .swiftPackage(), operations: .inSchemaModule), expectedNoNamespace),
+      (.mock(moduleType: .other, operations: .relative(subpath: nil)), expectedWithNamespace),
+      (.mock(moduleType: .other, operations: .absolute(path: "custom")), expectedWithNamespace),
+      (.mock(moduleType: .other, operations: .inSchemaModule), expectedNoNamespace),
+      (.mock(moduleType: .embeddedInTarget(name: "CustomTarget"), operations: .relative(subpath: nil)), expectedWithNamespace),
+      (.mock(moduleType: .embeddedInTarget(name: "CustomTarget"), operations: .absolute(path: "custom")), expectedWithNamespace),
+      (.mock(moduleType: .embeddedInTarget(name: "CustomTarget"), operations: .inSchemaModule), expectedNoNamespace)
+    ]
+
+    for test in tests {
+      // when
+      buildTemplate(configOutput: test.config)
+      let actual = template.VariableParameter(variable).description
+
+      // then
+      expect(actual).to(equal(test.expected))
+    }
+  }
+
+  func test__renderOperationVariableParameter__givenListOfInputObjectsField_withMultipleDefaultValue__generatesCorrectParametersWithInitializer_withNamespaceWhenRequired() throws {
+    // given
+    let variable: CompilationResult.VariableDefinition = .mock(
+      "inputField",
+      type: .list(
+        .inputObject(.mock(
+          "InnerInputObject",
+          fields: [
+            .mock("innerStringField", type: .scalar(.string()), defaultValue: nil)
+          ]
+        ))
+      ),
+    defaultValue: .list([
+      .object(["innerStringField": .string("Value 1")]),
+      .object(["innerStringField": .string("Value 2")])
+    ])
+    )
+
+    let expectedWithNamespace = """
+      inputField: GraphQLNullable<[TestSchema.InnerInputObject?]> = [
+        TestSchema.InnerInputObject(innerStringField: "Value 1"),
+        TestSchema.InnerInputObject(innerStringField: "Value 2")
+      ]
+      """
+
+    let expectedNoNamespace = """
+      inputField: GraphQLNullable<[InnerInputObject?]> = [
+        InnerInputObject(innerStringField: "Value 1"),
+        InnerInputObject(innerStringField: "Value 2")
+      ]
+      """
+
+    let tests: [(config: ApolloCodegenConfiguration.FileOutput, expected: String)] = [
+      (.mock(moduleType: .swiftPackage(), operations: .relative(subpath: nil)), expectedWithNamespace),
+      (.mock(moduleType: .swiftPackage(), operations: .absolute(path: "custom")), expectedWithNamespace),
+      (.mock(moduleType: .swiftPackage(), operations: .inSchemaModule), expectedNoNamespace),
+      (.mock(moduleType: .other, operations: .relative(subpath: nil)), expectedWithNamespace),
+      (.mock(moduleType: .other, operations: .absolute(path: "custom")), expectedWithNamespace),
+      (.mock(moduleType: .other, operations: .inSchemaModule), expectedNoNamespace),
+      (.mock(moduleType: .embeddedInTarget(name: "CustomTarget"), operations: .relative(subpath: nil)), expectedWithNamespace),
+      (.mock(moduleType: .embeddedInTarget(name: "CustomTarget"), operations: .absolute(path: "custom")), expectedWithNamespace),
+      (.mock(moduleType: .embeddedInTarget(name: "CustomTarget"), operations: .inSchemaModule), expectedNoNamespace)
+    ]
+
+    for test in tests {
+      // when
+      buildTemplate(configOutput: test.config)
+      let actual = template.VariableParameter(variable).description
+
+      // then
+      expect(actual).to(equalLineByLine(test.expected))
     }
   }
 
@@ -401,12 +503,18 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
         innerIntField: 123,
         innerFloatField: 12.3456,
         innerBoolField: true,
-        innerListField: ["A", "B"],
+        innerListField: [
+          "A",
+          "B"
+        ],
         innerEnumField: .init(.caseONE),
         innerInputObject: .init(
           TestSchema.InnerInputObject(
             innerStringField: "EFGH",
-            innerListField: [.init(.caseTwo), .init(.caseThree)]
+            innerListField: [
+              .init(.caseTwo),
+              .init(.caseThree)
+            ]
           )
         )
       )
@@ -468,11 +576,17 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
       innerIntField: 123,
       innerFloatField: 12.3456,
       innerBoolField: true,
-      innerListField: ["A", "B"],
+      innerListField: [
+        "A",
+        "B"
+      ],
       innerEnumField: .init(.caseONE),
       innerInputObject: TestSchema.InnerInputObject(
         innerStringField: "EFGH",
-        innerListField: [.init(.caseTwo), .init(.caseThree)]
+        innerListField: [
+          .init(.caseTwo),
+          .init(.caseThree)
+        ]
       )
     )
     """
@@ -522,7 +636,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
     // given
     subject = .mock("nullable", type: .scalar(.integer()), defaultValue: nil)
 
-    let expected = "nullable: GraphQLNullable<Int>"
+    let expected = "nullable: GraphQLNullable<Int32>"
 
     // when
     buildTemplate()
@@ -536,7 +650,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
     // given
     subject = .mock("nullableWithDefault", type: .scalar(.integer()), defaultValue: .int(3))
 
-    let expected = "nullableWithDefault: GraphQLNullable<Int> = 3"
+    let expected = "nullableWithDefault: GraphQLNullable<Int32> = 3"
 
     // when
     buildTemplate()
@@ -550,7 +664,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
     // given
     subject = .mock("nonNullable", type: .nonNull(.scalar(.integer())), defaultValue: nil)
 
-    let expected = "nonNullable: Int"
+    let expected = "nonNullable: Int32"
 
     // when
     buildTemplate()
@@ -564,7 +678,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
     // given
     subject = .mock("nonNullableWithDefault", type: .nonNull(.scalar(.integer())), defaultValue: .int(3))
 
-    let expected = "nonNullableWithDefault: Int = 3"
+    let expected = "nonNullableWithDefault: Int32 = 3"
     
     // when
     buildTemplate()
@@ -610,7 +724,12 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
                     type: .list(.scalar(.string())),
                     defaultValue: .list([.string("val"), .null]))
 
-    let expected = "nullableListNullableItemWithDefault: GraphQLNullable<[String?]> = [\"val\", nil]"
+    let expected = """
+    nullableListNullableItemWithDefault: GraphQLNullable<[String?]> = [
+      \"val\",
+      nil
+    ]
+    """
 
     // when
     buildTemplate()

@@ -1,17 +1,15 @@
-// swift-tools-version:5.9
-//
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-// Swift 5.9 is available from Xcode 15.0.
+// swift-tools-version:6.1
 
 import PackageDescription
 
 let package = Package(
   name: "ApolloPagination",
   platforms: [
-    .iOS(.v13),
-    .macOS(.v10_15),
-    .tvOS(.v13),
-    .watchOS(.v6),
+    .iOS(.v15),
+    .macOS(.v12),
+    .tvOS(.v15),
+    .watchOS(.v8),
+    .visionOS(.v1),
   ],
   products: [
     .library(name: "ApolloPagination", targets: ["ApolloPagination"]),
@@ -19,7 +17,7 @@ let package = Package(
   dependencies: [
     .package(
       url: "https://github.com/apollographql/apollo-ios.git",
-      .upToNextMajor(from: "1.2.0")
+      exact: "2.0.0-beta-3"
     ),
     .package(
       url: "https://github.com/apple/swift-collections",
@@ -34,7 +32,10 @@ let package = Package(
         .product(name: "ApolloAPI", package: "apollo-ios"),
         .product(name: "OrderedCollections", package: "swift-collections"),
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [
+        .swiftLanguageMode(.v6)
+      ]
     ),
-  ]
+  ],
+  swiftLanguageModes: [.v6, .v5]
 )

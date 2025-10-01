@@ -81,15 +81,15 @@ class OperationManifestFileGeneratorTests: XCTestCase {
        )
     ]
 
-    fileManager.mock(closure: .fileExists({ path, isDirectory in
+    await fileManager.mock(closure: .fileExists({ path, isDirectory in
       return false
     }))
 
-    fileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
+    await fileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
       // no-op
     }))
 
-    fileManager.mock(closure: .createFile({ path, data, attributes in
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       expect(path).to(equal("\(filePath).json"))
 
       return true
@@ -98,7 +98,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     // when
     try await subject.generate(operationManifest: manifest, fileManager: fileManager)
 
-    expect(self.fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await self.fileManager.allClosuresCalled }.to(beTrue())
   }
   
   func test__generate__givenOperation_withPathExtension_shouldWriteToAbsolutePathWithSinglePathExtension() async throws {
@@ -120,15 +120,15 @@ class OperationManifestFileGeneratorTests: XCTestCase {
        )
     ]
 
-    fileManager.mock(closure: .fileExists({ path, isDirectory in
+    await fileManager.mock(closure: .fileExists({ path, isDirectory in
       return false
     }))
 
-    fileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
+    await fileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
       // no-op
     }))
 
-    fileManager.mock(closure: .createFile({ path, data, attributes in
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       expect(path).to(equal("\(filePath).json"))
 
       return true
@@ -137,7 +137,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     // when
     try await subject.generate(operationManifest: manifest, fileManager: fileManager)
 
-    expect(self.fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await self.fileManager.allClosuresCalled }.to(beTrue())
   }
   
   func test__generate__givenOperation_shouldWriteToRelativePath() async throws {
@@ -159,19 +159,20 @@ class OperationManifestFileGeneratorTests: XCTestCase {
        )
     ]
 
-    fileManager.mock(closure: .fileExists({ path, isDirectory in
+    await fileManager.mock(closure: .fileExists({ path, isDirectory in
       return false
     }))
 
-    fileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
+    await fileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
       // no-op
     }))
 
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      let expectedPath = URL(fileURLWithPath: String(filePath.dropFirst(2)), relativeTo: self.subject.config.rootURL)
-        .resolvingSymlinksInPath()
-        .appendingPathExtension("json")
-        .path
+    let expectedPath = URL(fileURLWithPath: String(filePath.dropFirst(2)), relativeTo: self.subject.config.rootURL)
+      .resolvingSymlinksInPath()
+      .appendingPathExtension("json")
+      .path
+
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       expect(path).to(equal(expectedPath))
 
       return true
@@ -180,7 +181,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     // when
     try await subject.generate(operationManifest: manifest, fileManager: fileManager)
 
-    expect(self.fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await self.fileManager.allClosuresCalled }.to(beTrue())
   }
   
   func test__generate__givenOperation_withPathExtension_shouldWriteToRelativePathWithSinglePathExtension() async throws {
@@ -202,19 +203,20 @@ class OperationManifestFileGeneratorTests: XCTestCase {
        )
     ]
 
-    fileManager.mock(closure: .fileExists({ path, isDirectory in
+    await fileManager.mock(closure: .fileExists({ path, isDirectory in
       return false
     }))
 
-    fileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
+    await fileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
       // no-op
     }))
 
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      let expectedPath = URL(fileURLWithPath: String(filePath.dropFirst(2)), relativeTo: self.subject.config.rootURL)
-        .resolvingSymlinksInPath()
-        .appendingPathExtension("json")
-        .path
+    let expectedPath = URL(fileURLWithPath: String(filePath.dropFirst(2)), relativeTo: self.subject.config.rootURL)
+      .resolvingSymlinksInPath()
+      .appendingPathExtension("json")
+      .path
+    
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       expect(path).to(equal(expectedPath))
 
       return true
@@ -223,7 +225,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     // when
     try await subject.generate(operationManifest: manifest, fileManager: fileManager)
 
-    expect(self.fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await self.fileManager.allClosuresCalled }.to(beTrue())
   }
   
   func test__generate__givenOperations_whenFileExists_shouldOverwrite() async throws {
@@ -245,15 +247,15 @@ class OperationManifestFileGeneratorTests: XCTestCase {
        )
     ]
 
-    fileManager.mock(closure: .fileExists({ path, isDirectory in
+    await fileManager.mock(closure: .fileExists({ path, isDirectory in
       return true
     }))
 
-    fileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
+    await fileManager.mock(closure: .createDirectory({ path, intermediateDirectories, attributes in
       // no-op
     }))
 
-    fileManager.mock(closure: .createFile({ path, data, attributes in
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       expect(path).to(equal("\(filePath).json"))
 
       expect(String(data: data!, encoding: .utf8)).to(equal(
@@ -273,7 +275,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     // when
     try await subject.generate(operationManifest: manifest, fileManager: fileManager)
 
-    expect(self.fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await self.fileManager.allClosuresCalled }.to(beTrue())
   }
 
   // MARK: - Template Type Selection Tests
@@ -298,6 +300,6 @@ class OperationManifestFileGeneratorTests: XCTestCase {
 
     // then
     expect(actual).toNot(beNil())
-    expect(actual?.config).to(beIdenticalTo(self.subject.config))
+    expect(actual?.config).to(equal(self.subject.config))
   }
 }

@@ -1,12 +1,12 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import ApolloAPI
+@_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
 public struct PetAdoptionInput: InputObject {
-  public private(set) var __data: InputDict
+  @_spi(Unsafe) public private(set) var __data: InputDict
 
-  public init(_ data: InputDict) {
+  @_spi(Unsafe) public init(_ data: InputDict) {
     __data = data
   }
 
@@ -23,7 +23,7 @@ public struct PetAdoptionInput: InputObject {
       "petID": petID,
       "humanName": humanName,
       "favoriteToy": favoriteToy,
-      "isSpayedOrNeutered": isSpayedOrNeutered,
+      "isSpayedOrNeutered": isSpayedOrNeutered ?? GraphQLNullable.none,
       "measurements": measurements
     ])
   }

@@ -1,7 +1,7 @@
 import XCTest
-@testable import Apollo
-import ApolloAPI
-import ApolloInternalTestHelpers
+@testable @_spi(Internal) import Apollo
+@_spi(Execution) @_spi(Internal) @_spi(Unsafe) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 
 class JSONTests: XCTestCase {
   func testMissingValueMatchable() {
@@ -61,10 +61,10 @@ class JSONTests: XCTestCase {
       }
       """
     let data = try XCTUnwrap(jsonString.data(using: .utf8))
-    let json = try JSONSerializationFormat.deserialize(data: data)
+    let json = try JSONSerializationFormat.deserialize(data: data) as JSONObject
     XCTAssertNotNil(json)
     
-    let dict = try JSONObject(_jsonValue: json)
+    let dict = try JSONObject(_jsonValue: json as JSONValue)
     XCTAssertNotNil(dict)
     
     let reserialized = try JSONSerializationFormat.serialize(value: dict)
@@ -100,8 +100,8 @@ class JSONTests: XCTestCase {
     XCTAssertEqual(stringFromSerialized, #"{"aWeirdNull":null}"#)
   }
   
-  func testJSONConvertSelectionSetEncoding() throws {
-    class Hero: MockSelectionSet {
+  func testJSONConvertSelectionSetEncoding() async throws {
+    class Hero: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
       
       override class var __selections: [Selection] {[
@@ -117,12 +117,12 @@ class JSONTests: XCTestCase {
       "name": "Johnny Tsunami"
     ]
     
-    let converted = try JSONConverter.convert(Hero(data: expected))
+    let converted = try await JSONConverter.convert(Hero(data: expected))
     XCTAssertEqual(converted, expected)
   }
   
-  func testJSONConvertGraphQLResultEncoding() throws {
-    class MockData: MockSelectionSet {
+  func testJSONConvertGraphQLResultEncoding() async throws {
+    class MockData: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __selections: [Selection] {[
@@ -131,7 +131,7 @@ class JSONTests: XCTestCase {
 
       var hero: Hero? { __data["hero"] }
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
 
         override class var __selections: [Selection] {[
@@ -150,9 +150,9 @@ class JSONTests: XCTestCase {
       ]
     ]
     
-    let heroData = try MockData(data: jsonObj)
+    let heroData = try await MockData(data: jsonObj)
 
-    let result = GraphQLResult(
+    let result = GraphQLResponse<MockQuery<MockData>>(
       data: heroData,
       extensions: nil,
       errors: nil,

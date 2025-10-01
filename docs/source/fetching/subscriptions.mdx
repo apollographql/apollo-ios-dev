@@ -4,92 +4,21 @@ title: Subscriptions
 
 Subscriptions are long-lived GraphQL read operations that can update their response over time, enabling clients to receive new data as it becomes available.
 
-Apollo iOS supports subscriptions over the following protocols:
+Apollo iOS 2.0 supports subscriptions over HTTP, using [chunked multipart responses](https://github.com/graphql/graphql-over-http/blob/main/rfcs/IncrementalDelivery.md)
 
-- [WebSocket](#websocket), including multiple [subprotocols](#websocket-subprotocols)
-- [HTTP](#http), using [chunked multipart responses](https://github.com/graphql/graphql-over-http/blob/main/rfcs/IncrementalDelivery.md) (version 1.1.0 and later)
+<Note>
+`ApolloWebSocket` support for 2.0 is coming soon. If you need to use web sockets, please continue using Apollo iOS 1.0 for now.
+</Note>
 
 **You must use whichever protocol is supported by your GraphQL endpoint.**
 
 ## Enabling support
 
-To support GraphQL subscriptions, you need to initialize your `ApolloClient` instance with a [`NetworkTransport`](/ios/networking/client-creation#networktransport) that supports subscriptions. See below for applicable classes for each subscription protocol.
+To support GraphQL subscriptions, you need to initialize your `ApolloClient` instance with a [`NetworkTransport`](/ios/networking/client-creation#networktransport) that supports subscriptions.
 
-### WebSocket
+The default `NetworkTransport` for Apollo iOS is the [`RequestChainNetworkTransport`](/ios/api/Apollo/classes/RequestChainNetworkTransport). This transport supports subscriptions over HTTP, with no additional configuration required.
 
-To use Apollo iOS with WebSocket-based subscriptions, you need to install the optional  `ApolloWebSocket` library. This library includes two classes that conform to the [`NetworkTransport` protocol](/ios/networking/client-creation#networktransport):
-
-- **[`WebSocketTransport`](/ios/api/ApolloWebSocket/classes/WebSocketTransport)** sends _all_ operations (including queries and mutations) over WebSocket.
-- **[`SplitNetworkTransport`](/ios/api/ApolloWebSocket/classes/SplitNetworkTransport)** maintains a [`WebSocketTransport`](/ios/api/ApolloWebSocket/classes/WebSocketTransport) instance, _along with_ an [`UploadingNetworkTransport`](/ios/api/Apollo/protocols/UploadingNetworkTransport) instance (usually [`RequestChainNetworkTransport`](/ios/api/Apollo/classes/RequestChainNetworkTransport)). This provides a single network transport that uses HTTP for queries and mutations and WebSocket for subscriptions.
-
-`SplitNetworkTransport` is recommended for most use cases, because it enables you to retain a single `NetworkTransport` setup that avoids issues caused by using multiple client objects.
-
-Here's an example of setting up an `ApolloClient` that uses a `SplitNetworkTransport` to support all operation types:
-
-<ExpansionPanel title="Click to expand">
-
-```swift
-/// A common store to use for `httpTransport` and `webSocketTransport`.
-let store = ApolloStore()
-
-/// A web socket transport to use for subscriptions
-let webSocketTransport: WebSocketTransport = {
-  let url = URL(string: "ws://localhost:8080/websocket")!
-  let webSocketClient = WebSocket(url: url, protocol: .graphql_transport_ws)
-  return WebSocketTransport(websocket: webSocketClient)
-}()
-
-/// An HTTP transport to use for queries and mutations
-let httpTransport: RequestChainNetworkTransport = {
-  let url = URL(string: "http://localhost:8080/graphql")!
-  return RequestChainNetworkTransport(interceptorProvider: DefaultInterceptorProvider(store: store), endpointURL: url)
-}()
-
-/// A split network transport to allow the use of both of the above
-/// transports through a single `NetworkTransport` instance.
-let splitNetworkTransport = SplitNetworkTransport(
-  uploadingNetworkTransport: httpTransport,
-  webSocketNetworkTransport: webSocketTransport
-)
-
-/// Create a client using the `SplitNetworkTransport`.
-let client = ApolloClient(networkTransport: splitNetworkTransport, store: store)
-```
-
-</ExpansionPanel>
-
-#### WebSocket subprotocols
-
-Apollo iOS supports the following WebSocket subprotocols for subscriptions:
-
-- [`graphql-ws`](https://github.com/apollographql/subscriptions-transport-ws/blob/master/PROTOCOL.md), which is implemented in the [subscriptions-transport-ws](https://github.com/apollographql/subscriptions-transport-ws) and [AWS AppSync](https://docs.aws.amazon.com/appsync/latest/devguide/real-time-websocket-client.html#handshake-details-to-establish-the-websocket-connection) libraries. (⚠️ This protocol is not actively maintained!)
-- [`graphql-transport-ws`](https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md), which is implemented in the [graphql-ws](https://github.com/enisdenjo/graphql-ws) library.
-
-> **Note:** These protocols are **not** cross-compatible. You need to use whichever protocol is supported by your GraphQL endpoint. All `WebSocket` initializers enable you to specify which protocol to use (expand the code block above for an example).
-
-#### Providing authorization tokens
-
-In a standard HTTP operation, if authentication is necessary an `Authorization` header is often sent with requests. However, with WebSocket, this can't be sent with every payload because a persistent connection is required.
-
-For WebSocket, the `connectingPayload` provides the parameters you would typically specify in your request headers.
-
-Note that this must be set **when the `WebSocketTransport` is created**. If you need to update the `connectingPayload`, you need to recreate the client using a new `webSocketTransport`.
-
-```swift
-let webSocketTransport: WebSocketTransport = {
-  let url = URL(string: "ws://localhost:8080/websocket")!
-  let webSocketClient = WebSocket(url: url, protocol: .graphql_transport_ws)
-  let authPayload: JSONEncodableDictionary = ["authToken": myAuthToken]
-  let config = WebSocketTransport.Configuration(connectingPayload: authPayload)
-  return WebSocketTransport(websocket: webSocketClient, config: config)
-}()
-```
-
-### HTTP
-
-The default `NetworkTransport` for Apollo iOS is the [`RequestChainNetworkTransport`](/ios/api/Apollo/classes/RequestChainNetworkTransport). In Apollo iOS `1.1.0` and later, this transport supports subscriptions over HTTP, with no additional configuration required. 
-
-> See the instructions for [creating a client](../networking/client-creation).
+If you are building a custom network transport and want to support subscriptions, you may use the provided `JSONResponseParser` for parsing multi-part response data.
 
 ## Generating and executing
 
@@ -104,12 +33,15 @@ subscription ReviewAdded {
 }
 ```
 
-After you generate these classes, you can execute subscriptions using `ApolloClient.subscribe(subscription:)` with a [subscription-supporting `NetworkTransport`](#enabling-support). If you do, your client continues to receive updated data until the subscription is [canceled](#canceling-a-subscription).
+After you generate these classes, you can execute subscriptions using `ApolloClient.subscribe(subscription:)` with a [subscription-supporting `NetworkTransport`](#enabling-support). If you do, your client continues to receive updated data until the subscription is [canceled](#canceling-a-subscription) or is terminated by the server.
 
 ```swift
-let subscription = client.subscribe(subscription: ReviewAddedSubscription()) { result in
-  guard let data = try? result.get().data else { return }
-  print(data.reviews.map { $0.stars })
+let subscription = try await client.subscribe(subscription: ReviewAddedSubscription())
+
+Task {
+  for try await result in subscription {
+    // Handle each update from the subscription.
+  }
 }
 ```
 
@@ -117,28 +49,36 @@ let subscription = client.subscribe(subscription: ReviewAddedSubscription()) { r
 
 ## Canceling a subscription
 
-It's important to cancel a subscription connection whenever you're done with it. As long as a subscription is active, it maintains a connection to the server, and its `resultHandler` completion block is retained. This can create memory leaks and reduce your application's performance.
+Apollo iOS 2.0 participates in Swift structured concurrency task cancellation for subscription cancellation.
+To cancel a subscription, you cancel the `Task` that the subscription was initiated in.
 
-When you call `ApolloClient.subscribe(subscription:)` an opaque `Cancellable` is returned. You can cancel the subscription by calling `cancel()` on the returned `Cancellable`. This terminates the connection to the server and releases the `resultHandler` completion block.
-
-**A subscription's cancellation object does not cancel itself when it's deallocated!** Make sure to `cancel()` it yourself. A `class` can ensure any subscriptions it manages are canceled when it's released by using its deinitializer:
+When a task is cancelled, the subscription's `AsyncThrowingStream` will terminate gracefully and the connection to the server will be closed.
 
 ```swift
 class ReviewViewController {
 
   let client: ApolloClient!
-  private var subscription: Cancellable?
+  private var subscriptionTask: Task<Void, Never>?
 
   func subscribeToReviews() {
-    // Keep a reference to the subscription's cancellation object.
-    self.subscription = client.subscribe(subscription: ReviewAddedSubscription()) { [weak self] result in
-      // Handle each update from the subscription.
+    // Keep a reference to the subscription task
+    self.subscriptionTask = Task {
+      do {
+        let subscription = try await client.subscribe(subscription: ReviewAddedSubscription())
+
+        for try await result in subscription {
+          // Handle each update from the subscription
+          print("Received subscription update: \(result.data)")
+        }
+      } catch {
+        print("Subscription error: \(error)")
+      }
     }
   }
 
   deinit {
-    // Make sure the subscription is cancelled, if it exists, when this object is deallocated.
-    self.subscription?.cancel()
+    // Cancel the subscription task when this object is deallocated
+    self.subscriptionTask?.cancel()
   }
 }
 ```

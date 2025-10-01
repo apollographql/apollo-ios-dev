@@ -1,20 +1,34 @@
-import XCTest
-import Nimble
-@testable import ApolloCodegenLib
-import IR
 import ApolloCodegenInternalTestHelpers
+import IR
+import Nimble
+import XCTest
 
-class FragmentTemplateTests: XCTestCase {
+@testable import ApolloCodegenLib
 
-  var schemaSDL: String!
-  var document: String!
-  var ir: IRBuilder!
-  var fragment: IR.NamedFragment!
-  var subject: FragmentTemplate!
+final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
 
-  override func setUp() {
-    super.setUp()
-    schemaSDL = """
+  // MARK: - Helpers
+
+  private func buildFragmentTemplate(
+    named fragmentName: String = "TestFragment",
+    config: ApolloCodegenConfiguration = .mock(),
+    schemaSDL: String = FragmentTemplateTests.defaultSchema,
+    document: String = FragmentTemplateTests.defaultDocument
+  ) async throws -> (fragment: NamedFragment, template: FragmentTemplate) {
+    let ir: IRBuilder = try await .mock(schema: schemaSDL, document: document)
+    let fragmentDefinition = try XCTUnwrap(ir.compilationResult[fragment: fragmentName])
+    let fragment = await ir.build(fragment: fragmentDefinition)
+    return
+      (
+        fragment,
+        FragmentTemplate(
+          fragment: fragment,
+          config: ApolloCodegen.ConfigurationContext(config: config)
+        )
+      )
+  }
+
+  private static let defaultSchema: String = """
     type Query {
       allAnimals: [Animal!]
     }
@@ -24,59 +38,34 @@ class FragmentTemplateTests: XCTestCase {
     }
     """
 
-    document = """
+  private static let defaultDocument: String = """
     fragment TestFragment on Query {
       allAnimals {
         species
       }
     }
     """
-  }
 
-  override func tearDown() {
-    schemaSDL = nil
-    document = nil
-    ir = nil
-    fragment = nil
-    subject = nil
-    super.tearDown()
-  }
-
-  // MARK: - Helpers
-
-  private func buildSubjectAndFragment(
-    named fragmentName: String = "TestFragment",
-    config: ApolloCodegenConfiguration = .mock()
-  ) async throws {
-    ir = try await .mock(schema: schemaSDL, document: document)
-    let fragmentDefinition = try XCTUnwrap(ir.compilationResult[fragment: fragmentName])
-    fragment = await ir.build(fragment: fragmentDefinition)
-    subject = FragmentTemplate(
-      fragment: fragment,
-      config: ApolloCodegen.ConfigurationContext(config: config)
-    )
-  }
-
-  private func renderSubject() -> String {
-    subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
+  private func render(_ template: FragmentTemplate) -> String {
+    template.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
   // MARK: - Target Configuration Tests
 
   func test__target__givenModuleImports_targetHasModuleImports() async throws {
     // given
-    document = """
-    fragment TestFragment on Query @import(module: "ModuleA") {
-      allAnimals {
-        species
+    let document = """
+      fragment TestFragment on Query @import(module: "ModuleA") {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     // when
-    try await buildSubjectAndFragment()
+    let (_, template) = try await buildFragmentTemplate(document: document)
 
-    guard case let .operationFile(actual) = subject.target else {
+    guard case let .operationFile(actual) = template.target else {
       fail("expected operationFile target")
       return
     }
@@ -90,43 +79,45 @@ class FragmentTemplateTests: XCTestCase {
   func test__render__givenFragment_generatesFragmentDeclarationDefinitionAndBoilerplate() async throws {
     // given
     let expected =
-    """
-    struct TestFragment: TestSchema.SelectionSet, Fragment {
-      static var fragmentDefinition: StaticString {
-        #"fragment TestFragment on Query { __typename allAnimals { __typename species } }"#
-      }
+      """
+      struct TestFragment: TestSchema.SelectionSet, Fragment {
+        static var fragmentDefinition: StaticString {
+          #"fragment TestFragment on Query { __typename allAnimals { __typename species } }"#
+        }
 
-      let __data: DataDict
-      init(_dataDict: DataDict) { __data = _dataDict }
-    """
+        @_spi(Unsafe) let __data: DataDict
+        @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
+      """
 
     // when
-    try await buildSubjectAndFragment()
+    let (_, template) = try await buildFragmentTemplate()
 
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
     expect(String(actual.reversed())).to(equalLineByLine("\n}", ignoringExtraLines: true))
   }
-  
+
   func test__render__givenFragment_generatesFragmentDeclarationWithoutDefinition() async throws {
     // given
     let expected =
-    """
-    struct TestFragment: TestSchema.SelectionSet, Fragment {
-      let __data: DataDict
-      init(_dataDict: DataDict) { __data = _dataDict }
-    """
+      """
+      struct TestFragment: TestSchema.SelectionSet, Fragment {
+        @_spi(Unsafe) let __data: DataDict
+        @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
+      """
 
     // when
-    try await buildSubjectAndFragment(config: .mock(
-      options: .init(
-        operationDocumentFormat: .operationId
+    let (_, template) = try await buildFragmentTemplate(
+      config: .mock(
+        options: .init(
+          operationDocumentFormat: .operationId
+        )
       )
-    ))
+    )
 
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
@@ -135,25 +126,28 @@ class FragmentTemplateTests: XCTestCase {
 
   func test__render__givenLowercaseFragment_generatesTitleCaseTypeName() async throws {
     // given
-    document = """
-    fragment testFragment on Query {
-      allAnimals {
-        species
+    let document = """
+      fragment testFragment on Query {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-    struct TestFragment: TestSchema.SelectionSet, Fragment {
-      static var fragmentDefinition: StaticString {
-        #"fragment testFragment on Query { __typename allAnimals { __typename species } }"#
-    """
+      """
+      struct TestFragment: TestSchema.SelectionSet, Fragment {
+        static var fragmentDefinition: StaticString {
+          #"fragment testFragment on Query { __typename allAnimals { __typename species } }"#
+      """
 
     // when
-    try await buildSubjectAndFragment(named: "testFragment")
+    let (_, template) = try await buildFragmentTemplate(
+      named: "testFragment",
+      document: document
+    )
 
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
@@ -161,29 +155,33 @@ class FragmentTemplateTests: XCTestCase {
 
   func test__render__givenFragmentWithUnderscoreInName_rendersDeclarationWithName() async throws {
     // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+    let schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    interface Animal {
-      species: String!
-    }
-    """
+      interface Animal {
+        species: String!
+      }
+      """
 
-    document = """
-    fragment Test_Fragment on Animal {
-      species
-    }
-    """
+    let document = """
+      fragment Test_Fragment on Animal {
+        species
+      }
+      """
 
     let expected = """
-    struct Test_Fragment: TestSchema.SelectionSet, Fragment {
-    """
+      struct Test_Fragment: TestSchema.SelectionSet, Fragment {
+      """
 
     // when
-    try await buildSubjectAndFragment(named: "Test_Fragment")
-    let actual = renderSubject()
+    let (_, template) = try await buildFragmentTemplate(
+      named: "Test_Fragment",
+      schemaSDL: schemaSDL,
+      document: document
+    )
+    let actual = render(template)
 
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
@@ -191,29 +189,32 @@ class FragmentTemplateTests: XCTestCase {
 
   func test__render_parentType__givenFragmentTypeConditionAs_Object_rendersParentType() async throws {
     // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+    let schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    type Animal {
-      species: String!
-    }
-    """
+      type Animal {
+        species: String!
+      }
+      """
 
-    document = """
-    fragment TestFragment on Animal {
-      species
-    }
-    """
+    let document = """
+      fragment TestFragment on Animal {
+        species
+      }
+      """
 
     let expected = """
-      static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
-    """
+        @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
+      """
 
     // when
-    try await buildSubjectAndFragment()
-    let actual = renderSubject()
+    let (_, template) = try await buildFragmentTemplate(
+      schemaSDL: schemaSDL,
+      document: document
+    )
+    let actual = render(template)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
@@ -221,29 +222,32 @@ class FragmentTemplateTests: XCTestCase {
 
   func test__render_parentType__givenFragmentTypeConditionAs_Interface_rendersParentType() async throws {
     // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
+    let schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
 
-    interface Animal {
-      species: String!
-    }
-    """
+      interface Animal {
+        species: String!
+      }
+      """
 
-    document = """
-    fragment TestFragment on Animal {
-      species
-    }
-    """
+    let document = """
+      fragment TestFragment on Animal {
+        species
+      }
+      """
 
     let expected = """
-      static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
-    """
+        @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      """
 
     // when
-    try await buildSubjectAndFragment()
-    let actual = renderSubject()
+    let (_, template) = try await buildFragmentTemplate(
+      schemaSDL: schemaSDL,
+      document: document
+    )
+    let actual = render(template)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
@@ -251,98 +255,115 @@ class FragmentTemplateTests: XCTestCase {
 
   func test__render_parentType__givenFragmentTypeConditionAs_Union_rendersParentType() async throws {
     // given
-    schemaSDL = """
-    type Query {
-      allAnimals: [Animal!]
-    }
-
-    type Dog {
-      species: String!
-    }
-
-    union Animal = Dog
-    """
-
-    document = """
-    fragment TestFragment on Animal {
-      ... on Dog {
-        species
+    let schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
       }
-    }
-    """
+
+      type Dog {
+        species: String!
+      }
+
+      union Animal = Dog
+      """
+
+    let document = """
+      fragment TestFragment on Animal {
+        ... on Dog {
+          species
+        }
+      }
+      """
 
     let expected = """
-      static var __parentType: any ApolloAPI.ParentType { TestSchema.Unions.Animal }
-    """
+        @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Unions.Animal }
+      """
 
     // when
-    try await buildSubjectAndFragment()
-    let actual = renderSubject()
+    let (_, template) = try await buildFragmentTemplate(
+      schemaSDL: schemaSDL,
+      document: document
+    )
+    let actual = render(template)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 9, ignoringExtraLines: true))
   }
 
-  func test__render__givenFragmentOnRootOperationTypeWithOnlyTypenameField_generatesFragmentDefinition_withNoSelections() async throws {
+  func
+    test__render__givenFragmentOnRootOperationTypeWithOnlyTypenameField_generatesFragmentDefinition_withNoSelections()
+    async throws
+  {
     // given
-    document = """
-    fragment TestFragment on Query {
-      __typename
-    }
-    """
+    let document = """
+      fragment TestFragment on Query {
+        __typename
+      }
+      """
 
-    try await buildSubjectAndFragment()
+    let (_, template) = try await buildFragmentTemplate(
+      document: document
+    )
 
     let expected = """
-    struct TestFragment: TestSchema.SelectionSet, Fragment {
-      static var fragmentDefinition: StaticString {
-        #"fragment TestFragment on Query { __typename }"#
+      struct TestFragment: TestSchema.SelectionSet, Fragment {
+        static var fragmentDefinition: StaticString {
+          #"fragment TestFragment on Query { __typename }"#
+        }
+
+        @_spi(Unsafe) let __data: DataDict
+        @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
+
+        @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
+        @_spi(Execution) static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          TestFragment.self
+        ] }
       }
 
-      let __data: DataDict
-      init(_dataDict: DataDict) { __data = _dataDict }
-
-      static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
-    }
-
-    """
+      """
 
     // when
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
     expect(actual).to(equalLineByLine(expected))
   }
 
-  func test__render__givenFragmentWithOnlyTypenameField_generatesFragmentDefinition_withTypeNameSelection() async throws {
+  func test__render__givenFragmentWithOnlyTypenameField_generatesFragmentDefinition_withTypeNameSelection() async throws
+  {
     // given
-    document = """
-    fragment TestFragment on Animal {
-      __typename
-    }
-    """
+    let document = """
+      fragment TestFragment on Animal {
+        __typename
+      }
+      """
 
-    try await buildSubjectAndFragment()
+    let (_, template) = try await buildFragmentTemplate(
+      document: document
+    )
 
     let expected = """
-    struct TestFragment: TestSchema.SelectionSet, Fragment {
-      static var fragmentDefinition: StaticString {
-        #"fragment TestFragment on Animal { __typename }"#
+      struct TestFragment: TestSchema.SelectionSet, Fragment {
+        static var fragmentDefinition: StaticString {
+          #"fragment TestFragment on Animal { __typename }"#
+        }
+
+        @_spi(Unsafe) let __data: DataDict
+        @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
+
+        @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
+        @_spi(Execution) static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+        ] }
+        @_spi(Execution) static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          TestFragment.self
+        ] }
       }
 
-      let __data: DataDict
-      init(_dataDict: DataDict) { __data = _dataDict }
-
-      static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
-      static var __selections: [ApolloAPI.Selection] { [
-        .field("__typename", String.self),
-      ] }
-    }
-
-    """
+      """
 
     // when
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
     expect(actual).to(equalLineByLine(expected))
@@ -352,15 +373,15 @@ class FragmentTemplateTests: XCTestCase {
 
   func test__render__givenModuleType_swiftPackageManager_generatesFragmentDefinition_withPublicAccess() async throws {
     // given
-    try await buildSubjectAndFragment(config: .mock(.swiftPackage()))
+    let (_, template) = try await buildFragmentTemplate(config: .mock(.swiftPackage()))
 
     let expected = """
-    public struct TestFragment: TestSchema.SelectionSet, Fragment {
-      public static var fragmentDefinition: StaticString {
-    """
+      public struct TestFragment: TestSchema.SelectionSet, Fragment {
+        public static var fragmentDefinition: StaticString {
+      """
 
     // when
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
@@ -368,51 +389,57 @@ class FragmentTemplateTests: XCTestCase {
 
   func test__render__givenModuleType_other_generatesFragmentDefinition_withPublicAccess() async throws {
     // given
-    try await buildSubjectAndFragment(config: .mock(.other))
+    let (_, template) = try await buildFragmentTemplate(config: .mock(.other))
 
     let expected = """
-    public struct TestFragment: TestSchema.SelectionSet, Fragment {
-      public static var fragmentDefinition: StaticString {
-    """
+      public struct TestFragment: TestSchema.SelectionSet, Fragment {
+        public static var fragmentDefinition: StaticString {
+      """
 
     // when
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__render__givenModuleType_embeddedInTarget_withInternalAccessModifier_generatesFragmentDefinition_withInternalAccess() async throws {
+  func
+    test__render__givenModuleType_embeddedInTarget_withInternalAccessModifier_generatesFragmentDefinition_withInternalAccess()
+    async throws
+  {
     // given
-    try await buildSubjectAndFragment(
+    let (_, template) = try await buildFragmentTemplate(
       config: .mock(.embeddedInTarget(name: "TestTarget", accessModifier: .internal))
     )
 
     let expected = """
-    struct TestFragment: TestSchema.SelectionSet, Fragment {
-      static var fragmentDefinition: StaticString {
-    """
+      struct TestFragment: TestSchema.SelectionSet, Fragment {
+        static var fragmentDefinition: StaticString {
+      """
 
     // when
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
-  func test__render__givenModuleType_embeddedInTarget_withPublicAccessModifier_generatesFragmentDefinition_withPublicAccess() async throws {
+  func
+    test__render__givenModuleType_embeddedInTarget_withPublicAccessModifier_generatesFragmentDefinition_withPublicAccess()
+    async throws
+  {
     // given
-    try await buildSubjectAndFragment(
+    let (_, template) = try await buildFragmentTemplate(
       config: .mock(.embeddedInTarget(name: "TestTarget", accessModifier: .public))
     )
 
     let expected = """
-    struct TestFragment: TestSchema.SelectionSet, Fragment {
-      public static var fragmentDefinition: StaticString {
-    """
+      struct TestFragment: TestSchema.SelectionSet, Fragment {
+        public static var fragmentDefinition: StaticString {
+      """
 
     // when
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
@@ -422,7 +449,7 @@ class FragmentTemplateTests: XCTestCase {
 
   func test__render_givenInitializerConfigIncludesNamedFragments_rendersInitializer() async throws {
     // given
-    schemaSDL = """
+    let schemaSDL = """
       type Query {
         allAnimals: [Animal!]
       }
@@ -432,7 +459,7 @@ class FragmentTemplateTests: XCTestCase {
       }
       """
 
-    document = """
+    let document = """
       fragment TestFragment on Animal {
         species
       }
@@ -443,33 +470,33 @@ class FragmentTemplateTests: XCTestCase {
         init(
           species: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": TestSchema.Objects.Animal.typename,
-              "species": species,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(TestFragment.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": TestSchema.Objects.Animal.typename,
+            "species": species,
+          ])
         }
       """
 
     // when
-    try await buildSubjectAndFragment(
-      config: .mock(options: .init(
-        selectionSetInitializers: [.namedFragments]
-      )))
+    let (_, template) = try await buildFragmentTemplate(
+      config: .mock(
+        options: .init(
+          selectionSetInitializers: [.namedFragments]
+        )
+      ),
+      schemaSDL: schemaSDL,
+      document: document
+    )
 
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, forSection: .selectionSet.initializer))
   }
 
   func test__render_givenNamedFragment_configIncludesSpecificFragment_rendersInitializer() async throws {
     // given
-    schemaSDL = """
+    let schemaSDL = """
       type Query {
         allAnimals: [Animal!]
       }
@@ -479,7 +506,7 @@ class FragmentTemplateTests: XCTestCase {
       }
       """
 
-    document = """
+    let document = """
       fragment TestFragment on Animal {
         species
       }
@@ -490,33 +517,33 @@ class FragmentTemplateTests: XCTestCase {
         init(
           species: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": TestSchema.Objects.Animal.typename,
-              "species": species,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(TestFragment.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": TestSchema.Objects.Animal.typename,
+            "species": species,
+          ])
         }
       """
 
     // when
-    try await buildSubjectAndFragment(
-      config: .mock(options: .init(
-        selectionSetInitializers: [.fragment(named: "TestFragment")]
-      )))
+    let (_, template) = try await buildFragmentTemplate(
+      config: .mock(
+        options: .init(
+          selectionSetInitializers: [.fragment(named: "TestFragment")]
+        )
+      ),
+      schemaSDL: schemaSDL,
+      document: document
+    )
 
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, forSection: .selectionSet.initializer))
   }
 
   func test__render_givenNamedFragment_configDoesNotIncludeNamedFragments_doesNotRenderInitializer() async throws {
     // given
-    schemaSDL = """
+    let schemaSDL = """
       type Query {
         allAnimals: [Animal!]
       }
@@ -526,27 +553,40 @@ class FragmentTemplateTests: XCTestCase {
       }
       """
 
-    document = """
+    let document = """
       fragment TestFragment on Animal {
         species
       }
       """
 
     // when
-    try await buildSubjectAndFragment(
-      config: .mock(options: .init(
-        selectionSetInitializers: [.operations]
-      )))
+    let (_, template) = try await buildFragmentTemplate(
+      config: .mock(
+        options: .init(
+          selectionSetInitializers: [.operations]
+        )
+      ),
+      schemaSDL: schemaSDL,
+      document: document
+    )
 
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
-    expect(actual).to(equalLineByLine("}", atLine: 16, ignoringExtraLines: true))
+    expect(actual).to(
+      equalLineByLine(
+        "",
+        after: .selectionSet.propertyAccessors(),
+        ignoringExtraLines: false
+      )
+    )
   }
 
-  func test__render_givenNamedFragments_configIncludeSpecificFragmentWithOtherName_doesNotRenderInitializer() async throws {
+  func test__render_givenNamedFragments_configIncludeSpecificFragmentWithOtherName_doesNotRenderInitializer()
+    async throws
+  {
     // given
-    schemaSDL = """
+    let schemaSDL = """
       type Query {
         allAnimals: [Animal!]
       }
@@ -556,27 +596,38 @@ class FragmentTemplateTests: XCTestCase {
       }
       """
 
-    document = """
+    let document = """
       fragment TestFragment on Animal {
         species
       }
       """
 
     // when
-    try await buildSubjectAndFragment(
-      config: .mock(options: .init(
-        selectionSetInitializers: [.fragment(named: "OtherFragment")]
-      )))
+    let (_, template) = try await buildFragmentTemplate(
+      config: .mock(
+        options: .init(
+          selectionSetInitializers: [.fragment(named: "OtherFragment")]
+        )
+      ),
+      schemaSDL: schemaSDL,
+      document: document
+    )
 
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
-    expect(actual).to(equalLineByLine("}", atLine: 16, ignoringExtraLines: true))
+    expect(actual).to(
+      equalLineByLine(
+        "",
+        after: .selectionSet.propertyAccessors(),
+        ignoringExtraLines: false
+      )
+    )
   }
 
   func test__render_givenNamedFragments_asLocalCacheMutation_rendersInitializer() async throws {
     // given
-    schemaSDL = """
+    let schemaSDL = """
       type Query {
         allAnimals: [Animal!]
       }
@@ -586,7 +637,7 @@ class FragmentTemplateTests: XCTestCase {
       }
       """
 
-    document = """
+    let document = """
       fragment TestFragment on Animal @apollo_client_ios_localCacheMutation {
         species
       }
@@ -597,31 +648,34 @@ class FragmentTemplateTests: XCTestCase {
         init(
           species: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": TestSchema.Objects.Animal.typename,
-              "species": species,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(TestFragment.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": TestSchema.Objects.Animal.typename,
+            "species": species,
+          ])
         }
       """
 
     // when
-    try await buildSubjectAndFragment(
-      config: .mock(options: .init(
-        selectionSetInitializers: []
-      )))
+    let (_, template) = try await buildFragmentTemplate(
+      config: .mock(
+        options: .init(
+          selectionSetInitializers: []
+        )
+      ),
+      schemaSDL: schemaSDL,
+      document: document
+    )
 
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 20, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, forSection: .selectionSet.initializer))
   }
 
-  func test__render_givenOperationSelectionSet_initializerConfig_all_fieldMergingConfig_notAll_doesNotRenderInitializer() async throws {
+  func
+    test__render_givenOperationSelectionSet_initializerConfig_all_fieldMergingConfig_notAll_doesNotRenderInitializer()
+    async throws
+  {
     let tests: [ApolloCodegenConfiguration.FieldMerging] = [
       .none,
       .ancestors,
@@ -629,272 +683,294 @@ class FragmentTemplateTests: XCTestCase {
       .siblings,
       [.ancestors, .namedFragments],
       [.siblings, .ancestors],
-      [.siblings, .namedFragments]
+      [.siblings, .namedFragments],
     ]
 
     for test in tests {
       // given
-      schemaSDL = """
-      type Query {
-        allAnimals: [Animal!]
-      }
+      let schemaSDL = """
+        type Query {
+          allAnimals: [Animal!]
+        }
 
-      type Animal {
-        species: String!
-      }
-      """
+        type Animal {
+          species: String!
+        }
+        """
 
-      document = """
-      fragment TestFragment on Animal {
-        species
-      }
-      """
+      let document = """
+        fragment TestFragment on Animal {
+          species
+        }
+        """
 
       // when
-      try await buildSubjectAndFragment(config: .mock(
-        options: .init(
-          selectionSetInitializers: [.all]
+      let (_, template) = try await buildFragmentTemplate(
+        config: .mock(
+          options: .init(
+            selectionSetInitializers: [.all]
+          ),
+          experimentalFeatures: .init(fieldMerging: test)
         ),
-        experimentalFeatures: .init(fieldMerging: test)
-      ))
+        schemaSDL: schemaSDL,
+        document: document
+      )
 
-      let actual = renderSubject()
+      let actual = render(template)
 
       // then
-      expect(actual).to(equalLineByLine("}", atLine: 16, ignoringExtraLines: true))
+      expect(actual).to(
+        equalLineByLine(
+          "",
+          after: .selectionSet.propertyAccessors(),
+          ignoringExtraLines: false
+        )
+      )
     }
   }
 
   // MARK: Local Cache Mutation Tests
-  func test__render__givenFragment__asLocalCacheMutation_generatesFragmentDeclarationDefinitionAsMutableSelectionSetAndBoilerplate() async throws {
+  func
+    test__render__givenFragment__asLocalCacheMutation_generatesFragmentDeclarationDefinitionAsMutableSelectionSetAndBoilerplate()
+    async throws
+  {
     // given
-    document = """
-    fragment TestFragment on Query @apollo_client_ios_localCacheMutation {
-      allAnimals {
-        species
+    let document = """
+      fragment TestFragment on Query @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-    struct TestFragment: TestSchema.MutableSelectionSet, Fragment {
-    """
+      """
+      struct TestFragment: TestSchema.MutableSelectionSet, Fragment {
+      """
 
     // when
-    try await buildSubjectAndFragment()
+    let (_, template) = try await buildFragmentTemplate(document: document)
 
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
     expect(String(actual.reversed())).to(equalLineByLine("\n}", ignoringExtraLines: true))
   }
 
-  func test__render__givenFragment__asLocalCacheMutation_generatesFragmentDefinitionStrippingLocalCacheMutationDirective() async throws {
+  func
+    test__render__givenFragment__asLocalCacheMutation_generatesFragmentDefinitionStrippingLocalCacheMutationDirective()
+    async throws
+  {
     // given
-    document = """
-    fragment TestFragment on Query @apollo_client_ios_localCacheMutation {
-      allAnimals {
-        species
+    let document = """
+      fragment TestFragment on Query @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-    struct TestFragment: TestSchema.MutableSelectionSet, Fragment {
-      static var fragmentDefinition: StaticString {
-        #"fragment TestFragment on Query { __typename allAnimals { __typename species } }"#
-      }
-    """
+      """
+      struct TestFragment: TestSchema.MutableSelectionSet, Fragment {
+        static var fragmentDefinition: StaticString {
+          #"fragment TestFragment on Query { __typename allAnimals { __typename species } }"#
+        }
+      """
 
     // when
-    try await buildSubjectAndFragment()
+    let (_, template) = try await buildFragmentTemplate(document: document)
 
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
     expect(String(actual.reversed())).to(equalLineByLine("\n}", ignoringExtraLines: true))
   }
 
-  func test__render__givenFragment__asLocalCacheMutation_generatesFragmentDefinitionAsMutableSelectionSet() async throws {
+  func test__render__givenFragment__asLocalCacheMutation_generatesFragmentDefinitionAsMutableSelectionSet() async throws
+  {
     // given
-    document = """
-    fragment TestFragment on Query @apollo_client_ios_localCacheMutation {
-      allAnimals {
-        species
+    let document = """
+      fragment TestFragment on Query @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
       }
-    }
-    """
+      """
 
     let expected =
-    """
-      var __data: DataDict
-      init(_dataDict: DataDict) { __data = _dataDict }
-
-      static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
-      static var __selections: [ApolloAPI.Selection] { [
-        .field("allAnimals", [AllAnimal]?.self),
-      ] }
-
-      var allAnimals: [AllAnimal]? {
-        get { __data["allAnimals"] }
-        set { __data["allAnimals"] = newValue }
-      }
-    """
+      """
+        var allAnimals: [AllAnimal]? {
+          get { __data["allAnimals"] }
+          set { __data["allAnimals"] = newValue }
+        }
+      """
 
     // when
-    try await buildSubjectAndFragment()
+    let (_, template) = try await buildFragmentTemplate(document: document)
 
-    let actual = renderSubject()
+    let actual = render(template)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
+    expect(actual).to(
+      equalLineByLine(
+        expected,
+        forSection: .selectionSet.propertyAccessors(mutable: true)
+      )
+    )
   }
 
   // MARK: Casing
 
   func test__casing__givenLowercasedSchemaName_generatesWithFirstUppercasedNamespace() async throws {
     // given
-    try await buildSubjectAndFragment(config: .mock(schemaNamespace: "mySchema"))
+    let (_, template) = try await buildFragmentTemplate(config: .mock(schemaNamespace: "mySchema"))
 
     // then
     let expected = """
       struct TestFragment: MySchema.SelectionSet, Fragment {
       """
 
-    let actual = renderSubject()
+    let actual = render(template)
 
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
   func test__casing__givenUppercasedSchemaName_generatesWithUppercasedNamespace() async throws {
     // given
-    try await buildSubjectAndFragment(config: .mock(schemaNamespace: "MY_SCHEMA"))
+    let (_, template) = try await buildFragmentTemplate(config: .mock(schemaNamespace: "MY_SCHEMA"))
 
     // then
     let expected = """
       struct TestFragment: MY_SCHEMA.SelectionSet, Fragment {
       """
 
-    let actual = renderSubject()
+    let actual = render(template)
 
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
   func test__casing__givenCapitalizedSchemaName_generatesWithCapitalizedNamespace() async throws {
     // given
-    try await buildSubjectAndFragment(config: .mock(schemaNamespace: "MySchema"))
+    let (_, template) = try await buildFragmentTemplate(config: .mock(schemaNamespace: "MySchema"))
 
     // then
     let expected = """
       struct TestFragment: MySchema.SelectionSet, Fragment {
       """
 
-    let actual = renderSubject()
+    let actual = render(template)
 
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
-  
+
   // MARK: - Reserved Keyword Tests
-  
+
   func test__render__givenFragmentReservedKeywordName_rendersEscapedName() async throws {
     let keywords = ["Type", "type"]
-    
+
     try await keywords.asyncForEach { keyword in
       // given
-      schemaSDL = """
-      type Query {
-        getUser(id: String): User
-      }
+      let schemaSDL = """
+        type Query {
+          getUser(id: String): User
+        }
 
-      type User {
-        id: String!
-        name: String!
-      }
-      """
+        type User {
+          id: String!
+          name: String!
+        }
+        """
 
-      document = """
-      fragment \(keyword) on User {
-          name
-      }
-      """
+      let document = """
+        fragment \(keyword) on User {
+            name
+        }
+        """
 
       let expected = """
-      struct \(keyword.firstUppercased)_Fragment: TestSchema.SelectionSet, Fragment {
-      """
+        struct \(keyword.firstUppercased)_Fragment: TestSchema.SelectionSet, Fragment {
+        """
 
       // when
-      try await buildSubjectAndFragment(named: keyword)
-      let actual = renderSubject()
+      let (_, template) = try await buildFragmentTemplate(named: keyword, schemaSDL: schemaSDL, document: document)
+      let actual = render(template)
 
       // then
       expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
     }
   }
- 
+
   // MARK: - Protocol conformance
-  
+
   func test__render__givenFragmentWithIdKeyField_rendersIdentifiableConformance() async throws {
     // given
-    schemaSDL = """
-    type Query {
-      getUser(id: String): User
-    }
-      
-    type User @typePolicy(keyFields: "id") {
-      id: String!
-      name: String!
-    }
-    """
-    
-    document = """
-    fragment NodeFragment on User {
-      id
-    }
-    """
-    
+    let schemaSDL = """
+      type Query {
+        getUser(id: String): User
+      }
+        
+      type User @typePolicy(keyFields: "id") {
+        id: String!
+        name: String!
+      }
+      """
+
+    let document = """
+      fragment NodeFragment on User {
+        id
+      }
+      """
+
     let expected = """
-    struct NodeFragment: TestSchema.SelectionSet, Fragment, Identifiable {
-    """
-    
+      struct NodeFragment: TestSchema.SelectionSet, Fragment, Identifiable {
+      """
+
     // when
-    try await buildSubjectAndFragment(named: "NodeFragment")
-    let actual = renderSubject()
-    
+    let (_, template) = try await buildFragmentTemplate(
+      named: "NodeFragment",
+      schemaSDL: schemaSDL,
+      document: document
+    )
+    let actual = render(template)
+
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
-  
+
   func test__render_givenFragment_withoutUsingIDField_doesNotRenderIdentifiableConformance() async throws {
     // given
-    schemaSDL = """
-    type Query {
-      getUser(id: String): User
-    }
-      
-    type User @typePolicy(keyFields: "id") {
-      id: String!
-      name: String!
-    }
-    """
-    
-    document = """
-    fragment UserFragment on User {
-      name
-    }
-    """
-    
+    let schemaSDL = """
+      type Query {
+        getUser(id: String): User
+      }
+        
+      type User @typePolicy(keyFields: "id") {
+        id: String!
+        name: String!
+      }
+      """
+
+    let document = """
+      fragment UserFragment on User {
+        name
+      }
+      """
+
     let expected = """
-    struct UserFragment: TestSchema.SelectionSet, Fragment {
-    """
-    
+      struct UserFragment: TestSchema.SelectionSet, Fragment {
+      """
+
     // when
-    try await buildSubjectAndFragment(named: "UserFragment")
-    let actual = renderSubject()
-    
+    let (_, template) = try await buildFragmentTemplate(
+      named: "UserFragment",
+      schemaSDL: schemaSDL,
+      document: document
+    )
+    let actual = render(template)
+
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }

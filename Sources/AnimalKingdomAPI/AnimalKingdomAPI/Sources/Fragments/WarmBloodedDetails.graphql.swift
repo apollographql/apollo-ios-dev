@@ -2,28 +2,33 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct WarmBloodedDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment WarmBloodedDetails on WarmBlooded { __typename bodyTemperature ...HeightInMeters }"#
   }
 
-  public let __data: DataDict
-  public init(_dataDict: DataDict) { __data = _dataDict }
+  @_spi(Unsafe) public let __data: DataDict
+  @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
-  public static var __selections: [ApolloAPI.Selection] { [
+  @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
+  @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("bodyTemperature", Int.self),
     .fragment(HeightInMeters.self),
+  ] }
+  @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    WarmBloodedDetails.self,
+    HeightInMeters.self
   ] }
 
   public var bodyTemperature: Int { __data["bodyTemperature"] }
   public var height: Height { __data["height"] }
 
   public struct Fragments: FragmentContainer {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public var heightInMeters: HeightInMeters { _toFragment() }
   }
@@ -33,17 +38,11 @@ public struct WarmBloodedDetails: AnimalKingdomAPI.SelectionSet, Fragment {
     bodyTemperature: Int,
     height: Height
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": __typename,
-        "bodyTemperature": bodyTemperature,
-        "height": height._fieldData,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(WarmBloodedDetails.self),
-        ObjectIdentifier(HeightInMeters.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": __typename,
+      "bodyTemperature": bodyTemperature,
+      "height": height._fieldData,
+    ])
   }
 
   public typealias Height = HeightInMeters.Height

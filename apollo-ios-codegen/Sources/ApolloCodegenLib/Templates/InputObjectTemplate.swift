@@ -23,10 +23,10 @@ struct InputObjectTemplate: TemplateRenderer {
     \(documentation: graphqlInputObject.documentation, config: config)
     \(graphqlInputObject.name.typeNameDocumentation)
     \(accessControlModifier(for: .parent))\
-    struct \(graphqlInputObject.render(as: .typename)): InputObject {
-      \(memberAccessControl)private(set) var __data: InputDict
+    struct \(graphqlInputObject.render(as: .typename())): InputObject {
+      @_spi(Unsafe) \(memberAccessControl)private(set) var __data: InputDict
     
-      \(memberAccessControl)init(_ data: InputDict) {
+      @_spi(Unsafe) \(memberAccessControl)init(_ data: InputDict) {
         __data = data
       }
 
@@ -89,7 +89,13 @@ struct InputObjectTemplate: TemplateRenderer {
     _ fields: GraphQLInputFieldDictionary
   ) -> TemplateString {
     TemplateString("""
-    \(fields.map({ "\"\($1.name.schemaName)\": \($1.render(config: config))" }), separator: ",\n")
+    \(fields.map({
+      TemplateString("""
+      "\($1.name.schemaName)": \($1.render(config: config))\(
+          if: !$1.type.isNullable && $1.hasDefaultValue, " ?? GraphQLNullable.none"
+        )
+      """)
+    }), separator: ",\n")
     """)
   }
 

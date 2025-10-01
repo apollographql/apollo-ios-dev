@@ -2,8 +2,9 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public class PetAdoptionMutation: GraphQLMutation {
+public struct PetAdoptionMutation: GraphQLMutation {
   public static let operationName: String = "PetAdoptionMutation"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
@@ -16,15 +17,18 @@ public class PetAdoptionMutation: GraphQLMutation {
     self.input = input
   }
 
-  public var __variables: Variables? { ["input": input] }
+  @_spi(Unsafe) public var __variables: Variables? { ["input": input] }
 
   public struct Data: AnimalKingdomAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Mutation }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Mutation }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("adoptPet", AdoptPet.self, arguments: ["input": .variable("input")]),
+    ] }
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      PetAdoptionMutation.Data.self
     ] }
 
     public var adoptPet: AdoptPet { __data["adoptPet"] }
@@ -32,29 +36,27 @@ public class PetAdoptionMutation: GraphQLMutation {
     public init(
       adoptPet: AdoptPet
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": AnimalKingdomAPI.Objects.Mutation.typename,
-          "adoptPet": adoptPet._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(PetAdoptionMutation.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": AnimalKingdomAPI.Objects.Mutation.typename,
+        "adoptPet": adoptPet._fieldData,
+      ])
     }
 
     /// AdoptPet
     ///
     /// Parent Type: `Pet`
     public struct AdoptPet: AnimalKingdomAPI.SelectionSet, Identifiable {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Pet }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Pet }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("id", AnimalKingdomAPI.ID.self),
         .field("humanName", String?.self),
+      ] }
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        PetAdoptionMutation.Data.AdoptPet.self
       ] }
 
       public var id: AnimalKingdomAPI.ID { __data["id"] }
@@ -65,16 +67,11 @@ public class PetAdoptionMutation: GraphQLMutation {
         id: AnimalKingdomAPI.ID,
         humanName: String? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "id": id,
-            "humanName": humanName,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(PetAdoptionMutation.Data.AdoptPet.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "id": id,
+          "humanName": humanName,
+        ])
       }
     }
   }

@@ -19,15 +19,14 @@ class StoreSubscriptionTests: XCTestCase {
 
   // MARK: - Tests
 
-  func testSubscriberIsNotifiedOfStoreUpdate() throws {
-    let cacheKeyChangeExpectation = XCTestExpectation(description: "Subscriber is notified of cache key change")
+  func testSubscriberIsNotifiedOfStoreUpdate() async throws {
     let expectedChangeKeySet: Set<String> = ["QUERY_ROOT.__typename", "QUERY_ROOT.name"]
-    let subscriber = SimpleSubscriber(cacheKeyChangeExpectation, expectedChangeKeySet)
+    let subscriber = SimpleSubscriber(expectedChangeKeySet)
 
-    store.subscribe(subscriber)
-    addTeardownBlock { self.store.unsubscribe(subscriber) }
+    let subscriptionToken = await store.subscribe(subscriber)
+    addTeardownBlock { [store] in store!.unsubscribe(subscriptionToken) }
 
-    store.publish(
+    try await store.publish(
       records: [
         "QUERY_ROOT": [
           "__typename": "Hero",
@@ -36,35 +35,37 @@ class StoreSubscriptionTests: XCTestCase {
       ]
     )
 
-    wait(for: [cacheKeyChangeExpectation], timeout: Self.defaultWaitTimeout)
+    await expect { await subscriber.changeSet }.toEventually(beEmpty(), timeout: .seconds(2))
   }
 
-  func testUnsubscribeRemovesSubscriberFromApolloStore() throws {
-    let subscriber = SimpleSubscriber(XCTestExpectation(), [])
+  func testUnsubscribeRemovesSubscriberFromApolloStore() async throws {
+    let subscriber = SimpleSubscriber([])
 
-    store.subscribe(subscriber)
+    for _ in 0..<10 {
+      let subscriptionToken = await store.subscribe(subscriber)
 
-    store.unsubscribe(subscriber)
+      store.unsubscribe(subscriptionToken)
+    }
 
-    expect(self.store.subscribers).toEventually(beEmpty())
+    await expect(self.store.subscribers).toEventually(beEmpty())
   }
 
-  /// Fufills the provided expectation when all expected keys have been observed.
-  internal class SimpleSubscriber: ApolloStoreSubscriber {
-    private let expectation: XCTestExpectation
-    private var changeSet: Set<String>
+  internal actor SimpleSubscriber: ApolloStoreSubscriber {
+    var changeSet: Set<String>
 
-    init(_ expectation: XCTestExpectation, _ changeSet: Set<String>) {
-      self.expectation = expectation
+    init(_ changeSet: Set<String>) {
       self.changeSet = changeSet
     }
 
-    func store(_ store: ApolloStore,
-               didChangeKeys changedKeys: Set<CacheKey>,
-               contextIdentifier: UUID?) {
-      changeSet.subtract(changedKeys)
-      if (changeSet.isEmpty) {
-        expectation.fulfill()
+    func isolatedDo(_ block: @Sendable @escaping (isolated SimpleSubscriber) -> Void) {
+      block(self)
+    }
+
+    nonisolated func store(_ store: ApolloStore, didChangeKeys changedKeys: Set<CacheKey>) {
+      Task(priority: .high) {
+        await self.isolatedDo {
+          $0.changeSet.subtract(changedKeys)
+        }
       }
     }
   }

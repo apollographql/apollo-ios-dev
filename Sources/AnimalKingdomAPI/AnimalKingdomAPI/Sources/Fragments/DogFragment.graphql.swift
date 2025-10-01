@@ -2,19 +2,23 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct DogFragment: AnimalKingdomAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment DogFragment on Dog { __typename species }"#
   }
 
-  public let __data: DataDict
-  public init(_dataDict: DataDict) { __data = _dataDict }
+  @_spi(Unsafe) public let __data: DataDict
+  @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Dog }
-  public static var __selections: [ApolloAPI.Selection] { [
+  @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Dog }
+  @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("species", String.self),
+  ] }
+  @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    DogFragment.self
   ] }
 
   public var species: String { __data["species"] }
@@ -22,14 +26,9 @@ public struct DogFragment: AnimalKingdomAPI.SelectionSet, Fragment {
   public init(
     species: String
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": AnimalKingdomAPI.Objects.Dog.typename,
-        "species": species,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(DogFragment.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": AnimalKingdomAPI.Objects.Dog.typename,
+      "species": species,
+    ])
   }
 }

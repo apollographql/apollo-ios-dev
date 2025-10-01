@@ -139,6 +139,7 @@ enum SwiftKeywords {
     "String",
     "Bool",
     "Int",
+    "Int32",
     "Float",
     "Double",
     "ID",

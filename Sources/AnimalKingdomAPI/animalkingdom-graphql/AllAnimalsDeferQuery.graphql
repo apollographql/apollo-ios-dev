@@ -1,0 +1,46 @@
+query AllAnimalsDeferQuery {
+  allAnimals {
+    __typename
+    id
+    height {
+      feet
+      inches
+    }
+    ...HeightInMeters
+    ...WarmBloodedDetails
+    species
+    skinCovering
+    ... on Pet {
+      ...PetDetails
+      ...WarmBloodedDetails
+      ... on Animal @defer(label: "deferredPetAnimal") {
+        height {
+          relativeSize
+          centimeters
+        }
+      }
+    }
+    ... on Cat @defer(label: "deferredCat") {
+      isJellicle
+    }
+    ... on ClassroomPet {
+      ... on Bird {
+        wingspan
+      }
+    }
+    ... on Dog @defer(label: "deferredDog") {
+      favoriteToy
+      birthdate
+    }
+    predators {
+      species
+      ... on WarmBlooded {
+        predators {
+          species
+        }
+        ...WarmBloodedDetails
+        laysEggs
+      }
+    }
+  }
+}

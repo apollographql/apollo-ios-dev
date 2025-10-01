@@ -1,18 +1,18 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import ApolloAPI
+@_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
 /// The input object sent when someone is creating a new review
 public struct ReviewInput: InputObject {
-  public private(set) var __data: InputDict
+  @_spi(Unsafe) public private(set) var __data: InputDict
 
-  public init(_ data: InputDict) {
+  @_spi(Unsafe) public init(_ data: InputDict) {
     __data = data
   }
 
   public init(
-    stars: Int,
+    stars: Int32,
     commentary: GraphQLNullable<String> = nil,
     favoriteColor: GraphQLNullable<ColorInput> = nil
   ) {
@@ -24,7 +24,7 @@ public struct ReviewInput: InputObject {
   }
 
   /// 0-5 stars
-  public var stars: Int {
+  public var stars: Int32 {
     get { __data["stars"] }
     set { __data["stars"] = newValue }
   }

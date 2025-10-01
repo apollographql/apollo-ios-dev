@@ -13,7 +13,7 @@ import XCTest
 /// A mock server should be configured to expect particular operation types, and invokes the passed in request handler when a request of that type comes in. Because the request allows access to `operation`, you can return different responses based on query variables for example:
 
 /// ```
-/// let serverExpectation = server.expect(HeroNameQuery.self) { request in
+/// let serverExpectation = await server.expect(HeroNameQuery.self) { request in
 ///   [
 ///     "data": [
 ///       "hero": [
@@ -29,7 +29,7 @@ import XCTest
 /// ```
 /// serverExpectation.expectedFulfillmentCount = numberOfFetches
 /// ```
-public class MockGraphQLServer {
+public actor MockGraphQLServer {
   enum ServerError: Error, CustomStringConvertible {
     case unexpectedRequest(String)
 
@@ -41,15 +41,20 @@ public class MockGraphQLServer {
     }
   }
 
-  public var customDelay: DispatchTimeInterval?
-  public typealias RequestHandler<Operation: GraphQLOperation> = (HTTPRequest<Operation>) -> JSONObject
+  public typealias RequestHandler<Operation: GraphQLOperation> = (any GraphQLRequest<Operation>) ->
+    JSONObject
 
-  private class RequestExpectation<Operation: GraphQLOperation>: XCTestExpectation {
+  private class RequestExpectation<Operation: GraphQLOperation>: XCTestExpectation, @unchecked Sendable {
     let file: StaticString
     let line: UInt
     let handler: RequestHandler<Operation>
 
-    init(description: String, file: StaticString = #filePath, line: UInt = #line, handler: @escaping RequestHandler<Operation>) {
+    init(
+      description: String,
+      file: StaticString = #filePath,
+      line: UInt = #line,
+      handler: @escaping RequestHandler<Operation>
+    ) {
       self.file = file
       self.line = line
       self.handler = handler
@@ -58,16 +63,22 @@ public class MockGraphQLServer {
     }
   }
 
-  private let queue = DispatchQueue(label: "com.apollographql.MockGraphQLServer")
 
-  public init() { }
+  public init() {}
 
+  private var customDelay: UInt64?
   // Since RequestExpectation is generic over a specific GraphQLOperation, we can't store these in the dictionary
   // directly. Moreover, there is no way to specify the type relationship that holds between the key and value.
   // To work around this, we store values as Any and use a generic subscript as a type-safe way to access them.
   private var requestExpectations: [AnyHashable: Any] = [:]
 
-  private subscript<Operation: GraphQLOperation>(_ operationType: Operation.Type) -> RequestExpectation<Operation>? {
+  public func setDelay(milliseconds: UInt64) {
+    customDelay = milliseconds * 1_000_000
+  }
+  
+  private subscript<Operation: GraphQLOperation>(_ operationType: Operation.Type)
+    -> RequestExpectation<Operation>?
+  {
     get {
       requestExpectations[ObjectIdentifier(operationType)] as! RequestExpectation<Operation>?
     }
@@ -77,7 +88,9 @@ public class MockGraphQLServer {
     }
   }
 
-  private subscript<Operation: GraphQLOperation>(_ operationType: Operation) -> RequestExpectation<Operation>? {
+  private subscript<Operation: GraphQLOperation>(_ operationType: Operation) -> RequestExpectation<
+    Operation
+  >? {
     get {
       requestExpectations[operationType] as! RequestExpectation<Operation>?
     }
@@ -87,43 +100,55 @@ public class MockGraphQLServer {
     }
   }
 
-  public func expect<Operation: GraphQLOperation>(_ operationType: Operation.Type, file: StaticString = #filePath, line: UInt = #line, requestHandler: @escaping (HTTPRequest<Operation>) -> JSONObject) -> XCTestExpectation {
-    return queue.sync {
-      let expectation = RequestExpectation<Operation>(description: "Served request for \(String(describing: operationType))", file: file, line: line, handler: requestHandler)
-      expectation.assertForOverFulfill = true
+  public func expect<Operation: GraphQLOperation>(
+    _ operationType: Operation.Type,
+    file: StaticString = #filePath,
+    line: UInt = #line,
+    requestHandler: @escaping @Sendable RequestHandler<Operation>
+  ) -> XCTestExpectation {
+    let expectation = RequestExpectation<Operation>(
+      description: "Served request for \(String(describing: operationType))",
+      file: file,
+      line: line,
+      handler: requestHandler
+    )
+    expectation.assertForOverFulfill = true
 
-      self[operationType] = expectation
+    self[operationType] = expectation
 
-      return expectation
-    }
+    return expectation
   }
 
-  public func expect<Operation: GraphQLOperation>(_ operation: Operation, file: StaticString = #filePath, line: UInt = #line, requestHandler: @escaping (HTTPRequest<Operation>) -> JSONObject) -> XCTestExpectation {
-    return queue.sync {
-      let expectation = RequestExpectation<Operation>(description: "Served request for \(String(describing: operation.self))", file: file, line: line, handler: requestHandler)
-      expectation.assertForOverFulfill = true
+  public func expect<Operation: GraphQLOperation>(
+    _ operation: Operation,
+    file: StaticString = #filePath,
+    line: UInt = #line,
+    requestHandler: @escaping RequestHandler<Operation>
+  ) -> XCTestExpectation {
+    let expectation = RequestExpectation<Operation>(
+      description: "Served request for \(String(describing: operation.self))",
+      file: file,
+      line: line,
+      handler: requestHandler
+    )
+    expectation.assertForOverFulfill = true
 
-      self[operation] = expectation
+    self[operation] = expectation
 
-      return expectation
-    }
+    return expectation
   }
 
-  func serve<Operation>(request: HTTPRequest<Operation>, completionHandler: @escaping (Result<JSONObject, any Error>) -> Void) where Operation: GraphQLOperation {
-    let operationType = type(of: request.operation)
-
-    if let expectation = self[request.operation] ?? self[operationType] {
+  func serve<Operation: GraphQLOperation>(
+    request: some GraphQLRequest<Operation>
+  ) async throws -> JSONObject {
+    if let expectation = self[request.operation] ?? self[type(of: request.operation)] {
       // Dispatch after a small random delay to spread out concurrent requests and simulate somewhat real-world conditions.
-      queue.asyncAfter(deadline: .now() + (customDelay ?? .milliseconds(Int.random(in: 10...50)))) {
-        completionHandler(.success(expectation.handler(request)))
-        expectation.fulfill()
-      }
+      try await Task.sleep(nanoseconds: customDelay ?? UInt64.random(in: 10...50) * 1_000_000)
+      expectation.fulfill()
+      return expectation.handler(request)
 
     } else {
-      queue.async {
-        completionHandler(.failure(ServerError.unexpectedRequest(String(describing: operationType))))
-      }
+      throw ServerError.unexpectedRequest(String(describing: type(of: request.operation)))
     }
-
   }
 }

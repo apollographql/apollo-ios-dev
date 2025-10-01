@@ -48,9 +48,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
     """
@@ -85,9 +85,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -152,9 +152,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -218,9 +218,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -284,9 +284,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     struct MockInput: InputObject {
-      private(set) var __data: InputDict
+      @_spi(Unsafe) private(set) var __data: InputDict
 
-      init(_ data: InputDict) {
+      @_spi(Unsafe) init(_ data: InputDict) {
         __data = data
       }
 
@@ -544,7 +544,7 @@ class InputObjectTemplateTests: XCTestCase {
     let expected = """
       public init(
         stringField: GraphQLNullable<String> = nil,
-        intField: GraphQLNullable<Int> = nil,
+        intField: GraphQLNullable<Int32> = nil,
         boolField: GraphQLNullable<Bool> = nil,
         floatField: GraphQLNullable<Double> = nil,
         customScalarField: GraphQLNullable<CustomScalar> = nil,
@@ -575,7 +575,7 @@ class InputObjectTemplateTests: XCTestCase {
         set { __data["stringField"] = newValue }
       }
 
-      public var intField: GraphQLNullable<Int> {
+      public var intField: GraphQLNullable<Int32> {
         get { __data["intField"] }
         set { __data["intField"] = newValue }
       }
@@ -731,14 +731,14 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
       public init(
-        nullable: GraphQLNullable<Int> = nil
+        nullable: GraphQLNullable<Int32> = nil
       ) {
         __data = InputDict([
           "nullable": nullable
         ])
       }
 
-      public var nullable: GraphQLNullable<Int> {
+      public var nullable: GraphQLNullable<Int32> {
     """
 
     // when
@@ -756,14 +756,14 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
       public init(
-        nullableWithDefault: GraphQLNullable<Int> = nil
+        nullableWithDefault: GraphQLNullable<Int32> = nil
       ) {
         __data = InputDict([
           "nullableWithDefault": nullableWithDefault
         ])
       }
 
-      public var nullableWithDefault: GraphQLNullable<Int> {
+      public var nullableWithDefault: GraphQLNullable<Int32> {
     """
 
     // when
@@ -781,14 +781,14 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
       public init(
-        nonNullable: Int
+        nonNullable: Int32
       ) {
         __data = InputDict([
           "nonNullable": nonNullable
         ])
       }
 
-      public var nonNullable: Int {
+      public var nonNullable: Int32 {
     """
 
     // when
@@ -798,7 +798,7 @@ class InputObjectTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
   }
 
-  func test__render__given_NonNullableField_WithDefault__generates_OptionalParameter_InitializerNilDefault() throws {
+  func test__render__given_nonNullableField_WithDefault__generates_OptionalParameter_InitializerNilDefault() throws {
     // given
     buildSubject(fields: [
       GraphQLInputField.mock("nonNullableWithDefault", type: .nonNull(.scalar(.integer())), defaultValue: .int(3))
@@ -806,14 +806,14 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
       public init(
-        nonNullableWithDefault: Int? = nil
+        nonNullableWithDefault: Int32? = nil
       ) {
         __data = InputDict([
-          "nonNullableWithDefault": nonNullableWithDefault
+          "nonNullableWithDefault": nonNullableWithDefault ?? GraphQLNullable.none
         ])
       }
 
-      public var nonNullableWithDefault: Int? {
+      public var nonNullableWithDefault: Int32? {
     """
 
     // when
@@ -966,7 +966,7 @@ class InputObjectTemplateTests: XCTestCase {
         nonNullableListNullableItemWithDefault: [String?]? = nil
       ) {
         __data = InputDict([
-          "nonNullableListNullableItemWithDefault": nonNullableListNullableItemWithDefault
+          "nonNullableListNullableItemWithDefault": nonNullableListNullableItemWithDefault ?? GraphQLNullable.none
         ])
       }
 
@@ -1018,7 +1018,7 @@ class InputObjectTemplateTests: XCTestCase {
         nonNullableListNonNullableItemWithDefault: [String]? = nil
       ) {
         __data = InputDict([
-          "nonNullableListNonNullableItemWithDefault": nonNullableListNonNullableItemWithDefault
+          "nonNullableListNonNullableItemWithDefault": nonNullableListNonNullableItemWithDefault ?? GraphQLNullable.none
         ])
       }
 
@@ -1079,9 +1079,9 @@ class InputObjectTemplateTests: XCTestCase {
     let expected = """
     /// \(documentation)
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -1120,9 +1120,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -1203,9 +1203,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -1288,9 +1288,9 @@ class InputObjectTemplateTests: XCTestCase {
     let expected = """
     /// This is some great documentation!
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -1336,9 +1336,9 @@ class InputObjectTemplateTests: XCTestCase {
     let expected = """
     /// This is some great documentation!
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -1396,9 +1396,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -1487,9 +1487,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     public struct MockInput: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 
@@ -2530,9 +2530,9 @@ class InputObjectTemplateTests: XCTestCase {
 
       let expected = """
       public struct \(keyword.firstUppercased)_InputObject: InputObject {
-        public private(set) var __data: InputDict
+        @_spi(Unsafe) public private(set) var __data: InputDict
 
-        public init(_ data: InputDict) {
+        @_spi(Unsafe) public init(_ data: InputDict) {
           __data = data
         }
       """
@@ -2571,9 +2571,9 @@ class InputObjectTemplateTests: XCTestCase {
     let expected = """
     // Renamed from GraphQL schema value: 'MyInputObject'
     public struct MyCustomInputObject: InputObject {
-      public private(set) var __data: InputDict
+      @_spi(Unsafe) public private(set) var __data: InputDict
 
-      public init(_ data: InputDict) {
+      @_spi(Unsafe) public init(_ data: InputDict) {
         __data = data
       }
 

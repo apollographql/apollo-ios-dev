@@ -37,7 +37,7 @@ class FetchSchemaTests: XCTestCase {
     let mockConfiguration = ApolloCodegenConfiguration.mock()
     let mockFileManager = MockApolloFileManager(strict: true)
 
-    mockFileManager.mock(closure: .contents({ path in
+    await mockFileManager.mock(closure: .contents({ path in
       let actualPath = URL(fileURLWithPath: path).standardizedFileURL.path
       let expectedPath = URL(fileURLWithPath: inputPath).standardizedFileURL.path
 

@@ -44,7 +44,7 @@ enum TemplateTarget: Equatable {
 ///
 /// All templates that output to a file should conform to this protocol, this does not include
 /// templates that are used by others such as `HeaderCommentTemplate` or `ImportStatementTemplate`.
-protocol TemplateRenderer {
+protocol TemplateRenderer: Sendable {
   /// Shared codegen configuration.
   var config: ApolloCodegen.ConfigurationContext { get }
 
@@ -145,7 +145,7 @@ extension TemplateRenderer {
     return TemplateString(
     """
     \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
-    \(ImportStatementTemplate.SchemaType.template(for: config))
+    \(ImportStatementTemplate.SchemaType.template(for: config, type: type))
 
     \(ifLet: renderDetachedTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
     \(ifLet: namespace, {
@@ -224,8 +224,6 @@ enum AccessControlScope {
 }
 
 extension TemplateRenderer {
-  var classDefinitionKeywords: String { config.options.markOperationDefinitionsAsFinal ? "final class" : "class" }
-
   func accessControlModifier(for scope: AccessControlScope) -> String {
     switch target {
     case .moduleFile, .schemaFile: return schemaAccessControlModifier(scope: scope)
@@ -249,7 +247,6 @@ extension TemplateRenderer {
       (.embeddedInTarget(_, .internal), .member):
         return ApolloCodegenConfiguration.AccessModifier.internal.swiftString
     case
-      (.swiftPackageManager, _),
       (.swiftPackage, _),
       (.other, _):
         return ApolloCodegenConfiguration.AccessModifier.public.swiftString
@@ -333,19 +330,30 @@ struct ImportStatementTemplate {
 
   enum SchemaType {
     static func template(
-      for config: ApolloCodegen.ConfigurationContext
+      for config: ApolloCodegen.ConfigurationContext,
+      type: TemplateTarget.SchemaFileType
     ) -> String {
-      "import \(config.ApolloAPITargetName)"
+      let apolloAPIImport = "import \(TemplateConstants.ApolloAPITargetName)"
+      switch type {
+      case .inputObject:
+        return "@_spi(Internal) @_spi(Unsafe) \(apolloAPIImport)"
+      case .customScalar:
+        return "@_spi(Internal) @_spi(Execution) \(apolloAPIImport)"
+      case .enum:
+        return "@_spi(Internal) \(apolloAPIImport)"
+      default:
+        return apolloAPIImport
+      }
     }
   }
 
   enum Operation {
     static func template(
       for config: ApolloCodegen.ConfigurationContext
-    ) -> TemplateString {
-      let apolloAPITargetName = config.ApolloAPITargetName
+    ) -> TemplateString {      
       return """
-      @_exported import \(apolloAPITargetName)
+      @_exported import \(TemplateConstants.ApolloAPITargetName)
+      @_spi(Execution) @_spi(Unsafe) import \(TemplateConstants.ApolloAPITargetName)
       \(if: config.output.operations != .inSchemaModule, "import \(config.schemaModuleName)")
       """
     }
@@ -379,7 +387,7 @@ fileprivate extension ApolloCodegenConfiguration {
   var schemaModuleName: String {
     switch output.schemaTypes.moduleType {
     case let .embeddedInTarget(targetName, _): return targetName
-    case .swiftPackageManager, .swiftPackage, .other: return schemaNamespace.firstUppercased
+    case .swiftPackage, .other: return schemaNamespace.firstUppercased
     }
   }
 }

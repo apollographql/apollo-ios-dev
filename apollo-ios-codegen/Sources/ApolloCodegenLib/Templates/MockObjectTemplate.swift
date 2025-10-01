@@ -36,7 +36,7 @@ struct MockObjectTemplate: TemplateRenderer {
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
-    let objectName = graphqlObject.render(as: .typename)
+    let objectName = graphqlObject.render(as: .typename())
     let fields: [TemplateField] = fields
       .sorted { $0.0 < $1.0 }
       .map {
@@ -54,12 +54,12 @@ struct MockObjectTemplate: TemplateRenderer {
     let memberAccessControl = accessControlModifier(for: .member)
 
     return """
-    \(accessControlModifier(for: .parent))class \(objectName): MockObject {
-      \(memberAccessControl)static let objectType: \(config.ApolloAPITargetName).Object = \(config.schemaNamespace.firstUppercased).Objects.\(objectName)
+    \(accessControlModifier(for: .parent))final class \(objectName): MockObject {
+      \(memberAccessControl)static let objectType: \(TemplateConstants.ApolloAPITargetName).Object = \(config.schemaNamespace.firstUppercased).Objects.\(objectName)
       \(memberAccessControl)static let _mockFields = MockFields()
       \(memberAccessControl)typealias MockValueCollectionType = Array<Mock<\(objectName)>>
 
-      \(memberAccessControl)struct MockFields {
+      \(memberAccessControl)struct MockFields: Sendable {
         \(fields.map {
           TemplateString("""
           \(deprecationReason: $0.deprecationReason, config: config)
@@ -138,7 +138,7 @@ struct MockObjectTemplate: TemplateRenderer {
         case is GraphQLInterfaceType, is GraphQLUnionType:
           mockType = "(any AnyMock)"
         default:
-          mockType = "Mock<\(graphQLCompositeType.render(as: .typename))>"
+          mockType = "Mock<\(graphQLCompositeType.render(as: .typename()))>"
         }
         return TemplateString("\(mockType)\(if: !forceNonNull, "?")").description
       case .scalar,

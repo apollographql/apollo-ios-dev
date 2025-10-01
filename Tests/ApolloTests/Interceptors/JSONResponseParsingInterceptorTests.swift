@@ -1,75 +1,159 @@
-import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
+import Nimble
 import XCTest
 
+@testable import Apollo
+
 class JSONResponseParsingInterceptorTests: XCTestCase {
-  func testJSONResponseParsingInterceptorFailsWhenNoResponse() {
-    let provider = MockInterceptorProvider([
-      JSONResponseParsingInterceptor()
-    ])
 
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: TestURL.mockServer.url)
+  var subject: JSONResponseParsingInterceptor!
 
-    let expectation = self.expectation(description: "Request sent")
-
-    _ = network.send(operation: MockQuery.mock()) { result in
-      defer {
-        expectation.fulfill()
-      }
-
-      switch result {
-      case .success:
-        XCTFail("This should not have succeeded")
-      case .failure(let error):
-        switch error {
-        case JSONResponseParsingInterceptor.JSONResponseParsingError.noResponseToParse:
-          // This is what we want
-          break
-        default:
-          XCTFail("Unexpected error type: \(error.localizedDescription)")
-        }
-      }
-    }
-
-    self.wait(for: [expectation], timeout: 1)
+  override func setUp() {
+    super.setUp()
+    subject = JSONResponseParsingInterceptor()
   }
 
-  func testJSONResponseParsingInterceptorFailsWithEmptyData() {
-    let client = MockURLSessionClient(
-      response: .mock(),
-      data: Data()
+  override func tearDown() {
+    super.tearDown()
+    subject = nil
+  }
+
+  func test__intercept__givenEmptyResponse_throwsParsingError() async throws {
+    // given
+    let operation = MockQuery<MockSelectionSet>()
+    let expectedRequest = JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly)
+
+    let streamMocker = AsyncStreamMocker<Data>()
+    streamMocker.emit(Data())
+
+    // when
+    await expect {
+      try await self.subject.parse(
+        response: HTTPResponse(
+          response: .mock(),
+          chunks: streamMocker.getStream()
+        ),
+        for: expectedRequest,
+        includeCacheRecords: false
+      )
+      .getStream()
+      .getAllValues()
+    }.to(
+      throwError(
+        JSONResponseParsingError.couldNotParseToJSON(data: Data())
+      )
     )
-    
-    let provider = MockInterceptorProvider([
-      NetworkFetchInterceptor(client: client),
-      JSONResponseParsingInterceptor(),
-    ])
+  }
 
-    let network = RequestChainNetworkTransport(interceptorProvider: provider,
-                                               endpointURL: TestURL.mockServer.url)
+  // Multipart Header Error Tests
 
-    let expectation = self.expectation(description: "Request sent")
+  func test__error__givenResponse_withMissingMultipartBoundaryHeader_shouldReturnError() async throws {
+    // given
+    let operation = MockSubscription<MockSelectionSet>()
+    let streamMocker = AsyncStreamMocker<Data>()
 
-    _ = network.send(operation: MockQuery.mock()) { result in
-      defer {
-        expectation.fulfill()
-      }
+    let urlResponse = HTTPURLResponse.mock(headerFields: ["Content-Type": "multipart/mixed"])
+    streamMocker.emit(Data())
 
-      switch result {
-      case .success:
-        XCTFail("This should not have succeeded")
-      case .failure(let error):
-        switch error {
-        case JSONResponseParsingInterceptor.JSONResponseParsingError.couldNotParseToJSON(let data):
-          XCTAssertTrue(data.isEmpty)
-        default:
-          XCTFail("Unexpected error type: \(error.localizedDescription)")
-        }
-      }
-    }
+    // when
+    await expect {
+      try await self.subject.parse(
+        response: HTTPResponse(
+          response: urlResponse,
+          chunks: streamMocker.getStream()
+        ),
+        for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+        includeCacheRecords: false
+      )
+      .getStream()
+      .getAllValues()
+    }.to(
+      throwError(
+        JSONResponseParsingError.missingMultipartBoundary
+      )
+    )
+  }
 
-    self.wait(for: [expectation], timeout: 1)
+  func test__error__givenResponse_withMissingMultipartProtocolSpecifier_shouldReturnError() async throws {
+    // given
+    let operation = MockSubscription<MockSelectionSet>.mock()
+    let streamMocker = AsyncStreamMocker<Data>()
+
+    let urlResponse = HTTPURLResponse.mock(headerFields: ["Content-Type": "multipart/mixed;boundary=\"graphql\""])
+    streamMocker.emit(Data())
+
+    // when
+    await expect {
+      try await self.subject.parse(
+        response: HTTPResponse(
+          response: urlResponse,
+          chunks: streamMocker.getStream()
+        ),
+        for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+        includeCacheRecords: false
+      )
+      .getStream()
+      .getAllValues()
+    }.to(
+      throwError(
+        JSONResponseParsingError.invalidMultipartProtocol
+      )
+    )
+  }
+
+  func test__error__givenResponse_withUnknownMultipartProtocolSpecifier_shouldReturnError() async throws {
+    // given
+    let operation = MockSubscription<MockSelectionSet>.mock()
+    let streamMocker = AsyncStreamMocker<Data>()
+
+    let urlResponse = HTTPURLResponse.mock(headerFields: ["Content-Type": "multipart/mixed;boundary=\"graphql\";unknownSpec=0"])
+    streamMocker.emit(Data())
+
+    // when
+    await expect {
+      try await self.subject.parse(
+        response: HTTPResponse(
+          response: urlResponse,
+          chunks: streamMocker.getStream()
+        ),
+        for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+        includeCacheRecords: false
+      )
+      .getStream()
+      .getAllValues()
+    }.to(
+      throwError(
+        JSONResponseParsingError.invalidMultipartProtocol
+      )
+    )
+  }
+
+  func test__error__givenResponse_withInvalidData_shouldReturnError() async throws {
+    // given
+    let operation = MockSubscription<MockSelectionSet>.mock()
+    let invalidData = "🙃".data(using: .unicode)!
+    let streamMocker = AsyncStreamMocker<Data>()
+
+    let urlResponse = HTTPURLResponse.mock()
+    streamMocker.emit(invalidData)
+
+    // when
+    await expect {
+      try await self.subject.parse(
+        response: HTTPResponse(
+          response: urlResponse,
+          chunks: streamMocker.getStream()
+        ),
+        for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+        includeCacheRecords: false
+      )
+      .getStream()
+      .getAllValues()
+    }.to(
+      throwError(
+        JSONResponseParsingError.couldNotParseToJSON(data: invalidData)
+      )
+    )
   }
 }

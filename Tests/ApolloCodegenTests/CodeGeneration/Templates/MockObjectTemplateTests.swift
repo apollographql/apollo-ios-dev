@@ -67,12 +67,12 @@ class MockObjectTemplateTests: XCTestCase {
     buildSubject(name: "Dog", moduleType: .swiftPackage())
 
     let expected = """
-    public class Dog: MockObject {
+    public final class Dog: MockObject {
       public static let objectType: ApolloAPI.Object = TestSchema.Objects.Dog
       public static let _mockFields = MockFields()
       public typealias MockValueCollectionType = Array<Mock<Dog>>
 
-      public struct MockFields {
+      public struct MockFields: Sendable {
       }
     }
 
@@ -92,12 +92,12 @@ class MockObjectTemplateTests: XCTestCase {
     buildSubject(name: "dog")
 
     let expected = """
-    public class Dog: MockObject {
+    public final class Dog: MockObject {
       public static let objectType: ApolloAPI.Object = TestSchema.Objects.Dog
       public static let _mockFields = MockFields()
       public typealias MockValueCollectionType = Array<Mock<Dog>>
 
-      public struct MockFields {
+      public struct MockFields: Sendable {
       }
     }
 
@@ -175,7 +175,7 @@ class MockObjectTemplateTests: XCTestCase {
     )
 
     let expected = """
-      public struct MockFields {
+      public struct MockFields: Sendable {
         @Field<TestSchema.CustomScalar>("customScalar") public var customScalar
         @Field<Cat>("object") public var object
         @Field<[Cat]>("objectList") public var objectList
@@ -206,7 +206,7 @@ class MockObjectTemplateTests: XCTestCase {
     )
 
     let expected = """
-      public struct MockFields {
+      public struct MockFields: Sendable {
         @Field<TestSchema.CustomScalar>("customScalar") public var customScalar
         @Field<GraphQLEnum<TestSchema.EnumType>>("enumType") public var enumType
         @Field<Cat>("object") public var object
@@ -283,7 +283,7 @@ class MockObjectTemplateTests: XCTestCase {
     )
 
     let expected = """
-      public struct MockFields {
+      public struct MockFields: Sendable {
         @Field<String>("Any") public var `Any`
         @Field<String>("Protocol") public var `Protocol`
         @Field<String>("Self") public var `Self`
@@ -360,7 +360,7 @@ class MockObjectTemplateTests: XCTestCase {
     )
 
     let expected = """
-      public struct MockFields {
+      public struct MockFields: Sendable {
         @Field<MockObject.Actor>("actor") public var actor
       }
     """
@@ -383,7 +383,7 @@ class MockObjectTemplateTests: XCTestCase {
     )
 
     let expected = """
-      public struct MockFields {
+      public struct MockFields: Sendable {
         @Field<MockObject.Actor>("actor") public var actor
       }
     """
@@ -406,7 +406,7 @@ class MockObjectTemplateTests: XCTestCase {
     )
 
     let expected = """
-      public struct MockFields {
+      public struct MockFields: Sendable {
         @Field<Actor>("actor") public var actor
       }
     """
@@ -859,12 +859,12 @@ class MockObjectTemplateTests: XCTestCase {
     )
 
     let expectedClassDefinition = """
-    public class Dog: MockObject {
+    public final class Dog: MockObject {
       public static let objectType: ApolloAPI.Object = TestSchema.Objects.Dog
       public static let _mockFields = MockFields()
       public typealias MockValueCollectionType = Array<Mock<Dog>>
 
-      public struct MockFields {
+      public struct MockFields: Sendable {
     """
 
     let expectedExtensionDefinition = """
@@ -890,12 +890,12 @@ class MockObjectTemplateTests: XCTestCase {
     )
 
     let expectedClassDefinition = """
-    public class Dog: MockObject {
+    public final class Dog: MockObject {
       public static let objectType: ApolloAPI.Object = TestSchema.Objects.Dog
       public static let _mockFields = MockFields()
       public typealias MockValueCollectionType = Array<Mock<Dog>>
 
-      public struct MockFields {
+      public struct MockFields: Sendable {
     """
 
     let expectedExtensionDefinition = """
@@ -921,12 +921,12 @@ class MockObjectTemplateTests: XCTestCase {
     )
 
     let expectedClassDefinition = """
-    class Dog: MockObject {
+    final class Dog: MockObject {
       static let objectType: ApolloAPI.Object = TestSchema.Objects.Dog
       static let _mockFields = MockFields()
       typealias MockValueCollectionType = Array<Mock<Dog>>
 
-      struct MockFields {
+      struct MockFields: Sendable {
     """
 
     let expectedExtensionDefinition = """
@@ -954,7 +954,7 @@ class MockObjectTemplateTests: XCTestCase {
     )
 
     let expected = """
-      public struct MockFields {
+      public struct MockFields: Sendable {
         @available(*, deprecated, message: "Cause I said so!")
         @Field<String>("string") public var string
       }
@@ -977,7 +977,7 @@ class MockObjectTemplateTests: XCTestCase {
     )
 
     let expected = """
-      public struct MockFields {
+      public struct MockFields: Sendable {
         @Field<String>("string") public var string
       }
     """
@@ -1005,12 +1005,12 @@ class MockObjectTemplateTests: XCTestCase {
       )
 
       let expected = """
-      public class \(keyword.firstUppercased)_Object: MockObject {
+      public final class \(keyword.firstUppercased)_Object: MockObject {
         public static let objectType: ApolloAPI.Object = TestSchema.Objects.\(keyword.firstUppercased)_Object
         public static let _mockFields = MockFields()
         public typealias MockValueCollectionType = Array<Mock<\(keyword.firstUppercased)_Object>>
 
-        public struct MockFields {
+        public struct MockFields: Sendable {
           @Field<String>("string") public var string
         }
       }
@@ -1042,7 +1042,7 @@ class MockObjectTemplateTests: XCTestCase {
     )
     
     let expected = """
-    public class MyCustomObject: MockObject {
+    public final class MyCustomObject: MockObject {
       public static let objectType: ApolloAPI.Object = TestSchema.Objects.MyCustomObject
       public static let _mockFields = MockFields()
       public typealias MockValueCollectionType = Array<Mock<MyCustomObject>>

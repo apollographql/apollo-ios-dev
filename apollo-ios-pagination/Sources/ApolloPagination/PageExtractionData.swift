@@ -5,3 +5,5 @@ public enum PageExtractionData<InitialQuery: GraphQLQuery, PaginatedQuery: Graph
   case initial(InitialQuery.Data, T)
   case paginated(PaginatedQuery.Data, T)
 }
+
+extension PageExtractionData: Sendable where T: Sendable {}

@@ -2,8 +2,9 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public class SearchQuery: GraphQLQuery {
+public struct SearchQuery: GraphQLQuery {
   public static let operationName: String = "Search"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "29ecc9c7acac3eab2585d305aed9f8257b448bc7ea57341a135d1fa476973ecb",
@@ -17,15 +18,18 @@ public class SearchQuery: GraphQLQuery {
     self.term = term
   }
 
-  public var __variables: Variables? { ["term": term] }
+  @_spi(Unsafe) public var __variables: Variables? { ["term": term] }
 
   public struct Data: StarWarsAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("search", [Search?]?.self, arguments: ["text": .variable("term")]),
+    ] }
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      SearchQuery.Data.self
     ] }
 
     public var search: [Search?]? { __data["search"] }
@@ -33,30 +37,28 @@ public class SearchQuery: GraphQLQuery {
     public init(
       search: [Search?]? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "search": search._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(SearchQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "search": search._fieldData,
+      ])
     }
 
     /// Search
     ///
     /// Parent Type: `SearchResult`
     public struct Search: StarWarsAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Unions.SearchResult }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Unions.SearchResult }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .inlineFragment(AsHuman.self),
         .inlineFragment(AsDroid.self),
         .inlineFragment(AsStarship.self),
+      ] }
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        SearchQuery.Data.Search.self
       ] }
 
       public var asHuman: AsHuman? { _asInlineFragment() }
@@ -66,28 +68,27 @@ public class SearchQuery: GraphQLQuery {
       public init(
         __typename: String
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(SearchQuery.Data.Search.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+        ])
       }
 
       /// Search.AsHuman
       ///
       /// Parent Type: `Human`
       public struct AsHuman: StarWarsAPI.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = SearchQuery.Data.Search
-        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Human }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .field("id", StarWarsAPI.ID.self),
           .field("name", String.self),
+        ] }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          SearchQuery.Data.Search.self,
+          SearchQuery.Data.Search.AsHuman.self
         ] }
 
         /// The ID of the human
@@ -99,17 +100,11 @@ public class SearchQuery: GraphQLQuery {
           id: StarWarsAPI.ID,
           name: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": StarWarsAPI.Objects.Human.typename,
-              "id": id,
-              "name": name,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(SearchQuery.Data.Search.self),
-              ObjectIdentifier(SearchQuery.Data.Search.AsHuman.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": StarWarsAPI.Objects.Human.typename,
+            "id": id,
+            "name": name,
+          ])
         }
       }
 
@@ -117,14 +112,18 @@ public class SearchQuery: GraphQLQuery {
       ///
       /// Parent Type: `Droid`
       public struct AsDroid: StarWarsAPI.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = SearchQuery.Data.Search
-        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .field("id", StarWarsAPI.ID.self),
           .field("name", String.self),
+        ] }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          SearchQuery.Data.Search.self,
+          SearchQuery.Data.Search.AsDroid.self
         ] }
 
         /// The ID of the droid
@@ -136,17 +135,11 @@ public class SearchQuery: GraphQLQuery {
           id: StarWarsAPI.ID,
           name: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": StarWarsAPI.Objects.Droid.typename,
-              "id": id,
-              "name": name,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(SearchQuery.Data.Search.self),
-              ObjectIdentifier(SearchQuery.Data.Search.AsDroid.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": StarWarsAPI.Objects.Droid.typename,
+            "id": id,
+            "name": name,
+          ])
         }
       }
 
@@ -154,14 +147,18 @@ public class SearchQuery: GraphQLQuery {
       ///
       /// Parent Type: `Starship`
       public struct AsStarship: StarWarsAPI.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = SearchQuery.Data.Search
-        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Starship }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Starship }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .field("id", StarWarsAPI.ID.self),
           .field("name", String.self),
+        ] }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          SearchQuery.Data.Search.self,
+          SearchQuery.Data.Search.AsStarship.self
         ] }
 
         /// The ID of the starship
@@ -173,17 +170,11 @@ public class SearchQuery: GraphQLQuery {
           id: StarWarsAPI.ID,
           name: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": StarWarsAPI.Objects.Starship.typename,
-              "id": id,
-              "name": name,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(SearchQuery.Data.Search.self),
-              ObjectIdentifier(SearchQuery.Data.Search.AsStarship.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": StarWarsAPI.Objects.Starship.typename,
+            "id": id,
+            "name": name,
+          ])
         }
       }
     }

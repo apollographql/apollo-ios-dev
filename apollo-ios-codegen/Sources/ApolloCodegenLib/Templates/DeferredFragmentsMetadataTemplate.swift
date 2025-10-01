@@ -23,16 +23,16 @@ struct DeferredFragmentsMetadataTemplate {
   /// Renders metadata definitions for the deferred fragments of an Operation.
   ///
   /// - Returns: The `TemplateString` for the deferred fragments metadata definitions.
-  func render() -> TemplateString? {
+  func render() -> TemplateString {
     let deferredFragmentPathTypeInfo = DeferredFragmentsPathTypeInfo(
       from: operation.rootField.selectionSet.selections
     )
-    guard !deferredFragmentPathTypeInfo.isEmpty else { return nil }
+    guard !deferredFragmentPathTypeInfo.isEmpty else { return "" }
 
     return """
-
     // MARK: - Deferred Fragment Metadata
-
+    
+    public typealias ResponseFormat = IncrementalDeferredResponseFormat
     \(DeferredFragmentIdentifiersTemplate(deferredFragmentPathTypeInfo))
 
     \(DeferredFragmentsPropertyTemplate(deferredFragmentPathTypeInfo))
@@ -59,13 +59,15 @@ struct DeferredFragmentsMetadataTemplate {
     _ deferredFragmentPathTypeInfo: [DeferredPathTypeInfo]
   ) -> TemplateString {
     """
-    public static var deferredFragments: [DeferredFragmentIdentifier: any \(config.ApolloAPITargetName).SelectionSet.Type]? {[
-    \(deferredFragmentPathTypeInfo.map {
-      return """
-        DeferredFragmentIdentifiers.\($0.deferCondition.label): \($0.typeName).self,
-      """
-    }, separator: "\n")
-    ]}
+    public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+      deferredFragments: [
+        \(deferredFragmentPathTypeInfo.map {
+          return """
+          DeferredFragmentIdentifiers.\($0.deferCondition.label): \($0.typeName).self,
+          """
+        }, separator: "\n")
+      ]
+    )
     """
   }
 

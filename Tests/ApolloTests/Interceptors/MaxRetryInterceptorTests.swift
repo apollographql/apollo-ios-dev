@@ -1,128 +1,120 @@
-import XCTest
-import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
+import Nimble
+import XCTest
 
-class MaxRetryInterceptorTests: XCTestCase {
-  
-  func testMaxRetryInterceptorErrorsAfterMaximumRetries() {
-    class TestProvider: InterceptorProvider {
-      let testInterceptor = BlindRetryingTestInterceptor()
-      let retryCount = 15
+@testable import Apollo
 
-      func interceptors<Operation: GraphQLOperation>(
-        for operation: Operation
-      ) -> [any ApolloInterceptor] {
-        [
-          MaxRetryInterceptor(maxRetriesAllowed: self.retryCount),
-          self.testInterceptor
-        ]
-      }
-    }
+class MaxRetryInterceptorTests: XCTestCase, MockResponseProvider  {
 
-    let testProvider = TestProvider()
-    let network = RequestChainNetworkTransport(interceptorProvider: testProvider,
-                                               endpointURL: TestURL.mockServer.url)
-    
-    let expectation = self.expectation(description: "Request sent")
-    
-    let operation = MockQuery.mock()
-    _ = network.send(operation: operation) { result in
-      defer {
-        expectation.fulfill()
-      }
-      
-      switch result {
-      case .success:
-        XCTFail("This should not have worked")
-      case .failure(let error):
-        switch error {
-        case MaxRetryInterceptor.RetryError.hitMaxRetryCount(let count, let operationName):
-          XCTAssertEqual(count, testProvider.retryCount)
-          // There should be one more hit than retries since it will be hit on the original call
-          XCTAssertEqual(testProvider.testInterceptor.hitCount, testProvider.retryCount + 1)
-          XCTAssertEqual(operationName, MockQuery<MockSelectionSet>.operationName)
-        default:
-          XCTFail("Unexpected error type: \(error)")
-        }
-      }
-    }
-    
-    self.wait(for: [expectation], timeout: 1)
+  override func tearDown() async throws {
+    await Self.cleanUpRequestHandlers()
+
+    try await super.tearDown()
   }
-  
-  func testRetryInterceptorDoesNotErrorIfRetriedFewerThanMaxTimes() {
-    class TestProvider: InterceptorProvider {
-      let testInterceptor = RetryToCountThenSucceedInterceptor(timesToCallRetry: 2)
-      let retryCount = 3
-      
-      let mockClient: MockURLSessionClient = {
-        let client = MockURLSessionClient()
-        client.jsonData = [:]
-        client.response = HTTPURLResponse(url: TestURL.mockServer.url,
-                                          statusCode: 200,
-                                          httpVersion: nil,
-                                          headerFields: nil)
-        return client
-      }()
-      
-      func interceptors<Operation: GraphQLOperation>(
-        for operation: Operation
-      ) -> [any ApolloInterceptor] {
-        [
-          MaxRetryInterceptor(maxRetriesAllowed: self.retryCount),
-          self.testInterceptor,
-          NetworkFetchInterceptor(client: self.mockClient),
-          JSONResponseParsingInterceptor()
-        ]
-      }
+
+  final class TestProvider: InterceptorProvider {
+    let testInterceptor: any GraphQLInterceptor
+    let retryCount: Int
+
+    init(testInterceptor: any GraphQLInterceptor, retryCount: Int) {
+      self.testInterceptor = testInterceptor
+      self.retryCount = retryCount
     }
 
-    let testProvider = TestProvider()
-    let network = RequestChainNetworkTransport(interceptorProvider: testProvider,
-                                               endpointURL: TestURL.mockServer.url)
-    
-    let expectation = self.expectation(description: "Request sent")
-    
-    let operation = MockQuery.mock()
-    _ = network.send(operation: operation) { result in
-      defer {
-        expectation.fulfill()
-      }
-      
-      switch result {
-      case .success:
-        XCTAssertEqual(testProvider.testInterceptor.timesRetryHasBeenCalled, testProvider.testInterceptor.timesToCallRetry)
-      case .failure(let error):
-        XCTFail("Unexpected error: \(error.localizedDescription)")
-      }
+    func graphQLInterceptors<Operation>(for operation: Operation) -> [any GraphQLInterceptor]
+    where Operation: GraphQLOperation {
+      [
+        MaxRetryInterceptor(maxRetriesAllowed: self.retryCount),
+        self.testInterceptor,
+      ]
     }
-    
-    self.wait(for: [expectation], timeout: 1)
   }
-  
-  func testExponentialBackoffDoesNotBreakInterceptorChain() {
+
+  // MARK: - Tests
+
+  func testMaxRetryInterceptorErrorsAfterMaximumRetries() async throws {
+    let testProvider = TestProvider(
+      testInterceptor: BlindRetryingTestInterceptor(),
+      retryCount: 15
+    )
+
+    let urlSession = MockURLSession(responseProvider: Self.self)
+    let network = RequestChainNetworkTransport(
+      urlSession: urlSession,
+      interceptorProvider: testProvider,
+      store: .mock(),
+      endpointURL: TestURL.mockServer.url
+    )
+
+    let operation = MockQuery.mock()
+    let results = try network.send(
+      query: operation,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration()
+    )
+
+    await expect {
+      var iterator = results.makeAsyncIterator()
+      _ = try await iterator.next()
+
+    }.to(
+      throwError(errorType: MaxRetryInterceptor.MaxRetriesError.self) { error in
+        expect(error.count).to(equal(testProvider.retryCount))
+        expect(error.operationName).to(equal(MockQuery<MockSelectionSet>.operationName))
+      }
+    )
+  }
+
+  func testRetryInterceptorDoesNotErrorIfRetriedFewerThanMaxTimes() async throws {
+    let testInterceptor = RetryToCountThenSucceedInterceptor(timesToCallRetry: 2)
+    let testProvider = TestProvider(
+      testInterceptor: testInterceptor,
+      retryCount: 3
+    )
+
+    await Self.registerRequestHandler(for: TestURL.mockServer.url) { request in
+      return (
+        HTTPURLResponse(
+          url: TestURL.mockServer.url,
+          statusCode: 200,
+          httpVersion: nil,
+          headerFields: nil
+        )!,
+        Data()
+      )
+    }
+
+    let urlSession = MockURLSession(responseProvider: Self.self)
+    let network = RequestChainNetworkTransport(
+      urlSession: urlSession,
+      interceptorProvider: testProvider,
+      store: .mock(),
+      endpointURL: TestURL.mockServer.url
+    )
+
+    let operation = MockQuery.mock()
+    let results = try network.send(
+      query: operation,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration()
+    )
+
+    await expect { try await results.getAllValues() }.to(throwError(ApolloClient.Error.noResults))
+    expect(testInterceptor.timesRetryHasBeenCalled).to(equal(testInterceptor.timesToCallRetry))
+  }
+
+  func testExponentialBackoffDoesNotBreakInterceptorChain() async throws {
     // Test that exponential backoff preserves normal interceptor chain behavior
-    class TestProvider: InterceptorProvider {
+    final class TestProvider: InterceptorProvider {
       let testInterceptor = RetryToCountThenSucceedInterceptor(timesToCallRetry: 2)
       let retryCount = 3
-      
-      let mockClient: MockURLSessionClient = {
-        let client = MockURLSessionClient()
-        client.jsonData = [:]
-        client.response = HTTPURLResponse(url: TestURL.mockServer.url,
-                                          statusCode: 200,
-                                          httpVersion: nil,
-                                          headerFields: nil)
-        return client
-      }()
-      
-      func interceptors<Operation: GraphQLOperation>(
-        for operation: Operation
-      ) -> [any ApolloInterceptor] {
+
+      func graphQLInterceptors<Operation>(for operation: Operation) -> [any GraphQLInterceptor]
+      where Operation: GraphQLOperation {
         let config = MaxRetryInterceptor.Configuration(
           maxRetries: self.retryCount,
-          baseDelay: 0.001, // Very small delay to keep test fast
+          baseDelay: 0.001,  // Very small delay to keep test fast
           multiplier: 2.0,
           maxDelay: 0.01,
           enableExponentialBackoff: true,
@@ -130,46 +122,53 @@ class MaxRetryInterceptorTests: XCTestCase {
         )
         return [
           MaxRetryInterceptor(configuration: config),
-          self.testInterceptor,
-          NetworkFetchInterceptor(client: self.mockClient),
-          JSONResponseParsingInterceptor()
+          testInterceptor
         ]
       }
     }
 
     let testProvider = TestProvider()
-    let network = RequestChainNetworkTransport(interceptorProvider: testProvider,
-                                               endpointURL: TestURL.mockServer.url)
-    
-    let expectation = self.expectation(description: "Request completed successfully")
-    
+    let urlSession = MockURLSession(responseProvider: Self.self)
+    let network = RequestChainNetworkTransport(
+      urlSession: urlSession,
+      interceptorProvider: testProvider,
+      store: .mock(),
+      endpointURL: TestURL.mockServer.url
+    )
+
     let operation = MockQuery.mock()
-    _ = network.send(operation: operation) { result in
-      defer {
-        expectation.fulfill()
-      }
-      
-      switch result {
-      case .success:
-        // Verify that the chain completed successfully even with exponential backoff
-        XCTAssertEqual(testProvider.testInterceptor.timesRetryHasBeenCalled, testProvider.testInterceptor.timesToCallRetry)
-      case .failure(let error):
-        XCTFail("Chain should have succeeded with exponential backoff: \(error)")
-      }
+
+    await Self.registerRequestHandler(for: TestURL.mockServer.url) { request in
+      return (
+        HTTPURLResponse(
+          url: TestURL.mockServer.url,
+          statusCode: 200,
+          httpVersion: nil,
+          headerFields: nil
+        )!,
+        operation.defaultResponseData
+      )
     }
-    
-    self.wait(for: [expectation], timeout: 2)
+
+    let results = try network.send(
+      query: operation,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration()
+    )
+
+    await expect { try await results.getAllValues().count }.to(equal(1))
+    expect(testProvider.testInterceptor.timesRetryHasBeenCalled)
+      .to(equal(testProvider.testInterceptor.timesToCallRetry))
   }
-  
-  func testExponentialBackoffPreservesErrorHandling() {
+
+  func testExponentialBackoffPreservesErrorHandling() async throws {
     // Test that exponential backoff doesn't interfere with proper error propagation
-    class TestProvider: InterceptorProvider {
+    final class TestProvider: InterceptorProvider {
       let testInterceptor = BlindRetryingTestInterceptor()
       let retryCount = 2
-      
-      func interceptors<Operation: GraphQLOperation>(
-        for operation: Operation
-      ) -> [any ApolloInterceptor] {
+
+      func graphQLInterceptors<Operation>(for operation: Operation) -> [any GraphQLInterceptor]
+      where Operation: GraphQLOperation {
         let config = MaxRetryInterceptor.Configuration(
           maxRetries: self.retryCount,
           baseDelay: 0.001,
@@ -180,38 +179,50 @@ class MaxRetryInterceptorTests: XCTestCase {
         )
         return [
           MaxRetryInterceptor(configuration: config),
-          self.testInterceptor
+          self.testInterceptor,
         ]
       }
     }
 
     let testProvider = TestProvider()
-    let network = RequestChainNetworkTransport(interceptorProvider: testProvider,
-                                               endpointURL: TestURL.mockServer.url)
-    
-    let expectation = self.expectation(description: "Request failed as expected")
-    
+    let urlSession = MockURLSession(responseProvider: Self.self)
+    let network = RequestChainNetworkTransport(
+      urlSession: urlSession,
+      interceptorProvider: testProvider,
+      store: .mock(),
+      endpointURL: TestURL.mockServer.url
+    )
+
     let operation = MockQuery.mock()
-    _ = network.send(operation: operation) { result in
-      defer {
-        expectation.fulfill()
-      }
-      
-      switch result {
-      case .success:
-        XCTFail("This should not have succeeded")
-      case .failure(let error):
-        // Verify that the correct error is propagated even with exponential backoff
-        guard case MaxRetryInterceptor.RetryError.hitMaxRetryCount(let count, _) = error else {
-          XCTFail("Unexpected error type: \(error)")
-          return
-        }
-        XCTAssertEqual(count, testProvider.retryCount)
-        // Verify that retries still happened correctly
-        XCTAssertEqual(testProvider.testInterceptor.hitCount, testProvider.retryCount + 1)
-      }
+
+    await Self.registerRequestHandler(for: TestURL.mockServer.url) { request in
+      return (
+        HTTPURLResponse(
+          url: TestURL.mockServer.url,
+          statusCode: 200,
+          httpVersion: nil,
+          headerFields: nil
+        )!,
+        operation.defaultResponseData
+      )
     }
-    
-    self.wait(for: [expectation], timeout: 2)
+
+    let results = try network.send(
+      query: operation,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration()
+    )
+
+    await expect {
+      var iterator = results.makeAsyncIterator()
+      _ = try await iterator.next()
+
+    }.to(
+      throwError(errorType: MaxRetryInterceptor.MaxRetriesError.self) { error in
+        expect(error.count).to(equal(testProvider.retryCount))
+        expect(error.operationName).to(equal(MockQuery<MockSelectionSet>.operationName))
+      }
+    )    
+    expect(testProvider.testInterceptor.hitCount).to(equal(testProvider.retryCount + 1))
   }
 }
