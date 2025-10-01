@@ -67,6 +67,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     subject = SelectionSetTemplate(
       definition: self.operation.irObject,
       generateInitializers: selectionSetInitializers,
+      generateDecodableTypes: false,
       config: config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
