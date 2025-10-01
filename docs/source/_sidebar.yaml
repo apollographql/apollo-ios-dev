@@ -5,7 +5,7 @@ switcher:
       latest: true
       href: ./
     - label: v1
-      href: ./v1
+      href: ../v1
 items:
   - label: Introduction
     href: "."
@@ -27,40 +27,6 @@ items:
     children:
       - label: v2.0
         href: ./migrations/2.0
-  - label: Tutorial
-    children:
-      - label: Code Generation
-        href: ./tutorial/codegen-getting-started
-      - label: Build a project with Apollo
-        children:
-          - label: Introduction
-            href: ./tutorial/tutorial-introduction
-          - label: 1. Configure your project
-            href: ./tutorial/tutorial-configure-project
-          - label: 2. Add the GraphQL schema
-            href: ./tutorial/tutorial-add-graphql-schema
-          - label: 3. Write your first query
-            href: ./tutorial/tutorial-write-your-first-query
-          - label: 4. Running code generation
-            href: ./tutorial/tutorial-running-code-generation
-          - label: 5. Execute your first query
-            href: ./tutorial/tutorial-execute-first-query
-          - label: 6. Connect your queries to your UI
-            href: ./tutorial/tutorial-connect-queries-to-ui
-          - label: 7. Add more info to the list
-            href: ./tutorial/tutorial-add-more-info-to-list
-          - label: 8. Paginate results
-            href: ./tutorial/tutorial-paginate-results
-          - label: 9. Complete the details view
-            href: ./tutorial/tutorial-complete-details-view
-          - label: 10. Write your first mutation
-            href: ./tutorial/tutorial-first-mutation
-          - label: 11. Authenticate your operations
-            href: ./tutorial/tutorial-authenticate-operations
-          - label: 12. Define additional mutations
-            href: ./tutorial/tutorial-define-additional-mutations
-          - label: 13. Write your first subscription
-            href: ./tutorial/tutorial-subscriptions
   - label: API Reference
     children:
       - label: Overview
