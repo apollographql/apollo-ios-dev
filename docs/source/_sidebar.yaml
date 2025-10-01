@@ -6,6 +6,8 @@ switcher:
       href: ./
     - label: v1
       href: ./v1
+    - label: v0.x (legacy)
+      href: ./v0-legacy
 items:
   - label: Introduction
     href: "."
