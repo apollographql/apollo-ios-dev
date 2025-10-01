@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="https://github.com/apple/swift">
-    <img src="https://img.shields.io/badge/Swift-5.7-orange.svg" alt="Swift 5.7 supported">
+    <img src="https://img.shields.io/badge/Swift-6.1-orange.svg" alt="Swift 6.1 supported">
   </a>
   <a href="https://swift.org/package-manager/">
     <img src="https://img.shields.io/badge/Swift_Package_Manager-compatible-orange?style=flat-square" alt="Swift Package Manager compatible">
