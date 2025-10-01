@@ -85,7 +85,9 @@
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/Se",
         "doc:\/\/ApolloCodegenLib\/SE",
-        "doc:\/\/ApolloCodegenLib\/SQ"
+        "doc:\/\/ApolloCodegenLib\/SQ",
+        "doc:\/\/ApolloCodegenLib\/s8SendableP",
+        "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -115,8 +117,7 @@
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/embeddedInTarget(name:accessModifier:)",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/other",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/swiftPackage(apolloSDKDependency:)",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/swiftPackageManager"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/swiftPackage(apolloSDKDependency:)"
       ],
       "title" : "Enumeration Cases"
     },
@@ -660,57 +661,15 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/schematypesfileoutput\/moduletype-swift.enum\/swiftpackage(apollosdkdependency:)"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/SchemaTypesFileOutput/ModuleType-swift.enum/swiftPackageManager": {
-  "abstract" : [
-    {
-      "text" : "Generates a ",
-      "type" : "text"
-    },
-    {
-      "code" : "Package.swift",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " file that is suitable for linking the generated schema types",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "files to your project using Swift Package Manager.",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "Attention: This case has been deprecated, use .swiftPackage(apolloSDKVersion:) case instead.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "case"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "swiftPackageManager"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SchemaTypesFileOutput\/ModuleType-swift.enum\/swiftPackageManager",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType.swiftPackageManager",
-  "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/schematypesfileoutput\/moduletype-swift.enum\/swiftpackagemanager"
+"doc://ApolloCodegenLib/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://ApolloCodegenLib/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

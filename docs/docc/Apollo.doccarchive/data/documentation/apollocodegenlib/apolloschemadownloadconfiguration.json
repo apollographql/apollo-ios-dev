@@ -85,7 +85,9 @@
         "doc:\/\/ApolloCodegenLib\/s28CustomDebugStringConvertibleP",
         "doc:\/\/ApolloCodegenLib\/Se",
         "doc:\/\/ApolloCodegenLib\/SE",
-        "doc:\/\/ApolloCodegenLib\/SQ"
+        "doc:\/\/ApolloCodegenLib\/SQ",
+        "doc:\/\/ApolloCodegenLib\/s8SendableP",
+        "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -729,6 +731,11 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apolloschemadownloadconfiguration\/outputpath"
 },
+"doc://ApolloCodegenLib/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
 "doc://ApolloCodegenLib/s28CustomDebugStringConvertibleP": {
   "identifier" : "doc:\/\/ApolloCodegenLib\/s28CustomDebugStringConvertibleP",
   "title" : "Swift.CustomDebugStringConvertible",
@@ -737,6 +744,11 @@
 "doc://ApolloCodegenLib/s8CopyableP": {
   "identifier" : "doc:\/\/ApolloCodegenLib\/s8CopyableP",
   "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://ApolloCodegenLib/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }

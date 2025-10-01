@@ -89,6 +89,20 @@
           ],
           "tokens" : [
             {
+              "kind" : "attribute",
+              "text" : "@"
+            },
+            {
+              "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileManagerActor",
+              "kind" : "attribute",
+              "preciseIdentifier" : "s:16ApolloCodegenLib16FileManagerActorC",
+              "text" : "FileManagerActor"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
               "kind" : "keyword",
               "text" : "func"
             },
@@ -285,6 +299,37 @@
   "title" : "createDirectoryIfNeeded(atPath:)",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollofilemanager\/createdirectoryifneeded(atpath:)"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/FileManagerActor": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "actor"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "FileManagerActor"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileManagerActor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "FileManagerActor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "FileManagerActor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/filemanageractor"
 }
 }
 }

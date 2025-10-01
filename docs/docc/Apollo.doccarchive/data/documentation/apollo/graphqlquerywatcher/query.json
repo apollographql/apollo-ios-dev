@@ -1,4 +1,18 @@
 {
+  "abstract" : [
+    {
+      "text" : "The ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLQuery",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " for the watcher.",
+      "type" : "text"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -81,6 +95,71 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "When ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/fetch(fetchBehavior:requestConfiguration:)",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " is called, this query will be fetched and the ",
+              "type" : "text"
+            },
+            {
+              "code" : "resultHandler",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "will be called with the results.",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "After the initial fetch, changes in the local cache to any of the query’s data will trigger this query",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "to be re-fetched from the cache and the ",
+              "type" : "text"
+            },
+            {
+              "code" : "resultHandler",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " will be called again with the updated results.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -119,6 +198,48 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
+"doc://Apollo/documentation/Apollo/FetchBehavior": {
+  "abstract" : [
+    {
+      "text" : "Describes the cache\/networking behaviors that should be used for the execution of a GraphQL",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "request.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "FetchBehavior"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "FetchBehavior"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "FetchBehavior",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/fetchbehavior"
+},
 "doc://Apollo/documentation/Apollo/GraphQLQueryWatcher": {
   "abstract" : [
     {
@@ -126,8 +247,9 @@
       "type" : "text"
     },
     {
-      "code" : "GraphQLQueryWatcher",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
       "text" : " is responsible for watching the store, and calling the result handler with a new result",
@@ -138,30 +260,14 @@
       "type" : "text"
     },
     {
-      "text" : "whenever any of the data the previous result depends on changes. If your query shares response objects with other",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "operations you should read about normalizing objects by cache key in our documentation. Normalized objects will",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "update all query watchers that had received that object before.",
+      "text" : "whenever any of query’s data changes.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "actor"
     },
     {
       "kind" : "text",
@@ -185,9 +291,112 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlquerywatcher"
 },
+"doc://Apollo/documentation/Apollo/GraphQLQueryWatcher/fetch(fetchBehavior:requestConfiguration:)": {
+  "abstract" : [
+    {
+      "text" : "Triggers a fetch of the receiver’s ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/query",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " using a provided ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ". If a fetch",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "is currently in progress, it will be cancelled.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "fetch"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "fetchBehavior"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo13FetchBehaviorV",
+      "text" : "FetchBehavior"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : "?)"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher\/fetch(fetchBehavior:requestConfiguration:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "fetch(fetchBehavior:requestConfiguration:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlquerywatcher\/fetch(fetchbehavior:requestconfiguration:)"
+},
 "doc://Apollo/documentation/Apollo/GraphQLQueryWatcher/query": {
   "abstract" : [
-
+    {
+      "text" : "The ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLQuery",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " for the watcher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

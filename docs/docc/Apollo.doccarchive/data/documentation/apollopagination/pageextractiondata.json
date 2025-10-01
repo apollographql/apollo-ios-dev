@@ -152,6 +152,17 @@
       "kind" : "declarations"
     }
   ],
+  "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloPagination\/s8SendableP",
+        "doc:\/\/ApolloPagination\/s16SendableMetatypeP"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforms To",
+      "type" : "conformsTo"
+    }
+  ],
   "schemaVersion" : {
     "major" : 0,
     "minor" : 3,
@@ -345,6 +356,16 @@
   "title" : "PageExtractionData.paginated(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/pageextractiondata\/paginated(_:_:)"
+},
+"doc://ApolloPagination/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloPagination\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://ApolloPagination/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloPagination\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

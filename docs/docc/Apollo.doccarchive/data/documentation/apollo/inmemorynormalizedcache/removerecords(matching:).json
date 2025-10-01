@@ -212,7 +212,19 @@
 },
 "doc://Apollo/documentation/Apollo/InMemoryNormalizedCache": {
   "abstract" : [
-
+    {
+      "text" : "An implementation of a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that stores cache data in application memory.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -290,6 +302,37 @@
   "title" : "removeRecords(matching:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/inmemorynormalizedcache\/removerecords(matching:)"
+},
+"doc://Apollo/documentation/Apollo/NormalizedCache": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "NormalizedCache"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "NormalizedCache"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "NormalizedCache",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/normalizedcache"
 }
 }
 }

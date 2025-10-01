@@ -1,4 +1,18 @@
 {
+  "abstract" : [
+    {
+      "text" : "Reads an object from the transaction’s underlying cache. This read operation loads the records for the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "object’s data from the cache, validates it, and transforms it into the provided response model.",
+      "type" : "text"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -14,7 +28,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo0A5StoreC15ReadTransactionC10readObject6ofType7withKey9variablesxxm_SSSDySS0A3API29GraphQLOperationVariableValue_pGSgtKAJ16RootSelectionSetRzlF",
+    "externalID" : "s:6Apollo0A5StoreC15ReadTransactionC10readObject6ofType7withKey9variablesxxm_SSSDySS0A3API29GraphQLOperationVariableValue_pGSgtYaKAJ16RootSelectionSetRzlF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -98,6 +112,14 @@
       {
         "kind" : "text",
         "text" : "]?) "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
       },
       {
         "kind" : "keyword",
@@ -235,6 +257,14 @@
             },
             {
               "kind" : "keyword",
+              "text" : "async"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
               "text" : "throws"
             },
             {
@@ -274,6 +304,98 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "RootSelectionSet",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".Type for the object to read from the cache.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "type"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The ",
+                  "type" : "text"
+                },
+                {
+                  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CacheKey",
+                  "isActive" : true,
+                  "type" : "reference"
+                },
+                {
+                  "text" : " of the object to read from the cache.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "key"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Any operation variables necessary to resolve selected field’s on the object. Defaults to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "nil",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "variables"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "An instance of the object’s response model containing the loaded data.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -319,11 +441,12 @@
       "type" : "text"
     },
     {
-      "code" : "ApolloStore",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : " class acts as a local cache for normalized GraphQL results.",
+      "text" : " class manages access to a local cache for reading\/writing normalized GraphQL results.",
       "type" : "text"
     }
   ],
@@ -356,7 +479,19 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadTransaction": {
   "abstract" : [
-
+    {
+      "text" : "A read-only transaction used to access an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : "’s cache data.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -387,7 +522,18 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadTransaction/readObject(ofType:withKey:variables:)": {
   "abstract" : [
-
+    {
+      "text" : "Reads an object from the transaction’s underlying cache. This read operation loads the records for the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "object’s data from the cache, validates it, and transforms it into the provided response model.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -472,6 +618,14 @@
     {
       "kind" : "text",
       "text" : "]?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",

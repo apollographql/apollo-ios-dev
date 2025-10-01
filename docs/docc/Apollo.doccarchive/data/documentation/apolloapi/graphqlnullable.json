@@ -106,7 +106,28 @@
             },
             {
               "kind" : "text",
-              "text" : ">"
+              "text" : "> "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "where"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Wrapped"
+            },
+            {
+              "kind" : "text",
+              "text" : " : "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
             }
           ]
         }
@@ -651,7 +672,9 @@
         "doc:\/\/ApolloAPI\/s23ExpressibleByNilLiteralP",
         "doc:\/\/ApolloAPI\/s26ExpressibleByStringLiteralP",
         "doc:\/\/ApolloAPI\/s33ExpressibleByUnicodeScalarLiteralP",
-        "doc:\/\/ApolloAPI\/SH"
+        "doc:\/\/ApolloAPI\/SH",
+        "doc:\/\/ApolloAPI\/s8SendableP",
+        "doc:\/\/ApolloAPI\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -680,7 +703,7 @@
       "anchor" : "Initializers",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/init(_:)-3syxd",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/init(_:)-11vj4",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/init(_:)-7pg3j"
       ],
       "title" : "Initializers"
@@ -1032,7 +1055,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqlnullable\/expressiblebyunicodescalarliteral-implementations"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLNullable/init(_:)-3syxd": {
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLNullable/init(_:)-11vj4": {
   "abstract" : [
     {
       "text" : "Intializer for use with an ",
@@ -1048,6 +1071,38 @@
       "type" : "text"
     }
   ],
+  "conformance" : {
+    "availabilityPrefix" : [
+      {
+        "text" : "Available when",
+        "type" : "text"
+      }
+    ],
+    "conformancePrefix" : [
+      {
+        "text" : "Conforms when",
+        "type" : "text"
+      }
+    ],
+    "constraints" : [
+      {
+        "code" : "Wrapped",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "Sendable",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ".",
+        "type" : "text"
+      }
+    ]
+  },
   "fragments" : [
     {
       "kind" : "identifier",
@@ -1066,12 +1121,12 @@
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/init(_:)-3syxd",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLNullable\/init(_:)-11vj4",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "init(_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqlnullable\/init(_:)-3syxd"
+  "url" : "\/documentation\/apolloapi\/graphqlnullable\/init(_:)-11vj4"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLNullable/init(_:)-7pg3j": {
   "abstract" : [
@@ -1089,6 +1144,38 @@
       "type" : "text"
     }
   ],
+  "conformance" : {
+    "availabilityPrefix" : [
+      {
+        "text" : "Available when",
+        "type" : "text"
+      }
+    ],
+    "conformancePrefix" : [
+      {
+        "text" : "Conforms when",
+        "type" : "text"
+      }
+    ],
+    "constraints" : [
+      {
+        "code" : "Wrapped",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "Sendable",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ".",
+        "type" : "text"
+      }
+    ]
+  },
   "fragments" : [
     {
       "kind" : "identifier",
@@ -1559,6 +1646,11 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/inputobject"
 },
+"doc://ApolloAPI/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
 "doc://ApolloAPI/s23ExpressibleByNilLiteralP": {
   "identifier" : "doc:\/\/ApolloAPI\/s23ExpressibleByNilLiteralP",
   "title" : "Swift.ExpressibleByNilLiteral",
@@ -1607,6 +1699,11 @@
 "doc://ApolloAPI/s8CopyableP": {
   "identifier" : "doc:\/\/ApolloAPI\/s8CopyableP",
   "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 },
 "http://spec.graphql.org/October2021/#sec-Null-Value": {

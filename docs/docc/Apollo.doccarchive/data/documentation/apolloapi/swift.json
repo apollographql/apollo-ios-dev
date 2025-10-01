@@ -39,14 +39,6 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary"
       ],
       "title" : "Extended Structures"
-    },
-    {
-      "anchor" : "Extended-Enumerations",
-      "generated" : true,
-      "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Optional"
-      ],
-      "title" : "Extended Enumerations"
     }
   ],
   "variants" : [
@@ -157,38 +149,6 @@
   "title" : "Dictionary",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/swift\/dictionary"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/Swift/Optional": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "extension"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "preciseIdentifier" : "s:Sq",
-      "text" : "Optional"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Optional",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "Optional"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "Optional",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/swift\/optional"
 }
 }
 }

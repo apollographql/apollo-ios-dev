@@ -1,7 +1,24 @@
 {
   "abstract" : [
     {
-      "text" : "A cache policy that specifies whether results should be fetched from the server or loaded from the local cache.",
+      "text" : "A set of cache policies for requests to an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that specify whether results should be fetched from the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "server or loaded from the local cache.",
       "type" : "text"
     }
   ],
@@ -76,13 +93,74 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "overview",
+          "level" : 2,
+          "text" : "Overview",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " consists of multiple enums that can be used with different ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " functions.",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "Different cache policy types can result in different return types for requests. Seperate enums are used to",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "determine what return type ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " should provide.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "relationshipsSections" : [
     {
       "identifiers" : [
         "doc:\/\/Apollo\/SQ",
-        "doc:\/\/Apollo\/SH"
+        "doc:\/\/Apollo\/SH",
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -99,24 +177,13 @@
   ],
   "topicSections" : [
     {
-      "anchor" : "Enumeration-Cases",
+      "anchor" : "Enumerations",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/fetchIgnoringCacheCompletely",
-        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/fetchIgnoringCacheData",
-        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/returnCacheDataAndFetch",
-        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/returnCacheDataDontFetch",
-        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/returnCacheDataElseFetch"
+        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/Query",
+        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/Subscription"
       ],
-      "title" : "Enumeration Cases"
-    },
-    {
-      "anchor" : "Type-Properties",
-      "generated" : true,
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/default"
-      ],
-      "title" : "Type Properties"
+      "title" : "Enumerations"
     },
     {
       "anchor" : "Default-Implementations",
@@ -165,10 +232,74 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
+"doc://Apollo/documentation/Apollo/ApolloClient": {
+  "abstract" : [
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " is the primary public entry point for interacting with a GraphQL server and a local GraphQL",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "normalized cache.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "class"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ApolloClient"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ApolloClient"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloClient",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apolloclient"
+},
 "doc://Apollo/documentation/Apollo/CachePolicy": {
   "abstract" : [
     {
-      "text" : "A cache policy that specifies whether results should be fetched from the server or loaded from the local cache.",
+      "text" : "A set of cache policies for requests to an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that specify whether results should be fetched from the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "server or loaded from the local cache.",
       "type" : "text"
     }
   ],
@@ -210,25 +341,25 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/cachepolicy\/equatable-implementations"
 },
-"doc://Apollo/documentation/Apollo/CachePolicy/default": {
+"doc://Apollo/documentation/Apollo/CachePolicy/Query": {
   "abstract" : [
     {
-      "text" : "The current default cache policy.",
+      "text" : "Cache policies for use with ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLQuery",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " operations.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "var"
+      "text" : "enum"
     },
     {
       "kind" : "text",
@@ -236,36 +367,41 @@
     },
     {
       "kind" : "identifier",
-      "text" : "`default`"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
-      "text" : "CachePolicy"
+      "text" : "Query"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/default",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/Query",
   "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Query"
+    }
+  ],
   "role" : "symbol",
-  "title" : "default",
+  "title" : "CachePolicy.Query",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/cachepolicy\/default"
+  "url" : "\/documentation\/apollo\/cachepolicy\/query"
 },
-"doc://Apollo/documentation/Apollo/CachePolicy/fetchIgnoringCacheCompletely": {
+"doc://Apollo/documentation/Apollo/CachePolicy/Subscription": {
   "abstract" : [
     {
-      "text" : "Always fetch results from the server, and don’t store these in the cache.",
+      "text" : "Cache policies for use with ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLSubscription",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " operations.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "case"
+      "text" : "enum"
     },
     {
       "kind" : "text",
@@ -273,127 +409,31 @@
     },
     {
       "kind" : "identifier",
-      "text" : "fetchIgnoringCacheCompletely"
+      "text" : "Subscription"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/fetchIgnoringCacheCompletely",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/Subscription",
   "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Subscription"
+    }
+  ],
   "role" : "symbol",
-  "title" : "CachePolicy.fetchIgnoringCacheCompletely",
+  "title" : "CachePolicy.Subscription",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/cachepolicy\/fetchignoringcachecompletely"
+  "url" : "\/documentation\/apollo\/cachepolicy\/subscription"
 },
-"doc://Apollo/documentation/Apollo/CachePolicy/fetchIgnoringCacheData": {
-  "abstract" : [
-    {
-      "text" : "Always fetch results from the server.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "case"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "fetchIgnoringCacheData"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/fetchIgnoringCacheData",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "CachePolicy.fetchIgnoringCacheData",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/cachepolicy\/fetchignoringcachedata"
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
-"doc://Apollo/documentation/Apollo/CachePolicy/returnCacheDataAndFetch": {
-  "abstract" : [
-    {
-      "text" : "Return data from the cache if available, and always fetch results from the server.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "case"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "returnCacheDataAndFetch"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/returnCacheDataAndFetch",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "CachePolicy.returnCacheDataAndFetch",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/cachepolicy\/returncachedataandfetch"
-},
-"doc://Apollo/documentation/Apollo/CachePolicy/returnCacheDataDontFetch": {
-  "abstract" : [
-    {
-      "text" : "Return data from the cache if available, else return an error.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "case"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "returnCacheDataDontFetch"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/returnCacheDataDontFetch",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "CachePolicy.returnCacheDataDontFetch",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/cachepolicy\/returncachedatadontfetch"
-},
-"doc://Apollo/documentation/Apollo/CachePolicy/returnCacheDataElseFetch": {
-  "abstract" : [
-    {
-      "text" : "Return data from the cache if available, else fetch results from the server.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "case"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "returnCacheDataElseFetch"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/returnCacheDataElseFetch",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "CachePolicy.returnCacheDataElseFetch",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/cachepolicy\/returncachedataelsefetch"
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

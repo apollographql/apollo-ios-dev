@@ -271,7 +271,7 @@ Apollo uses the following SPI categories:
 - **Internal** Exposes symbols used by  `Apollo` and `ApolloAPI` across module boundaries but not intended for public consumption.
 - **Unsafe** Exposes symbols that provide unsafe access to the underlying data of the GraphQL models. The public API provides strongly type access to the data that is guaranteed to be safe. If invalid data is provided to the models by using unsafe APIs you may cause crashes or other undefined behavior.
 
-### `CustomScalarTypes`s
+### Custom Scalar Types
 
 Custom implementations of `CustomScalarType` need to import the `Execution` and `Internal` SPIs. Newly generated custom scalars will have the correct import statement, but existing custom scalars are not overwritten when code generation is ran.
 

@@ -1,4 +1,19 @@
 {
+  "abstract" : [
+    {
+      "text" : "A read\/write transaction used to access an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : "’s cache data.",
+      "type" : "text"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -79,6 +94,102 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "overview",
+          "level" : 2,
+          "text" : "Overview",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " is provided as a parameter of the transaction block of",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/withinReadWriteTransaction(_:)",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : ". While inside of a read\/write transaction block, concurrent",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "read and write access to the cache is blocked.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A ",
+                  "type" : "text"
+                },
+                {
+                  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction",
+                  "isActive" : true,
+                  "type" : "reference"
+                },
+                {
+                  "text" : " should only be accessed from within the body of the",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/withinReadWriteTransaction(_:)",
+                  "isActive" : true,
+                  "type" : "reference"
+                },
+                {
+                  "text" : " that provided it. Capturing and using the transaction outside of",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "the transaction block may cause data races or crashes.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "Note",
+          "style" : "note",
+          "type" : "aside"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "relationshipsSections" : [
@@ -89,6 +200,15 @@
       "kind" : "relationships",
       "title" : "Inherits From",
       "type" : "inheritsFrom"
+    },
+    {
+      "identifiers" : [
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforms To",
+      "type" : "conformsTo"
     }
   ],
   "schemaVersion" : {
@@ -116,8 +236,8 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/removeObjects(matching:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/update(_:_:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/updateObject(ofType:withKey:variables:_:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-9mzaz",
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-y0jm",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-4w5fv",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-5stiz",
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(selectionSet:withKey:variables:)"
       ],
       "title" : "Instance Methods"
@@ -158,11 +278,12 @@
       "type" : "text"
     },
     {
-      "code" : "ApolloStore",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : " class acts as a local cache for normalized GraphQL results.",
+      "text" : " class manages access to a local cache for reading\/writing normalized GraphQL results.",
       "type" : "text"
     }
   ],
@@ -195,7 +316,19 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadTransaction": {
   "abstract" : [
-
+    {
+      "text" : "A read-only transaction used to access an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : "’s cache data.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -226,7 +359,19 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction": {
   "abstract" : [
-
+    {
+      "text" : "A read\/write transaction used to access an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : "’s cache data.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -257,7 +402,19 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/cache": {
   "abstract" : [
-
+    {
+      "text" : "The underlying ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " the transaction is operating upon.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -292,23 +449,7 @@
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/removeObject(for:)": {
   "abstract" : [
     {
-      "text" : "Removes the object for the specified cache key. Does not cascade",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "or allow removal of only certain fields. Does nothing if an object",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "does not exist for the given key.",
+      "text" : "Removes the object for the specified cache key from the transaction’s underlying cache.",
       "type" : "text"
     }
   ],
@@ -348,6 +489,14 @@
     },
     {
       "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
       "text" : "throws"
     }
   ],
@@ -361,31 +510,7 @@
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/removeObjects(matching:)": {
   "abstract" : [
     {
-      "text" : "Removes records with keys that match the specified pattern. This method will only",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "remove whole records, it does not perform cascading deletes. This means only the",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "records with matched keys will be removed, and not any references to them. Key",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "matching is case-insensitive.",
+      "text" : "Removes records with keys that match the specified pattern.",
       "type" : "text"
     }
   ],
@@ -425,6 +550,14 @@
     },
     {
       "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
       "text" : "throws"
     }
   ],
@@ -437,7 +570,58 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/update(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Updates the data for a ",
+      "type" : "text"
+    },
+    {
+      "code" : "LocalCacheMutation",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " in the transaction’s underlying cache. This operation loads the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "records for the cache mutation’s data from the cache, validates it, and transforms it into the cache mutation’s",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "associated reponse model. The response model for the cache mutation is then passed to the ",
+      "type" : "text"
+    },
+    {
+      "code" : "body",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " block where it",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "may be mutated. Once the ",
+      "type" : "text"
+    },
+    {
+      "code" : "body",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " block completes, the final mutated data is written back to the cache.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -516,6 +700,14 @@
     },
     {
       "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
       "text" : "throws"
     }
   ],
@@ -528,7 +720,50 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/updateObject(ofType:withKey:variables:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Updates the data for an object in the transaction’s underlying cache. This operation loads the records for the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "object’s data from the cache, validates it, and transforms it into the provided associated reponse model.",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "The object is then passed to the ",
+      "type" : "text"
+    },
+    {
+      "code" : "body",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " block where it may be mutated. Once the ",
+      "type" : "text"
+    },
+    {
+      "code" : "body",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " block completes, the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "final mutated data is written back to the cache.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -649,6 +884,14 @@
     },
     {
       "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
       "text" : "throws"
     }
   ],
@@ -659,9 +902,20 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore\/readwritetransaction\/updateobject(oftype:withkey:variables:_:)"
 },
-"doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/write(data:for:)-9mzaz": {
+"doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/write(data:for:)-4w5fv": {
   "abstract" : [
-
+    {
+      "text" : "Writes the data for a ",
+      "type" : "text"
+    },
+    {
+      "code" : "LocalCacheMutation",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " to the transaction’s underlying cache.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -731,19 +985,38 @@
     },
     {
       "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
       "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-9mzaz",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-4w5fv",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "write(data:for:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apollostore\/readwritetransaction\/write(data:for:)-9mzaz"
+  "url" : "\/documentation\/apollo\/apollostore\/readwritetransaction\/write(data:for:)-4w5fv"
 },
-"doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/write(data:for:)-y0jm": {
+"doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/write(data:for:)-5stiz": {
   "abstract" : [
-
+    {
+      "text" : "Writes the data for a ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLOperation",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " to the transaction’s underlying cache.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -813,19 +1086,30 @@
     },
     {
       "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
       "text" : "throws"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-y0jm",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/ReadWriteTransaction\/write(data:for:)-5stiz",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "write(data:for:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apollostore\/readwritetransaction\/write(data:for:)-y0jm"
+  "url" : "\/documentation\/apollo\/apollostore\/readwritetransaction\/write(data:for:)-5stiz"
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/write(selectionSet:withKey:variables:)": {
   "abstract" : [
-
+    {
+      "text" : "Writes the data for an object to the transaction’s underlying cache.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -913,6 +1197,14 @@
     },
     {
       "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
       "text" : "throws"
     }
   ],
@@ -922,6 +1214,149 @@
   "title" : "write(selectionSet:withKey:variables:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore\/readwritetransaction\/write(selectionset:withkey:variables:)"
+},
+"doc://Apollo/documentation/Apollo/ApolloStore/withinReadWriteTransaction(_:)": {
+  "abstract" : [
+    {
+      "text" : "Performs an operation within a read\/write transaction",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "withinReadWriteTransaction"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ">(("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC",
+      "text" : "ApolloStore"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC20ReadWriteTransactionC",
+      "text" : "ReadWriteTransaction"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "T"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/withinReadWriteTransaction(_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "withinReadWriteTransaction(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostore\/withinreadwritetransaction(_:)"
+},
+"doc://Apollo/documentation/Apollo/NormalizedCache": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "NormalizedCache"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "NormalizedCache"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "NormalizedCache",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/normalizedcache"
+},
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

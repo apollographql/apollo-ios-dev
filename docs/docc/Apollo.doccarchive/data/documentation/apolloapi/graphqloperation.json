@@ -68,12 +68,21 @@
             },
             {
               "kind" : "text",
-              "text" : " : AnyObject, "
+              "text" : " : "
             },
             {
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:SH",
               "text" : "Hashable"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
             }
           ]
         }
@@ -85,7 +94,9 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloAPI\/SQ",
-        "doc:\/\/ApolloAPI\/SH"
+        "doc:\/\/ApolloAPI\/SH",
+        "doc:\/\/ApolloAPI\/s8SendableP",
+        "doc:\/\/ApolloAPI\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Inherits From",
@@ -115,7 +126,8 @@
       "anchor" : "Associated-Types",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/Data"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/Data",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/ResponseFormat-swift.associatedtype"
       ],
       "title" : "Associated Types"
     },
@@ -131,24 +143,15 @@
       "anchor" : "Type-Properties",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredFragments",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/definition",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/document",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/hasDeferredFragments",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationDocument",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationIdentifier",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationName",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/responseFormat-6jbyj"
       ],
       "title" : "Type Properties"
-    },
-    {
-      "anchor" : "Type-Methods",
-      "generated" : true,
-      "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredSelectionSetType(for:withLabel:atFieldPath:)"
-      ],
-      "title" : "Type Methods"
     },
     {
       "anchor" : "Default-Implementations",
@@ -355,6 +358,50 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqloperation\/hashable-implementations"
 },
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/ResponseFormat-swift.associatedtype": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "associatedtype"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ResponseFormat"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI23OperationResponseFormatP",
+      "text" : "OperationResponseFormat"
+    },
+    {
+      "kind" : "text",
+      "text" : " = "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI20SingleResponseFormatV",
+      "text" : "SingleResponseFormat"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/ResponseFormat-swift.associatedtype",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "ResponseFormat",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqloperation\/responseformat-swift.associatedtype"
+},
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/Variables": {
   "abstract" : [
 
@@ -385,167 +432,6 @@
   "title" : "GraphQLOperation.Variables",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqloperation\/variables"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/deferredFragments": {
-  "abstract" : [
-
-  ],
-  "defaultImplementations" : 1,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "deferredFragments"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ["
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI26DeferredFragmentIdentifierV",
-      "text" : "DeferredFragmentIdentifier"
-    },
-    {
-      "kind" : "text",
-      "text" : " : any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI12SelectionSetP",
-      "text" : "SelectionSet"
-    },
-    {
-      "kind" : "text",
-      "text" : ".Type]?"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredFragments",
-  "kind" : "symbol",
-  "required" : true,
-  "role" : "symbol",
-  "title" : "deferredFragments",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqloperation\/deferredfragments"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/deferredSelectionSetType(for:withLabel:atFieldPath:)": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "deferredSelectionSetType"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "genericParameter",
-      "text" : "T"
-    },
-    {
-      "kind" : "text",
-      "text" : ">("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "for"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "T"
-    },
-    {
-      "kind" : "text",
-      "text" : ".Type, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "withLabel"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "atFieldPath"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ["
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : "]) -> (any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI12SelectionSetP",
-      "text" : "SelectionSet"
-    },
-    {
-      "kind" : "text",
-      "text" : ".Type)?"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/deferredSelectionSetType(for:withLabel:atFieldPath:)",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "deferredSelectionSetType(for:withLabel:atFieldPath:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqloperation\/deferredselectionsettype(for:withlabel:atfieldpath:)"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/definition": {
   "abstract" : [
@@ -635,48 +521,6 @@
   "title" : "document",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqloperation\/document"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/hasDeferredFragments": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "hasDeferredFragments"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sb",
-      "text" : "Bool"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/hasDeferredFragments",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "hasDeferredFragments",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/graphqloperation\/hasdeferredfragments"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/operationDocument": {
   "abstract" : [
@@ -854,6 +698,58 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqloperation\/operationtype"
 },
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/responseFormat-6jbyj": {
+  "abstract" : [
+
+  ],
+  "defaultImplementations" : 2,
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "responseFormat"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Self"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP14ResponseFormatQa",
+      "text" : "ResponseFormat"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/responseFormat-6jbyj",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "responseFormat",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqloperation\/responseformat-6jbyj"
+},
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLQuery": {
   "abstract" : [
 
@@ -915,6 +811,16 @@
   "title" : "GraphQLSubscription",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqlsubscription"
+},
+"doc://ApolloAPI/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

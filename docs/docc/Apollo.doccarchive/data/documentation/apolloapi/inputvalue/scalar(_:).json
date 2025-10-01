@@ -13,7 +13,7 @@
       "type" : "text"
     },
     {
-      "code" : "Int",
+      "code" : "Int32",
       "type" : "codeVoice"
     },
     {
@@ -297,7 +297,7 @@
       "type" : "text"
     },
     {
-      "code" : "Int",
+      "code" : "Int32",
       "type" : "codeVoice"
     },
     {

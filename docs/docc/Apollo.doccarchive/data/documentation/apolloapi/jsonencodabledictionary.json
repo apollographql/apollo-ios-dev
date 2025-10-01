@@ -133,7 +133,7 @@
         },
         {
           "code" : [
-            "dictionary.compactMapValues { $0.jsonValue }"
+            "dictionary.mapValues { $0.jsonValue }"
           ],
           "syntax" : "swift",
           "type" : "codeListing"

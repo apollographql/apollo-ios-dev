@@ -18,11 +18,11 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo13UploadRequestC",
+    "externalID" : "s:6Apollo13UploadRequestV",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "class"
+        "text" : "struct"
       },
       {
         "kind" : "text",
@@ -45,8 +45,8 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Class",
-    "symbolKind" : "class",
+    "roleHeading" : "Structure",
+    "symbolKind" : "struct",
     "title" : "UploadRequest"
   },
   "primaryContentSections" : [
@@ -62,7 +62,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "class"
+              "text" : "struct"
             },
             {
               "kind" : "text",
@@ -114,17 +114,9 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/HTTPRequest"
-      ],
-      "kind" : "relationships",
-      "title" : "Inherits From",
-      "type" : "inheritsFrom"
-    },
-    {
-      "identifiers" : [
-        "doc:\/\/Apollo\/s28CustomDebugStringConvertibleP",
-        "doc:\/\/Apollo\/SQ",
-        "doc:\/\/Apollo\/SH"
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -152,7 +144,7 @@
       "anchor" : "Initializers",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:sendEnhancedClientAwareness:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/init(operation:graphQLEndpoint:files:multipartBoundary:writeResultsToCache:requestBodyCreator:)"
       ],
       "title" : "Initializers"
     },
@@ -160,10 +152,15 @@
       "anchor" : "Instance-Properties",
       "generated" : true,
       "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/additionalHeaders",
+        "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/fetchBehavior",
         "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/files",
-        "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/manualBoundary",
+        "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/graphQLEndpoint",
+        "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/multipartBoundary",
+        "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/operation",
         "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/requestBodyCreator",
-        "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/serializationFormat"
+        "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/requestTimeout",
+        "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/writeResultsToCache"
       ],
       "title" : "Instance Properties"
     },
@@ -176,6 +173,14 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/toURLRequest()"
       ],
       "title" : "Instance Methods"
+    },
+    {
+      "anchor" : "Default-Implementations",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/GraphQLRequest-Implementations"
+      ],
+      "title" : "Default Implementations"
     }
   ],
   "variants" : [
@@ -192,16 +197,6 @@
   ]
 , 
 "references": {
-"doc://Apollo/SH": {
-  "identifier" : "doc:\/\/Apollo\/SH",
-  "title" : "Swift.Hashable",
-  "type" : "unresolvable"
-},
-"doc://Apollo/SQ": {
-  "identifier" : "doc:\/\/Apollo\/SQ",
-  "title" : "Swift.Equatable",
-  "type" : "unresolvable"
-},
 "doc://Apollo/documentation/Apollo": {
   "abstract" : [
     {
@@ -216,17 +211,25 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
-"doc://Apollo/documentation/Apollo/HTTPRequest": {
+"doc://Apollo/documentation/Apollo/GraphQLRequest": {
   "abstract" : [
     {
-      "text" : "Encapsulation of all information about a request before it hits the network",
+      "text" : "A protocol for a type that represents a request to fetch a ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLOperation",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "protocol"
     },
     {
       "kind" : "text",
@@ -234,21 +237,21 @@
     },
     {
       "kind" : "identifier",
-      "text" : "HTTPRequest"
+      "text" : "GraphQLRequest"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPRequest",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "HTTPRequest"
+      "text" : "GraphQLRequest"
     }
   ],
   "role" : "symbol",
-  "title" : "HTTPRequest",
+  "title" : "GraphQLRequest",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/httprequest"
+  "url" : "\/documentation\/apollo\/graphqlrequest"
 },
 "doc://Apollo/documentation/Apollo/UploadRequest": {
   "abstract" : [
@@ -260,7 +263,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -319,7 +322,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13UploadRequestC",
+      "preciseIdentifier" : "s:6Apollo13UploadRequestV",
       "text" : "UploadRequest"
     },
     {
@@ -336,7 +339,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13UploadRequestC",
+      "preciseIdentifier" : "s:6Apollo13UploadRequestV",
       "text" : "UploadRequest"
     },
     {
@@ -363,6 +366,112 @@
   "title" : "==(_:_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/uploadrequest\/==(_:_:)"
+},
+"doc://Apollo/documentation/Apollo/UploadRequest/GraphQLRequest-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/GraphQLRequest-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "GraphQLRequest Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/uploadrequest\/graphqlrequest-implementations"
+},
+"doc://Apollo/documentation/Apollo/UploadRequest/additionalHeaders": {
+  "abstract" : [
+    {
+      "text" : "Any additional headers you wish to add to this request",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "additionalHeaders"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : "]"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/additionalHeaders",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "additionalHeaders",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/uploadrequest\/additionalheaders"
+},
+"doc://Apollo/documentation/Apollo/UploadRequest/fetchBehavior": {
+  "abstract" : [
+    {
+      "text" : "The ",
+      "type" : "text"
+    },
+    {
+      "code" : "FetchBehavior",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " to use for this request. Determines if fetching will include cache\/network.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "fetchBehavior"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo13FetchBehaviorV",
+      "text" : "FetchBehavior"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/fetchBehavior",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "fetchBehavior",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/uploadrequest\/fetchbehavior"
 },
 "doc://Apollo/documentation/Apollo/UploadRequest/files": {
   "abstract" : [
@@ -401,6 +510,43 @@
   "title" : "files",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/uploadrequest\/files"
+},
+"doc://Apollo/documentation/Apollo/UploadRequest/graphQLEndpoint": {
+  "abstract" : [
+    {
+      "text" : "The endpoint to make a GraphQL request to",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "graphQLEndpoint"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation3URLV",
+      "text" : "URL"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/graphQLEndpoint",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "graphQLEndpoint",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/uploadrequest\/graphqlendpoint"
 },
 "doc://Apollo/documentation/Apollo/UploadRequest/hash(into:)": {
   "abstract" : [
@@ -456,7 +602,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/uploadrequest\/hash(into:)"
 },
-"doc://Apollo/documentation/Apollo/UploadRequest/init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:sendEnhancedClientAwareness:)": {
+"doc://Apollo/documentation/Apollo/UploadRequest/init(operation:graphQLEndpoint:files:multipartBoundary:writeResultsToCache:requestBodyCreator:)": {
   "abstract" : [
     {
       "text" : "Designated Initializer",
@@ -471,6 +617,22 @@
     {
       "kind" : "text",
       "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
     },
     {
       "kind" : "externalParam",
@@ -491,82 +653,6 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "clientName"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "clientVersion"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "additionalHeaders"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ["
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : " : "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : "], "
-    },
-    {
-      "kind" : "externalParam",
       "text" : "files"
     },
     {
@@ -584,7 +670,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "manualBoundary"
+      "text" : "multipartBoundary"
     },
     {
       "kind" : "text",
@@ -601,41 +687,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "context"
-    },
-    {
-      "kind" : "text",
-      "text" : ": (any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo14RequestContextP",
-      "text" : "RequestContext"
-    },
-    {
-      "kind" : "text",
-      "text" : ")?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "requestBodyCreator"
-    },
-    {
-      "kind" : "text",
-      "text" : ": any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo18RequestBodyCreatorP",
-      "text" : "RequestBodyCreator"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "sendEnhancedClientAwareness"
+      "text" : "writeResultsToCache"
     },
     {
       "kind" : "text",
@@ -648,17 +700,34 @@
     },
     {
       "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestBodyCreator"
+    },
+    {
+      "kind" : "text",
+      "text" : ": any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo22JSONRequestBodyCreatorP",
+      "text" : "JSONRequestBodyCreator"
+    },
+    {
+      "kind" : "text",
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:sendEnhancedClientAwareness:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/init(operation:graphQLEndpoint:files:multipartBoundary:writeResultsToCache:requestBodyCreator:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(graphQLEndpoint:operation:clientName:clientVersion:additionalHeaders:files:manualBoundary:context:requestBodyCreator:sendEnhancedClientAwareness:)",
+  "title" : "init(operation:graphQLEndpoint:files:multipartBoundary:writeResultsToCache:requestBodyCreator:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/uploadrequest\/init(graphqlendpoint:operation:clientname:clientversion:additionalheaders:files:manualboundary:context:requestbodycreator:sendenhancedclientawareness:)"
+  "url" : "\/documentation\/apollo\/uploadrequest\/init(operation:graphqlendpoint:files:multipartboundary:writeresultstocache:requestbodycreator:)"
 },
-"doc://Apollo/documentation/Apollo/UploadRequest/manualBoundary": {
+"doc://Apollo/documentation/Apollo/UploadRequest/multipartBoundary": {
   "abstract" : [
 
   ],
@@ -673,7 +742,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "manualBoundary"
+      "text" : "multipartBoundary"
     },
     {
       "kind" : "text",
@@ -683,18 +752,50 @@
       "kind" : "typeIdentifier",
       "preciseIdentifier" : "s:SS",
       "text" : "String"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/multipartBoundary",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "multipartBoundary",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/uploadrequest\/multipartboundary"
+},
+"doc://Apollo/documentation/Apollo/UploadRequest/operation": {
+  "abstract" : [
+    {
+      "text" : "The GraphQL Operation to execute",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "var"
     },
     {
       "kind" : "text",
-      "text" : "?"
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/manualBoundary",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/operation",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "manualBoundary",
+  "title" : "operation",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/uploadrequest\/manualboundary"
+  "url" : "\/documentation\/apollo\/uploadrequest\/operation"
 },
 "doc://Apollo/documentation/Apollo/UploadRequest/requestBodyCreator": {
   "abstract" : [
@@ -719,8 +820,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo18RequestBodyCreatorP",
-      "text" : "RequestBodyCreator"
+      "preciseIdentifier" : "s:6Apollo22JSONRequestBodyCreatorP",
+      "text" : "JSONRequestBodyCreator"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/requestBodyCreator",
@@ -783,14 +884,25 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/uploadrequest\/requestmultipartformdata()"
 },
-"doc://Apollo/documentation/Apollo/UploadRequest/serializationFormat": {
+"doc://Apollo/documentation/Apollo/UploadRequest/requestTimeout": {
   "abstract" : [
-
+    {
+      "text" : "The timeout interval specifies the limit on the idle interval allotted to a request in the process of",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "loading. This timeout interval is measured in seconds.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "let"
+      "text" : "var"
     },
     {
       "kind" : "text",
@@ -798,7 +910,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "serializationFormat"
+      "text" : "requestTimeout"
     },
     {
       "kind" : "text",
@@ -806,20 +918,20 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo23JSONSerializationFormatC",
-      "text" : "JSONSerializationFormat"
+      "preciseIdentifier" : "c:@T@NSTimeInterval",
+      "text" : "TimeInterval"
     },
     {
       "kind" : "text",
-      "text" : ".Type"
+      "text" : "?"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/serializationFormat",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/requestTimeout",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "serializationFormat",
+  "title" : "requestTimeout",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/uploadrequest\/serializationformat"
+  "url" : "\/documentation\/apollo\/uploadrequest\/requesttimeout"
 },
 "doc://Apollo/documentation/Apollo/UploadRequest/toURLRequest()": {
   "abstract" : [
@@ -863,9 +975,51 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/uploadrequest\/tourlrequest()"
 },
-"doc://Apollo/s28CustomDebugStringConvertibleP": {
-  "identifier" : "doc:\/\/Apollo\/s28CustomDebugStringConvertibleP",
-  "title" : "Swift.CustomDebugStringConvertible",
+"doc://Apollo/documentation/Apollo/UploadRequest/writeResultsToCache": {
+  "abstract" : [
+    {
+      "text" : "Determines if the results of a network fetch should be written to the local cache.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "writeResultsToCache"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadRequest\/writeResultsToCache",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "writeResultsToCache",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/uploadrequest\/writeresultstocache"
+},
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }

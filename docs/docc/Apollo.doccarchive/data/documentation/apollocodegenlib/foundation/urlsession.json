@@ -14,7 +14,7 @@
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "Foundation",
-    "externalID" : "s:e:s:So12NSURLSessionC16ApolloCodegenLibE8loadData4with17completionHandlerSo0aF4TaskCSg10Foundation10URLRequestV_yAJ0F0VSg_So13NSURLResponseCSgs5Error_pSgtctF",
+    "externalID" : "s:e:s:So12NSURLSessionC16ApolloCodegenLibE8loadData4with17completionHandlerSo0aF4TaskCSg10Foundation10URLRequestV_yAJ0F0VSg_So13NSURLResponseCSgs5Error_pSgtYaYbctF",
     "fragments" : [
       {
         "kind" : "keyword",

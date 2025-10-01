@@ -1,7 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Unsubscribes from notifications of ApolloStore content changes",
+      "text" : "Unsubscribes from notifications for changes to the store’s cache data.",
       "type" : "text"
     }
   ],
@@ -19,7 +19,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo0A5StoreC11unsubscribeyyAA0aB10Subscriber_pF",
+    "externalID" : "s:6Apollo0A5StoreC11unsubscribeyyAC17SubscriptionTokenVF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -35,12 +35,21 @@
       },
       {
         "kind" : "text",
-        "text" : "(any "
+        "text" : "("
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo0A15StoreSubscriberP",
-        "text" : "ApolloStoreSubscriber"
+        "preciseIdentifier" : "s:6Apollo0A5StoreC",
+        "text" : "ApolloStore"
+      },
+      {
+        "kind" : "text",
+        "text" : "."
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:6Apollo0A5StoreC17SubscriptionTokenV",
+        "text" : "SubscriptionToken"
       },
       {
         "kind" : "text",
@@ -94,17 +103,27 @@
             },
             {
               "kind" : "internalParam",
-              "text" : "subscriber"
+              "text" : "subscriptionToken"
             },
             {
               "kind" : "text",
-              "text" : ": any "
+              "text" : ": "
             },
             {
-              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStoreSubscriber",
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo0A15StoreSubscriberP",
-              "text" : "ApolloStoreSubscriber"
+              "preciseIdentifier" : "s:6Apollo0A5StoreC",
+              "text" : "ApolloStore"
+            },
+            {
+              "kind" : "text",
+              "text" : "."
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/SubscriptionToken",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo0A5StoreC17SubscriptionTokenV",
+              "text" : "SubscriptionToken"
             },
             {
               "kind" : "text",
@@ -123,15 +142,15 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "A subscribe that has previously been added via ",
+                  "text" : "An opaque token for the subscriber that was provided via ",
                   "type" : "text"
                 },
                 {
-                  "code" : "subscribe",
+                  "code" : "subscribe(_:)",
                   "type" : "codeVoice"
                 },
                 {
-                  "text" : ". To avoid retain cycles,",
+                  "text" : ".",
                   "type" : "text"
                 },
                 {
@@ -139,7 +158,7 @@
                   "type" : "text"
                 },
                 {
-                  "text" : "call ",
+                  "text" : "To avoid retain cycles, call ",
                   "type" : "text"
                 },
                 {
@@ -154,7 +173,7 @@
               "type" : "paragraph"
             }
           ],
-          "name" : "subscriber"
+          "name" : "subscriptionToken"
         }
       ]
     }
@@ -202,11 +221,12 @@
       "type" : "text"
     },
     {
-      "code" : "ApolloStore",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : " class acts as a local cache for normalized GraphQL results.",
+      "text" : " class manages access to a local cache for reading\/writing normalized GraphQL results.",
       "type" : "text"
     }
   ],
@@ -237,10 +257,62 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore"
 },
+"doc://Apollo/documentation/Apollo/ApolloStore/SubscriptionToken": {
+  "abstract" : [
+    {
+      "text" : "An opaque token used to track an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStoreSubscriber",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " subscribed to an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "SubscriptionToken"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore\/SubscriptionToken",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "SubscriptionToken"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloStore.SubscriptionToken",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostore\/subscriptiontoken"
+},
 "doc://Apollo/documentation/Apollo/ApolloStore/unsubscribe(_:)": {
   "abstract" : [
     {
-      "text" : "Unsubscribes from notifications of ApolloStore content changes",
+      "text" : "Unsubscribes from notifications for changes to the store’s cache data.",
       "type" : "text"
     }
   ],
@@ -259,12 +331,21 @@
     },
     {
       "kind" : "text",
-      "text" : "(any "
+      "text" : "("
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo0A15StoreSubscriberP",
-      "text" : "ApolloStoreSubscriber"
+      "preciseIdentifier" : "s:6Apollo0A5StoreC",
+      "text" : "ApolloStore"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC17SubscriptionTokenV",
+      "text" : "SubscriptionToken"
     },
     {
       "kind" : "text",
@@ -285,11 +366,21 @@
       "type" : "text"
     },
     {
-      "code" : "ApolloStoreSubscriber",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStoreSubscriber",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : " provides a means to observe changes to items in the ApolloStore.",
+      "text" : " provides a means to observe changes to items in the ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
       "type" : "text"
     },
     {

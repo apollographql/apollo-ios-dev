@@ -79,7 +79,8 @@
         "doc:\/\/Apollo\/SQ",
         "doc:\/\/Apollo\/s5ErrorP",
         "doc:\/\/Apollo\/SH",
-        "doc:\/\/Apollo\/s8SendableP"
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -158,11 +159,12 @@
       "type" : "text"
     },
     {
-      "code" : "ApolloStore",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : " class acts as a local cache for normalized GraphQL results.",
+      "text" : " class manages access to a local cache for reading\/writing normalized GraphQL results.",
       "type" : "text"
     }
   ],
@@ -270,6 +272,11 @@
   "title" : "ApolloStore.Error.notWithinReadTransaction",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore\/error\/notwithinreadtransaction"
+},
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://Apollo/s5ErrorP": {
   "identifier" : "doc:\/\/Apollo\/s5ErrorP",

@@ -1,31 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Removes records with keys that match the specified pattern. This method will only",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "remove whole records, it does not perform cascading deletes. This means only the",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "records with matched keys will be removed, and not any references to them. Key",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "matching is case-insensitive.",
+      "text" : "Removes records with keys that match the specified pattern.",
       "type" : "text"
     }
   ],
@@ -44,7 +20,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo0A5StoreC20ReadWriteTransactionC13removeObjects8matchingySS_tKF",
+    "externalID" : "s:6Apollo0A5StoreC20ReadWriteTransactionC13removeObjects8matchingySS_tYaKF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -78,6 +54,14 @@
       {
         "kind" : "text",
         "text" : ") "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
       },
       {
         "kind" : "keyword",
@@ -149,6 +133,14 @@
             },
             {
               "kind" : "keyword",
+              "text" : "async"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
               "text" : "throws"
             }
           ]
@@ -186,7 +178,7 @@
         {
           "inlineContent" : [
             {
-              "text" : "If you attempt to pass a cache path for a single field, this method will do nothing",
+              "text" : "This method will only remove whole records, it does not perform cascading deletes. This means only the",
               "type" : "text"
             },
             {
@@ -194,11 +186,44 @@
               "type" : "text"
             },
             {
-              "text" : "since it won’t be able to locate a record to remove based on that path.",
+              "text" : "records with matched keys will be removed, but not any references to them.",
               "type" : "text"
             }
           ],
           "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Key matching is case-insensitive.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "If you attempt to pass a cache path for a single field, this method will do nothing",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "since it won’t be able to locate a record to remove based on that path.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "Note",
+          "style" : "note",
+          "type" : "aside"
         },
         {
           "content" : [
@@ -220,8 +245,8 @@
               "type" : "paragraph"
             }
           ],
-          "name" : "Note",
-          "style" : "note",
+          "name" : "Warning",
+          "style" : "warning",
           "type" : "aside"
         }
       ],
@@ -271,11 +296,12 @@
       "type" : "text"
     },
     {
-      "code" : "ApolloStore",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : " class acts as a local cache for normalized GraphQL results.",
+      "text" : " class manages access to a local cache for reading\/writing normalized GraphQL results.",
       "type" : "text"
     }
   ],
@@ -308,7 +334,19 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction": {
   "abstract" : [
-
+    {
+      "text" : "A read\/write transaction used to access an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : "’s cache data.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -340,31 +378,7 @@
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/removeObjects(matching:)": {
   "abstract" : [
     {
-      "text" : "Removes records with keys that match the specified pattern. This method will only",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "remove whole records, it does not perform cascading deletes. This means only the",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "records with matched keys will be removed, and not any references to them. Key",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "matching is case-insensitive.",
+      "text" : "Removes records with keys that match the specified pattern.",
       "type" : "text"
     }
   ],
@@ -401,6 +415,14 @@
     {
       "kind" : "text",
       "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",

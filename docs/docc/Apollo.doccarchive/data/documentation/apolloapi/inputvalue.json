@@ -138,7 +138,9 @@
         "doc:\/\/ApolloAPI\/s27ExpressibleByIntegerLiteralP",
         "doc:\/\/ApolloAPI\/s26ExpressibleByStringLiteralP",
         "doc:\/\/ApolloAPI\/s33ExpressibleByUnicodeScalarLiteralP",
-        "doc:\/\/ApolloAPI\/SH"
+        "doc:\/\/ApolloAPI\/SH",
+        "doc:\/\/ApolloAPI\/s8SendableP",
+        "doc:\/\/ApolloAPI\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -591,7 +593,7 @@
       "type" : "text"
     },
     {
-      "code" : "Int",
+      "code" : "Int32",
       "type" : "codeVoice"
     },
     {
@@ -809,6 +811,11 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selection\/field\/arguments"
 },
+"doc://ApolloAPI/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
 "doc://ApolloAPI/s25ExpressibleByArrayLiteralP": {
   "identifier" : "doc:\/\/ApolloAPI\/s25ExpressibleByArrayLiteralP",
   "title" : "Swift.ExpressibleByArrayLiteral",
@@ -852,6 +859,11 @@
 "doc://ApolloAPI/s8CopyableP": {
   "identifier" : "doc:\/\/ApolloAPI\/s8CopyableP",
   "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 },
 "http://spec.graphql.org/October2021/#sec-Input-Values": {

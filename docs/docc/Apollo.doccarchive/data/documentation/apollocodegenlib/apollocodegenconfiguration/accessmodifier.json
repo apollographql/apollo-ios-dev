@@ -86,7 +86,9 @@
         "doc:\/\/ApolloCodegenLib\/SE",
         "doc:\/\/ApolloCodegenLib\/SQ",
         "doc:\/\/ApolloCodegenLib\/SH",
-        "doc:\/\/ApolloCodegenLib\/SY"
+        "doc:\/\/ApolloCodegenLib\/SY",
+        "doc:\/\/ApolloCodegenLib\/s8SendableP",
+        "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -381,6 +383,16 @@
   "title" : "ApolloCodegenConfiguration.AccessModifier.public",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/accessmodifier\/public"
+},
+"doc://ApolloCodegenLib/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://ApolloCodegenLib/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

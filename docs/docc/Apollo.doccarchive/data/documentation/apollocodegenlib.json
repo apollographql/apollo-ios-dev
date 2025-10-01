@@ -82,7 +82,8 @@
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegen",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager"
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloFileManager",
+        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileManagerActor"
       ],
       "title" : "Classes"
     },
@@ -457,6 +458,37 @@
   "title" : "FileAttributes",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/fileattributes"
+},
+"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/FileManagerActor": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "actor"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "FileManagerActor"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/FileManagerActor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "FileManagerActor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "FileManagerActor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollocodegenlib\/filemanageractor"
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/FileManagerPathError": {
   "abstract" : [

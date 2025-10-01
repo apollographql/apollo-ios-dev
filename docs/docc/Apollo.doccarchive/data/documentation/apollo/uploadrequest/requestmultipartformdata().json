@@ -27,7 +27,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo13UploadRequestC24requestMultipartFormDataAA0efG0CyKF",
+    "externalID" : "s:6Apollo13UploadRequestV24requestMultipartFormDataAA0efG0CyKF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -261,7 +261,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",

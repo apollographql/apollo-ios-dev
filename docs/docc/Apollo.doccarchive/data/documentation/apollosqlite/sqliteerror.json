@@ -77,7 +77,8 @@
       "identifiers" : [
         "doc:\/\/ApolloSQLite\/s23CustomStringConvertibleP",
         "doc:\/\/ApolloSQLite\/s5ErrorP",
-        "doc:\/\/ApolloSQLite\/s8SendableP"
+        "doc:\/\/ApolloSQLite\/s8SendableP",
+        "doc:\/\/ApolloSQLite\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -505,6 +506,11 @@
   "title" : "SQLiteError.step(message:resultCode:)",
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/sqliteerror\/step(message:resultcode:)"
+},
+"doc://ApolloSQLite/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloSQLite\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://ApolloSQLite/s23CustomStringConvertibleP": {
   "identifier" : "doc:\/\/ApolloSQLite\/s23CustomStringConvertibleP",

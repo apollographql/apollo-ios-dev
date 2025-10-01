@@ -107,15 +107,16 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "An instance of ",
+                  "text" : "A ",
                   "type" : "text"
                 },
                 {
-                  "code" : "normalizedCache",
-                  "type" : "codeVoice"
+                  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache",
+                  "isActive" : true,
+                  "type" : "reference"
                 },
                 {
-                  "text" : " to use to cache results.",
+                  "text" : " used to store cached results.",
                   "type" : "text"
                 },
                 {
@@ -127,8 +128,9 @@
                   "type" : "text"
                 },
                 {
-                  "code" : "InMemoryNormalizedCache",
-                  "type" : "codeVoice"
+                  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InMemoryNormalizedCache",
+                  "isActive" : true,
+                  "type" : "reference"
                 },
                 {
                   "text" : ".",
@@ -186,11 +188,12 @@
       "type" : "text"
     },
     {
-      "code" : "ApolloStore",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : " class acts as a local cache for normalized GraphQL results.",
+      "text" : " class manages access to a local cache for reading\/writing normalized GraphQL results.",
       "type" : "text"
     }
   ],
@@ -261,6 +264,49 @@
   "title" : "init(cache:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apollostore\/init(cache:)"
+},
+"doc://Apollo/documentation/Apollo/InMemoryNormalizedCache": {
+  "abstract" : [
+    {
+      "text" : "An implementation of a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that stores cache data in application memory.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "class"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "InMemoryNormalizedCache"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InMemoryNormalizedCache",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "InMemoryNormalizedCache"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "InMemoryNormalizedCache",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/inmemorynormalizedcache"
 },
 "doc://Apollo/documentation/Apollo/NormalizedCache": {
   "abstract" : [

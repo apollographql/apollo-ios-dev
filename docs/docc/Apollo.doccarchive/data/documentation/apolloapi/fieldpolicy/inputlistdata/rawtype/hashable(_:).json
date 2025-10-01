@@ -15,7 +15,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:9ApolloAPI11FieldPolicyO13InputListDataV7RawTypeO8hashableyAGSays11AnyHashableVGcAGmF",
+    "externalID" : "s:9ApolloAPI11FieldPolicyO13InputListDataV7RawTypeO8hashableyAGSaySH_s8SendablepGcAGmF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -35,8 +35,8 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:s11AnyHashableV",
-        "text" : "AnyHashable"
+        "preciseIdentifier" : "s:9ApolloAPI9JSONValuea",
+        "text" : "JSONValue"
       },
       {
         "kind" : "text",
@@ -81,9 +81,10 @@
               "text" : "(["
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONValue",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:s11AnyHashableV",
-              "text" : "AnyHashable"
+              "preciseIdentifier" : "s:9ApolloAPI9JSONValuea",
+              "text" : "JSONValue"
             },
             {
               "kind" : "text",
@@ -304,8 +305,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s11AnyHashableV",
-      "text" : "AnyHashable"
+      "preciseIdentifier" : "s:9ApolloAPI9JSONValuea",
+      "text" : "JSONValue"
     },
     {
       "kind" : "text",
@@ -318,6 +319,79 @@
   "title" : "FieldPolicy.InputListData.RawType.hashable(_:)",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/fieldpolicy\/inputlistdata\/rawtype\/hashable(_:)"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/JSONObject": {
+  "abstract" : [
+    {
+      "text" : "Represents a JSON Dictionary",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "typealias"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "JSONObject"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONObject",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "JSONObject"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "JSONObject",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/jsonobject"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/JSONValue": {
+  "abstract" : [
+    {
+      "text" : "Represents a value in a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONObject",
+      "isActive" : true,
+      "type" : "reference"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "typealias"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "JSONValue"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONValue",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "JSONValue"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "JSONValue",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/jsonvalue"
 }
 }
 }

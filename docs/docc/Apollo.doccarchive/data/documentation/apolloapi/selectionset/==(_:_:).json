@@ -1,15 +1,31 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
+      "text" : "Checks for equality using a narrowly scoped algorithm that only compares fields in the underlying data",
       "type" : "text"
     },
     {
-      "code" : "Equatable.==(_:_:)",
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "that are relevant to the ",
+      "type" : "text"
+    },
+    {
+      "code" : "SelectionSet",
       "type" : "codeVoice"
     },
     {
-      "text" : ".",
+      "text" : ". This ensures that equality checks for a fragment do not",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "consider fields that are not included in the fragment, even if they are present in the data.",
       "type" : "text"
     }
   ],
@@ -279,7 +295,34 @@
 },
 "doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/==(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Checks for equality using a narrowly scoped algorithm that only compares fields in the underlying data",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "that are relevant to the ",
+      "type" : "text"
+    },
+    {
+      "code" : "SelectionSet",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ". This ensures that equality checks for a fragment do not",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "consider fields that are not included in the fragment, even if they are present in the data.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

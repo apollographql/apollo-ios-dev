@@ -1,4 +1,58 @@
 {
+  "abstract" : [
+    {
+      "text" : "Updates the data for a ",
+      "type" : "text"
+    },
+    {
+      "code" : "LocalCacheMutation",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " in the transaction’s underlying cache. This operation loads the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "records for the cache mutation’s data from the cache, validates it, and transforms it into the cache mutation’s",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "associated reponse model. The response model for the cache mutation is then passed to the ",
+      "type" : "text"
+    },
+    {
+      "code" : "body",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " block where it",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "may be mutated. Once the ",
+      "type" : "text"
+    },
+    {
+      "code" : "body",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " block completes, the final mutated data is written back to the cache.",
+      "type" : "text"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -14,7 +68,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo0A5StoreC20ReadWriteTransactionC6updateyyx_y4DataQzzKXEtK0A3API18LocalCacheMutationRzlF",
+    "externalID" : "s:6Apollo0A5StoreC20ReadWriteTransactionC6updateyyx_y4DataQzzKXEtYaK0A3API18LocalCacheMutationRzlF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -89,6 +143,14 @@
       {
         "kind" : "text",
         "text" : ") "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
       },
       {
         "kind" : "keyword",
@@ -224,6 +286,14 @@
             },
             {
               "kind" : "keyword",
+              "text" : "async"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
               "text" : "throws"
             },
             {
@@ -255,6 +325,47 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "LocalCacheMutation",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " to mutate data for in the cache.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "cacheMutation"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A block used to mutate the response data of the cache mutation.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "body"
+        }
+      ]
     }
   ],
   "schemaVersion" : {
@@ -300,11 +411,12 @@
       "type" : "text"
     },
     {
-      "code" : "ApolloStore",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : " class acts as a local cache for normalized GraphQL results.",
+      "text" : " class manages access to a local cache for reading\/writing normalized GraphQL results.",
       "type" : "text"
     }
   ],
@@ -337,7 +449,19 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction": {
   "abstract" : [
-
+    {
+      "text" : "A read\/write transaction used to access an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : "’s cache data.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -368,7 +492,58 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/update(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Updates the data for a ",
+      "type" : "text"
+    },
+    {
+      "code" : "LocalCacheMutation",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " in the transaction’s underlying cache. This operation loads the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "records for the cache mutation’s data from the cache, validates it, and transforms it into the cache mutation’s",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "associated reponse model. The response model for the cache mutation is then passed to the ",
+      "type" : "text"
+    },
+    {
+      "code" : "body",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " block where it",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "may be mutated. Once the ",
+      "type" : "text"
+    },
+    {
+      "code" : "body",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " block completes, the final mutated data is written back to the cache.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -444,6 +619,14 @@
     {
       "kind" : "text",
       "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",

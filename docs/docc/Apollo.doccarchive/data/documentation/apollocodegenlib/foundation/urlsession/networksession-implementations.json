@@ -183,7 +183,15 @@
     },
     {
       "kind" : "text",
-      "text" : ")?) -> "
+      "text" : ")?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
     },
     {
       "kind" : "typeIdentifier",

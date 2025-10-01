@@ -79,12 +79,21 @@
             },
             {
               "kind" : "text",
-              "text" : " = "
+              "text" : " = any "
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:s11AnyHashableV",
-              "text" : "AnyHashable"
+              "preciseIdentifier" : "s:SH",
+              "text" : "Hashable"
+            },
+            {
+              "kind" : "text",
+              "text" : " & "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
             }
           ]
         }
@@ -100,55 +109,68 @@
           "type" : "heading"
         },
         {
-          "inlineContent" : [
+          "content" : [
             {
-              "text" : "Making ",
-              "type" : "text"
-            },
-            {
-              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONValue",
-              "isActive" : true,
-              "type" : "reference"
-            },
-            {
-              "text" : " an ",
-              "type" : "text"
-            },
-            {
-              "code" : "AnyHashable",
-              "type" : "codeVoice"
-            },
-            {
-              "text" : " enables comparing ",
-              "type" : "text"
-            },
-            {
-              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONObject",
-              "isActive" : true,
-              "type" : "reference"
-            },
-            {
-              "text" : "s",
-              "type" : "text"
-            },
-            {
-              "text" : " ",
-              "type" : "text"
-            },
-            {
-              "text" : "in ",
-              "type" : "text"
-            },
-            {
-              "code" : "Equatable",
-              "type" : "codeVoice"
-            },
-            {
-              "text" : " conformances.",
-              "type" : "text"
+              "inlineContent" : [
+                {
+                  "text" : "A ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "JSONValue",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " must be a value type that is valid for JSON",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "serialization and must be both ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "Hashable",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " and ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "Sendable",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ". This typealias does not validate",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "that the value is valid JSON. It functions only as an indicator of the semantic intentions",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "of the underlying value.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
             }
           ],
-          "type" : "paragraph"
+          "name" : "Precondition",
+          "style" : "note",
+          "type" : "aside"
         }
       ],
       "kind" : "content"

@@ -87,7 +87,9 @@
         "doc:\/\/Apollo\/s23CustomStringConvertibleP",
         "doc:\/\/Apollo\/SQ",
         "doc:\/\/Apollo\/s30ExpressibleByDictionaryLiteralP",
-        "doc:\/\/Apollo\/SH"
+        "doc:\/\/Apollo\/SH",
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -835,6 +837,11 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/recordset\/subscript(_:)"
 },
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
 "doc://Apollo/s23CustomStringConvertibleP": {
   "identifier" : "doc:\/\/Apollo\/s23CustomStringConvertibleP",
   "title" : "Swift.CustomStringConvertible",
@@ -858,6 +865,11 @@
 "doc://Apollo/s8CopyableP": {
   "identifier" : "doc:\/\/Apollo\/s8CopyableP",
   "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }

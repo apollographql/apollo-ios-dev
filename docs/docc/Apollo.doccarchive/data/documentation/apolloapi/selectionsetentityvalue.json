@@ -65,6 +65,24 @@
             {
               "kind" : "identifier",
               "text" : "SelectionSetEntityValue"
+            },
+            {
+              "kind" : "text",
+              "text" : " : "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:SH",
+              "text" : "Hashable"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
             }
           ]
         }
@@ -73,6 +91,17 @@
     }
   ],
   "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/ApolloAPI\/SQ",
+        "doc:\/\/ApolloAPI\/SH",
+        "doc:\/\/ApolloAPI\/s8SendableP",
+        "doc:\/\/ApolloAPI\/s16SendableMetatypeP"
+      ],
+      "kind" : "relationships",
+      "title" : "Inherits From",
+      "type" : "inheritsFrom"
+    },
     {
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/MutableRootSelectionSet",
@@ -137,6 +166,16 @@
   ],
   "type" : "link",
   "url" : "\/documentation\/apollocodegenlib"
+},
+"doc://ApolloAPI/SH": {
+  "identifier" : "doc:\/\/ApolloAPI\/SH",
+  "title" : "Swift.Hashable",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/SQ": {
+  "identifier" : "doc:\/\/ApolloAPI\/SQ",
+  "title" : "Swift.Equatable",
+  "type" : "unresolvable"
 },
 "doc://ApolloAPI/documentation/ApolloAPI": {
   "abstract" : [
@@ -292,68 +331,19 @@
   "type" : "unresolvable"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Swift/Optional": {
-  "abstract" : [
-
-  ],
-  "conformance" : {
-    "availabilityPrefix" : [
-      {
-        "text" : "Available when",
-        "type" : "text"
-      }
-    ],
-    "conformancePrefix" : [
-      {
-        "text" : "Conforms when",
-        "type" : "text"
-      }
-    ],
-    "constraints" : [
-      {
-        "code" : "Wrapped",
-        "type" : "codeVoice"
-      },
-      {
-        "text" : " conforms to ",
-        "type" : "text"
-      },
-      {
-        "code" : "SelectionSetEntityValue",
-        "type" : "codeVoice"
-      },
-      {
-        "text" : ".",
-        "type" : "text"
-      }
-    ]
-  },
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "extension"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "preciseIdentifier" : "s:Sq",
-      "text" : "Optional"
-    }
-  ],
   "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Optional",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "Optional"
-    }
-  ],
-  "role" : "symbol",
   "title" : "Optional",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/swift\/optional"
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

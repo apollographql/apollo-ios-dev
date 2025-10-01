@@ -140,7 +140,9 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloPagination\/SQ",
-        "doc:\/\/ApolloPagination\/SH"
+        "doc:\/\/ApolloPagination\/SH",
+        "doc:\/\/ApolloPagination\/s8SendableP",
+        "doc:\/\/ApolloPagination\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -557,8 +559,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
     },
     {
       "kind" : "text",
@@ -567,15 +569,6 @@
     {
       "kind" : "typeIdentifier",
       "text" : "InitialQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
     },
     {
       "kind" : "text",
@@ -612,8 +605,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
     },
     {
       "kind" : "text",
@@ -622,15 +615,6 @@
     {
       "kind" : "typeIdentifier",
       "text" : "PaginatedQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
     },
     {
       "kind" : "text",
@@ -646,8 +630,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
     },
     {
       "kind" : "text",
@@ -656,15 +640,6 @@
     {
       "kind" : "typeIdentifier",
       "text" : "InitialQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
     },
     {
       "kind" : "text",
@@ -680,8 +655,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
     },
     {
       "kind" : "text",
@@ -690,15 +665,6 @@
     {
       "kind" : "typeIdentifier",
       "text" : "PaginatedQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
     },
     {
       "kind" : "text",
@@ -780,8 +746,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
     },
     {
       "kind" : "text",
@@ -790,15 +756,6 @@
     {
       "kind" : "typeIdentifier",
       "text" : "InitialQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
     },
     {
       "kind" : "text",
@@ -897,8 +854,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
     },
     {
       "kind" : "text",
@@ -907,15 +864,6 @@
     {
       "kind" : "typeIdentifier",
       "text" : "PaginatedQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
     },
     {
       "kind" : "text",
@@ -963,8 +911,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
     },
     {
       "kind" : "text",
@@ -973,15 +921,6 @@
     {
       "kind" : "typeIdentifier",
       "text" : "PaginatedQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
     },
     {
       "kind" : "text",
@@ -994,6 +933,16 @@
   "title" : "previousPages",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/paginationoutput\/previouspages"
+},
+"doc://ApolloPagination/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloPagination\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://ApolloPagination/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloPagination\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

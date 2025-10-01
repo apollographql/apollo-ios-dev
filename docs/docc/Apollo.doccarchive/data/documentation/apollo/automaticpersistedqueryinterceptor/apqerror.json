@@ -79,7 +79,8 @@
         "doc:\/\/Apollo\/10Foundation14LocalizedErrorP",
         "doc:\/\/Apollo\/SQ",
         "doc:\/\/Apollo\/s5ErrorP",
-        "doc:\/\/Apollo\/s8SendableP"
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -99,7 +100,6 @@
       "anchor" : "Enumeration-Cases",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/AutomaticPersistedQueryInterceptor\/APQError\/noParsedResponse",
         "doc:\/\/Apollo\/documentation\/Apollo\/AutomaticPersistedQueryInterceptor\/APQError\/persistedQueryNotFoundForPersistedOnlyQuery(operationName:)",
         "doc:\/\/Apollo\/documentation\/Apollo\/AutomaticPersistedQueryInterceptor\/APQError\/persistedQueryRetryFailed(operationName:)"
       ],
@@ -164,7 +164,19 @@
 },
 "doc://Apollo/documentation/Apollo/AutomaticPersistedQueryInterceptor": {
   "abstract" : [
-
+    {
+      "text" : "A ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLInterceptor",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that handles the functionality of automatic persisted queries (APQs).",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -295,31 +307,6 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/automaticpersistedqueryinterceptor\/apqerror\/errordescription"
 },
-"doc://Apollo/documentation/Apollo/AutomaticPersistedQueryInterceptor/APQError/noParsedResponse": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "case"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "noParsedResponse"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/AutomaticPersistedQueryInterceptor\/APQError\/noParsedResponse",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "AutomaticPersistedQueryInterceptor.APQError.noParsedResponse",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/automaticpersistedqueryinterceptor\/apqerror\/noparsedresponse"
-},
 "doc://Apollo/documentation/Apollo/AutomaticPersistedQueryInterceptor/APQError/persistedQueryNotFoundForPersistedOnlyQuery(operationName:)": {
   "abstract" : [
 
@@ -411,6 +398,76 @@
   "title" : "AutomaticPersistedQueryInterceptor.APQError.persistedQueryRetryFailed(operationName:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/automaticpersistedqueryinterceptor\/apqerror\/persistedqueryretryfailed(operationname:)"
+},
+"doc://Apollo/documentation/Apollo/GraphQLInterceptor": {
+  "abstract" : [
+    {
+      "text" : "A protocol for an interceptor in a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that can perform a unit of work that operates on a",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " and ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ParsedResult",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLInterceptor"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLInterceptor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLInterceptor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "GraphQLInterceptor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlinterceptor"
+},
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://Apollo/s5ErrorP": {
   "identifier" : "doc:\/\/Apollo\/s5ErrorP",

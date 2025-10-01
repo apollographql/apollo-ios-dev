@@ -1,4 +1,26 @@
 {
+  "abstract" : [
+    {
+      "text" : "Reads a ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLQuery",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " from the transaction’s underlying cache. This read operation loads the records for the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "query’s data from the cache, validates it, and transforms it into the query’s associated reponse model.",
+      "type" : "text"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -14,7 +36,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo0A5StoreC15ReadTransactionC4read5query4DataQzx_tK0A3API12GraphQLQueryRzlF",
+    "externalID" : "s:6Apollo0A5StoreC15ReadTransactionC4read5query4DataQzx_tYaK0A3API12GraphQLQueryRzlF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -55,6 +77,14 @@
       {
         "kind" : "text",
         "text" : ") "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
       },
       {
         "kind" : "keyword",
@@ -141,6 +171,14 @@
             },
             {
               "kind" : "keyword",
+              "text" : "async"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
               "text" : "throws"
             },
             {
@@ -189,6 +227,53 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "GraphQLQuery",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " to read from the cache.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "query"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "An instance of the query’s response model containing the loaded data.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -234,11 +319,12 @@
       "type" : "text"
     },
     {
-      "code" : "ApolloStore",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : " class acts as a local cache for normalized GraphQL results.",
+      "text" : " class manages access to a local cache for reading\/writing normalized GraphQL results.",
       "type" : "text"
     }
   ],
@@ -271,7 +357,19 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadTransaction": {
   "abstract" : [
-
+    {
+      "text" : "A read-only transaction used to access an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : "’s cache data.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -302,7 +400,26 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadTransaction/read(query:)": {
   "abstract" : [
-
+    {
+      "text" : "Reads a ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLQuery",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " from the transaction’s underlying cache. This read operation loads the records for the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "query’s data from the cache, validates it, and transforms it into the query’s associated reponse model.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -344,6 +461,14 @@
     {
       "kind" : "text",
       "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",

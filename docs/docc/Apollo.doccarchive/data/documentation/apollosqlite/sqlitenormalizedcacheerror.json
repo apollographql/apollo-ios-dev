@@ -76,7 +76,8 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloSQLite\/s5ErrorP",
-        "doc:\/\/ApolloSQLite\/s8SendableP"
+        "doc:\/\/ApolloSQLite\/s8SendableP",
+        "doc:\/\/ApolloSQLite\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -96,8 +97,7 @@
       "anchor" : "Enumeration-Cases",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError\/invalidRecordEncoding(record:)",
-        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError\/invalidRecordShape(object:)"
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError\/invalidRecordEncoding(record:)"
       ],
       "title" : "Enumeration Cases"
     },
@@ -255,50 +255,10 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/sqlitenormalizedcacheerror\/invalidrecordencoding(record:)"
 },
-"doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteNormalizedCacheError/invalidRecordShape(object:)": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "case"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "invalidRecordShape"
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "object"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "Any"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/SQLiteNormalizedCacheError\/invalidRecordShape(object:)",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "SQLiteNormalizedCacheError.invalidRecordShape(object:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apollosqlite\/sqlitenormalizedcacheerror\/invalidrecordshape(object:)"
+"doc://ApolloSQLite/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloSQLite\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://ApolloSQLite/s5ErrorP": {
   "identifier" : "doc:\/\/ApolloSQLite\/s5ErrorP",

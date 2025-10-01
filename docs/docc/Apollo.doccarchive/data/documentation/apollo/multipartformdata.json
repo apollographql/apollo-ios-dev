@@ -111,7 +111,6 @@
       "anchor" : "Initializers",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/init()",
         "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/init(boundary:)"
       ],
       "title" : "Initializers"
@@ -604,38 +603,6 @@
   "title" : "encode()",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/multipartformdata\/encode()"
-},
-"doc://Apollo/documentation/Apollo/MultipartFormData/init()": {
-  "abstract" : [
-    {
-      "text" : "Convenience initializer which uses a pre-defined boundary",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "convenience"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "init"
-    },
-    {
-      "kind" : "text",
-      "text" : "()"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartFormData\/init()",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "init()",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/multipartformdata\/init()"
 },
 "doc://Apollo/documentation/Apollo/MultipartFormData/init(boundary:)": {
   "abstract" : [

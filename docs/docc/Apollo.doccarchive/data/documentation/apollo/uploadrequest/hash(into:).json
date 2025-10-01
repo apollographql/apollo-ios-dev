@@ -1,18 +1,4 @@
 {
-  "abstract" : [
-    {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Hashable.hash(into:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -27,7 +13,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo13UploadRequestC4hash4intoys6HasherVz_tF",
+    "externalID" : "s:6Apollo13UploadRequestV4hash4intoys6HasherVz_tF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -92,14 +78,6 @@
             "macOS"
           ],
           "tokens" : [
-            {
-              "kind" : "keyword",
-              "text" : "override"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
             {
               "kind" : "keyword",
               "text" : "func"
@@ -201,7 +179,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",

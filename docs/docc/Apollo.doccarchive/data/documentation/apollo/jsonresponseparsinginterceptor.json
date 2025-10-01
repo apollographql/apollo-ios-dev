@@ -1,23 +1,25 @@
 {
   "abstract" : [
     {
-      "text" : "An interceptor which parses JSON response data into a ",
+      "text" : "A ",
       "type" : "text"
     },
     {
-      "code" : "GraphQLResult",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponseParsingInterceptor",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : " and attaches it to the ",
+      "text" : " which uses a ",
       "type" : "text"
     },
     {
-      "code" : "HTTPResponse",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParser",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : ".",
+      "text" : " to parse JSON response data.",
       "type" : "text"
     }
   ],
@@ -34,11 +36,11 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo30JSONResponseParsingInterceptorV",
+    "externalID" : "s:6Apollo30JSONResponseParsingInterceptorC",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "struct"
+        "text" : "actor"
       },
       {
         "kind" : "text",
@@ -61,8 +63,8 @@
       }
     ],
     "role" : "symbol",
-    "roleHeading" : "Structure",
-    "symbolKind" : "struct",
+    "roleHeading" : "Class",
+    "symbolKind" : "class",
     "title" : "JSONResponseParsingInterceptor"
   },
   "primaryContentSections" : [
@@ -78,7 +80,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "struct"
+              "text" : "actor"
             },
             {
               "kind" : "text",
@@ -97,7 +99,10 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloInterceptor"
+        "doc:\/\/Apollo\/documentation\/Apollo\/ResponseParsingInterceptor",
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP",
+        "doc:\/\/Apollo\/ScA"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -122,28 +127,20 @@
       "title" : "Initializers"
     },
     {
-      "anchor" : "Instance-Properties",
-      "generated" : true,
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParsingInterceptor\/id"
-      ],
-      "title" : "Instance Properties"
-    },
-    {
       "anchor" : "Instance-Methods",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParsingInterceptor\/interceptAsync(chain:request:response:completion:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParsingInterceptor\/parse(response:for:includeCacheRecords:)"
       ],
       "title" : "Instance Methods"
     },
     {
-      "anchor" : "Enumerations",
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParsingInterceptor\/JSONResponseParsingError"
+        "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParsingInterceptor\/Actor-Implementations"
       ],
-      "title" : "Enumerations"
+      "title" : "Default Implementations"
     }
   ],
   "variants" : [
@@ -160,6 +157,11 @@
   ]
 , 
 "references": {
+"doc://Apollo/ScA": {
+  "identifier" : "doc:\/\/Apollo\/ScA",
+  "title" : "_Concurrency.Actor",
+  "type" : "unresolvable"
+},
 "doc://Apollo/documentation/Apollo": {
   "abstract" : [
     {
@@ -174,10 +176,18 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
-"doc://Apollo/documentation/Apollo/ApolloInterceptor": {
+"doc://Apollo/documentation/Apollo/GraphQLRequest": {
   "abstract" : [
     {
-      "text" : "A protocol to set up a chainable unit of networking work.",
+      "text" : "A protocol for a type that represents a request to fetch a ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLOperation",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
       "type" : "text"
     }
   ],
@@ -192,38 +202,52 @@
     },
     {
       "kind" : "identifier",
-      "text" : "ApolloInterceptor"
+      "text" : "GraphQLRequest"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloInterceptor",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "ApolloInterceptor"
+      "text" : "GraphQLRequest"
     }
   ],
   "role" : "symbol",
-  "title" : "ApolloInterceptor",
+  "title" : "GraphQLRequest",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apollointerceptor"
+  "url" : "\/documentation\/apollo\/graphqlrequest"
 },
-"doc://Apollo/documentation/Apollo/JSONResponseParsingInterceptor": {
+"doc://Apollo/documentation/Apollo/JSONResponseParser": {
   "abstract" : [
     {
-      "text" : "An interceptor which parses JSON response data into a ",
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParser",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " parses JSON format GraphQL responses from raw HTTP responses into ",
       "type" : "text"
     },
     {
-      "code" : "GraphQLResult",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ParsedResult",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : " and attaches it to the ",
+      "text" : "s. This",
       "type" : "text"
     },
     {
-      "code" : "HTTPResponse",
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "parser performs GraphQL execution over the response data using a ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLExecutor",
       "type" : "codeVoice"
     },
     {
@@ -235,6 +259,58 @@
     {
       "kind" : "keyword",
       "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "JSONResponseParser"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParser",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "JSONResponseParser"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "JSONResponseParser",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/jsonresponseparser"
+},
+"doc://Apollo/documentation/Apollo/JSONResponseParsingInterceptor": {
+  "abstract" : [
+    {
+      "text" : "A ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponseParsingInterceptor",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " which uses a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParser",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " to parse JSON response data.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "actor"
     },
     {
       "kind" : "text",
@@ -258,70 +334,16 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/jsonresponseparsinginterceptor"
 },
-"doc://Apollo/documentation/Apollo/JSONResponseParsingInterceptor/JSONResponseParsingError": {
+"doc://Apollo/documentation/Apollo/JSONResponseParsingInterceptor/Actor-Implementations": {
   "abstract" : [
 
   ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "enum"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "JSONResponseParsingError"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParsingInterceptor\/JSONResponseParsingError",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "JSONResponseParsingError"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "JSONResponseParsingInterceptor.JSONResponseParsingError",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParsingInterceptor\/Actor-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "Actor Implementations",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/jsonresponseparsinginterceptor\/jsonresponseparsingerror"
-},
-"doc://Apollo/documentation/Apollo/JSONResponseParsingInterceptor/id": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "id"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParsingInterceptor\/id",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "id",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/jsonresponseparsinginterceptor\/id"
+  "url" : "\/documentation\/apollo\/jsonresponseparsinginterceptor\/actor-implementations"
 },
 "doc://Apollo/documentation/Apollo/JSONResponseParsingInterceptor/init()": {
   "abstract" : [
@@ -344,7 +366,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/jsonresponseparsinginterceptor\/init()"
 },
-"doc://Apollo/documentation/Apollo/JSONResponseParsingInterceptor/interceptAsync(chain:request:response:completion:)": {
+"doc://Apollo/documentation/Apollo/JSONResponseParsingInterceptor/parse(response:for:includeCacheRecords:)": {
   "abstract" : [
 
   ],
@@ -359,7 +381,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "interceptAsync"
+      "text" : "parse"
     },
     {
       "kind" : "text",
@@ -367,53 +389,11 @@
     },
     {
       "kind" : "genericParameter",
-      "text" : "Operation"
+      "text" : "Request"
     },
     {
       "kind" : "text",
       "text" : ">("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "chain"
-    },
-    {
-      "kind" : "text",
-      "text" : ": any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo12RequestChainP",
-      "text" : "RequestChain"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "request"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11HTTPRequestC",
-      "text" : "HTTPRequest"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, "
     },
     {
       "kind" : "externalParam",
@@ -424,34 +404,75 @@
       "text" : ": "
     },
     {
+      "kind" : "keyword",
+      "text" : "consuming"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo12HTTPResponseC",
+      "preciseIdentifier" : "s:6Apollo12HTTPResponseV",
       "text" : "HTTPResponse"
     },
     {
       "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">?, "
+      "text" : ", "
     },
     {
       "kind" : "externalParam",
-      "text" : "completion"
+      "text" : "for"
     },
     {
       "kind" : "text",
-      "text" : ": ("
+      "text" : ": "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s6ResultO",
-      "text" : "Result"
+      "text" : "Request"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "includeCacheRecords"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo23InterceptorResultStreama",
+      "text" : "InterceptorResultStream"
     },
     {
       "kind" : "text",
@@ -459,55 +480,188 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "text" : "Request"
     },
     {
       "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s5ErrorP",
-      "text" : "Error"
-    },
-    {
-      "kind" : "text",
-      "text" : ">) -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s4Voida",
-      "text" : "Void"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
+      "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParsingInterceptor\/interceptAsync(chain:request:response:completion:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParsingInterceptor\/parse(response:for:includeCacheRecords:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "interceptAsync(chain:request:response:completion:)",
+  "title" : "parse(response:for:includeCacheRecords:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/jsonresponseparsinginterceptor\/interceptasync(chain:request:response:completion:)"
+  "url" : "\/documentation\/apollo\/jsonresponseparsinginterceptor\/parse(response:for:includecacherecords:)"
+},
+"doc://Apollo/documentation/Apollo/ParsedResult": {
+  "abstract" : [
+    {
+      "text" : "A result parsed from GraphQL specification compliant response data.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ParsedResult"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ParsedResult",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ParsedResult"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ParsedResult",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/parsedresult"
+},
+"doc://Apollo/documentation/Apollo/RequestChain": {
+  "abstract" : [
+    {
+      "text" : "Manages a chain of steps taken to execute a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ". ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " enables customization of each step",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "of a request by injection of ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Interceptors",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "RequestChain"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "RequestChain"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "RequestChain",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestchain"
+},
+"doc://Apollo/documentation/Apollo/ResponseParsingInterceptor": {
+  "abstract" : [
+    {
+      "text" : "A protocol for an interceptor in a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that handles the parsing of response data for a",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ResponseParsingInterceptor"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponseParsingInterceptor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ResponseParsingInterceptor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ResponseParsingInterceptor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/responseparsinginterceptor"
+},
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

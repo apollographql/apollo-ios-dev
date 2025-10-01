@@ -19,7 +19,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloPagination0B6OutputV11initialPage0A013GraphQLResultVy4DataQzGSgvp",
+    "externalID" : "s:16ApolloPagination0B6OutputV11initialPage0A015GraphQLResponseVyxGSgvp",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -39,8 +39,8 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-        "text" : "GraphQLResult"
+        "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+        "text" : "GraphQLResponse"
       },
       {
         "kind" : "text",
@@ -49,15 +49,6 @@
       {
         "kind" : "typeIdentifier",
         "text" : "InitialQuery"
-      },
-      {
-        "kind" : "text",
-        "text" : "."
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-        "text" : "Data"
       },
       {
         "kind" : "text",
@@ -103,8 +94,8 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-              "text" : "GraphQLResult"
+              "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+              "text" : "GraphQLResponse"
             },
             {
               "kind" : "text",
@@ -113,15 +104,6 @@
             {
               "kind" : "typeIdentifier",
               "text" : "InitialQuery"
-            },
-            {
-              "kind" : "text",
-              "text" : "."
-            },
-            {
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-              "text" : "Data"
             },
             {
               "kind" : "text",
@@ -226,8 +208,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
     },
     {
       "kind" : "text",
@@ -236,15 +218,6 @@
     {
       "kind" : "typeIdentifier",
       "text" : "InitialQuery"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
     },
     {
       "kind" : "text",

@@ -1,7 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "A network transport which can also handle uploads of files.",
+      "text" : "A protocol for a type that is responsible for sending GraphQL file upload operations to a server.",
       "type" : "text"
     }
   ],
@@ -71,35 +71,64 @@
             {
               "kind" : "identifier",
               "text" : "UploadingNetworkTransport"
-            },
-            {
-              "kind" : "text",
-              "text" : " : "
-            },
-            {
-              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport",
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo16NetworkTransportP",
-              "text" : "NetworkTransport"
             }
           ]
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "overview",
+          "level" : 2,
+          "text" : "Overview",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "To support query and mutation operations without file uploads, an ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadingNetworkTransport",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " should also",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "implement the ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " protocol.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport"
-      ],
-      "kind" : "relationships",
-      "title" : "Inherits From",
-      "type" : "inheritsFrom"
-    },
-    {
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport",
+        "doc:\/\/Apollo\/documentation\/Apollo\/SplitNetworkTransport"
       ],
       "kind" : "relationships",
       "title" : "Conforming Types",
@@ -119,7 +148,7 @@
       "anchor" : "Instance-Methods",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/UploadingNetworkTransport\/upload(operation:files:context:callbackQueue:completionHandler:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/UploadingNetworkTransport\/upload(operation:files:requestConfiguration:)"
       ],
       "title" : "Instance Methods"
     }
@@ -155,7 +184,7 @@
 "doc://Apollo/documentation/Apollo/NetworkTransport": {
   "abstract" : [
     {
-      "text" : "A network transport is responsible for sending GraphQL operations to a server.",
+      "text" : "A protocol for a type that is responsible for sending GraphQL query and mutation operations to a server.",
       "type" : "text"
     }
   ],
@@ -244,10 +273,180 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestchainnetworktransport"
 },
+"doc://Apollo/documentation/Apollo/SplitNetworkTransport": {
+  "abstract" : [
+    {
+      "text" : "A network transport that sends allows you to use different ",
+      "type" : "text"
+    },
+    {
+      "code" : "NetworkTransport",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " types for each operation type.",
+      "type" : "text"
+    }
+  ],
+  "conformance" : {
+    "availabilityPrefix" : [
+      {
+        "text" : "Available when",
+        "type" : "text"
+      }
+    ],
+    "conformancePrefix" : [
+      {
+        "text" : "Conforms when",
+        "type" : "text"
+      }
+    ],
+    "constraints" : [
+      {
+        "code" : "QueryTransport",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "NetworkTransport",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ", ",
+        "type" : "text"
+      },
+      {
+        "code" : "MutationTransport",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "NetworkTransport",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ", ",
+        "type" : "text"
+      },
+      {
+        "code" : "SubscriptionTransport",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "Copyable",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ", ",
+        "type" : "text"
+      },
+      {
+        "code" : "SubscriptionTransport",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "Escapable",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ", ",
+        "type" : "text"
+      },
+      {
+        "code" : "SubscriptionTransport",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "Sendable",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ", ",
+        "type" : "text"
+      },
+      {
+        "code" : "UploadTransport",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "UploadingNetworkTransport",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ", and ",
+        "type" : "text"
+      },
+      {
+        "code" : "UploadTransport",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "Sendable",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ".",
+        "type" : "text"
+      }
+    ]
+  },
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "class"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "SplitNetworkTransport"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/SplitNetworkTransport",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "SplitNetworkTransport"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "SplitNetworkTransport",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/splitnetworktransport"
+},
 "doc://Apollo/documentation/Apollo/UploadingNetworkTransport": {
   "abstract" : [
     {
-      "text" : "A network transport which can also handle uploads of files.",
+      "text" : "A protocol for a type that is responsible for sending GraphQL file upload operations to a server.",
       "type" : "text"
     }
   ],
@@ -278,10 +477,10 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/uploadingnetworktransport"
 },
-"doc://Apollo/documentation/Apollo/UploadingNetworkTransport/upload(operation:files:context:callbackQueue:completionHandler:)": {
+"doc://Apollo/documentation/Apollo/UploadingNetworkTransport/upload(operation:files:requestConfiguration:)": {
   "abstract" : [
     {
-      "text" : "Uploads the given files with the given operation.",
+      "text" : "Sends a GraphQL operation to a server and uploads the given files.",
       "type" : "text"
     }
   ],
@@ -345,24 +544,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "context"
-    },
-    {
-      "kind" : "text",
-      "text" : ": (any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo14RequestContextP",
-      "text" : "RequestContext"
-    },
-    {
-      "kind" : "text",
-      "text" : ")?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "callbackQueue"
+      "text" : "requestConfiguration"
     },
     {
       "kind" : "text",
@@ -370,25 +552,25 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
-      "text" : "DispatchQueue"
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
     },
     {
       "kind" : "text",
-      "text" : ", "
+      "text" : ") "
     },
     {
-      "kind" : "externalParam",
-      "text" : "completionHandler"
+      "kind" : "keyword",
+      "text" : "throws"
     },
     {
       "kind" : "text",
-      "text" : ": ("
+      "text" : " -> "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s6ResultO",
-      "text" : "Result"
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
     },
     {
       "kind" : "text",
@@ -396,8 +578,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
     },
     {
       "kind" : "text",
@@ -406,15 +588,6 @@
     {
       "kind" : "typeIdentifier",
       "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
     },
     {
       "kind" : "text",
@@ -427,30 +600,16 @@
     },
     {
       "kind" : "text",
-      "text" : ">) -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s4Voida",
-      "text" : "Void"
-    },
-    {
-      "kind" : "text",
-      "text" : ") -> any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11CancellableP",
-      "text" : "Cancellable"
+      "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadingNetworkTransport\/upload(operation:files:context:callbackQueue:completionHandler:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/UploadingNetworkTransport\/upload(operation:files:requestConfiguration:)",
   "kind" : "symbol",
   "required" : true,
   "role" : "symbol",
-  "title" : "upload(operation:files:context:callbackQueue:completionHandler:)",
+  "title" : "upload(operation:files:requestConfiguration:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/uploadingnetworktransport\/upload(operation:files:context:callbackqueue:completionhandler:)"
+  "url" : "\/documentation\/apollo\/uploadingnetworktransport\/upload(operation:files:requestconfiguration:)"
 }
 }
 }

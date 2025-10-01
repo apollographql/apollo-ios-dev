@@ -44,6 +44,13 @@
         "text" : "Cancellable"
       }
     ],
+    "platforms" : [
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "unavailable" : false
+      }
+    ],
     "role" : "symbol",
     "roleHeading" : "Protocol",
     "symbolKind" : "protocol",
@@ -74,7 +81,12 @@
             },
             {
               "kind" : "text",
-              "text" : " : AnyObject"
+              "text" : " : "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
             }
           ]
         }
@@ -85,19 +97,16 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain"
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
-      "title" : "Inherited By",
-      "type" : "inheritedBy"
+      "title" : "Inherits From",
+      "type" : "inheritsFrom"
     },
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/EmptyCancellable",
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher",
-        "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorRequestChain",
-        "doc:\/\/Apollo\/documentation\/Apollo\/NetworkFetchInterceptor",
-        "doc:\/\/Apollo\/documentation\/Apollo\/Foundation\/URLSessionTask"
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher"
       ],
       "kind" : "relationships",
       "title" : "Conforming Types",
@@ -157,6 +166,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -191,6 +201,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -217,53 +228,6 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/cancellable\/cancel()"
 },
-"doc://Apollo/documentation/Apollo/EmptyCancellable": {
-  "abstract" : [
-    {
-      "text" : "A class to return when we need to bail out of something which still needs to return ",
-      "type" : "text"
-    },
-    {
-      "code" : "Cancellable",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "class"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "EmptyCancellable"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/EmptyCancellable",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "EmptyCancellable"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "EmptyCancellable",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/emptycancellable"
-},
-"doc://Apollo/documentation/Apollo/Foundation/URLSessionTask": {
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Foundation\/URLSessionTask",
-  "title" : "URLSessionTask",
-  "type" : "unresolvable"
-},
 "doc://Apollo/documentation/Apollo/GraphQLQueryWatcher": {
   "abstract" : [
     {
@@ -271,8 +235,9 @@
       "type" : "text"
     },
     {
-      "code" : "GraphQLQueryWatcher",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLQueryWatcher",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
       "text" : " is responsible for watching the store, and calling the result handler with a new result",
@@ -283,30 +248,46 @@
       "type" : "text"
     },
     {
-      "text" : "whenever any of the data the previous result depends on changes. If your query shares response objects with other",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "operations you should read about normalizing objects by cache key in our documentation. Normalized objects will",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "text" : "update all query watchers that had received that object before.",
+      "text" : "whenever any of query’s data changes.",
       "type" : "text"
     }
   ],
+  "conformance" : {
+    "availabilityPrefix" : [
+      {
+        "text" : "Available when",
+        "type" : "text"
+      }
+    ],
+    "conformancePrefix" : [
+      {
+        "text" : "Conforms when",
+        "type" : "text"
+      }
+    ],
+    "constraints" : [
+      {
+        "code" : "Query",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " conforms to ",
+        "type" : "text"
+      },
+      {
+        "code" : "GraphQLQuery",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ".",
+        "type" : "text"
+      }
+    ]
+  },
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "actor"
     },
     {
       "kind" : "text",
@@ -330,104 +311,15 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlquerywatcher"
 },
-"doc://Apollo/documentation/Apollo/InterceptorRequestChain": {
-  "abstract" : [
-    {
-      "text" : "A chain that allows a single network request to be created and executed.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "class"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "InterceptorRequestChain"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorRequestChain",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "InterceptorRequestChain"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "InterceptorRequestChain",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/interceptorrequestchain"
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
-"doc://Apollo/documentation/Apollo/NetworkFetchInterceptor": {
-  "abstract" : [
-    {
-      "text" : "An interceptor which actually fetches data from the network.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "class"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "NetworkFetchInterceptor"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NetworkFetchInterceptor",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "NetworkFetchInterceptor"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "NetworkFetchInterceptor",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/networkfetchinterceptor"
-},
-"doc://Apollo/documentation/Apollo/RequestChain": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "protocol"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "RequestChain"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "RequestChain"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "RequestChain",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchain"
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

@@ -1,15 +1,31 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
+      "text" : "Creates a hash using a narrowly scoped algorithm that only combines fields in the underlying data",
       "type" : "text"
     },
     {
-      "code" : "Hashable.hash(into:)",
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "that are relevant to the ",
+      "type" : "text"
+    },
+    {
+      "code" : "SelectionSet",
       "type" : "codeVoice"
     },
     {
-      "text" : ".",
+      "text" : ". This ensures that hashes for a fragment do not",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "consider fields that are not included in the fragment, even if they are present in the data.",
       "type" : "text"
     }
   ],
@@ -255,7 +271,34 @@
 },
 "doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/hash(into:)": {
   "abstract" : [
-
+    {
+      "text" : "Creates a hash using a narrowly scoped algorithm that only combines fields in the underlying data",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "that are relevant to the ",
+      "type" : "text"
+    },
+    {
+      "code" : "SelectionSet",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ". This ensures that hashes for a fragment do not",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "consider fields that are not included in the fragment, even if they are present in the data.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

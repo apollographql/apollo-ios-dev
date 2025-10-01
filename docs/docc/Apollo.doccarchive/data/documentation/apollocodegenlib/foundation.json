@@ -12,7 +12,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:m:s:e:s:10Foundation3URLV16ApolloCodegenLibE011isDirectoryB0Sbvp",
+    "externalID" : "s:m:s:e:c:objc(cs)NSFileManagers:s8SendableP",
     "modules" : [
       {
         "name" : "ApolloCodegenLib"

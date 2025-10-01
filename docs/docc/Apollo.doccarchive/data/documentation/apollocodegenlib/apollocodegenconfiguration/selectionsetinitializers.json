@@ -168,7 +168,9 @@
         "doc:\/\/ApolloCodegenLib\/Se",
         "doc:\/\/ApolloCodegenLib\/SE",
         "doc:\/\/ApolloCodegenLib\/SQ",
-        "doc:\/\/ApolloCodegenLib\/s25ExpressibleByArrayLiteralP"
+        "doc:\/\/ApolloCodegenLib\/s25ExpressibleByArrayLiteralP",
+        "doc:\/\/ApolloCodegenLib\/s8SendableP",
+        "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -205,7 +207,6 @@
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SelectionSetInitializers\/all",
-        "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SelectionSetInitializers\/localCacheMutations",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SelectionSetInitializers\/namedFragments",
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SelectionSetInitializers\/operations"
       ],
@@ -641,61 +642,6 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/selectionsetinitializers\/insert(_:)"
 },
-"doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/SelectionSetInitializers/localCacheMutations": {
-  "abstract" : [
-    {
-      "text" : "Option to generate initializers for all local cache mutations.",
-      "type" : "text"
-    }
-  ],
-  "deprecated" : true,
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "let"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "localCacheMutations"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:16ApolloCodegenLib0aB13ConfigurationV",
-      "text" : "ApolloCodegenConfiguration"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:16ApolloCodegenLib0aB13ConfigurationV24SelectionSetInitializersV",
-      "text" : "SelectionSetInitializers"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/ApolloCodegenConfiguration\/SelectionSetInitializers\/localCacheMutations",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "localCacheMutations",
-  "type" : "topic",
-  "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/selectionsetinitializers\/localcachemutations"
-},
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/SelectionSetInitializers/namedFragments": {
   "abstract" : [
     {
@@ -883,9 +829,19 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/selectionsetinitializers\/operations"
 },
+"doc://ApolloCodegenLib/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
 "doc://ApolloCodegenLib/s25ExpressibleByArrayLiteralP": {
   "identifier" : "doc:\/\/ApolloCodegenLib\/s25ExpressibleByArrayLiteralP",
   "title" : "Swift.ExpressibleByArrayLiteral",
+  "type" : "unresolvable"
+},
+"doc://ApolloCodegenLib/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }

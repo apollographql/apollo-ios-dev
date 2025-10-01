@@ -13,7 +13,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo13UploadRequestC5filesSayAA11GraphQLFileVGvp",
+    "externalID" : "s:6Apollo13UploadRequestV5filesSayAA11GraphQLFileVGvp",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -174,7 +174,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",

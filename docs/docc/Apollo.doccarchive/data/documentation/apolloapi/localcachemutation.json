@@ -68,12 +68,21 @@
             },
             {
               "kind" : "text",
-              "text" : " : AnyObject, "
+              "text" : " : "
             },
             {
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:SH",
               "text" : "Hashable"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
             }
           ]
         }
@@ -85,7 +94,9 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloAPI\/SQ",
-        "doc:\/\/ApolloAPI\/SH"
+        "doc:\/\/ApolloAPI\/SH",
+        "doc:\/\/ApolloAPI\/s8SendableP",
+        "doc:\/\/ApolloAPI\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Inherits From",
@@ -333,6 +344,16 @@
   "title" : "operationType",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/localcachemutation\/operationtype"
+},
+"doc://ApolloAPI/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

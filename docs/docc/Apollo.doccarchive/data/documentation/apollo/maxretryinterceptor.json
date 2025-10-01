@@ -1,15 +1,16 @@
 {
   "abstract" : [
     {
-      "text" : "An interceptor to enforce a maximum number of retries of any ",
+      "text" : "A ",
       "type" : "text"
     },
     {
-      "code" : "HTTPRequest",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLInterceptor",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : " with optional exponential backoff support",
+      "text" : " that enforces a maximum number of retries for a request",
       "type" : "text"
     }
   ],
@@ -30,7 +31,7 @@
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "class"
+        "text" : "actor"
       },
       {
         "kind" : "text",
@@ -70,7 +71,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "class"
+              "text" : "actor"
             },
             {
               "kind" : "text",
@@ -89,7 +90,10 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloInterceptor"
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLInterceptor",
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP",
+        "doc:\/\/Apollo\/ScA"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -109,7 +113,8 @@
       "anchor" : "Structures",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration"
+        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Configuration",
+        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/MaxRetriesError"
       ],
       "title" : "Structures"
     },
@@ -123,28 +128,20 @@
       "title" : "Initializers"
     },
     {
-      "anchor" : "Instance-Properties",
-      "generated" : true,
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/id"
-      ],
-      "title" : "Instance Properties"
-    },
-    {
       "anchor" : "Instance-Methods",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/interceptAsync(chain:request:response:completion:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/intercept(request:next:)"
       ],
       "title" : "Instance Methods"
     },
     {
-      "anchor" : "Enumerations",
+      "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/RetryError"
+        "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Actor-Implementations"
       ],
-      "title" : "Enumerations"
+      "title" : "Default Implementations"
     }
   ],
   "variants" : [
@@ -161,6 +158,11 @@
   ]
 , 
 "references": {
+"doc://Apollo/ScA": {
+  "identifier" : "doc:\/\/Apollo\/ScA",
+  "title" : "_Concurrency.Actor",
+  "type" : "unresolvable"
+},
 "doc://Apollo/documentation/Apollo": {
   "abstract" : [
     {
@@ -175,10 +177,41 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
-"doc://Apollo/documentation/Apollo/ApolloInterceptor": {
+"doc://Apollo/documentation/Apollo/GraphQLInterceptor": {
   "abstract" : [
     {
-      "text" : "A protocol to set up a chainable unit of networking work.",
+      "text" : "A protocol for an interceptor in a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that can perform a unit of work that operates on a",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " and ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ParsedResult",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
       "type" : "text"
     }
   ],
@@ -193,41 +226,84 @@
     },
     {
       "kind" : "identifier",
-      "text" : "ApolloInterceptor"
+      "text" : "GraphQLInterceptor"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloInterceptor",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLInterceptor",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "ApolloInterceptor"
+      "text" : "GraphQLInterceptor"
     }
   ],
   "role" : "symbol",
-  "title" : "ApolloInterceptor",
+  "title" : "GraphQLInterceptor",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/apollointerceptor"
+  "url" : "\/documentation\/apollo\/graphqlinterceptor"
 },
-"doc://Apollo/documentation/Apollo/MaxRetryInterceptor": {
+"doc://Apollo/documentation/Apollo/GraphQLRequest": {
   "abstract" : [
     {
-      "text" : "An interceptor to enforce a maximum number of retries of any ",
+      "text" : "A protocol for a type that represents a request to fetch a ",
       "type" : "text"
     },
     {
-      "code" : "HTTPRequest",
+      "code" : "GraphQLOperation",
       "type" : "codeVoice"
     },
     {
-      "text" : " with optional exponential backoff support",
+      "text" : ".",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLRequest"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLRequest"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "GraphQLRequest",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlrequest"
+},
+"doc://Apollo/documentation/Apollo/MaxRetryInterceptor": {
+  "abstract" : [
+    {
+      "text" : "A ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLInterceptor",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that enforces a maximum number of retries for a request",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "actor"
     },
     {
       "kind" : "text",
@@ -250,6 +326,17 @@
   "title" : "MaxRetryInterceptor",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/maxretryinterceptor"
+},
+"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/Actor-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/Actor-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "Actor Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/maxretryinterceptor\/actor-implementations"
 },
 "doc://Apollo/documentation/Apollo/MaxRetryInterceptor/Configuration": {
   "abstract" : [
@@ -285,14 +372,14 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/maxretryinterceptor\/configuration"
 },
-"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/RetryError": {
+"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/MaxRetriesError": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "enum"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -300,55 +387,21 @@
     },
     {
       "kind" : "identifier",
-      "text" : "RetryError"
+      "text" : "MaxRetriesError"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/RetryError",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/MaxRetriesError",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "RetryError"
+      "text" : "MaxRetriesError"
     }
   ],
   "role" : "symbol",
-  "title" : "MaxRetryInterceptor.RetryError",
+  "title" : "MaxRetryInterceptor.MaxRetriesError",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/maxretryinterceptor\/retryerror"
-},
-"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/id": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "id"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/id",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "id",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/maxretryinterceptor\/id"
+  "url" : "\/documentation\/apollo\/maxretryinterceptor\/maxretrieserror"
 },
 "doc://Apollo/documentation/Apollo/MaxRetryInterceptor/init(configuration:)": {
   "abstract" : [
@@ -441,7 +494,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/maxretryinterceptor\/init(maxretriesallowed:)"
 },
-"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/interceptAsync(chain:request:response:completion:)": {
+"doc://Apollo/documentation/Apollo/MaxRetryInterceptor/intercept(request:next:)": {
   "abstract" : [
 
   ],
@@ -456,7 +509,7 @@
     },
     {
       "kind" : "identifier",
-      "text" : "interceptAsync"
+      "text" : "intercept"
     },
     {
       "kind" : "text",
@@ -464,28 +517,11 @@
     },
     {
       "kind" : "genericParameter",
-      "text" : "Operation"
+      "text" : "Request"
     },
     {
       "kind" : "text",
       "text" : ">("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "chain"
-    },
-    {
-      "kind" : "text",
-      "text" : ": any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo12RequestChainP",
-      "text" : "RequestChain"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
     },
     {
       "kind" : "externalParam",
@@ -497,49 +533,15 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11HTTPRequestC",
-      "text" : "HTTPRequest"
+      "text" : "Request"
     },
     {
       "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, "
+      "text" : ", "
     },
     {
       "kind" : "externalParam",
-      "text" : "response"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo12HTTPResponseC",
-      "text" : "HTTPResponse"
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : ">?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "completion"
+      "text" : "next"
     },
     {
       "kind" : "text",
@@ -547,8 +549,24 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s6ResultO",
-      "text" : "Result"
+      "text" : "Request"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo23InterceptorResultStreama",
+      "text" : "InterceptorResultStream"
     },
     {
       "kind" : "text",
@@ -556,8 +574,32 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "text" : "Request"
+    },
+    {
+      "kind" : "text",
+      "text" : ">) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo23InterceptorResultStreama",
+      "text" : "InterceptorResultStream"
     },
     {
       "kind" : "text",
@@ -565,46 +607,132 @@
     },
     {
       "kind" : "typeIdentifier",
-      "text" : "Operation"
+      "text" : "Request"
     },
     {
       "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
-    },
-    {
-      "kind" : "text",
-      "text" : ">, any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s5ErrorP",
-      "text" : "Error"
-    },
-    {
-      "kind" : "text",
-      "text" : ">) -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s4Voida",
-      "text" : "Void"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
+      "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/interceptAsync(chain:request:response:completion:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MaxRetryInterceptor\/intercept(request:next:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "interceptAsync(chain:request:response:completion:)",
+  "title" : "intercept(request:next:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/maxretryinterceptor\/interceptasync(chain:request:response:completion:)"
+  "url" : "\/documentation\/apollo\/maxretryinterceptor\/intercept(request:next:)"
+},
+"doc://Apollo/documentation/Apollo/ParsedResult": {
+  "abstract" : [
+    {
+      "text" : "A result parsed from GraphQL specification compliant response data.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ParsedResult"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ParsedResult",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ParsedResult"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ParsedResult",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/parsedresult"
+},
+"doc://Apollo/documentation/Apollo/RequestChain": {
+  "abstract" : [
+    {
+      "text" : "Manages a chain of steps taken to execute a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ". ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " enables customization of each step",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "of a request by injection of ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Interceptors",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "RequestChain"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "RequestChain"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "RequestChain",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestchain"
+},
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

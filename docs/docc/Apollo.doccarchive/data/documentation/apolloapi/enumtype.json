@@ -77,6 +77,16 @@
               "text" : " : "
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableListElement",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:9ApolloAPI35GraphQLOperationVariableListElementP",
+              "text" : "GraphQLOperationVariableListElement"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
               "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableValue",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI29GraphQLOperationVariableValueP",
@@ -232,10 +242,13 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableListElement",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableValue",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONEncodable",
         "doc:\/\/ApolloAPI\/s12CaseIterableP",
-        "doc:\/\/ApolloAPI\/SY"
+        "doc:\/\/ApolloAPI\/SY",
+        "doc:\/\/ApolloAPI\/s8SendableP",
+        "doc:\/\/ApolloAPI\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Inherits From",
@@ -410,6 +423,37 @@
   "title" : "GraphQLEnum",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/graphqlenum"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperationVariableListElement": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLOperationVariableListElement"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableListElement",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLOperationVariableListElement"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "GraphQLOperationVariableListElement",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqloperationvariablelistelement"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperationVariableValue": {
   "abstract" : [
@@ -718,6 +762,16 @@
 "doc://ApolloAPI/s12CaseIterableP": {
   "identifier" : "doc:\/\/ApolloAPI\/s12CaseIterableP",
   "title" : "Swift.CaseIterable",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 },
 "https://spec.graphql.org/draft/#sec-Enums": {

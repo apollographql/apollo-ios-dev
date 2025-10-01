@@ -13,7 +13,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloPagination9PagerTypeP5resetyyF",
+    "externalID" : "s:16ApolloPagination9PagerTypeP5resetyyYaF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -29,7 +29,11 @@
       },
       {
         "kind" : "text",
-        "text" : "()"
+        "text" : "() "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
       }
     ],
     "modules" : [
@@ -68,7 +72,11 @@
             },
             {
               "kind" : "text",
-              "text" : "()"
+              "text" : "() "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "async"
             }
           ]
         }
@@ -159,7 +167,11 @@
     },
     {
       "kind" : "text",
-      "text" : "()"
+      "text" : "() "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
     }
   ],
   "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/PagerType\/reset()",

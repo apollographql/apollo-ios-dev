@@ -181,8 +181,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s18IntegerLiteralTypea",
-      "text" : "IntegerLiteralType"
+      "preciseIdentifier" : "s:s5Int32V",
+      "text" : "Int32"
     },
     {
       "kind" : "text",

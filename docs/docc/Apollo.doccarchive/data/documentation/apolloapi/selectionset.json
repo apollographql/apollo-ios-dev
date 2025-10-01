@@ -83,6 +83,15 @@
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:SH",
               "text" : "Hashable"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
             }
           ]
         }
@@ -95,7 +104,9 @@
       "identifiers" : [
         "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
         "doc:\/\/ApolloAPI\/SQ",
-        "doc:\/\/ApolloAPI\/SH"
+        "doc:\/\/ApolloAPI\/SH",
+        "doc:\/\/ApolloAPI\/s8SendableP",
+        "doc:\/\/ApolloAPI\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Inherits From",
@@ -147,9 +158,7 @@
       "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/CustomDebugStringConvertible-Implementations",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Equatable-Implementations",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Hashable-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/CustomDebugStringConvertible-Implementations"
       ],
       "title" : "Default Implementations"
     }
@@ -592,21 +601,10 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionset\/customdebugstringconvertible-implementations"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/Equatable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selectionset\/equatable-implementations"
-},
 "doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/Fragments-swift.associatedtype": {
   "abstract" : [
     {
-      "text" : "A type representing all of the fragments the ",
+      "text" : "A type representing all of the named fragments the ",
       "type" : "text"
     },
     {
@@ -676,17 +674,6 @@
   "title" : "Fragments",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionset\/fragments-swift.associatedtype"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/Hashable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Hashable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Hashable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selectionset\/hashable-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/Schema": {
   "abstract" : [
@@ -808,9 +795,19 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionset\/fragments-swift.property"
 },
+"doc://ApolloAPI/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
 "doc://ApolloAPI/s28CustomDebugStringConvertibleP": {
   "identifier" : "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
   "title" : "Swift.CustomDebugStringConvertible",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }
