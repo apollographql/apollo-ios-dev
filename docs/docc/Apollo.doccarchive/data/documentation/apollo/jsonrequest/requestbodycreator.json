@@ -13,7 +13,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo11JSONRequestC18requestBodyCreatorAA07RequestdE0_pvp",
+    "externalID" : "s:6Apollo11JSONRequestV18requestBodyCreatorAA0bdE0_pvp",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -33,8 +33,8 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo18RequestBodyCreatorP",
-        "text" : "RequestBodyCreator"
+        "preciseIdentifier" : "s:6Apollo22JSONRequestBodyCreatorP",
+        "text" : "JSONRequestBodyCreator"
       }
     ],
     "modules" : [
@@ -75,10 +75,10 @@
               "text" : ": any "
             },
             {
-              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestBodyCreator",
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequestBodyCreator",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo18RequestBodyCreatorP",
-              "text" : "RequestBodyCreator"
+              "preciseIdentifier" : "s:6Apollo22JSONRequestBodyCreatorP",
+              "text" : "JSONRequestBodyCreator"
             }
           ]
         }
@@ -132,7 +132,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -179,8 +179,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo18RequestBodyCreatorP",
-      "text" : "RequestBodyCreator"
+      "preciseIdentifier" : "s:6Apollo22JSONRequestBodyCreatorP",
+      "text" : "JSONRequestBodyCreator"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequest\/requestBodyCreator",
@@ -190,7 +190,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/jsonrequest\/requestbodycreator"
 },
-"doc://Apollo/documentation/Apollo/RequestBodyCreator": {
+"doc://Apollo/documentation/Apollo/JSONRequestBodyCreator": {
   "abstract" : [
 
   ],
@@ -205,21 +205,21 @@
     },
     {
       "kind" : "identifier",
-      "text" : "RequestBodyCreator"
+      "text" : "JSONRequestBodyCreator"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestBodyCreator",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequestBodyCreator",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "RequestBodyCreator"
+      "text" : "JSONRequestBodyCreator"
     }
   ],
   "role" : "symbol",
-  "title" : "RequestBodyCreator",
+  "title" : "JSONRequestBodyCreator",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestbodycreator"
+  "url" : "\/documentation\/apollo\/jsonrequestbodycreator"
 }
 }
 }

@@ -82,12 +82,14 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/AnyHashableConvertible",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableListElement",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableValue",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONDecodable",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONEncodable",
         "doc:\/\/ApolloAPI\/s8CopyableP",
-        "doc:\/\/ApolloAPI\/s30ExpressibleByDictionaryLiteralP"
+        "doc:\/\/ApolloAPI\/s30ExpressibleByDictionaryLiteralP",
+        "doc:\/\/ApolloAPI\/s8SendableP",
+        "doc:\/\/ApolloAPI\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -178,32 +180,9 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/AnyHashableConvertible": {
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperationVariableListElement": {
   "abstract" : [
-    {
-      "text" : "A helper protocol to enable ",
-      "type" : "text"
-    },
-    {
-      "code" : "AnyHashable",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " conversion for types that do not have automatic",
-      "type" : "text"
-    },
-    {
-      "text" : " ",
-      "type" : "text"
-    },
-    {
-      "code" : "AnyHashable",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : " conversion implemented.",
-      "type" : "text"
-    }
+
   ],
   "conformance" : {
     "availabilityPrefix" : [
@@ -244,7 +223,7 @@
         "type" : "text"
       },
       {
-        "code" : "AnyHashable",
+        "code" : "any GraphQLOperationVariableValue",
         "type" : "codeVoice"
       },
       {
@@ -264,21 +243,21 @@
     },
     {
       "kind" : "identifier",
-      "text" : "AnyHashableConvertible"
+      "text" : "GraphQLOperationVariableListElement"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/AnyHashableConvertible",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableListElement",
   "kind" : "symbol",
   "navigatorTitle" : [
     {
       "kind" : "identifier",
-      "text" : "AnyHashableConvertible"
+      "text" : "GraphQLOperationVariableListElement"
     }
   ],
   "role" : "symbol",
-  "title" : "AnyHashableConvertible",
+  "title" : "GraphQLOperationVariableListElement",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/anyhashableconvertible"
+  "url" : "\/documentation\/apolloapi\/graphqloperationvariablelistelement"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperationVariableValue": {
   "abstract" : [
@@ -414,7 +393,7 @@
         "type" : "text"
       },
       {
-        "code" : "AnyHashable",
+        "code" : "any Hashable & Sendable",
         "type" : "codeVoice"
       },
       {
@@ -692,6 +671,11 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/swift\/dictionary\/init(_:)"
 },
+"doc://ApolloAPI/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
 "doc://ApolloAPI/s30ExpressibleByDictionaryLiteralP": {
   "identifier" : "doc:\/\/ApolloAPI\/s30ExpressibleByDictionaryLiteralP",
   "title" : "Swift.ExpressibleByDictionaryLiteral",
@@ -700,6 +684,11 @@
 "doc://ApolloAPI/s8CopyableP": {
   "identifier" : "doc:\/\/ApolloAPI\/s8CopyableP",
   "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }

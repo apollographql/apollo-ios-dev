@@ -19,7 +19,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo23ReadOnlyNormalizedCacheP11loadRecords7forKeysSDySSAA6RecordVGShySSG_tKF",
+    "externalID" : "s:6Apollo23ReadOnlyNormalizedCacheP11loadRecords7forKeysSDySSAA6RecordVGShySSG_tYaKF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -62,6 +62,14 @@
       {
         "kind" : "text",
         "text" : ">) "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
       },
       {
         "kind" : "keyword",
@@ -162,6 +170,14 @@
             {
               "kind" : "text",
               "text" : ">) "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "async"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
             },
             {
               "kind" : "keyword",
@@ -287,6 +303,37 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/cachekey"
 },
+"doc://Apollo/documentation/Apollo/NormalizedCache": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "NormalizedCache"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "NormalizedCache"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "NormalizedCache",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/normalizedcache"
+},
 "doc://Apollo/documentation/Apollo/ReadOnlyNormalizedCache": {
   "abstract" : [
     {
@@ -294,8 +341,9 @@
       "type" : "text"
     },
     {
-      "code" : "NormalizedCache",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
       "text" : " for use within a ",
@@ -386,6 +434,14 @@
     {
       "kind" : "text",
       "text" : ">) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",

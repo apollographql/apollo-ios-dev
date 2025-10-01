@@ -1,4 +1,10 @@
 {
+  "abstract" : [
+    {
+      "text" : "Writes the data for an object to the transaction’s underlying cache.",
+      "type" : "text"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -14,7 +20,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo0A5StoreC20ReadWriteTransactionC5write12selectionSet7withKey9variablesyx_SSSDySS0A3API29GraphQLOperationVariableValue_pGSgtKAJ013RootSelectionH0RzlF",
+    "externalID" : "s:6Apollo0A5StoreC20ReadWriteTransactionC5write12selectionSet7withKey9variablesyx_SSSDySS0A3API29GraphQLOperationVariableValue_pGSgtYaKAJ013RootSelectionH0RzlF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -98,6 +104,14 @@
       {
         "kind" : "text",
         "text" : "]?) "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
       },
       {
         "kind" : "keyword",
@@ -219,6 +233,14 @@
             },
             {
               "kind" : "keyword",
+              "text" : "async"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
               "text" : "throws"
             },
             {
@@ -250,6 +272,90 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "RootSelectionSet",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " model containing the data to write to the cache.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "selectionSet"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The ",
+                  "type" : "text"
+                },
+                {
+                  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CacheKey",
+                  "isActive" : true,
+                  "type" : "reference"
+                },
+                {
+                  "text" : " of the object to write to the cache. If an object with this key already exists, the",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "selectionSet",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : "’s data will be merged into the existing object.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "key"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Any operation variables necessary to resolve selected field’s on the object. Defaults to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "nil",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "variables"
+        }
+      ]
     }
   ],
   "schemaVersion" : {
@@ -295,11 +401,12 @@
       "type" : "text"
     },
     {
-      "code" : "ApolloStore",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : " class acts as a local cache for normalized GraphQL results.",
+      "text" : " class manages access to a local cache for reading\/writing normalized GraphQL results.",
       "type" : "text"
     }
   ],
@@ -332,7 +439,19 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction": {
   "abstract" : [
-
+    {
+      "text" : "A read\/write transaction used to access an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : "’s cache data.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -363,7 +482,10 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadWriteTransaction/write(selectionSet:withKey:variables:)": {
   "abstract" : [
-
+    {
+      "text" : "Writes the data for an object to the transaction’s underlying cache.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -448,6 +570,14 @@
     {
       "kind" : "text",
       "text" : "]?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",

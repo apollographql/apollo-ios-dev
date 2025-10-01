@@ -76,7 +76,9 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloPagination\/SQ",
-        "doc:\/\/ApolloPagination\/SH"
+        "doc:\/\/ApolloPagination\/SH",
+        "doc:\/\/ApolloPagination\/s8SendableP",
+        "doc:\/\/ApolloPagination\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -236,6 +238,16 @@
   "title" : "UpdateSource.server",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/updatesource\/server"
+},
+"doc://ApolloPagination/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloPagination\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://ApolloPagination/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloPagination\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
 }
 }
 }

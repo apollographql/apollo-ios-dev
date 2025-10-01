@@ -268,16 +268,7 @@
 "doc://ApolloAPI/documentation/ApolloAPI/CacheKeyInfo": {
   "abstract" : [
     {
-      "text" : "Contains the information needed to resolve a ",
-      "type" : "text"
-    },
-    {
-      "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference",
-      "isActive" : true,
-      "type" : "reference"
-    },
-    {
-      "text" : " in a ",
+      "text" : "Contains the information needed to resolve a cache key in a ",
       "type" : "text"
     },
     {
@@ -373,40 +364,6 @@
   "title" : "init(id:uniqueKeyGroup:)",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/cachekeyinfo\/init(id:uniquekeygroup:)"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/CacheReference": {
-  "abstract" : [
-    {
-      "text" : "Represents a reference to a record for a GraphQL object in the cache.",
-      "type" : "text"
-    }
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "struct"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "CacheReference"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/CacheReference",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "CacheReference"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "CacheReference",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/cachereference"
 }
 }
 }

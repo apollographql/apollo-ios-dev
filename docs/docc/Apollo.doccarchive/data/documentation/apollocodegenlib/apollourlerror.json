@@ -79,7 +79,8 @@
         "doc:\/\/ApolloCodegenLib\/SQ",
         "doc:\/\/ApolloCodegenLib\/s5ErrorP",
         "doc:\/\/ApolloCodegenLib\/SH",
-        "doc:\/\/ApolloCodegenLib\/s8SendableP"
+        "doc:\/\/ApolloCodegenLib\/s8SendableP",
+        "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -291,6 +292,11 @@
   "title" : "ApolloURLError.fileNameIsEmpty",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollourlerror\/filenameisempty"
+},
+"doc://ApolloCodegenLib/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://ApolloCodegenLib/s5ErrorP": {
   "identifier" : "doc:\/\/ApolloCodegenLib\/s5ErrorP",

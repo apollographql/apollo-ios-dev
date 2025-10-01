@@ -1,7 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "A path to the field that triggered the error, represented by an array of Path Entries.",
+      "text" : "A path to the field that triggered the error, represented by an array of path components.",
       "type" : "text"
     }
   ],
@@ -39,17 +39,8 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo12GraphQLErrorV",
-        "text" : "GraphQLError"
-      },
-      {
-        "kind" : "text",
-        "text" : "."
-      },
-      {
-        "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo12GraphQLErrorV9PathEntrya",
-        "text" : "PathEntry"
+        "preciseIdentifier" : "s:6Apollo13PathComponentO",
+        "text" : "PathComponent"
       },
       {
         "kind" : "text",
@@ -94,20 +85,10 @@
               "text" : ": ["
             },
             {
-              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError",
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo12GraphQLErrorV",
-              "text" : "GraphQLError"
-            },
-            {
-              "kind" : "text",
-              "text" : "."
-            },
-            {
-              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry",
-              "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo12GraphQLErrorV9PathEntrya",
-              "text" : "PathEntry"
+              "preciseIdentifier" : "s:6Apollo13PathComponentO",
+              "text" : "PathComponent"
             },
             {
               "kind" : "text",
@@ -197,41 +178,10 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlerror"
 },
-"doc://Apollo/documentation/Apollo/GraphQLError/PathEntry": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "typealias"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "PathEntry"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "PathEntry"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "GraphQLError.PathEntry",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror\/pathentry"
-},
 "doc://Apollo/documentation/Apollo/GraphQLError/path": {
   "abstract" : [
     {
-      "text" : "A path to the field that triggered the error, represented by an array of Path Entries.",
+      "text" : "A path to the field that triggered the error, represented by an array of path components.",
       "type" : "text"
     }
   ],
@@ -254,17 +204,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo12GraphQLErrorV",
-      "text" : "GraphQLError"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo12GraphQLErrorV9PathEntrya",
-      "text" : "PathEntry"
+      "preciseIdentifier" : "s:6Apollo13PathComponentO",
+      "text" : "PathComponent"
     },
     {
       "kind" : "text",
@@ -277,6 +218,40 @@
   "title" : "path",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlerror\/path"
+},
+"doc://Apollo/documentation/Apollo/PathComponent": {
+  "abstract" : [
+    {
+      "text" : "Represents a path in a GraphQL query.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "PathComponent"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/PathComponent",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "PathComponent"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "PathComponent",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/pathcomponent"
 }
 }
 }

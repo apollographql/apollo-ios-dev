@@ -12,7 +12,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:m:s:e:s:9ApolloAPI16RootSelectionSetP0A0E4data9variablesxSDySSs11AnyHashableVG_SDySSAA29GraphQLOperationVariableValue_pGSgtKcfc",
+    "externalID" : "s:m:s:e:s:9ApolloAPI16RootSelectionSetP0A0E4data9variablesxSDySSSH_s8SendablepG_SDySSAA29GraphQLOperationVariableValue_pGSgtYaKcfc",
     "modules" : [
       {
         "name" : "Apollo"
@@ -39,14 +39,6 @@
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/RootSelectionSet"
       ],
       "title" : "Extended Protocols"
-    },
-    {
-      "anchor" : "Extended-Types",
-      "generated" : true,
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/Selection"
-      ],
-      "title" : "Extended Types"
     }
   ],
   "variants" : [
@@ -119,23 +111,6 @@
   "title" : "RootSelectionSet",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloapi\/rootselectionset"
-},
-"doc://Apollo/documentation/Apollo/ApolloAPI/Selection": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloAPI\/Selection",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "Selection"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "Selection",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/apolloapi\/selection"
 }
 }
 }

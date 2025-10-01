@@ -69,12 +69,21 @@
             },
             {
               "kind" : "text",
-              "text" : " = "
+              "text" : " = any "
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:s11AnyHashableV",
-              "text" : "AnyHashable"
+              "preciseIdentifier" : "s:SH",
+              "text" : "Hashable"
+            },
+            {
+              "kind" : "text",
+              "text" : " & "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
             }
           ]
         }

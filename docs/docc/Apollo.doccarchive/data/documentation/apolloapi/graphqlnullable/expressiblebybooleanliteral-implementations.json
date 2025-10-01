@@ -187,6 +187,14 @@
         "type" : "codeVoice"
       },
       {
+        "text" : " and ",
+        "type" : "text"
+      },
+      {
+        "code" : "Sendable",
+        "type" : "codeVoice"
+      },
+      {
         "text" : ".",
         "type" : "text"
       }

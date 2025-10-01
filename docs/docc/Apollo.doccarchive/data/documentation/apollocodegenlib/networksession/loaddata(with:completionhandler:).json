@@ -19,7 +19,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:16ApolloCodegenLib14NetworkSessionP8loadData4with17completionHandlerSo012NSURLSessionG4TaskCSg10Foundation10URLRequestV_yAJ0G0VSg_So13NSURLResponseCSgs5Error_pSgtctF",
+    "externalID" : "s:16ApolloCodegenLib14NetworkSessionP8loadData4with17completionHandlerSo012NSURLSessionG4TaskCSg10Foundation10URLRequestV_yAJ0G0VSg_So13NSURLResponseCSgs5Error_pSgtYaYbctF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -87,7 +87,15 @@
       },
       {
         "kind" : "text",
-        "text" : ")?) -> "
+        "text" : ")?) "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
+      },
+      {
+        "kind" : "text",
+        "text" : " -> "
       },
       {
         "kind" : "typeIdentifier",
@@ -188,12 +196,12 @@
               "text" : ": "
             },
             {
-              "kind" : "keyword",
-              "text" : "@escaping"
+              "kind" : "attribute",
+              "text" : "@escaping "
             },
             {
               "kind" : "text",
-              "text" : " ("
+              "text" : "("
             },
             {
               "kind" : "typeIdentifier",
@@ -220,7 +228,15 @@
             },
             {
               "kind" : "text",
-              "text" : ")?) -> "
+              "text" : ")?) "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "async"
+            },
+            {
+              "kind" : "text",
+              "text" : " -> "
             },
             {
               "kind" : "typeIdentifier",
@@ -467,7 +483,15 @@
     },
     {
       "kind" : "text",
-      "text" : ")?) -> "
+      "text" : ")?) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
     },
     {
       "kind" : "typeIdentifier",

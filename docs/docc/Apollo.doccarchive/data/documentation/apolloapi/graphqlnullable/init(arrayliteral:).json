@@ -54,13 +54,21 @@
           "type" : "codeVoice"
         },
         {
+          "text" : " and ",
+          "type" : "text"
+        },
+        {
+          "code" : "Sendable",
+          "type" : "codeVoice"
+        },
+        {
           "text" : ".",
           "type" : "text"
         }
       ]
     },
     "extendedModule" : "ApolloAPI",
-    "externalID" : "s:9ApolloAPI15GraphQLNullableOA2A36_InitializableByArrayLiteralElementsRzlE05arrayH0ACyxG0gH7ElementQzd_tcfc",
+    "externalID" : "s:9ApolloAPI15GraphQLNullableOA2A36_InitializableByArrayLiteralElementsRzrlE05arrayH0ACyxG0gH7ElementQzd_tcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -316,6 +324,14 @@
       },
       {
         "code" : "_InitializableByArrayLiteralElements",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " and ",
+        "type" : "text"
+      },
+      {
+        "code" : "Sendable",
         "type" : "codeVoice"
       },
       {

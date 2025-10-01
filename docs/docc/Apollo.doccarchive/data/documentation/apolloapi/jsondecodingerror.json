@@ -125,7 +125,7 @@
               "type" : "codeVoice"
             },
             {
-              "text" : " may also throw this error when decoding a ",
+              "text" : " may also throw this error when decoding ",
               "type" : "text"
             },
             {
@@ -150,7 +150,8 @@
         "doc:\/\/ApolloAPI\/SQ",
         "doc:\/\/ApolloAPI\/s5ErrorP",
         "doc:\/\/ApolloAPI\/SH",
-        "doc:\/\/ApolloAPI\/s8SendableP"
+        "doc:\/\/ApolloAPI\/s8SendableP",
+        "doc:\/\/ApolloAPI\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -531,8 +532,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s11AnyHashableV",
-      "text" : "AnyHashable"
+      "preciseIdentifier" : "s:9ApolloAPI9JSONValuea",
+      "text" : "JSONValue"
     },
     {
       "kind" : "text",
@@ -702,7 +703,7 @@
       "type" : "codeVoice"
     },
     {
-      "text" : "value.",
+      "text" : " value.",
       "type" : "text"
     }
   ],
@@ -934,6 +935,11 @@
   "title" : "JSONValue",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/jsonvalue"
+},
+"doc://ApolloAPI/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://ApolloAPI/s5ErrorP": {
   "identifier" : "doc:\/\/ApolloAPI\/s5ErrorP",

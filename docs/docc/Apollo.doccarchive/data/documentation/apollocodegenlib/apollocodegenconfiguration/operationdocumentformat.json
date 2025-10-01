@@ -82,6 +82,8 @@
         "doc:\/\/ApolloCodegenLib\/s25ExpressibleByArrayLiteralP",
         "doc:\/\/ApolloCodegenLib\/s9OptionSetP",
         "doc:\/\/ApolloCodegenLib\/SY",
+        "doc:\/\/ApolloCodegenLib\/s8SendableP",
+        "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP",
         "doc:\/\/ApolloCodegenLib\/s10SetAlgebraP"
       ],
       "kind" : "relationships",
@@ -634,9 +636,19 @@
   "title" : "Swift.SetAlgebra",
   "type" : "unresolvable"
 },
+"doc://ApolloCodegenLib/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
 "doc://ApolloCodegenLib/s25ExpressibleByArrayLiteralP": {
   "identifier" : "doc:\/\/ApolloCodegenLib\/s25ExpressibleByArrayLiteralP",
   "title" : "Swift.ExpressibleByArrayLiteral",
+  "type" : "unresolvable"
+},
+"doc://ApolloCodegenLib/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 },
 "doc://ApolloCodegenLib/s9OptionSetP": {

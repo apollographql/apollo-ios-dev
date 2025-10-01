@@ -146,7 +146,9 @@
         "doc:\/\/ApolloAPI\/s23CustomStringConvertibleP",
         "doc:\/\/ApolloAPI\/SQ",
         "doc:\/\/ApolloAPI\/s25ExpressibleByArrayLiteralP",
-        "doc:\/\/ApolloAPI\/SH"
+        "doc:\/\/ApolloAPI\/SH",
+        "doc:\/\/ApolloAPI\/s8SendableP",
+        "doc:\/\/ApolloAPI\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -166,9 +168,7 @@
       "anchor" : "Operators",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ResponsePath\/+(_:_:)-54cn0",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ResponsePath\/+(_:_:)-6u2nc",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ResponsePath\/+(_:_:)-7p0fz"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ResponsePath\/+(_:_:)"
       ],
       "title" : "Operators"
     },
@@ -195,8 +195,7 @@
       "generated" : true,
       "identifiers" : [
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ResponsePath\/append(_:)",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ResponsePath\/appending(_:)",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ResponsePath\/toArray()"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ResponsePath\/appending(_:)"
       ],
       "title" : "Instance Methods"
     },
@@ -329,71 +328,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/responsepath"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/ResponsePath/+(_:_:)-54cn0": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "+"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI12ResponsePathV",
-      "text" : "ResponsePath"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI12ResponsePathV",
-      "text" : "ResponsePath"
-    },
-    {
-      "kind" : "text",
-      "text" : ") -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI12ResponsePathV",
-      "text" : "ResponsePath"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ResponsePath\/+(_:_:)-54cn0",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "+(_:_:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/responsepath\/+(_:_:)-54cn0"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/ResponsePath/+(_:_:)-6u2nc": {
+"doc://ApolloAPI/documentation/ApolloAPI/ResponsePath/+(_:_:)": {
   "abstract" : [
 
   ],
@@ -459,83 +394,12 @@
       "text" : "ResponsePath"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ResponsePath\/+(_:_:)-6u2nc",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ResponsePath\/+(_:_:)",
   "kind" : "symbol",
   "role" : "symbol",
   "title" : "+(_:_:)",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/responsepath\/+(_:_:)-6u2nc"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/ResponsePath/+(_:_:)-7p0fz": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "static"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "+"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "text",
-      "text" : "<"
-    },
-    {
-      "kind" : "genericParameter",
-      "text" : "T"
-    },
-    {
-      "kind" : "text",
-      "text" : ">("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI12ResponsePathV",
-      "text" : "ResponsePath"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "text" : "T"
-    },
-    {
-      "kind" : "text",
-      "text" : ") -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI12ResponsePathV",
-      "text" : "ResponsePath"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ResponsePath\/+(_:_:)-7p0fz",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "+(_:_:)",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/responsepath\/+(_:_:)-7p0fz"
+  "url" : "\/documentation\/apolloapi\/responsepath\/+(_:_:)"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/ResponsePath/CustomStringConvertible-Implementations": {
   "abstract" : [
@@ -854,43 +718,10 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/responsepath\/joined"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/ResponsePath/toArray()": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "func"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "toArray"
-    },
-    {
-      "kind" : "text",
-      "text" : "() -> ["
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    },
-    {
-      "kind" : "text",
-      "text" : "]"
-    }
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/ResponsePath\/toArray()",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "toArray()",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/responsepath\/toarray()"
+"doc://ApolloAPI/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://ApolloAPI/s23CustomStringConvertibleP": {
   "identifier" : "doc:\/\/ApolloAPI\/s23CustomStringConvertibleP",
@@ -905,6 +736,11 @@
 "doc://ApolloAPI/s8CopyableP": {
   "identifier" : "doc:\/\/ApolloAPI\/s8CopyableP",
   "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }

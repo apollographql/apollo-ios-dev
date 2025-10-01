@@ -13,7 +13,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo30JSONResponseParsingInterceptorVACycfc",
+    "externalID" : "s:6Apollo30JSONResponseParsingInterceptorCACycfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -95,22 +95,36 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
-"doc://Apollo/documentation/Apollo/JSONResponseParsingInterceptor": {
+"doc://Apollo/documentation/Apollo/JSONResponseParser": {
   "abstract" : [
     {
-      "text" : "An interceptor which parses JSON response data into a ",
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParser",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " parses JSON format GraphQL responses from raw HTTP responses into ",
       "type" : "text"
     },
     {
-      "code" : "GraphQLResult",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ParsedResult",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : " and attaches it to the ",
+      "text" : "s. This",
       "type" : "text"
     },
     {
-      "code" : "HTTPResponse",
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "parser performs GraphQL execution over the response data using a ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLExecutor",
       "type" : "codeVoice"
     },
     {
@@ -122,6 +136,58 @@
     {
       "kind" : "keyword",
       "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "JSONResponseParser"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParser",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "JSONResponseParser"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "JSONResponseParser",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/jsonresponseparser"
+},
+"doc://Apollo/documentation/Apollo/JSONResponseParsingInterceptor": {
+  "abstract" : [
+    {
+      "text" : "A ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponseParsingInterceptor",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " which uses a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONResponseParser",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " to parse JSON response data.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "actor"
     },
     {
       "kind" : "text",
@@ -165,6 +231,62 @@
   "title" : "init()",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/jsonresponseparsinginterceptor\/init()"
+},
+"doc://Apollo/documentation/Apollo/ResponseParsingInterceptor": {
+  "abstract" : [
+    {
+      "text" : "A protocol for an interceptor in a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that handles the parsing of response data for a",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ResponseParsingInterceptor"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponseParsingInterceptor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ResponseParsingInterceptor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ResponseParsingInterceptor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/responseparsinginterceptor"
 }
 }
 }

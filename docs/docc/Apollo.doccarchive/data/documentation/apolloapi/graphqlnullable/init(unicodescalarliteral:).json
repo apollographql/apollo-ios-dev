@@ -54,13 +54,21 @@
           "type" : "codeVoice"
         },
         {
+          "text" : " and ",
+          "type" : "text"
+        },
+        {
+          "code" : "Sendable",
+          "type" : "codeVoice"
+        },
+        {
           "text" : ".",
           "type" : "text"
         }
       ]
     },
     "extendedModule" : "ApolloAPI",
-    "externalID" : "s:9ApolloAPI15GraphQLNullableOAAs33ExpressibleByUnicodeScalarLiteralRzlE07unicodehI0ACyxG0ghI4TypeQz_tcfc",
+    "externalID" : "s:9ApolloAPI15GraphQLNullableOAAs33ExpressibleByUnicodeScalarLiteralRzrlE07unicodehI0ACyxG0ghI4TypeQz_tcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -316,6 +324,14 @@
       },
       {
         "code" : "ExpressibleByUnicodeScalarLiteral",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " and ",
+        "type" : "text"
+      },
+      {
+        "code" : "Sendable",
         "type" : "codeVoice"
       },
       {

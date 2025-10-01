@@ -5,7 +5,7 @@
       "type" : "text"
     },
     {
-      "code" : "HTTPRequest.toURLRequest()",
+      "code" : "GraphQLRequest.toURLRequest()",
       "type" : "codeVoice"
     },
     {
@@ -27,7 +27,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo11JSONRequestC12toURLRequest10Foundation0D0VyKF",
+    "externalID" : "s:6Apollo11JSONRequestV12toURLRequest10Foundation0D0VyKF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -80,14 +80,6 @@
             "macOS"
           ],
           "tokens" : [
-            {
-              "kind" : "keyword",
-              "text" : "override"
-            },
-            {
-              "kind" : "text",
-              "text" : " "
-            },
             {
               "kind" : "keyword",
               "text" : "func"
@@ -169,7 +161,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",

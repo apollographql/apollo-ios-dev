@@ -59,10 +59,91 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo"
 },
+"doc://Apollo/documentation/Apollo/HTTPInterceptor": {
+  "abstract" : [
+    {
+      "text" : "A protocol for an interceptor in a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that can perform a unit of work that operates on an",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "code" : "URLRequest",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " and ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "HTTPInterceptor"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPInterceptor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "HTTPInterceptor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "HTTPInterceptor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/httpinterceptor"
+},
 "doc://Apollo/documentation/Apollo/ResponseCodeInterceptor": {
   "abstract" : [
     {
-      "text" : "An interceptor to check the response code returned with a request.",
+      "text" : "An ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPInterceptor",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that checks the response code returned with a request. If the response code indicates a",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "failure, it throws an error, failing early and preventing unnecessary additional work.",
       "type" : "text"
     }
   ],
@@ -100,7 +181,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "enum"
+      "text" : "struct"
     },
     {
       "kind" : "text",

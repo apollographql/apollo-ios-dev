@@ -119,7 +119,8 @@
         "doc:\/\/Apollo\/SQ",
         "doc:\/\/Apollo\/s5ErrorP",
         "doc:\/\/Apollo\/SH",
-        "doc:\/\/Apollo\/s8SendableP"
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -144,6 +145,14 @@
       "title" : "Structures"
     },
     {
+      "anchor" : "Operators",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/==(_:_:)"
+      ],
+      "title" : "Operators"
+    },
+    {
       "anchor" : "Initializers",
       "generated" : true,
       "identifiers" : [
@@ -163,20 +172,20 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/hash(into:)"
+      ],
+      "title" : "Instance Methods"
+    },
+    {
       "anchor" : "Subscripts",
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/subscript(_:)"
       ],
       "title" : "Subscripts"
-    },
-    {
-      "anchor" : "Type-Aliases",
-      "generated" : true,
-      "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry"
-      ],
-      "title" : "Type Aliases"
     },
     {
       "anchor" : "Default-Implementations",
@@ -267,6 +276,70 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlerror"
 },
+"doc://Apollo/documentation/Apollo/GraphQLError/==(_:_:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "static"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "=="
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo12GraphQLErrorV",
+      "text" : "GraphQLError"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo12GraphQLErrorV",
+      "text" : "GraphQLError"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/==(_:_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "==(_:_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlerror\/==(_:_:)"
+},
 "doc://Apollo/documentation/Apollo/GraphQLError/CustomStringConvertible-Implementations": {
   "abstract" : [
 
@@ -345,37 +418,6 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlerror\/location"
 },
-"doc://Apollo/documentation/Apollo/GraphQLError/PathEntry": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "typealias"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "PathEntry"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/PathEntry",
-  "kind" : "symbol",
-  "navigatorTitle" : [
-    {
-      "kind" : "identifier",
-      "text" : "PathEntry"
-    }
-  ],
-  "role" : "symbol",
-  "title" : "GraphQLError.PathEntry",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/graphqlerror\/pathentry"
-},
 "doc://Apollo/documentation/Apollo/GraphQLError/extensions": {
   "abstract" : [
     {
@@ -424,6 +466,60 @@
   "title" : "extensions",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlerror\/extensions"
+},
+"doc://Apollo/documentation/Apollo/GraphQLError/hash(into:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "hash"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "into"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "inout"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s6HasherV",
+      "text" : "Hasher"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError\/hash(into:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "hash(into:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlerror\/hash(into:)"
 },
 "doc://Apollo/documentation/Apollo/GraphQLError/init(_:)": {
   "abstract" : [
@@ -549,7 +645,7 @@
 "doc://Apollo/documentation/Apollo/GraphQLError/path": {
   "abstract" : [
     {
-      "text" : "A path to the field that triggered the error, represented by an array of Path Entries.",
+      "text" : "A path to the field that triggered the error, represented by an array of path components.",
       "type" : "text"
     }
   ],
@@ -572,17 +668,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo12GraphQLErrorV",
-      "text" : "GraphQLError"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo12GraphQLErrorV9PathEntrya",
-      "text" : "PathEntry"
+      "preciseIdentifier" : "s:6Apollo13PathComponentO",
+      "text" : "PathComponent"
     },
     {
       "kind" : "text",
@@ -636,6 +723,11 @@
   "title" : "subscript(_:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlerror\/subscript(_:)"
+},
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://Apollo/s23CustomStringConvertibleP": {
   "identifier" : "doc:\/\/Apollo\/s23CustomStringConvertibleP",

@@ -19,7 +19,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo15NormalizedCacheP11loadRecords7forKeysSDySSAA6RecordVGShySSG_tKF",
+    "externalID" : "s:6Apollo15NormalizedCacheP11loadRecords7forKeysSDySSAA6RecordVGShySSG_tYaKF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -62,6 +62,14 @@
       {
         "kind" : "text",
         "text" : ">) "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
       },
       {
         "kind" : "keyword",
@@ -170,6 +178,14 @@
             {
               "kind" : "text",
               "text" : ">) "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "async"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
             },
             {
               "kind" : "keyword",
@@ -375,6 +391,14 @@
     {
       "kind" : "text",
       "text" : ">) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",

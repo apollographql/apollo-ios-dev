@@ -19,7 +19,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo0A5StoreC21withinReadTransaction_13callbackQueue10completionyxAC0dE0CKc_So17OS_dispatch_queueCSgys6ResultOyxs5Error_pGcSgtlF",
+    "externalID" : "s:6Apollo0A5StoreC21withinReadTransaction_13callbackQueue10completionyxAC0dE0CYaYbKc_So17OS_dispatch_queueCSgys6ResultOyxs5Error_pGYbcSgts8SendableRzlF",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -62,6 +62,14 @@
       {
         "kind" : "text",
         "text" : ") "
+      },
+      {
+        "kind" : "keyword",
+        "text" : "async"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
       },
       {
         "kind" : "keyword",
@@ -145,6 +153,14 @@
         "name" : "Apollo"
       }
     ],
+    "platforms" : [
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "renamed" : "withinReadTransaction(_:)",
+        "unavailable" : false
+      }
+    ],
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
@@ -202,12 +218,12 @@
               "text" : ": "
             },
             {
-              "kind" : "keyword",
-              "text" : "@escaping"
+              "kind" : "attribute",
+              "text" : "@escaping "
             },
             {
               "kind" : "text",
-              "text" : " ("
+              "text" : "("
             },
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
@@ -228,6 +244,14 @@
             {
               "kind" : "text",
               "text" : ") "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "async"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
             },
             {
               "kind" : "keyword",
@@ -303,7 +327,28 @@
             },
             {
               "kind" : "text",
-              "text" : ")? = nil)"
+              "text" : ")? = nil) "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "where"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "T"
+            },
+            {
+              "kind" : "text",
+              "text" : " : "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:s8SendableP",
+              "text" : "Sendable"
             }
           ]
         }
@@ -332,7 +377,15 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[Optional] The callback queue to use to perform the completion block on. Will perform on the current queue if not provided. Defaults to nil.",
+                  "text" : "[Optional] The callback queue to use to perform the completion block on.",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "Will perform on the current queue if not provided. Defaults to nil.",
                   "type" : "text"
                 }
               ],
@@ -346,7 +399,15 @@
             {
               "inlineContent" : [
                 {
-                  "text" : "[Optional] The completion block to perform when the read transaction completes. Defaults to nil.",
+                  "text" : "[Optional] The completion block to perform when the transaction completes.",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "Defaults to nil.",
                   "type" : "text"
                 }
               ],
@@ -401,11 +462,12 @@
       "type" : "text"
     },
     {
-      "code" : "ApolloStore",
-      "type" : "codeVoice"
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
     },
     {
-      "text" : " class acts as a local cache for normalized GraphQL results.",
+      "text" : " class manages access to a local cache for reading\/writing normalized GraphQL results.",
       "type" : "text"
     }
   ],
@@ -438,7 +500,19 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloStore/ReadTransaction": {
   "abstract" : [
-
+    {
+      "text" : "A read-only transaction used to access an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : "’s cache data.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -474,6 +548,7 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
@@ -516,6 +591,14 @@
     {
       "kind" : "text",
       "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
     },
     {
       "kind" : "keyword",

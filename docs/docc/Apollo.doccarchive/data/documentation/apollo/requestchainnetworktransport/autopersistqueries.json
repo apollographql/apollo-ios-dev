@@ -9,8 +9,27 @@
       "type" : "codeVoice"
     },
     {
-      "text" : " if Automatic Persisted Queries should be used to send a query hash instead of the full query body by default.",
+      "text" : " if Automatic Persisted Queries should be used to send a query hash instead of",
       "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "the full query body by default.",
+      "type" : "text"
+    }
+  ],
+  "deprecationSummary" : [
+    {
+      "inlineContent" : [
+        {
+          "text" : "Use apqConfig.autoPersistQueries instead.",
+          "type" : "text"
+        }
+      ],
+      "type" : "paragraph"
     }
   ],
   "hierarchy" : {
@@ -27,11 +46,12 @@
   },
   "kind" : "symbol",
   "metadata" : {
+    "extendedModule" : "Apollo",
     "externalID" : "s:6Apollo28RequestChainNetworkTransportC18autoPersistQueriesSbvp",
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "let"
+        "text" : "var"
       },
       {
         "kind" : "text",
@@ -56,6 +76,14 @@
         "name" : "Apollo"
       }
     ],
+    "platforms" : [
+      {
+        "beta" : false,
+        "deprecated" : true,
+        "message" : "Use apqConfig.autoPersistQueries instead.",
+        "unavailable" : false
+      }
+    ],
     "role" : "symbol",
     "roleHeading" : "Instance Property",
     "symbolKind" : "property",
@@ -74,7 +102,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "let"
+              "text" : "var"
             },
             {
               "kind" : "text",
@@ -92,6 +120,18 @@
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:Sb",
               "text" : "Bool"
+            },
+            {
+              "kind" : "text",
+              "text" : " { "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "get"
+            },
+            {
+              "kind" : "text",
+              "text" : " }"
             }
           ]
         }
@@ -204,14 +244,23 @@
       "type" : "codeVoice"
     },
     {
-      "text" : " if Automatic Persisted Queries should be used to send a query hash instead of the full query body by default.",
+      "text" : " if Automatic Persisted Queries should be used to send a query hash instead of",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "the full query body by default.",
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "let"
+      "text" : "var"
     },
     {
       "kind" : "text",

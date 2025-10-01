@@ -86,6 +86,14 @@
           "tokens" : [
             {
               "kind" : "keyword",
+              "text" : "final"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "keyword",
               "text" : "class"
             },
             {
@@ -106,7 +114,10 @@
     {
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport",
+        "doc:\/\/Apollo\/documentation\/Apollo\/SubscriptionNetworkTransport",
         "doc:\/\/Apollo\/s8CopyableP",
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP",
         "doc:\/\/Apollo\/documentation\/Apollo\/UploadingNetworkTransport"
       ],
       "kind" : "relationships",
@@ -127,7 +138,7 @@
       "anchor" : "Initializers",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:sendEnhancedClientAwareness:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/init(urlSession:interceptorProvider:store:endpointURL:additionalHeaders:apqConfig:requestBodyCreator:useGETForQueries:)"
       ],
       "title" : "Initializers"
     },
@@ -136,11 +147,13 @@
       "generated" : true,
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/additionalHeaders",
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/apqConfig",
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/autoPersistQueries",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/clientName",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/clientVersion",
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/endpointURL",
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/interceptorProvider",
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/requestBodyCreator",
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/store",
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/urlSession",
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/useGETForPersistedQueryRetry",
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/useGETForQueries"
       ],
@@ -150,9 +163,10 @@
       "anchor" : "Instance-Methods",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/constructRequest(for:cachePolicy:contextIdentifier:context:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/constructUploadRequest(for:with:context:manualBoundary:)",
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/send(operation:cachePolicy:contextIdentifier:context:callbackQueue:completionHandler:)"
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/constructRequest(for:fetchBehavior:requestConfiguration:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/constructUploadRequest(for:files:requestConfiguration:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/send(mutation:requestConfiguration:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/send(query:fetchBehavior:requestConfiguration:)"
       ],
       "title" : "Instance Methods"
     },
@@ -160,7 +174,7 @@
       "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/NetworkTransport-Implementations",
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/SubscriptionNetworkTransport-Implementations",
         "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/UploadingNetworkTransport-Implementations"
       ],
       "title" : "Default Implementations"
@@ -197,7 +211,7 @@
 "doc://Apollo/documentation/Apollo/NetworkTransport": {
   "abstract" : [
     {
-      "text" : "A network transport is responsible for sending GraphQL operations to a server.",
+      "text" : "A protocol for a type that is responsible for sending GraphQL query and mutation operations to a server.",
       "type" : "text"
     }
   ],
@@ -286,16 +300,16 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestchainnetworktransport"
 },
-"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/NetworkTransport-Implementations": {
+"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/SubscriptionNetworkTransport-Implementations": {
   "abstract" : [
 
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/NetworkTransport-Implementations",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/SubscriptionNetworkTransport-Implementations",
   "kind" : "article",
   "role" : "collectionGroup",
-  "title" : "NetworkTransport Implementations",
+  "title" : "SubscriptionNetworkTransport Implementations",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/networktransport-implementations"
+  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/subscriptionnetworktransport-implementations"
 },
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/UploadingNetworkTransport-Implementations": {
   "abstract" : [
@@ -311,27 +325,35 @@
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/additionalHeaders": {
   "abstract" : [
     {
-      "text" : "Any additional HTTP headers that should be added to ",
+      "text" : "If a header should only be added to ",
       "type" : "text"
     },
     {
       "inlineContent" : [
         {
-          "text" : "every",
+          "text" : "certain",
           "type" : "text"
         }
       ],
-      "type" : "strong"
+      "type" : "emphasis"
     },
     {
-      "text" : " request, such as an API key or a language setting.",
+      "text" : " requests, or if its value might differ between",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "requests, you should add that header in an interceptor instead.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "var"
+      "text" : "let"
     },
     {
       "kind" : "text",
@@ -371,6 +393,68 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestchainnetworktransport\/additionalheaders"
 },
+"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/apqConfig": {
+  "abstract" : [
+    {
+      "text" : "A configuration struct used by a ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLRequest",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " to configure the usage of",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "https:\/\/www.apollographql.com\/docs\/apollo-server\/performance\/apq",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "By default, APQs are disabled.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "apqConfig"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo31AutoPersistedQueryConfigurationV",
+      "text" : "AutoPersistedQueryConfiguration"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/apqConfig",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "apqConfig",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/apqconfig"
+},
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/autoPersistQueries": {
   "abstract" : [
     {
@@ -382,14 +466,23 @@
       "type" : "codeVoice"
     },
     {
-      "text" : " if Automatic Persisted Queries should be used to send a query hash instead of the full query body by default.",
+      "text" : " if Automatic Persisted Queries should be used to send a query hash instead of",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "the full query body by default.",
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "let"
+      "text" : "var"
     },
     {
       "kind" : "text",
@@ -416,75 +509,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestchainnetworktransport\/autopersistqueries"
 },
-"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/clientName": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "clientName"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/clientName",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "clientName",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/clientname"
-},
-"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/clientVersion": {
-  "abstract" : [
-
-  ],
-  "fragments" : [
-    {
-      "kind" : "keyword",
-      "text" : "var"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "identifier",
-      "text" : "clientVersion"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
-    }
-  ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/clientVersion",
-  "kind" : "symbol",
-  "role" : "symbol",
-  "title" : "clientVersion",
-  "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/clientversion"
-},
-"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/constructRequest(for:cachePolicy:contextIdentifier:context:)": {
+"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/constructRequest(for:fetchBehavior:requestConfiguration:)": {
   "abstract" : [
     {
       "text" : "Constructs a GraphQL request for the given operation.",
@@ -534,7 +559,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "cachePolicy"
+      "text" : "fetchBehavior"
     },
     {
       "kind" : "text",
@@ -542,8 +567,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
-      "text" : "CachePolicy"
+      "preciseIdentifier" : "s:6Apollo13FetchBehaviorV",
+      "text" : "FetchBehavior"
     },
     {
       "kind" : "text",
@@ -551,7 +576,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "contextIdentifier"
+      "text" : "requestConfiguration"
     },
     {
       "kind" : "text",
@@ -559,34 +584,17 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:10Foundation4UUIDV",
-      "text" : "UUID"
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
     },
     {
       "kind" : "text",
-      "text" : "?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "context"
-    },
-    {
-      "kind" : "text",
-      "text" : ": (any "
+      "text" : ") -> "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo14RequestContextP",
-      "text" : "RequestContext"
-    },
-    {
-      "kind" : "text",
-      "text" : ")?) -> "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11HTTPRequestC",
-      "text" : "HTTPRequest"
+      "preciseIdentifier" : "s:6Apollo11JSONRequestV",
+      "text" : "JSONRequest"
     },
     {
       "kind" : "text",
@@ -601,14 +609,14 @@
       "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/constructRequest(for:cachePolicy:contextIdentifier:context:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/constructRequest(for:fetchBehavior:requestConfiguration:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "constructRequest(for:cachePolicy:contextIdentifier:context:)",
+  "title" : "constructRequest(for:fetchBehavior:requestConfiguration:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/constructrequest(for:cachepolicy:contextidentifier:context:)"
+  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/constructrequest(for:fetchbehavior:requestconfiguration:)"
 },
-"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/constructUploadRequest(for:with:context:manualBoundary:)": {
+"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/constructUploadRequest(for:files:requestConfiguration:)": {
   "abstract" : [
     {
       "text" : "Constructs an uploading (ie, multipart) GraphQL request",
@@ -658,7 +666,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "with"
+      "text" : "files"
     },
     {
       "kind" : "text",
@@ -675,24 +683,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "context"
-    },
-    {
-      "kind" : "text",
-      "text" : ": (any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo14RequestContextP",
-      "text" : "RequestContext"
-    },
-    {
-      "kind" : "text",
-      "text" : ")?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "manualBoundary"
+      "text" : "requestConfiguration"
     },
     {
       "kind" : "text",
@@ -700,17 +691,17 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:SS",
-      "text" : "String"
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
     },
     {
       "kind" : "text",
-      "text" : "?) -> "
+      "text" : ") -> "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11HTTPRequestC",
-      "text" : "HTTPRequest"
+      "preciseIdentifier" : "s:6Apollo13UploadRequestV",
+      "text" : "UploadRequest"
     },
     {
       "kind" : "text",
@@ -725,12 +716,12 @@
       "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/constructUploadRequest(for:with:context:manualBoundary:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/constructUploadRequest(for:files:requestConfiguration:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "constructUploadRequest(for:with:context:manualBoundary:)",
+  "title" : "constructUploadRequest(for:files:requestConfiguration:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/constructuploadrequest(for:with:context:manualboundary:)"
+  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/constructuploadrequest(for:files:requestconfiguration:)"
 },
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/endpointURL": {
   "abstract" : [
@@ -769,7 +760,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestchainnetworktransport\/endpointurl"
 },
-"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:sendEnhancedClientAwareness:)": {
+"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/init(urlSession:interceptorProvider:store:endpointURL:additionalHeaders:apqConfig:requestBodyCreator:useGETForQueries:)": {
   "abstract" : [
     {
       "text" : "Designated initializer",
@@ -787,6 +778,23 @@
     },
     {
       "kind" : "externalParam",
+      "text" : "urlSession"
+    },
+    {
+      "kind" : "text",
+      "text" : ": any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A10URLSessionP",
+      "text" : "ApolloURLSession"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
       "text" : "interceptorProvider"
     },
     {
@@ -797,6 +805,23 @@
       "kind" : "typeIdentifier",
       "preciseIdentifier" : "s:6Apollo19InterceptorProviderP",
       "text" : "InterceptorProvider"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "store"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC",
+      "text" : "ApolloStore"
     },
     {
       "kind" : "text",
@@ -847,7 +872,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "autoPersistQueries"
+      "text" : "apqConfig"
     },
     {
       "kind" : "text",
@@ -855,8 +880,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sb",
-      "text" : "Bool"
+      "preciseIdentifier" : "s:6Apollo31AutoPersistedQueryConfigurationV",
+      "text" : "AutoPersistedQueryConfiguration"
     },
     {
       "kind" : "text",
@@ -872,8 +897,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo18RequestBodyCreatorP",
-      "text" : "RequestBodyCreator"
+      "preciseIdentifier" : "s:6Apollo22JSONRequestBodyCreatorP",
+      "text" : "JSONRequestBodyCreator"
     },
     {
       "kind" : "text",
@@ -894,49 +919,52 @@
     },
     {
       "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "useGETForPersistedQueryRetry"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sb",
-      "text" : "Bool"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "sendEnhancedClientAwareness"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:Sb",
-      "text" : "Bool"
-    },
-    {
-      "kind" : "text",
       "text" : ")"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:sendEnhancedClientAwareness:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/init(urlSession:interceptorProvider:store:endpointURL:additionalHeaders:apqConfig:requestBodyCreator:useGETForQueries:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "init(interceptorProvider:endpointURL:additionalHeaders:autoPersistQueries:requestBodyCreator:useGETForQueries:useGETForPersistedQueryRetry:sendEnhancedClientAwareness:)",
+  "title" : "init(urlSession:interceptorProvider:store:endpointURL:additionalHeaders:apqConfig:requestBodyCreator:useGETForQueries:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/init(interceptorprovider:endpointurl:additionalheaders:autopersistqueries:requestbodycreator:usegetforqueries:usegetforpersistedqueryretry:sendenhancedclientawareness:)"
+  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/init(urlsession:interceptorprovider:store:endpointurl:additionalheaders:apqconfig:requestbodycreator:usegetforqueries:)"
+},
+"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/interceptorProvider": {
+  "abstract" : [
+    {
+      "text" : "The interceptor provider to use when constructing a request chain",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "interceptorProvider"
+    },
+    {
+      "kind" : "text",
+      "text" : ": any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo19InterceptorProviderP",
+      "text" : "InterceptorProvider"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/interceptorProvider",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "interceptorProvider",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/interceptorprovider"
 },
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/requestBodyCreator": {
   "abstract" : [
@@ -945,7 +973,7 @@
       "type" : "text"
     },
     {
-      "code" : "RequestBodyCreator",
+      "code" : "JSONRequestBodyCreator",
       "type" : "codeVoice"
     },
     {
@@ -957,14 +985,14 @@
       "type" : "codeVoice"
     },
     {
-      "text" : ".",
+      "text" : "’s JSON body.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "var"
+      "text" : "let"
     },
     {
       "kind" : "text",
@@ -980,8 +1008,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo18RequestBodyCreatorP",
-      "text" : "RequestBodyCreator"
+      "preciseIdentifier" : "s:6Apollo22JSONRequestBodyCreatorP",
+      "text" : "JSONRequestBodyCreator"
     }
   ],
   "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/requestBodyCreator",
@@ -991,7 +1019,7 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestchainnetworktransport\/requestbodycreator"
 },
-"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/send(operation:cachePolicy:contextIdentifier:context:callbackQueue:completionHandler:)": {
+"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/send(mutation:requestConfiguration:)": {
   "abstract" : [
 
   ],
@@ -1014,7 +1042,7 @@
     },
     {
       "kind" : "genericParameter",
-      "text" : "Operation"
+      "text" : "Mutation"
     },
     {
       "kind" : "text",
@@ -1022,7 +1050,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "operation"
+      "text" : "mutation"
     },
     {
       "kind" : "text",
@@ -1030,7 +1058,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "text" : "Operation"
+      "text" : "Mutation"
     },
     {
       "kind" : "text",
@@ -1038,7 +1066,7 @@
     },
     {
       "kind" : "externalParam",
-      "text" : "cachePolicy"
+      "text" : "requestConfiguration"
     },
     {
       "kind" : "text",
@@ -1046,76 +1074,25 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11CachePolicyO",
-      "text" : "CachePolicy"
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
     },
     {
       "kind" : "text",
-      "text" : ", "
+      "text" : ") "
     },
     {
-      "kind" : "externalParam",
-      "text" : "contextIdentifier"
+      "kind" : "keyword",
+      "text" : "throws"
     },
     {
       "kind" : "text",
-      "text" : ": "
+      "text" : " -> "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:10Foundation4UUIDV",
-      "text" : "UUID"
-    },
-    {
-      "kind" : "text",
-      "text" : "?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "context"
-    },
-    {
-      "kind" : "text",
-      "text" : ": (any "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo14RequestContextP",
-      "text" : "RequestContext"
-    },
-    {
-      "kind" : "text",
-      "text" : ")?, "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "callbackQueue"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "c:objc(cs)OS_dispatch_queue",
-      "text" : "DispatchQueue"
-    },
-    {
-      "kind" : "text",
-      "text" : ", "
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "completionHandler"
-    },
-    {
-      "kind" : "text",
-      "text" : ": ("
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s6ResultO",
-      "text" : "Result"
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
     },
     {
       "kind" : "text",
@@ -1123,8 +1100,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo13GraphQLResultV",
-      "text" : "GraphQLResult"
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
     },
     {
       "kind" : "text",
@@ -1132,16 +1109,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "text" : "Operation"
-    },
-    {
-      "kind" : "text",
-      "text" : "."
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP4DataQa",
-      "text" : "Data"
+      "text" : "Mutation"
     },
     {
       "kind" : "text",
@@ -1154,29 +1122,213 @@
     },
     {
       "kind" : "text",
-      "text" : ">) -> "
-    },
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/send(mutation:requestConfiguration:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "send(mutation:requestConfiguration:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/send(mutation:requestconfiguration:)"
+},
+"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/send(query:fetchBehavior:requestConfiguration:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
     {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s4Voida",
-      "text" : "Void"
+      "kind" : "keyword",
+      "text" : "func"
     },
     {
       "kind" : "text",
-      "text" : ") -> any "
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "send"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "query"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11CancellableP",
-      "text" : "Cancellable"
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "fetchBehavior"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo13FetchBehaviorV",
+      "text" : "FetchBehavior"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "requestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo20RequestConfigurationV",
+      "text" : "RequestConfiguration"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Scs",
+      "text" : "AsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Query"
+    },
+    {
+      "kind" : "text",
+      "text" : ">, any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s5ErrorP",
+      "text" : "Error"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
     }
   ],
-  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/send(operation:cachePolicy:contextIdentifier:context:callbackQueue:completionHandler:)",
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/send(query:fetchBehavior:requestConfiguration:)",
   "kind" : "symbol",
   "role" : "symbol",
-  "title" : "send(operation:cachePolicy:contextIdentifier:context:callbackQueue:completionHandler:)",
+  "title" : "send(query:fetchBehavior:requestConfiguration:)",
   "type" : "topic",
-  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/send(operation:cachepolicy:contextidentifier:context:callbackqueue:completionhandler:)"
+  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/send(query:fetchbehavior:requestconfiguration:)"
+},
+"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/store": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "store"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC",
+      "text" : "ApolloStore"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/store",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "store",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/store"
+},
+"doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/urlSession": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "urlSession"
+    },
+    {
+      "kind" : "text",
+      "text" : ": any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A10URLSessionP",
+      "text" : "ApolloURLSession"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChainNetworkTransport\/urlSession",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "urlSession",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestchainnetworktransport\/urlsession"
 },
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/useGETForPersistedQueryRetry": {
   "abstract" : [
@@ -1209,10 +1361,11 @@
       "type" : "text"
     }
   ],
+  "deprecated" : true,
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "let"
+      "text" : "var"
     },
     {
       "kind" : "text",
@@ -1300,10 +1453,44 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestchainnetworktransport\/usegetforqueries"
 },
+"doc://Apollo/documentation/Apollo/SubscriptionNetworkTransport": {
+  "abstract" : [
+    {
+      "text" : "A protocol for a type that is responsible for sending GraphQL subscriptions to a server.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "SubscriptionNetworkTransport"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/SubscriptionNetworkTransport",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "SubscriptionNetworkTransport"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "SubscriptionNetworkTransport",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/subscriptionnetworktransport"
+},
 "doc://Apollo/documentation/Apollo/UploadingNetworkTransport": {
   "abstract" : [
     {
-      "text" : "A network transport which can also handle uploads of files.",
+      "text" : "A protocol for a type that is responsible for sending GraphQL file upload operations to a server.",
       "type" : "text"
     }
   ],
@@ -1334,10 +1521,32 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/uploadingnetworktransport"
 },
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
 "doc://Apollo/s8CopyableP": {
   "identifier" : "doc:\/\/Apollo\/s8CopyableP",
   "title" : "Swift.Copyable",
   "type" : "unresolvable"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
+},
+"https://www.apollographql.com/docs/apollo-server/performance/apq": {
+  "identifier" : "https:\/\/www.apollographql.com\/docs\/apollo-server\/performance\/apq",
+  "title" : "Automatic Persisted Queries (APQs).",
+  "titleInlineContent" : [
+    {
+      "text" : "Automatic Persisted Queries (APQs).",
+      "type" : "text"
+    }
+  ],
+  "type" : "link",
+  "url" : "https:\/\/www.apollographql.com\/docs\/apollo-server\/performance\/apq"
 }
 }
 }

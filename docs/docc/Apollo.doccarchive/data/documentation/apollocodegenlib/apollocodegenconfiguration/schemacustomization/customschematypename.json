@@ -82,7 +82,9 @@
         "doc:\/\/ApolloCodegenLib\/SQ",
         "doc:\/\/ApolloCodegenLib\/s43ExpressibleByExtendedGraphemeClusterLiteralP",
         "doc:\/\/ApolloCodegenLib\/s26ExpressibleByStringLiteralP",
-        "doc:\/\/ApolloCodegenLib\/s33ExpressibleByUnicodeScalarLiteralP"
+        "doc:\/\/ApolloCodegenLib\/s33ExpressibleByUnicodeScalarLiteralP",
+        "doc:\/\/ApolloCodegenLib\/s8SendableP",
+        "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -628,6 +630,11 @@
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/schemacustomization\/customschematypename\/type(name:)"
 },
+"doc://ApolloCodegenLib/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
 "doc://ApolloCodegenLib/s26ExpressibleByStringLiteralP": {
   "identifier" : "doc:\/\/ApolloCodegenLib\/s26ExpressibleByStringLiteralP",
   "title" : "Swift.ExpressibleByStringLiteral",
@@ -641,6 +648,11 @@
 "doc://ApolloCodegenLib/s43ExpressibleByExtendedGraphemeClusterLiteralP": {
   "identifier" : "doc:\/\/ApolloCodegenLib\/s43ExpressibleByExtendedGraphemeClusterLiteralP",
   "title" : "Swift.ExpressibleByExtendedGraphemeClusterLiteral",
+  "type" : "unresolvable"
+},
+"doc://ApolloCodegenLib/s8SendableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s8SendableP",
+  "title" : "Swift.Sendable",
   "type" : "unresolvable"
 }
 }

@@ -1,4 +1,18 @@
 {
+  "abstract" : [
+    {
+      "text" : "Inherited from ",
+      "type" : "text"
+    },
+    {
+      "code" : "Equatable.==(_:_:)",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -13,7 +27,7 @@
   },
   "kind" : "symbol",
   "metadata" : {
-    "externalID" : "s:6Apollo11JSONRequestC2eeoiySbACyxG_AEtFZ",
+    "externalID" : "s:6Apollo11JSONRequestV2eeoiySbACyxG_AEtFZ",
     "fragments" : [
       {
         "kind" : "keyword",
@@ -45,7 +59,7 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo11JSONRequestC",
+        "preciseIdentifier" : "s:6Apollo11JSONRequestV",
         "text" : "JSONRequest"
       },
       {
@@ -62,7 +76,7 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:6Apollo11JSONRequestC",
+        "preciseIdentifier" : "s:6Apollo11JSONRequestV",
         "text" : "JSONRequest"
       },
       {
@@ -143,7 +157,7 @@
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequest",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo11JSONRequestC",
+              "preciseIdentifier" : "s:6Apollo11JSONRequestV",
               "text" : "JSONRequest"
             },
             {
@@ -169,7 +183,7 @@
             {
               "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/JSONRequest",
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:6Apollo11JSONRequestC",
+              "preciseIdentifier" : "s:6Apollo11JSONRequestV",
               "text" : "JSONRequest"
             },
             {
@@ -241,7 +255,7 @@
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "class"
+      "text" : "struct"
     },
     {
       "kind" : "text",
@@ -300,7 +314,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11JSONRequestC",
+      "preciseIdentifier" : "s:6Apollo11JSONRequestV",
       "text" : "JSONRequest"
     },
     {
@@ -317,7 +331,7 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:6Apollo11JSONRequestC",
+      "preciseIdentifier" : "s:6Apollo11JSONRequestV",
       "text" : "JSONRequest"
     },
     {

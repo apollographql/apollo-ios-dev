@@ -1,20 +1,28 @@
 {
   "abstract" : [
     {
-      "text" : "Any additional HTTP headers that should be added to ",
+      "text" : "If a header should only be added to ",
       "type" : "text"
     },
     {
       "inlineContent" : [
         {
-          "text" : "every",
+          "text" : "certain",
           "type" : "text"
         }
       ],
-      "type" : "strong"
+      "type" : "emphasis"
     },
     {
-      "text" : " request, such as an API key or a language setting.",
+      "text" : " requests, or if its value might differ between",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "requests, you should add that header in an interceptor instead.",
       "type" : "text"
     }
   ],
@@ -36,7 +44,7 @@
     "fragments" : [
       {
         "kind" : "keyword",
-        "text" : "var"
+        "text" : "let"
       },
       {
         "kind" : "text",
@@ -92,7 +100,7 @@
           "tokens" : [
             {
               "kind" : "keyword",
-              "text" : "var"
+              "text" : "let"
             },
             {
               "kind" : "text",
@@ -122,7 +130,7 @@
             },
             {
               "kind" : "text",
-              "text" : "] { get }"
+              "text" : "]"
             }
           ]
         }
@@ -136,36 +144,6 @@
           "level" : 2,
           "text" : "Discussion",
           "type" : "heading"
-        },
-        {
-          "inlineContent" : [
-            {
-              "text" : "If a header should only be added to ",
-              "type" : "text"
-            },
-            {
-              "inlineContent" : [
-                {
-                  "text" : "certain",
-                  "type" : "text"
-                }
-              ],
-              "type" : "emphasis"
-            },
-            {
-              "text" : " requests, or if its value might differ between requests,",
-              "type" : "text"
-            },
-            {
-              "text" : " ",
-              "type" : "text"
-            },
-            {
-              "text" : "you should add that header in an interceptor instead.",
-              "type" : "text"
-            }
-          ],
-          "type" : "paragraph"
         },
         {
           "inlineContent" : [
@@ -277,27 +255,35 @@
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/additionalHeaders": {
   "abstract" : [
     {
-      "text" : "Any additional HTTP headers that should be added to ",
+      "text" : "If a header should only be added to ",
       "type" : "text"
     },
     {
       "inlineContent" : [
         {
-          "text" : "every",
+          "text" : "certain",
           "type" : "text"
         }
       ],
-      "type" : "strong"
+      "type" : "emphasis"
     },
     {
-      "text" : " request, such as an API key or a language setting.",
+      "text" : " requests, or if its value might differ between",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "requests, you should add that header in an interceptor instead.",
       "type" : "text"
     }
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "var"
+      "text" : "let"
     },
     {
       "kind" : "text",

@@ -28,7 +28,7 @@
   "kind" : "symbol",
   "metadata" : {
     "extendedModule" : "ApolloAPI",
-    "externalID" : "s:9ApolloAPI10InputValueO14integerLiteralACSi_tcfc",
+    "externalID" : "s:9ApolloAPI10InputValueO14integerLiteralACs5Int32V_tcfc",
     "fragments" : [
       {
         "kind" : "identifier",
@@ -48,8 +48,8 @@
       },
       {
         "kind" : "typeIdentifier",
-        "preciseIdentifier" : "s:s18IntegerLiteralTypea",
-        "text" : "IntegerLiteralType"
+        "preciseIdentifier" : "s:s5Int32V",
+        "text" : "Int32"
       },
       {
         "kind" : "text",
@@ -103,8 +103,8 @@
             },
             {
               "kind" : "typeIdentifier",
-              "preciseIdentifier" : "s:s18IntegerLiteralTypea",
-              "text" : "IntegerLiteralType"
+              "preciseIdentifier" : "s:s5Int32V",
+              "text" : "Int32"
             },
             {
               "kind" : "text",
@@ -265,8 +265,8 @@
     },
     {
       "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s18IntegerLiteralTypea",
-      "text" : "IntegerLiteralType"
+      "preciseIdentifier" : "s:s5Int32V",
+      "text" : "Int32"
     },
     {
       "kind" : "text",
