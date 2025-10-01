@@ -1,14 +1,15 @@
-// swift-tools-version:5.9
+// swift-tools-version:6.1
 
 import PackageDescription
 
 let package = Package(
   name: "AnimalKingdomAPI",
   platforms: [
-    .iOS(.v12),
-    .macOS(.v10_14),
-    .tvOS(.v12),
-    .watchOS(.v5),
+    .iOS(.v15),
+    .macOS(.v12),
+    .tvOS(.v15),
+    .watchOS(.v8),
+    .visionOS(.v1),
   ],
   products: [
     .library(name: "AnimalKingdomAPI", targets: ["AnimalKingdomAPI"]),
@@ -33,5 +34,6 @@ let package = Package(
       ],
       path: "./TestMocks"
     ),
-  ]
+  ],
+  swiftLanguageModes: [.v6, .v5]
 )

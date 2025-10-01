@@ -1,23 +1,23 @@
 import XCTest
 @_spi(Execution) @testable import Apollo
-import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Execution) @_spi(Internal) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 
 class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
 
   // MARK: - Helpers
 
-  private static let executor: GraphQLExecutor = {
-    let executor = GraphQLExecutor(executionSource: NetworkResponseExecutionSource())    
+  private static let executor: GraphQLExecutor<NetworkResponseExecutionSource> = {
+    let executor = GraphQLExecutor(executionSource: NetworkResponseExecutionSource())
     return executor
   }()
 
-  private func normalizeRecords<S: RootSelectionSet>(
+  private static func normalizeRecords<S: RootSelectionSet>(
     _ selectionSet: S.Type,
     with variables: GraphQLOperation.Variables? = nil,
     from object: JSONObject
-  ) throws -> RecordSet {
-    return try GraphQLExecutor_ResultNormalizer_FromResponse_Tests.executor.execute(
+  ) async throws -> RecordSet {
+    return try await executor.execute(
       selectionSet: selectionSet,
       on: object,
       withRootCacheReference: CacheReference.RootQuery,
@@ -28,14 +28,14 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
 
   // MARK: - Tests
 
-  func test__execute__givenObjectWithNoCacheKey_normalizesRecordToPathFromQueryRoot() throws {
+  func test__execute__givenObjectWithNoCacheKey_normalizesRecordToPathFromQueryRoot() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("name", String.self)
         ]}
@@ -47,7 +47,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,
@@ -57,14 +57,14 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     XCTAssertEqual(hero["name"] as? String, "R2-D2")
   }
   
-  func test__execute__givenObjectWithNoCacheKey_forFieldWithStringArgument_normalizesRecordToPathFromQueryRootIncludingArgument() throws {
+  func test__execute__givenObjectWithNoCacheKey_forFieldWithStringArgument_normalizesRecordToPathFromQueryRootIncludingArgument() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self, arguments: ["episode": .variable("episode")])
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("name", String.self)
         ]}
@@ -78,7 +78,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, with: variables, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, with: variables, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero(episode:JEDI)"] as? CacheReference,
@@ -88,7 +88,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     XCTAssertEqual(hero["name"] as? String, "R2-D2")
   }
 
-  func test__execute__givenObjectWithNoCacheKey_forFieldWithEnumArgument_normalizesRecordToPathFromQueryRootIncludingArgument() throws {
+  func test__execute__givenObjectWithNoCacheKey_forFieldWithEnumArgument_normalizesRecordToPathFromQueryRootIncludingArgument() async throws {
     // given
     enum MockEnum: String, EnumType {
       case NEWHOPE
@@ -96,12 +96,12 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
       case JEDI
     }
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self, arguments: ["episode": .variable("episode")])
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("name", String.self)
         ]}
@@ -115,7 +115,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, with: variables, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, with: variables, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero(episode:EMPIRE)"] as? CacheReference,
@@ -125,20 +125,20 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     XCTAssertEqual(hero["name"] as? String, "R2-D2")
   }
 
-  func test__execute__givenObjectWithNoCacheKey_andNestedArrayOfObjectsWithNoCacheKey_normalizesRecordsToPathsFromQueryRoot() throws {
+  func test__execute__givenObjectWithNoCacheKey_andNestedArrayOfObjectsWithNoCacheKey_normalizesRecordsToPathsFromQueryRoot() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("name", String.self),
           .field("friends", [Friend].self)
         ]}
 
-        class Friend: MockSelectionSet {
+        class Friend: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("name", String.self)
           ]}
@@ -155,11 +155,11 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
           ["__typename": "Human", "name": "Han Solo"],
           ["__typename": "Human", "name": "Leia Organa"]
         ]
-      ]
+      ] as JSONValue
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,
@@ -177,21 +177,21 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   }
 
   @MainActor
-  func test__execute__givenObjectWithCacheKey_andNestedArrayOfObjectsWithCacheKey_normalizesRecordsToIndividualReferences() throws {
+  func test__execute__givenObjectWithCacheKey_andNestedArrayOfObjectsWithCacheKey_normalizesRecordsToIndividualReferences() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("id", String.self),
           .field("name", String.self),
           .field("friends", [Friend].self)
         ]}
 
-        class Friend: MockSelectionSet {
+        class Friend: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("id", String.self),
             .field("name", String.self)
@@ -212,11 +212,11 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
           ["__typename": "Human", "id": "1002", "name": "Han Solo"],
           ["__typename": "Human", "id": "1003", "name": "Leia Organa"]
         ]
-      ]
+      ] as JSONValue
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,
@@ -239,22 +239,22 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     XCTAssertEqual(leia["name"] as? String, "Leia Organa")
   }
   
-  func test__execute__givenFieldForObjectWithNoCacheKey_andAliasedFieldForSameFieldName_normalizesRecordsForBothFieldsIntoOneRecord() throws {
+  func test__execute__givenFieldForObjectWithNoCacheKey_andAliasedFieldForSameFieldName_normalizesRecordsForBothFieldsIntoOneRecord() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self),
         .field("hero", alias: "r2", R2.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("name", String.self)
         ]}
       }
 
-      class R2: MockSelectionSet {
+      class R2: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("catchphrase", String.self)
         ]}
@@ -267,7 +267,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     let hero = try XCTUnwrap(records["QUERY_ROOT.hero"])
@@ -277,7 +277,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   }
 
   @MainActor
-  func test__execute__givenDifferentAliasedFieldsOnTwoTypeCasesWithSameAlias_givenIsFirstType_hasRecordWithFieldValueUsingNonaliasedFieldName() throws {
+  func test__execute__givenDifferentAliasedFieldsOnTwoTypeCasesWithSameAlias_givenIsFirstType_hasRecordWithFieldValueUsingNonaliasedFieldName() async throws {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
@@ -292,26 +292,26 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
       }
     })
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self),
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .inlineFragment(AsHuman.self),
           .inlineFragment(AsDroid.self),
         ]}
 
-        class AsHuman: MockTypeCase {
+        class AsHuman: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("name", alias: "property", String.self)
           ]}
         }
 
-        class AsDroid: MockTypeCase {
+        class AsDroid: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Droid }
           override class var __selections: [Selection] {[
             .field("primaryFunction", alias: "property", String.self)
@@ -325,7 +325,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     let hero = try XCTUnwrap(records["QUERY_ROOT.hero"])
@@ -335,7 +335,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   }
 
   @MainActor
-  func test__execute__givenDifferentAliasedFieldsOnTwoTypeCasesWithSameAlias_givenIsSecondType_hasRecordWithFieldValueUsingNonaliasedFieldName() throws {
+  func test__execute__givenDifferentAliasedFieldsOnTwoTypeCasesWithSameAlias_givenIsSecondType_hasRecordWithFieldValueUsingNonaliasedFieldName() async throws {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
@@ -350,18 +350,18 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
       }
     })
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self),
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .inlineFragment(AsHuman.self),
           .inlineFragment(AsDroid.self),
         ]}
 
-        class AsHuman: MockTypeCase {
+        class AsHuman: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
@@ -369,7 +369,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
           ]}
         }
 
-        class AsDroid: MockTypeCase {
+        class AsDroid: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Droid }
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
@@ -384,7 +384,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     let hero = try XCTUnwrap(records["QUERY_ROOT.hero"])
@@ -394,7 +394,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   }
 
   @MainActor
-  func test__execute__givenSameFieldWithDifferentArgumentValueOnSameNestedFieldOnTwoTypeCases_givenIsFirstType_hasRecordForFieldNameWithFirstTypesArgument() throws {
+  func test__execute__givenSameFieldWithDifferentArgumentValueOnSameNestedFieldOnTwoTypeCases_givenIsFirstType_hasRecordForFieldNameWithFirstTypesArgument() async throws {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
@@ -409,38 +409,38 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
       }
     })
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self),
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .inlineFragment(AsHuman.self),
           .inlineFragment(AsDroid.self),
         ]}
 
-        class AsHuman: MockTypeCase {
+        class AsHuman: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("friend", Friend.self),
           ]}
 
-          class Friend: MockSelectionSet {
+          class Friend: MockSelectionSet, @unchecked Sendable {
             override class var __selections: [Selection] {[
               .field("height", Double.self, arguments: ["unit": "FOOT"])
             ]}
           }
         }
 
-        class AsDroid: MockTypeCase {
+        class AsDroid: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Droid }
           override class var __selections: [Selection] {[
             .field("friend", Friend.self),
           ]}
 
-          class Friend: MockSelectionSet {
+          class Friend: MockSelectionSet, @unchecked Sendable {
             override class var __selections: [Selection] {[
               .field("height", Double.self, arguments: ["unit": "METER"])
             ]}
@@ -454,11 +454,11 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
         "name": "Luke Skywalker",
         "__typename": "Human",
         "friend": ["__typename": "Human", "name": "Han Solo", "height": 5.905512],
-      ]
+      ] as JSONValue
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     let han = try XCTUnwrap(records["QUERY_ROOT.hero.friend"])
@@ -468,7 +468,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   }
 
   @MainActor
-  func test__execute__givenSameFieldWithDifferentArgumentValueOnSameNestedFieldOnTwoTypeCases_givenIsSecondType_hasRecordForFieldNameWithFirstTypesArgument() throws {
+  func test__execute__givenSameFieldWithDifferentArgumentValueOnSameNestedFieldOnTwoTypeCases_givenIsSecondType_hasRecordForFieldNameWithFirstTypesArgument() async throws {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
@@ -483,38 +483,38 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
       }
     })
 
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self),
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .inlineFragment(AsHuman.self),
           .inlineFragment(AsDroid.self),
         ]}
 
-        class AsHuman: MockTypeCase {
+        class AsHuman: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Human }
           override class var __selections: [Selection] {[
             .field("friend", Friend.self),
           ]}
 
-          class Friend: MockSelectionSet {
+          class Friend: MockSelectionSet, @unchecked Sendable {
             override class var __selections: [Selection] {[
               .field("height", Double.self, arguments: ["unit": "FOOT"])
             ]}
           }
         }
 
-        class AsDroid: MockTypeCase {
+        class AsDroid: MockTypeCase, @unchecked Sendable {
           override class var __parentType: any ParentType { Types.Droid }
           override class var __selections: [Selection] {[
             .field("friend", Friend.self),
           ]}
 
-          class Friend: MockSelectionSet {
+          class Friend: MockSelectionSet, @unchecked Sendable {
             override class var __selections: [Selection] {[
               .field("height", Double.self, arguments: ["unit": "METER"])
             ]}
@@ -528,11 +528,11 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
         "name": "Luke Skywalker",
         "__typename": "Droid",
         "friend": ["__typename": "Human", "name": "Luke Skywalker", "height": 1.72],
-      ]
+      ] as JSONValue
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     let luke = try XCTUnwrap(records["QUERY_ROOT.hero.friend"])
@@ -544,14 +544,14 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   // MARK: - @typePolicy Tests
 
   @MainActor
-  func test__execute__givenObjectOfTypeWithKeyFields_normalizesRecordsToReference() throws {
+  func test__execute__givenObjectOfTypeWithKeyFields_normalizesRecordsToReference() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Object(typename: "Hero", implementedInterfaces: [], keyFields: ["name"])
         }
@@ -576,7 +576,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,
@@ -584,14 +584,14 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
   }
 
   @MainActor
-  func test__execute__givenObjectOfUnknownType_forInterfaceFieldWithKeyFields_normalizesRecordsToReference() throws {
+  func test__execute__givenObjectOfUnknownType_forInterfaceFieldWithKeyFields_normalizesRecordsToReference() async throws {
     // given
-    class GivenSelectionSet: MockSelectionSet {
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {[
         .field("hero", Hero.self)
       ]}
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __parentType: any ParentType {
           Interface(name: "Hero", keyFields: ["name"], implementingObjects: ["Hero"])
         }
@@ -614,7 +614,7 @@ class GraphQLExecutor_ResultNormalizer_FromResponse_Tests: XCTestCase {
     ]
 
     // when
-    let records = try normalizeRecords(GivenSelectionSet.self, from: object)
+    let records = try await Self.normalizeRecords(GivenSelectionSet.self, from: object)
 
     // then
     XCTAssertEqual(records["QUERY_ROOT"]?["hero"] as? CacheReference,

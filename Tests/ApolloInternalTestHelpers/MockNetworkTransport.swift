@@ -1,99 +1,125 @@
-import Foundation
-import Apollo
+@_spi(Internal) import Apollo
 import ApolloAPI
+import Foundation
 
-public final class MockNetworkTransport: RequestChainNetworkTransport {
+public final class MockNetworkTransport: NetworkTransport {
+  public let mockServer: MockGraphQLServer
+  public let requestChainTransport: RequestChainNetworkTransport
+
+  public var url: URL { requestChainTransport.endpointURL }
+
   public init(
-    server: MockGraphQLServer = MockGraphQLServer(),
-    store: ApolloStore,
-    clientName: String = "MockNetworkTransport_ClientName",
-    clientVersion: String = "MockNetworkTransport_ClientVersion"
+    mockServer: MockGraphQLServer = MockGraphQLServer(),
+    store: ApolloStore
   ) {
-    super.init(interceptorProvider: TestInterceptorProvider(store: store, server: server),
-               endpointURL: TestURL.mockServer.url)
-    self.clientName = clientName
-    self.clientVersion = clientVersion
+    self.mockServer = mockServer
+    let session = MockSession(server: mockServer)
+    self.requestChainTransport = RequestChainNetworkTransport(
+      urlSession: session,
+      interceptorProvider: MockInterceptorProvider(),
+      store: store,
+      endpointURL: TestURL.mockServer.url
+    )
   }
 
-  struct TestInterceptorProvider: InterceptorProvider {
-    let store: ApolloStore
-    let server: MockGraphQLServer
+  public func send<Query: GraphQLQuery>(
+    query: Query,
+    fetchBehavior: FetchBehavior,
+    requestConfiguration: RequestConfiguration
+  ) throws -> AsyncThrowingStream<GraphQLResponse<Query>, any Error> {
+    try requestChainTransport.send(
+      query: query,
+      fetchBehavior: fetchBehavior,
+      requestConfiguration: requestConfiguration
+    )
+  }
 
-    func interceptors<Operation>(
-      for operation: Operation
-    ) -> [any ApolloInterceptor] where Operation: GraphQLOperation {
-      return [
-        MaxRetryInterceptor(),
-        CacheReadInterceptor(store: self.store),
-        MockGraphQLServerInterceptor(server: server),
-        ResponseCodeInterceptor(),
-        JSONResponseParsingInterceptor(),
-        AutomaticPersistedQueryInterceptor(),
-        CacheWriteInterceptor(store: self.store),
-      ]
+  public func send<Mutation: GraphQLMutation>(
+    mutation: Mutation,
+    requestConfiguration: RequestConfiguration
+  ) throws -> AsyncThrowingStream<GraphQLResponse<Mutation>, any Error> {
+    try requestChainTransport.send(
+      mutation: mutation,
+      requestConfiguration: requestConfiguration
+    )
+  }
+
+
+  private struct MockInterceptorProvider: InterceptorProvider {
+    func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any GraphQLInterceptor] {
+      return DefaultInterceptorProvider.shared.graphQLInterceptors(for: operation) + [TaskLocalRequestInterceptor()]
     }
   }
-}
 
-private final class MockTask: Cancellable {
-  func cancel() {
-    // no-op
-  }
-}
+  fileprivate struct TaskLocalRequestInterceptor: GraphQLInterceptor {
+    @TaskLocal static var currentRequest: (any GraphQLRequest)? = nil
 
-private class MockGraphQLServerInterceptor: ApolloInterceptor {
-  let server: MockGraphQLServer
-
-  public var id: String = UUID().uuidString
-
-  init(server: MockGraphQLServer) {
-    self.server = server
-  }
-
-  public func interceptAsync<Operation>(chain: any RequestChain, request: HTTPRequest<Operation>, response: HTTPResponse<Operation>?, completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) where Operation: GraphQLOperation {
-    server.serve(request: request) { result in
-      let httpResponse = HTTPURLResponse(url: TestURL.mockServer.url,
-                                         statusCode: 200,
-                                         httpVersion: nil,
-                                         headerFields: nil)!
-
-      switch result {
-      case .failure(let error):
-        chain.handleErrorAsync(error,
-                               request: request,
-                               response: response,
-                               completion: completion)
-      case .success(let body):
-        let data = try! JSONSerializationFormat.serialize(value: body)
-        let response = HTTPResponse<Operation>(response: httpResponse,
-                                               rawData: data,
-                                               parsedResponse: nil)
-        guard !chain.isCancelled else { return }
-        chain.proceedAsync(request: request,
-                           response: response,
-                           interceptor: self,
-                           completion: completion)
+    func intercept<Request>(
+      request: Request,
+      next: (Request) async -> InterceptorResultStream<Request>
+    ) async throws -> InterceptorResultStream<Request> {
+      return await TaskLocalRequestInterceptor.$currentRequest.withValue(request) {
+        return await next(request)
       }
     }
   }
-}
 
-public class MockWebSocketTransport: NetworkTransport {
-  public var clientName, clientVersion: String
+  fileprivate struct MockSession: ApolloURLSession {
 
-  public init(clientName: String, clientVersion: String) {
-    self.clientName = clientName
-    self.clientVersion = clientVersion
+    let server: MockGraphQLServer
+
+    init(server: MockGraphQLServer) {
+      self.server = server
+    }
+
+    func chunks(for request: URLRequest) async throws -> (any AsyncChunkSequence, URLResponse) {
+      guard let graphQLRequest = TaskLocalRequestInterceptor.currentRequest else {
+        throw MockGraphQLServer.ServerError.unexpectedRequest(request.description)
+      }
+
+      let (stream, continuation) = MockAsyncChunkSequence.makeStream()
+      do {
+        let body = try await server.serve(request: graphQLRequest)
+        let data = try JSONSerializationFormat.serialize(value: body)
+        continuation.yield(data)
+        continuation.finish()
+
+      } catch {
+        continuation.finish(throwing: error)
+      }
+
+      let httpResponse = HTTPURLResponse(
+        url: request.url!,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: nil
+      )!
+      return (stream, httpResponse)
+    }
+
   }
 
-  public func send<Operation>(
-    operation: Operation,
-    cachePolicy: CachePolicy,
-    contextIdentifier: UUID?,
-    context: (any RequestContext)?,
-    callbackQueue: DispatchQueue,
-    completionHandler: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void
-  ) -> any Cancellable where Operation : GraphQLOperation {
-    return MockTask()
+}
+
+public struct MockAsyncChunkSequence: AsyncChunkSequence {
+  public typealias UnderlyingStream = AsyncThrowingStream<Data, any Error>
+
+  public typealias AsyncIterator = UnderlyingStream.AsyncIterator
+
+  public typealias Element = Data
+
+  let underlying: UnderlyingStream
+
+  public func makeAsyncIterator() -> UnderlyingStream.AsyncIterator {
+    underlying.makeAsyncIterator()
+  }
+
+  public static func makeStream() -> (
+    stream: MockAsyncChunkSequence,
+    continuation: UnderlyingStream.Continuation
+  ) {
+    let (s, c) = UnderlyingStream.makeStream(of: Data.self)
+    return (Self.init(underlying: s), c)
   }
 }
+

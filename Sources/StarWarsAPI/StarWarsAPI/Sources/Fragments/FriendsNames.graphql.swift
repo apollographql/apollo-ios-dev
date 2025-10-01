@@ -2,19 +2,23 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct FriendsNames: StarWarsAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment FriendsNames on Character { __typename friends { __typename name } }"#
   }
 
-  public let __data: DataDict
-  public init(_dataDict: DataDict) { __data = _dataDict }
+  @_spi(Unsafe) public let __data: DataDict
+  @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-  public static var __selections: [ApolloAPI.Selection] { [
+  @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+  @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("friends", [Friend?]?.self),
+  ] }
+  @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    FriendsNames.self
   ] }
 
   /// The friends of the character, or an empty list if they have none
@@ -24,28 +28,26 @@ public struct FriendsNames: StarWarsAPI.SelectionSet, Fragment {
     __typename: String,
     friends: [Friend?]? = nil
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": __typename,
-        "friends": friends._fieldData,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(FriendsNames.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": __typename,
+      "friends": friends._fieldData,
+    ])
   }
 
   /// Friend
   ///
   /// Parent Type: `Character`
   public struct Friend: StarWarsAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("__typename", String.self),
       .field("name", String.self),
+    ] }
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      FriendsNames.Friend.self
     ] }
 
     /// The name of the character
@@ -55,15 +57,10 @@ public struct FriendsNames: StarWarsAPI.SelectionSet, Fragment {
       __typename: String,
       name: String
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": __typename,
-          "name": name,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(FriendsNames.Friend.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": __typename,
+        "name": name,
+      ])
     }
   }
 }

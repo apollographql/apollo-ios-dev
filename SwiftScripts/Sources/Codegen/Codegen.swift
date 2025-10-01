@@ -52,7 +52,7 @@ struct Codegen: AsyncParsableCommand {
 
       // This more necessary if you're using a sub-folder, but make sure
       // there's actually a place to write out what you're doing.
-      try ApolloFileManager.default.createDirectoryIfNeeded(atPath: targetURL.path)
+      try await ApolloFileManager.default.createDirectoryIfNeeded(atPath: targetURL.path)
 
       // Actually attempt to generate code.
       try await ApolloCodegen.build(

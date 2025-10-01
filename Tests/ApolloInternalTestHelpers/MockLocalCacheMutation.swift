@@ -1,7 +1,7 @@
 import Foundation
-import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-open class MockLocalCacheMutation<SelectionSet: MutableRootSelectionSet>: LocalCacheMutation {
+open class MockLocalCacheMutation<SelectionSet: MutableRootSelectionSet>: LocalCacheMutation, @unchecked Sendable {
   open class var operationType: GraphQLOperationType { .query }
 
   public typealias Data = SelectionSet
@@ -13,12 +13,12 @@ open class MockLocalCacheMutation<SelectionSet: MutableRootSelectionSet>: LocalC
 }
 
 open class MockLocalCacheMutationFromMutation<SelectionSet: MutableRootSelectionSet>:
-  MockLocalCacheMutation<SelectionSet> {
+  MockLocalCacheMutation<SelectionSet>, @unchecked Sendable {
   override open class var operationType: GraphQLOperationType { .mutation }
 }
 
 open class MockLocalCacheMutationFromSubscription<SelectionSet: MutableRootSelectionSet>:
-  MockLocalCacheMutation<SelectionSet> {
+  MockLocalCacheMutation<SelectionSet>, @unchecked Sendable {
   override open class var operationType: GraphQLOperationType { .subscription }
 }
 
@@ -26,7 +26,8 @@ public protocol MockMutableRootSelectionSet: MutableRootSelectionSet
 where Schema == MockSchemaMetadata {}
 
 public extension MockMutableRootSelectionSet {
-  static var __parentType: any ParentType { Object.mock }
+  @_spi(Execution) static var __parentType: any ParentType { Object.mock }
+  @_spi(Execution) static var __fulfilledFragments: [any SelectionSet.Type] { [] }
 
   init() {
     self.init(_dataDict: DataDict(
@@ -38,3 +39,7 @@ public extension MockMutableRootSelectionSet {
 
 public protocol MockMutableInlineFragment: MutableSelectionSet, InlineFragment
 where Schema == MockSchemaMetadata {}
+
+public extension MockMutableInlineFragment {
+  static var __fulfilledFragments: [any SelectionSet.Type] { [] }
+}

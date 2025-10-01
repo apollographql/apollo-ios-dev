@@ -2,12 +2,12 @@ import Foundation
 import IR
 
 /// A configuration object that defines behavior for code generation.
-public struct ApolloCodegenConfiguration: Codable, Equatable {
+public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
 
   // MARK: Input Types
 
   /// The input paths and files required for code generation.
-  public struct FileInput: Codable, Equatable {
+  public struct FileInput: Codable, Equatable, Sendable {
     /// An array of path matching pattern strings used to find GraphQL schema
     /// files to be included for code generation.
     ///
@@ -158,14 +158,14 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   // MARK: Output Types
 
   /// The paths and files output by code generation.
-  public struct FileOutput: Codable, Equatable {
+  public struct FileOutput: Codable, Equatable, Sendable {
     /// The local path structure for the generated schema types files.
     public let schemaTypes: SchemaTypesFileOutput
     /// The local path structure for the generated operation object files.
     public let operations: OperationsFileOutput
     /// The local path structure for the test mock operation object files.
     public let testMocks: TestMockFileOutput
-    
+
     /// This var helps maintain backwards compatibility with legacy operation manifest generation
     /// with the new `OperationManifestConfiguration` and will be fully removed in v2.0
     fileprivate let operationIDsPath: String?
@@ -242,7 +242,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   }
 
   /// Swift access control configuration.
-  public enum AccessModifier: String, Codable, Equatable {
+  public enum AccessModifier: String, Codable, Equatable, Sendable {
     /// Enable entities to be used within any source file from their defining module, and also in
     /// a source file from another module that imports the defining module.
     case `public`
@@ -252,7 +252,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   }
 
   /// The local path structure for the generated schema types files.
-  public struct SchemaTypesFileOutput: Codable, Equatable {
+  public struct SchemaTypesFileOutput: Codable, Equatable, Sendable {
     /// Local path where the generated schema types files should be stored.
     public let path: String
     /// How to package the schema types for dependency management.
@@ -268,11 +268,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       moduleType: ModuleType
     ) {
       self.path = path
-      self.moduleType = moduleType == .swiftPackageManager ? .swiftPackage(apolloSDKDependency: .default) : moduleType
+      self.moduleType = moduleType
     }
 
     /// Compatible dependency manager automation.
-    public enum ModuleType: Codable, Equatable {
+    public enum ModuleType: Codable, Equatable, Sendable {
       /// Generated schema types will be manually embedded in a target with the specified `name`.
       /// No module will be created for the generated schema types. Use `accessModifier` to control
       /// the visibility of generated code, defaults to `.internal`.
@@ -281,10 +281,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       /// schema types files will be namespaced with the value of your configuration's
       /// `schemaNamespace` to prevent naming conflicts.
       case embeddedInTarget(name: String, accessModifier: AccessModifier = .internal)
-      /// Generates a `Package.swift` file that is suitable for linking the generated schema types
-      /// files to your project using Swift Package Manager.
-      /// Attention: This case has been deprecated, use .swiftPackage(apolloSDKVersion:) case instead.
-      case swiftPackageManager
       /// Generates a `Package.swift` file that is suitable for linking then generated schema types
       /// files to your project using Swift Package Manager. Uses the `apolloSDKDependency`
       /// to determine how to setup the dependency on `apollo-ios`.
@@ -293,21 +289,20 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       /// module to support your preferred dependency manager. You must specify the name of the
       /// module you will create in the `schemaNamespace` property as this will be used in `import`
       /// statements of generated operation files.
-      ///
-      /// Use this option for dependency managers, such as CocoaPods. Example usage would be to 
-      /// create the podspec file that is expecting the generated files in the configured output 
-      /// location.
       case other
 
       public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         guard let key = container.allKeys.first else {
-          throw DecodingError.typeMismatch(Self.self, DecodingError.Context.init(
-            codingPath: container.codingPath,
-            debugDescription: "Invalid number of keys found, expected one.",
-            underlyingError: nil
-          ))
+          throw DecodingError.typeMismatch(
+            Self.self,
+            DecodingError.Context.init(
+              codingPath: container.codingPath,
+              debugDescription: "Invalid number of keys found, expected one.",
+              underlyingError: nil
+            )
+          )
         }
 
         switch key {
@@ -318,40 +313,40 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
           )
 
           let name = try nestedContainer.decode(String.self, forKey: .name)
-          let accessModifier = try nestedContainer.decodeIfPresent(
-            AccessModifier.self,
-            forKey: .accessModifier
-          ) ?? .internal
+          let accessModifier =
+            try nestedContainer.decodeIfPresent(
+              AccessModifier.self,
+              forKey: .accessModifier
+            ) ?? .internal
 
           self = .embeddedInTarget(name: name, accessModifier: accessModifier)
 
-        case .swiftPackageManager:
-          self = .swiftPackage(apolloSDKDependency: .default)
-          
         case .swiftPackage:
           let nestedContainer = try container.nestedContainer(
             keyedBy: SwiftPackageCodingKeys.self,
             forKey: .swiftPackage
           )
-          
-          let apolloSDKDependency = try nestedContainer.decodeIfPresent(ApolloSDKDependency.self, forKey: .apolloSDKDependency) ?? ApolloSDKDependency()
+
+          let apolloSDKDependency =
+            try nestedContainer.decodeIfPresent(ApolloSDKDependency.self, forKey: .apolloSDKDependency)
+            ?? ApolloSDKDependency()
           self = .swiftPackage(apolloSDKDependency: apolloSDKDependency)
 
         case .other:
           self = .other
         }
       }
-      
+
       /// Configuation for apollo-ios dependency in SPM modules
-      public struct ApolloSDKDependency: Codable, Equatable {
+      public struct ApolloSDKDependency: Codable, Equatable, Sendable {
         /// URL for the SPM package dependency, not used for local dependencies.
         ///  Defaults to 'https://github.com/apollographql/apollo-ios'.
         let url: String
         /// Type of SPM dependency to use.
         let sdkVersion: SDKVersion
-        
+
         public static let `default` = ApolloSDKDependency()
-        
+
         public init(
           url: String = "https://github.com/apollographql/apollo-ios",
           sdkVersion: SDKVersion = .default
@@ -359,17 +354,17 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
           self.url = url
           self.sdkVersion = sdkVersion
         }
-        
+
         enum CodingKeys: CodingKey, CaseIterable {
           case url
           case sdkVersion
         }
-        
+
         public func encode(to encoder: any Encoder) throws {
           var container = encoder.container(keyedBy: CodingKeys.self)
-          
+
           try container.encode(self.url, forKey: .url)
-          
+
           switch self.sdkVersion {
           case .default:
             try container.encode(self.sdkVersion.stringValue, forKey: .sdkVersion)
@@ -377,7 +372,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
             try container.encode(self.sdkVersion, forKey: .sdkVersion)
           }
         }
-        
+
         public init(from decoder: any Decoder) throws {
           let values = try decoder.container(keyedBy: CodingKeys.self)
           try throwIfContainsUnexpectedKey(
@@ -385,9 +380,9 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
             type: Self.self,
             decoder: decoder
           )
-          
+
           url = try values.decodeIfPresent(String.self, forKey: .url) ?? "https://github.com/apollographql/apollo-ios"
-          
+
           if let version = try? values.decodeIfPresent(SDKVersion.self, forKey: .sdkVersion) {
             sdkVersion = version
           } else if let versionString = try? values.decodeIfPresent(String.self, forKey: .sdkVersion) {
@@ -397,9 +392,9 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
             sdkVersion = .default
           }
         }
-        
+
         /// Type of SPM dependency
-        public enum SDKVersion: Codable, Equatable {
+        public enum SDKVersion: Codable, Equatable, Sendable {
           /// Configures SPM dependency to use the exact version of apollo-ios
           /// that matches the code generation library version currently in use.
           /// Results in a dependency that looks like:
@@ -430,7 +425,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
           /// Results in a dependency that looks like:
           /// '.package(path: "{path}")'
           case local(path: String)
-          
+
           public var stringValue: String {
             switch self {
             case .default: return "default"
@@ -441,7 +436,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
             case .local(_): return "local"
             }
           }
-          
+
           public init(fromString str: String) throws {
             switch str {
             case Self.default.stringValue:
@@ -450,18 +445,21 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
               throw ApolloConfigurationError.invalidValueForKey(key: "sdkVersion", value: str)
             }
           }
-          
+
           public init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            
+
             guard let key = container.allKeys.first else {
-              throw DecodingError.typeMismatch(Self.self, DecodingError.Context.init(
-                codingPath: container.codingPath,
-                debugDescription: "Invalid number of keys found, expected one.",
-                underlyingError: nil
-              ))
+              throw DecodingError.typeMismatch(
+                Self.self,
+                DecodingError.Context.init(
+                  codingPath: container.codingPath,
+                  debugDescription: "Invalid number of keys found, expected one.",
+                  underlyingError: nil
+                )
+              )
             }
-            
+
             switch key {
             case .default:
               self = .default
@@ -470,7 +468,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
                 keyedBy: BranchCodingKeys.self,
                 forKey: .branch
               )
-              
+
               let name = try nestedContainer.decode(String.self, forKey: .name)
               self = .branch(name: name)
             case .commit:
@@ -478,7 +476,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
                 keyedBy: CommitCodingKeys.self,
                 forKey: .commit
               )
-              
+
               let hash = try nestedContainer.decode(String.self, forKey: .hash)
               self = .commit(hash: hash)
             case .exact:
@@ -486,7 +484,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
                 keyedBy: ExactCodingKeys.self,
                 forKey: .exact
               )
-              
+
               let version = try nestedContainer.decode(String.self, forKey: .version)
               self = .exact(version: version)
             case .from:
@@ -494,7 +492,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
                 keyedBy: FromCodingKeys.self,
                 forKey: .from
               )
-              
+
               let version = try nestedContainer.decode(String.self, forKey: .version)
               self = .from(version: version)
             case .local:
@@ -502,7 +500,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
                 keyedBy: LocalCodingKeys.self,
                 forKey: .local
               )
-              
+
               let path = try nestedContainer.decode(String.self, forKey: .path)
               self = .local(path: path)
             }
@@ -513,7 +511,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   }
 
   /// The local path structure for the generated operation object files.
-  public enum OperationsFileOutput: Codable, Equatable {
+  public enum OperationsFileOutput: Codable, Equatable, Sendable {
     /// All operation object files will be located in the module with the schema types.
     case inSchemaModule
     /// Operation object files will be co-located relative to the defining operation `.graphql`
@@ -530,11 +528,14 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       let container = try decoder.container(keyedBy: CodingKeys.self)
 
       guard let key = container.allKeys.first else {
-        throw DecodingError.typeMismatch(Self.self, DecodingError.Context.init(
-          codingPath: container.codingPath,
-          debugDescription: "Invalid number of keys found, expected one.",
-          underlyingError: nil
-        ))
+        throw DecodingError.typeMismatch(
+          Self.self,
+          DecodingError.Context.init(
+            codingPath: container.codingPath,
+            debugDescription: "Invalid number of keys found, expected one.",
+            underlyingError: nil
+          )
+        )
       }
 
       switch key {
@@ -548,10 +549,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         )
 
         let subpath = try nestedContainer.decodeIfPresent(String.self, forKey: .subpath)
-        let accessModifier = try nestedContainer.decodeIfPresent(
-          AccessModifier.self,
-          forKey: .accessModifier
-        ) ?? .public
+        let accessModifier =
+          try nestedContainer.decodeIfPresent(
+            AccessModifier.self,
+            forKey: .accessModifier
+          ) ?? .public
 
         self = .relative(subpath: subpath, accessModifier: accessModifier)
 
@@ -562,10 +564,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         )
 
         let path = try nestedContainer.decode(String.self, forKey: .path)
-        let accessModifier = try nestedContainer.decodeIfPresent(
-          AccessModifier.self,
-          forKey: .accessModifier
-        ) ?? .public
+        let accessModifier =
+          try nestedContainer.decodeIfPresent(
+            AccessModifier.self,
+            forKey: .accessModifier
+          ) ?? .public
 
         self = .absolute(path: path, accessModifier: accessModifier)
       }
@@ -573,7 +576,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   }
 
   /// The local path structure for the generated test mock object files.
-  public enum TestMockFileOutput: Codable, Equatable {
+  public enum TestMockFileOutput: Codable, Equatable, Sendable {
     /// Test mocks will not be generated. This is the default value.
     case none
     /// Generated test mock files will be located in the specified `path`. Use `accessModifier` to
@@ -600,11 +603,14 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       let container = try decoder.container(keyedBy: CodingKeys.self)
 
       guard let key = container.allKeys.first else {
-        throw DecodingError.typeMismatch(Self.self, DecodingError.Context.init(
-          codingPath: container.codingPath,
-          debugDescription: "Invalid number of keys found, expected one.",
-          underlyingError: nil
-        ))
+        throw DecodingError.typeMismatch(
+          Self.self,
+          DecodingError.Context.init(
+            codingPath: container.codingPath,
+            debugDescription: "Invalid number of keys found, expected one.",
+            underlyingError: nil
+          )
+        )
       }
 
       switch key {
@@ -618,10 +624,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         )
 
         let path = try nestedContainer.decode(String.self, forKey: .path)
-        let accessModifier = try nestedContainer.decodeIfPresent(
-          AccessModifier.self,
-          forKey: .accessModifier
-        ) ?? .public
+        let accessModifier =
+          try nestedContainer.decodeIfPresent(
+            AccessModifier.self,
+            forKey: .accessModifier
+          ) ?? .public
 
         self = .absolute(path: path, accessModifier: accessModifier)
 
@@ -639,7 +646,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   }
 
   // MARK: - Other Types
-  public struct OutputOptions: Codable, Equatable {
+  public struct OutputOptions: Codable, Equatable, Sendable {
     /// Any non-default rules for pluralization or singularization you wish to include.
     public let additionalInflectionRules: [InflectionRule]
     /// How deprecated enum cases from the schema should be handled.
@@ -654,16 +661,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public let schemaCustomization: SchemaCustomization
     /// Whether to reduce the number of schema types that are generated to only those that are referenced in an operation.
     public let reduceGeneratedSchemaTypes: Bool
-    /// Generate import statements that are compatible with including `Apollo` via Cocoapods.
-    ///
-    /// Cocoapods bundles all files from subspecs into the main target for a pod. This means that
-    /// when including `Apollo` via Cocoapods, the files in `ApolloAPI` will be added to the
-    /// `Apollo` target. In order for the generated code to compile, all `import ApolloAPI`
-    /// statements must be generated as `import Apollo` instead. Setting this option to `true`
-    /// configures the import statements to be compatible with Cocoapods.
-    ///
-    /// Defaults to `false`.
-    public let cocoapodsCompatibleImportStatements: Bool
     /// Annotate generated Swift code with the Swift `available` attribute and `deprecated`
     /// argument for parts of the GraphQL schema annotated with the built-in `@deprecated`
     /// directive.
@@ -690,8 +687,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     ///
     ///  Defaults to `true`.
     public let pruneGeneratedFiles: Bool
-    /// Whether generated GraphQL operation and local cache mutation class types will be marked as `final`.
-    public let markOperationDefinitionsAsFinal: Bool
     /// `true` will add a filename suffix matching the schema type, the default is `false`. This can be used to
     /// avoid filename conflicts when operation type names match schema type names.
     public let appendSchemaTypeFilenameSuffix: Bool
@@ -706,11 +701,9 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       public static let operationDocumentFormat: OperationDocumentFormat = .definition
       public static let schemaCustomization: SchemaCustomization = .init()
       public static let reduceGeneratedSchemaTypes: Bool = false
-      public static let cocoapodsCompatibleImportStatements: Bool = false
       public static let warningsOnDeprecatedUsage: Composition = .include
       public static let conversionStrategies: ConversionStrategies = .init()
       public static let pruneGeneratedFiles: Bool = true
-      public static let markOperationDefinitionsAsFinal: Bool = false
       public static let appendSchemaTypeFilenameSuffix: Bool = false
     }
 
@@ -726,16 +719,12 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     ///   - operationDocumentFormat: How to generate the operation documents for your generated operations.
     ///   - schemaCustomization: Customization options to be applied to the schema during code generation.
     ///   - reduceGeneratedSchemaTypes: Whether to reduce the number of schema types that are generated to only those that are referenced in an operation.
-    ///   - cocoapodsCompatibleImportStatements: Generate import statements that are compatible with
-    ///     including `Apollo` via Cocoapods.
     ///   - warningsOnDeprecatedUsage: Annotate generated Swift code with the Swift `available`
     ///     attribute and `deprecated` argument for parts of the GraphQL schema annotated with the
     ///     built-in `@deprecated` directive.
     ///   - conversionStrategies: Rules for how to convert the names of values from the schema in
     ///     generated code.
     ///   - pruneGeneratedFiles: Whether unused generated files will be automatically deleted.
-    ///   - markOperationDefinitionsAsFinal: Whether generated GraphQL operation and local cache mutation
-    ///     class types will be marked as `final`.
     ///   - appendSchemaTypeFilenameSuffix: `true` will add a filename suffix matching the schema type, the
     ///     default is `false`. This can be used to avoid filename conflicts when operation type names match
     ///     schema type names.
@@ -747,11 +736,9 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       operationDocumentFormat: OperationDocumentFormat = Default.operationDocumentFormat,
       schemaCustomization: SchemaCustomization = Default.schemaCustomization,
       reduceGeneratedSchemaTypes: Bool = Default.reduceGeneratedSchemaTypes,
-      cocoapodsCompatibleImportStatements: Bool = Default.cocoapodsCompatibleImportStatements,
       warningsOnDeprecatedUsage: Composition = Default.warningsOnDeprecatedUsage,
       conversionStrategies: ConversionStrategies = Default.conversionStrategies,
       pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-      markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
       appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix
     ) {
       self.additionalInflectionRules = additionalInflectionRules
@@ -761,11 +748,9 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       self.operationDocumentFormat = operationDocumentFormat
       self.schemaCustomization = schemaCustomization
       self.reduceGeneratedSchemaTypes = reduceGeneratedSchemaTypes
-      self.cocoapodsCompatibleImportStatements = cocoapodsCompatibleImportStatements
       self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
       self.conversionStrategies = conversionStrategies
       self.pruneGeneratedFiles = pruneGeneratedFiles
-      self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
       self.appendSchemaTypeFilenameSuffix = appendSchemaTypeFilenameSuffix
     }
 
@@ -777,15 +762,12 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case deprecatedEnumCases
       case schemaDocumentation
       case selectionSetInitializers
-      case apqs
       case operationDocumentFormat
       case schemaCustomization
       case reduceGeneratedSchemaTypes
-      case cocoapodsCompatibleImportStatements
       case warningsOnDeprecatedUsage
       case conversionStrategies
       case pruneGeneratedFiles
-      case markOperationDefinitionsAsFinal
       case appendSchemaTypeFilenameSuffix
     }
 
@@ -793,75 +775,71 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       let values = try decoder.container(keyedBy: CodingKeys.self)
       try throwIfContainsUnexpectedKey(container: values, type: Self.self, decoder: decoder)
 
-      additionalInflectionRules = try values.decodeIfPresent(
-        [InflectionRule].self,
-        forKey: .additionalInflectionRules
-      ) ?? Default.additionalInflectionRules
+      additionalInflectionRules =
+        try values.decodeIfPresent(
+          [InflectionRule].self,
+          forKey: .additionalInflectionRules
+        ) ?? Default.additionalInflectionRules
 
-      deprecatedEnumCases = try values.decodeIfPresent(
-        Composition.self,
-        forKey: .deprecatedEnumCases
-      ) ?? Default.deprecatedEnumCases
+      deprecatedEnumCases =
+        try values.decodeIfPresent(
+          Composition.self,
+          forKey: .deprecatedEnumCases
+        ) ?? Default.deprecatedEnumCases
 
-      schemaDocumentation = try values.decodeIfPresent(
-        Composition.self,
-        forKey: .schemaDocumentation
-      ) ?? Default.schemaDocumentation
+      schemaDocumentation =
+        try values.decodeIfPresent(
+          Composition.self,
+          forKey: .schemaDocumentation
+        ) ?? Default.schemaDocumentation
 
-      selectionSetInitializers = try values.decodeIfPresent(
-        SelectionSetInitializers.self,
-        forKey: .selectionSetInitializers
-      ) ?? Default.selectionSetInitializers
+      selectionSetInitializers =
+        try values.decodeIfPresent(
+          SelectionSetInitializers.self,
+          forKey: .selectionSetInitializers
+        ) ?? Default.selectionSetInitializers
 
-      operationDocumentFormat = try values.decodeIfPresent(
-        OperationDocumentFormat.self,
-        forKey: .operationDocumentFormat
-      ) ??
-      values.decodeIfPresent(
-        APQConfig.self,
-        forKey: .apqs
-      )?.operationDocumentFormat ??
-      Default.operationDocumentFormat
-      
-      schemaCustomization = try values.decodeIfPresent(
-        SchemaCustomization.self,
-        forKey: .schemaCustomization
-      ) ?? Default.schemaCustomization
-      
-      reduceGeneratedSchemaTypes = try values.decodeIfPresent(
-        Bool.self,
-        forKey: .reduceGeneratedSchemaTypes
-      ) ?? Default.reduceGeneratedSchemaTypes
+      operationDocumentFormat =
+        try values.decodeIfPresent(
+          OperationDocumentFormat.self,
+          forKey: .operationDocumentFormat
+        ) ?? Default.operationDocumentFormat
 
-      cocoapodsCompatibleImportStatements = try values.decodeIfPresent(
-        Bool.self,
-        forKey: .cocoapodsCompatibleImportStatements
-      ) ?? Default.cocoapodsCompatibleImportStatements
+      schemaCustomization =
+        try values.decodeIfPresent(
+          SchemaCustomization.self,
+          forKey: .schemaCustomization
+        ) ?? Default.schemaCustomization
 
-      warningsOnDeprecatedUsage = try values.decodeIfPresent(
-        Composition.self,
-        forKey: .warningsOnDeprecatedUsage
-      ) ?? Default.warningsOnDeprecatedUsage
+      reduceGeneratedSchemaTypes =
+        try values.decodeIfPresent(
+          Bool.self,
+          forKey: .reduceGeneratedSchemaTypes
+        ) ?? Default.reduceGeneratedSchemaTypes
 
-      conversionStrategies = try values.decodeIfPresent(
-        ConversionStrategies.self,
-        forKey: .conversionStrategies
-      ) ?? Default.conversionStrategies
+      warningsOnDeprecatedUsage =
+        try values.decodeIfPresent(
+          Composition.self,
+          forKey: .warningsOnDeprecatedUsage
+        ) ?? Default.warningsOnDeprecatedUsage
 
-      pruneGeneratedFiles = try values.decodeIfPresent(
-        Bool.self,
-        forKey: .pruneGeneratedFiles
-      ) ?? Default.pruneGeneratedFiles
+      conversionStrategies =
+        try values.decodeIfPresent(
+          ConversionStrategies.self,
+          forKey: .conversionStrategies
+        ) ?? Default.conversionStrategies
 
-      markOperationDefinitionsAsFinal = try values.decodeIfPresent(
-        Bool.self,
-        forKey: .markOperationDefinitionsAsFinal
-      ) ?? Default.markOperationDefinitionsAsFinal
+      pruneGeneratedFiles =
+        try values.decodeIfPresent(
+          Bool.self,
+          forKey: .pruneGeneratedFiles
+        ) ?? Default.pruneGeneratedFiles
 
-      appendSchemaTypeFilenameSuffix = try values.decodeIfPresent(
-        Bool.self,
-        forKey: .appendSchemaTypeFilenameSuffix
-      ) ?? Default.appendSchemaTypeFilenameSuffix
+      appendSchemaTypeFilenameSuffix =
+        try values.decodeIfPresent(
+          Bool.self,
+          forKey: .appendSchemaTypeFilenameSuffix
+        ) ?? Default.appendSchemaTypeFilenameSuffix
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -874,11 +852,9 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       try container.encode(self.operationDocumentFormat, forKey: .operationDocumentFormat)
       try container.encode(self.schemaCustomization, forKey: .schemaCustomization)
       try container.encode(self.reduceGeneratedSchemaTypes, forKey: .reduceGeneratedSchemaTypes)
-      try container.encode(self.cocoapodsCompatibleImportStatements, forKey: .cocoapodsCompatibleImportStatements)
       try container.encode(self.warningsOnDeprecatedUsage, forKey: .warningsOnDeprecatedUsage)
       try container.encode(self.conversionStrategies, forKey: .conversionStrategies)
       try container.encode(self.pruneGeneratedFiles, forKey: .pruneGeneratedFiles)
-      try container.encode(self.markOperationDefinitionsAsFinal, forKey: .markOperationDefinitionsAsFinal)
       try container.encode(self.appendSchemaTypeFilenameSuffix, forKey: .appendSchemaTypeFilenameSuffix)
     }
   }
@@ -886,18 +862,18 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   /// Composition is used as a substitute for a boolean where context is better placed in the value
   /// instead of the parameter name, e.g.: `includeDeprecatedEnumCases = true` vs.
   /// `deprecatedEnumCases = .include`.
-  public enum Composition: String, Codable, Equatable {
+  public enum Composition: String, Codable, Equatable, Sendable {
     case include
     case exclude
   }
 
   /// ``ConversionStrategies`` configures rules for how to convert the names of values from the
   /// schema in generated code.
-  public struct ConversionStrategies: Codable, Equatable {
+  public struct ConversionStrategies: Codable, Equatable, Sendable {
 
     /// ``ApolloCodegenConfiguration/ConversionStrategies/EnumCases`` is used to specify the strategy
     /// used to convert the casing of enum cases in a GraphQL schema into generated Swift code.
-    public enum EnumCases: String, Codable, Equatable {
+    public enum EnumCases: String, Codable, Equatable, Sendable {
       /// Generates swift code using the exact name provided in the GraphQL schema
       /// performing no conversion.
       case none
@@ -908,7 +884,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     /// ``ApolloCodegenConfiguration/ConversionStrategies/FieldAccessors`` is used to specify the
     /// strategy used to convert the casing of fields on GraphQL selection sets into field accessors
     /// on the response models in generated Swift code.
-    public enum FieldAccessors: String, Codable, Equatable {
+    public enum FieldAccessors: String, Codable, Equatable, Sendable {
       /// This conversion strategy will:
       /// - Lowercase the first letter of all fields.
       /// - Convert field names that are all `UPPERCASE` to all `lowercase`.
@@ -918,27 +894,27 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       /// - Convert field names that are all `UPPERCASE` to all `lowercase`.
       case camelCase
     }
-    
+
     /// ``ApolloCodegenConfiguration/ConversionStrategies/InputObjects`` is used to specify
     ///  the strategy used to convert the casing of input objects in a GraphQL schema into generated Swift code.
-    public enum InputObjects: String, Codable, Equatable {
+    public enum InputObjects: String, Codable, Equatable, Sendable {
       /// Generates swift code using the exact name provided in the GraphQL schema
       ///  performing no conversion
       case none
       /// Convert to lower camel case from `snake_case`, `UpperCamelCase`, or `UPPERCASE`.
       case camelCase
     }
-    
+
     /// Determines how the names of enum cases in the GraphQL schema will be converted into
     /// cases on the generated Swift enums.
     /// Defaults to ``ApolloCodegenConfiguration/ConversionStrategies/CaseConversionStrategy/camelCase``
     public let enumCases: EnumCases
-    
+
     /// Determines how the names of fields in the GraphQL schema will be converted into
     /// properties in the generated Swift code.
     /// Defaults to ``ApolloCodegenConfiguration/ConversionStrategies/FieldAccessors/idiomatic``
     public let fieldAccessors: FieldAccessors
-    
+
     /// Determines how the names of input objects in the GraphQL schema will be converted into
     /// the generated Swift code.
     /// Defaults to ``ApolloCodegenConfiguration/ConversionStrategies/InputObjects/camelCase``
@@ -950,7 +926,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       public static let fieldAccessors: FieldAccessors = .idiomatic
       public static let inputObjects: InputObjects = .camelCase
     }
-      
+
     public init(
       enumCases: EnumCases = Default.enumCases,
       fieldAccessors: FieldAccessors = Default.fieldAccessors,
@@ -969,49 +945,43 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case inputObjects
     }
 
-    @available(*, deprecated) // Deprecation attribute added to supress warning.
+    @available(*, deprecated)  // Deprecation attribute added to supress warning.
     public init(from decoder: any Decoder) throws {
       let values = try decoder.container(keyedBy: CodingKeys.self)
       guard values.allKeys.first != nil else {
-        throw DecodingError.typeMismatch(Self.self, DecodingError.Context.init(
-          codingPath: values.codingPath,
-          debugDescription: "Invalid value found.",
-          underlyingError: nil
-        ))
+        throw DecodingError.typeMismatch(
+          Self.self,
+          DecodingError.Context.init(
+            codingPath: values.codingPath,
+            debugDescription: "Invalid value found.",
+            underlyingError: nil
+          )
+        )
       }
 
-      if let deprecatedEnumCase = try? values.decodeIfPresent(
-        CaseConversionStrategy.self,
-        forKey: .enumCases
-      ) {
-        switch deprecatedEnumCase {
-        case .none:
-          enumCases = .none
-        case .camelCase:
-          enumCases = .camelCase
-        }
-      } else {
-        enumCases = try values.decodeIfPresent(
+      enumCases =
+        try values.decodeIfPresent(
           EnumCases.self,
           forKey: .enumCases
         ) ?? Default.enumCases
-      }
-      
-      fieldAccessors = try values.decodeIfPresent(
-        FieldAccessors.self,
-        forKey: .fieldAccessors
-      ) ?? Default.fieldAccessors
-      
-      inputObjects = try values.decodeIfPresent(
-        InputObjects.self,
-        forKey: .inputObjects
-      ) ?? Default.inputObjects
+
+      fieldAccessors =
+        try values.decodeIfPresent(
+          FieldAccessors.self,
+          forKey: .fieldAccessors
+        ) ?? Default.fieldAccessors
+
+      inputObjects =
+        try values.decodeIfPresent(
+          InputObjects.self,
+          forKey: .inputObjects
+        ) ?? Default.inputObjects
     }
   }
-  
+
   // MARK: - OperationDocumentFormat
-  
-  public struct OperationDocumentFormat: OptionSet, Codable, Equatable {
+
+  public struct OperationDocumentFormat: OptionSet, Codable, Equatable, Sendable {
     /// Include the GraphQL source document for the operation in the generated operation models.
     public static let definition = Self(rawValue: 1)
     /// Include the computed operation identifier hash for use with persisted queries
@@ -1047,10 +1017,14 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       guard self.rawValue != 0 else {
         throw DecodingError.valueNotFound(
           OperationDocumentFormat.self,
-          .init(codingPath: [
-            ApolloCodegenConfiguration.CodingKeys.options,
-            OutputOptions.CodingKeys.operationDocumentFormat
-          ], debugDescription: "operationDocumentFormat configuration cannot be empty."))
+          .init(
+            codingPath: [
+              ApolloCodegenConfiguration.CodingKeys.options,
+              OutputOptions.CodingKeys.operationDocumentFormat,
+            ],
+            debugDescription: "operationDocumentFormat configuration cannot be empty."
+          )
+        )
       }
     }
 
@@ -1064,7 +1038,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       }
     }
   }
-  
+
   /// The ``SelectionSetInitializers`` configuration is used to determine if you would like
   /// initializers to be generated for your generated selection set models.
   ///
@@ -1074,7 +1048,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   /// ``SelectionSetInitializers`` functions like an `OptionSet`, allowing you to combine multiple
   /// different instances together to indicate all the types you would like to generate
   /// initializers for.
-  public struct SelectionSetInitializers: Codable, Equatable, ExpressibleByArrayLiteral {
+  public struct SelectionSetInitializers: Codable, Equatable, Sendable, ExpressibleByArrayLiteral {
     /// Option to generate initializers for all named fragments.
     public static let namedFragments: SelectionSetInitializers = .init(.namedFragments)
 
@@ -1085,7 +1059,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     /// Option to generate initializers for all models.
     /// This includes named fragments, operations, and local cache mutations.
     public static let all: SelectionSetInitializers = [
-      .namedFragments, .operations
+      .namedFragments, .operations,
     ]
 
     /// An option to generate initializers for a single operation with a given name.
@@ -1136,20 +1110,20 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
   ///  - Note: Disabling field merging and `selectionSetInitializers` functionality are
   /// incompatible. If using `selectionSetInitializers`, `fieldMerging` must be set to `.all`,
   /// otherwise a validation error will be thrown when runnning code generation.
-  public struct FieldMerging: Codable, Equatable, ExpressibleByArrayLiteral {
+  public struct FieldMerging: Codable, Equatable, Sendable, ExpressibleByArrayLiteral {
     /// Merges fields and fragment accessors from the selection set's direct ancestors.
-    public static let ancestors          = FieldMerging(.ancestors)
+    public static let ancestors = FieldMerging(.ancestors)
 
     /// Merges fields and fragment accessors from sibling inline fragments that match the selection
     /// set's scope.
-    public static let siblings           = FieldMerging(.siblings)
+    public static let siblings = FieldMerging(.siblings)
 
     /// Merges fields and fragment accessors from named fragments that have been spread into the
     /// selection set.
-    public static let namedFragments     = FieldMerging(.namedFragments)
+    public static let namedFragments = FieldMerging(.namedFragments)
 
     /// Merges all possible fields and fragment accessors from all sources.
-    public static let all: FieldMerging  = [.ancestors, .siblings, .namedFragments]
+    public static let all: FieldMerging = [.ancestors, .siblings, .namedFragments]
 
     /// Disables field merging entirely. Aside from removal of redundant selections, the shape of
     /// the generated models will directly mirror the GraphQL definition.
@@ -1174,7 +1148,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     }
   }
 
-  public struct ExperimentalFeatures: Codable, Equatable {
+  public struct ExperimentalFeatures: Codable, Equatable, Sendable {
 
     /// **EXPERIMENTAL**: If enabled, the generated operations will be transformed using a method
     /// that attempts to maintain compatibility with the legacy behavior from
@@ -1198,7 +1172,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       public static let legacySafelistingCompatibleOperations: Bool = false
       public static let fieldMerging: FieldMerging = [.all]
     }
-    
+
     /// Designated Initializer
     ///
     /// - Parameters:
@@ -1223,15 +1197,17 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public init(from decoder: any Decoder) throws {
       let values = try decoder.container(keyedBy: CodingKeys.self)
 
-      fieldMerging = try values.decodeIfPresent(
-        FieldMerging.self,
-        forKey: .fieldMerging
-      ) ?? Default.fieldMerging
+      fieldMerging =
+        try values.decodeIfPresent(
+          FieldMerging.self,
+          forKey: .fieldMerging
+        ) ?? Default.fieldMerging
 
-      legacySafelistingCompatibleOperations = try values.decodeIfPresent(
-        Bool.self,
-        forKey: .legacySafelistingCompatibleOperations
-      ) ?? Default.legacySafelistingCompatibleOperations
+      legacySafelistingCompatibleOperations =
+        try values.decodeIfPresent(
+          Bool.self,
+          forKey: .legacySafelistingCompatibleOperations
+        ) ?? Default.legacySafelistingCompatibleOperations
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -1269,10 +1245,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public static let operationManifest: OperationManifestConfiguration? = nil
   }
 
-  // MARK: - Helper Properties
-  
-  let ApolloAPITargetName: String
-
   // MARK: Initializers
 
   /// Designated initializer.
@@ -1299,7 +1271,6 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     self.experimentalFeatures = experimentalFeatures
     self.schemaDownload = schemaDownload
     self.operationManifest = operationManifest
-    self.ApolloAPITargetName = options.cocoapodsCompatibleImportStatements ? "Apollo" : "ApolloAPI"
   }
 
   // MARK: Codable
@@ -1328,7 +1299,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     if let schemaDownload {
       try container.encode(schemaDownload, forKey: .schemaDownload)
     }
-    
+
     if let operationManifest {
       try container.encode(operationManifest, forKey: .operationManifest)
     }
@@ -1354,13 +1325,14 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         )
       )
     }
-    
+
     let fileOutput = try values.decode(FileOutput.self, forKey: .output)
-    let options = try values.decodeIfPresent(
-      OutputOptions.self,
-      forKey: .options
-    ) ?? Default.options
-    
+    let options =
+      try values.decodeIfPresent(
+        OutputOptions.self,
+        forKey: .options
+      ) ?? Default.options
+
     var operationManifest = try values.decodeIfPresent(OperationManifestConfiguration.self, forKey: .operationManifest)
     if operationManifest == nil {
       if let operationIDsPath = fileOutput.operationIDsPath {
@@ -1370,10 +1342,13 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         )
       }
     }
-    
+
     var schemaDownload = try values.decodeIfPresent(ApolloSchemaDownloadConfiguration.self, forKey: .schemaDownload)
     if schemaDownload == nil {
-      schemaDownload = try values.decodeIfPresent(ApolloSchemaDownloadConfiguration.self, forKey: .schemaDownloadConfiguration)
+      schemaDownload = try values.decodeIfPresent(
+        ApolloSchemaDownloadConfiguration.self,
+        forKey: .schemaDownloadConfiguration
+      )
     }
 
     self.init(
@@ -1389,7 +1364,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       operationManifest: operationManifest ?? Default.operationManifest
     )
   }
-  
+
 }
 
 // MARK: Errors
@@ -1397,13 +1372,13 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
 extension ApolloCodegenConfiguration {
   public enum ApolloConfigurationError: Error, LocalizedError {
     case invalidValueForKey(key: String, value: String)
-    
+
     public var errorDescription: String? {
       switch self {
       case .invalidValueForKey(let key, let value):
         return """
-        Invalid value '\(value)' provided for key '\(key)'.
-        """
+          Invalid value '\(value)' provided for key '\(key)'.
+          """
       }
     }
   }
@@ -1416,9 +1391,9 @@ extension ApolloCodegenConfiguration.SchemaTypesFileOutput {
   var isInModule: Bool {
     switch moduleType {
     case .embeddedInTarget: return false
-    case .swiftPackageManager, .swiftPackage, .other: return true
+    case .swiftPackage, .other: return true
     }
-  }  
+  }
 }
 
 extension ApolloCodegenConfiguration.OperationsFileOutput {
@@ -1471,8 +1446,8 @@ extension ApolloCodegenConfiguration {
 extension ApolloCodegenConfiguration.SelectionSetInitializers {
   struct Options: OptionSet, Codable, Equatable {
     let rawValue: Int
-    static let namedFragments      = Options(rawValue: 1 << 1)
-    static let operations          = Options(rawValue: 1 << 2)
+    static let namedFragments = Options(rawValue: 1 << 1)
+    static let operations = Options(rawValue: 1 << 2)
   }
 
   private init(_ options: Options) {
@@ -1520,9 +1495,11 @@ extension ApolloCodegenConfiguration.SelectionSetInitializers {
     try decode(option: .namedFragments, forKey: .namedFragments)
 
     self.options = options
-    self.definitions = try values.decodeIfPresent(
-      Set<String>.self,
-      forKey: .definitionsNamed) ?? []
+    self.definitions =
+      try values.decodeIfPresent(
+        Set<String>.self,
+        forKey: .definitionsNamed
+      ) ?? []
   }
 
   public func encode(to encoder: any Encoder) throws {
@@ -1612,346 +1589,6 @@ extension ApolloCodegenConfiguration.FieldMerging {
   }
 }
 
-// MARK: - Deprecations
-
-extension ApolloCodegenConfiguration {
-  /// Name used to scope the generated schema type files.
-  @available(*, deprecated, renamed: "schemaNamespace")
-  public var schemaName: String { schemaNamespace }
-
-  /// Deprecated initializer - use `init(schemaNamespace:input:output:options:experimentalFeatures:schemaDownload:operationManifest:)`
-  /// instead.
-  ///
-  /// - Parameters:
-  ///  - schemaName: Name used to scope the generated schema type files.
-  ///  - input: The input files required for code generation.
-  ///  - output: The paths and files output by code generation.
-  ///  - options: Rules and options to customize the generated code.
-  ///  - experimentalFeatures: Allows users to enable experimental features.
-  @available(*, deprecated, renamed: "init(schemaNamespace:input:output:options:experimentalFeatures:schemaDownload:operationManifest:)")
-  @_disfavoredOverload
-  public init(
-    schemaName: String,
-    input: FileInput,
-    output: FileOutput,
-    options: OutputOptions = Default.options,
-    experimentalFeatures: ExperimentalFeatures = Default.experimentalFeatures,
-    schemaDownloadConfiguration: ApolloSchemaDownloadConfiguration? = Default.schemaDownload
-  ) {
-    self.init(
-      schemaNamespace: schemaName,
-      input: input,
-      output: output,
-      options: options,
-      experimentalFeatures: experimentalFeatures,
-      schemaDownload: schemaDownloadConfiguration)
-  }
-
-  /// Enum to enable using
-  /// [Automatic Persisted Queries (APQs)](https://www.apollographql.com/docs/apollo-server/performance/apq)
-  /// with your generated operations.
-  ///
-  /// APQs are a feature of Apollo Server/Router. When using Apollo iOS to connect to any other GraphQL server,
-  /// `APQConfig` should be set to `.disabled`
-  public enum APQConfig: String, Decodable {
-    /// The default value. Disables APQs.
-    /// The operation document is sent to the server with each operation request.
-    @available(*, deprecated, message: "Use OperationDocumentFormat instead.")
-    case disabled
-
-    /// Automatically persists your operations using Apollo Server/Router's
-    /// [APQs](https://www.apollographql.com/docs/apollo-server/performance/apq).
-    @available(*, deprecated, message: "Use OperationDocumentFormat instead.")
-    case automaticallyPersist
-
-    /// Provides only the `operationIdentifier` for operations that have been previously persisted
-    /// to an Apollo Server/Router using
-    /// [APQs](https://www.apollographql.com/docs/apollo-server/performance/apq).
-    ///
-    /// If the server does not recognize the `operationIdentifier`, the operation will fail. This
-    /// method should only be used if you are manually persisting your queries to an
-    /// Apollo Server/Router.
-    @available(*, deprecated, message: "Use OperationDocumentFormat instead.")
-    case persistedOperationsOnly
-
-    var operationDocumentFormat: ApolloCodegenConfiguration.OperationDocumentFormat {
-      switch self {
-      case .disabled:
-        return .definition
-      case .automaticallyPersist:
-        return [.definition, .operationId]
-      case .persistedOperationsOnly:
-        return .operationId
-      }
-    }
-  }
-}
-
-extension ApolloCodegenConfiguration.FileOutput {
-  /// Deprecated initializer.
-  ///
-  /// - Parameters:
-  ///  - schemaTypes: The local path structure for the generated schema types files.
-  ///  - operations: The local path structure for the generated operation object files.
-  ///  Defaults to `.inSchemaModule`.
-  ///  - testMocks: The local path structure for the test mock operation object files.
-  ///  If `.none`, test mocks will not be generated. Defaults to `.none`.
-  ///  - operationIdentifiersPath: An absolute location to an operation id JSON map file
-  ///  for use with APQ registration. Defaults to `nil`.
-  @available(*, deprecated, renamed: "init(schemaTypes:operations:testMocks:)")
-  @_disfavoredOverload
-  public init(
-    schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput,
-    operations: ApolloCodegenConfiguration.OperationsFileOutput = Default.operations,
-    testMocks: ApolloCodegenConfiguration.TestMockFileOutput = Default.testMocks,
-    operationIdentifiersPath: String?
-  ) {
-    self.schemaTypes = schemaTypes
-    self.operations = operations
-    self.testMocks = testMocks
-    self.operationIDsPath = operationIdentifiersPath
-  }
-
-  /// An absolute location to an operation id JSON map file.
-  @available(*, deprecated, message: "Moved to ApolloCodegenConfiguration.OperationManifestConfiguration.OperationManifest.path")
-  public var operationIdentifiersPath: String? { operationIDsPath }
-}
-
-extension ApolloCodegenConfiguration.OutputOptions {
-  /// Deprecated initializer.
-  ///
-  /// - Parameters:
-  ///   - additionalInflectionRules: Any non-default rules for pluralization or singularization
-  ///   you wish to include.
-  ///   - deprecatedEnumCases: How deprecated enum cases from the schema should be handled.
-  ///   - schemaDocumentation: Whether schema documentation is added to the generated files.
-  ///   - selectionSetInitializers: Which generated selection sets should include
-  ///     generated initializers.
-  ///   - operationDocumentFormat: How to generate the operation documents for your generated operations.
-  ///   - cocoapodsCompatibleImportStatements: Generate import statements that are compatible with
-  ///     including `Apollo` via Cocoapods.
-  ///   - warningsOnDeprecatedUsage: Annotate generated Swift code with the Swift `available`
-  ///     attribute and `deprecated` argument for parts of the GraphQL schema annotated with the
-  ///     built-in `@deprecated` directive.
-  ///   - conversionStrategies: Rules for how to convert the names of values from the schema in
-  ///     generated code.
-  ///   - pruneGeneratedFiles: Whether unused generated files will be automatically deleted.
-  ///   - markOperationDefinitionsAsFinal: Whether generated GraphQL operation and local cache mutation
-  ///     class types will be marked as `final`.
-  ///   - appendSchemaTypeFilenameSuffix: `true` will add a filename suffix matching the schema type, the
-  ///     default is `false`. This can be used to avoid filename conflicts when operation type names match
-  ///     schema type names.
-  ///
-  @available(*, deprecated,
-              renamed: "init(additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:schemaCustomization:reduceGeneratedSchemaTypes:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
-  )
-  @_disfavoredOverload
-  public init(
-    additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
-    deprecatedEnumCases: ApolloCodegenConfiguration.Composition = Default.deprecatedEnumCases,
-    schemaDocumentation: ApolloCodegenConfiguration.Composition = Default.schemaDocumentation,
-    selectionSetInitializers: ApolloCodegenConfiguration.SelectionSetInitializers = Default.selectionSetInitializers,
-    operationDocumentFormat: ApolloCodegenConfiguration.OperationDocumentFormat = Default.operationDocumentFormat,
-    schemaCustomization: ApolloCodegenConfiguration.SchemaCustomization = Default.schemaCustomization,
-    cocoapodsCompatibleImportStatements: Bool = Default.cocoapodsCompatibleImportStatements,
-    warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
-    conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
-    pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal,
-    appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix
-  ) {
-    self.additionalInflectionRules = additionalInflectionRules
-    self.deprecatedEnumCases = deprecatedEnumCases
-    self.schemaDocumentation = schemaDocumentation
-    self.selectionSetInitializers = selectionSetInitializers
-    self.operationDocumentFormat = operationDocumentFormat
-    self.schemaCustomization = schemaCustomization
-    self.reduceGeneratedSchemaTypes = Default.reduceGeneratedSchemaTypes
-    self.cocoapodsCompatibleImportStatements = cocoapodsCompatibleImportStatements
-    self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
-    self.conversionStrategies = conversionStrategies
-    self.pruneGeneratedFiles = pruneGeneratedFiles
-    self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
-    self.appendSchemaTypeFilenameSuffix = appendSchemaTypeFilenameSuffix
-  }
-  
-  /// Deprecated initializer.
-  ///
-  /// - Parameters:
-  ///   - additionalInflectionRules: Any non-default rules for pluralization or singularization
-  ///   you wish to include.
-  ///   - queryStringLiteralFormat: Formatting of the GraphQL query string literal that is
-  ///   included in each generated operation object.
-  ///   - deprecatedEnumCases: How deprecated enum cases from the schema should be handled.
-  ///   - schemaDocumentation: Whether schema documentation is added to the generated files.
-  ///   - selectionSetInitializers: Which generated selection sets should include
-  ///     generated initializers.
-  ///   - apqs: Whether the generated operations should use Automatic Persisted Queries.
-  ///   - cocoapodsCompatibleImportStatements: Generate import statements that are compatible with
-  ///     including `Apollo` via Cocoapods.
-  ///   - warningsOnDeprecatedUsage: Annotate generated Swift code with the Swift `available`
-  ///     attribute and `deprecated` argument for parts of the GraphQL schema annotated with the
-  ///     built-in `@deprecated` directive.
-  ///   - conversionStrategies: Rules for how to convert the names of values from the schema in
-  ///     generated code.
-  ///   - pruneGeneratedFiles: Whether unused generated files will be automatically deleted.
-  ///   - markOperationDefinitionsAsFinal: Whether generated GraphQL operation and local cache mutation class types will be marked as `final`.
-  @available(*, deprecated,
-              renamed: "init(additionalInflectionRules:queryStringLiteralFormat:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:appendSchemaTypeFilenameSuffix:)"
-  )
-  @_disfavoredOverload
-  public init(
-    additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
-    queryStringLiteralFormat: QueryStringLiteralFormat = .singleLine,
-    deprecatedEnumCases: ApolloCodegenConfiguration.Composition = Default.deprecatedEnumCases,
-    schemaDocumentation: ApolloCodegenConfiguration.Composition = Default.schemaDocumentation,
-    selectionSetInitializers: ApolloCodegenConfiguration.SelectionSetInitializers = Default.selectionSetInitializers,
-    apqs: ApolloCodegenConfiguration.APQConfig,
-    cocoapodsCompatibleImportStatements: Bool = Default.cocoapodsCompatibleImportStatements,
-    warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
-    conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
-    pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal
-  ) {
-    self.additionalInflectionRules = additionalInflectionRules
-    self.deprecatedEnumCases = deprecatedEnumCases
-    self.schemaDocumentation = schemaDocumentation
-    self.selectionSetInitializers = selectionSetInitializers
-    self.operationDocumentFormat = apqs.operationDocumentFormat
-    self.cocoapodsCompatibleImportStatements = cocoapodsCompatibleImportStatements
-    self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
-    self.conversionStrategies = conversionStrategies
-    self.pruneGeneratedFiles = pruneGeneratedFiles
-    self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
-    self.schemaCustomization = Default.schemaCustomization
-    self.appendSchemaTypeFilenameSuffix = Default.appendSchemaTypeFilenameSuffix
-    self.reduceGeneratedSchemaTypes = Default.reduceGeneratedSchemaTypes
-  }
-  
-  /// Deprecated initializer.
-  ///
-  /// - Parameters:
-  ///   - additionalInflectionRules: Any non-default rules for pluralization or singularization
-  ///   you wish to include.
-  ///   - queryStringLiteralFormat: Formatting of the GraphQL query string literal that is
-  ///   included in each generated operation object.
-  ///   - deprecatedEnumCases: How deprecated enum cases from the schema should be handled.
-  ///   - schemaDocumentation: Whether schema documentation is added to the generated files.
-  ///   - selectionSetInitializers: Which generated selection sets should include
-  ///     generated initializers.
-  ///   - operationDocumentFormat: How to generate the operation documents for your generated operations.
-  ///   - cocoapodsCompatibleImportStatements: Generate import statements that are compatible with
-  ///     including `Apollo` via Cocoapods.
-  ///   - warningsOnDeprecatedUsage: Annotate generated Swift code with the Swift `available`
-  ///     attribute and `deprecated` argument for parts of the GraphQL schema annotated with the
-  ///     built-in `@deprecated` directive.
-  ///   - conversionStrategies: Rules for how to convert the names of values from the schema in
-  ///     generated code.
-  ///   - pruneGeneratedFiles: Whether unused generated files will be automatically deleted.
-  ///   - markOperationDefinitionsAsFinal: Whether generated GraphQL operation and local cache mutation class types will be marked as `final`.
-  @available(*, deprecated,
-              renamed: "init(additionalInflectionRules:deprecatedEnumCases:schemaDocumentation:selectionSetInitializers:operationDocumentFormat:cocoapodsCompatibleImportStatements:warningsOnDeprecatedUsage:conversionStrategies:pruneGeneratedFiles:markOperationDefinitionsAsFinal:)"
-  )
-  @_disfavoredOverload
-  public init(
-    additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
-    queryStringLiteralFormat: QueryStringLiteralFormat,
-    deprecatedEnumCases: ApolloCodegenConfiguration.Composition = Default.deprecatedEnumCases,
-    schemaDocumentation: ApolloCodegenConfiguration.Composition = Default.schemaDocumentation,
-    selectionSetInitializers: ApolloCodegenConfiguration.SelectionSetInitializers = Default.selectionSetInitializers,
-    operationDocumentFormat: ApolloCodegenConfiguration.OperationDocumentFormat = Default.operationDocumentFormat,
-    cocoapodsCompatibleImportStatements: Bool = Default.cocoapodsCompatibleImportStatements,
-    warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = Default.warningsOnDeprecatedUsage,
-    conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = Default.conversionStrategies,
-    pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-    markOperationDefinitionsAsFinal: Bool = Default.markOperationDefinitionsAsFinal
-  ) {
-    self.additionalInflectionRules = additionalInflectionRules
-    self.deprecatedEnumCases = deprecatedEnumCases
-    self.schemaDocumentation = schemaDocumentation
-    self.selectionSetInitializers = selectionSetInitializers
-    self.operationDocumentFormat = operationDocumentFormat
-    self.cocoapodsCompatibleImportStatements = cocoapodsCompatibleImportStatements
-    self.warningsOnDeprecatedUsage = warningsOnDeprecatedUsage
-    self.conversionStrategies = conversionStrategies
-    self.pruneGeneratedFiles = pruneGeneratedFiles
-    self.markOperationDefinitionsAsFinal = markOperationDefinitionsAsFinal
-    self.schemaCustomization = Default.schemaCustomization
-    self.appendSchemaTypeFilenameSuffix = Default.appendSchemaTypeFilenameSuffix
-    self.reduceGeneratedSchemaTypes = Default.reduceGeneratedSchemaTypes
-  }
-
-  /// Whether the generated operations should use Automatic Persisted Queries.
-  ///
-  /// See `APQConfig` for more information on Automatic Persisted Queries.
-  @available(*, deprecated, message: "Use OperationDocumentFormat instead.")
-  public var apqs: ApolloCodegenConfiguration.APQConfig {
-      switch self.operationDocumentFormat {
-      case .definition:
-        return .disabled
-      case .operationId:
-        return .persistedOperationsOnly
-      case [.operationId, .definition]:
-        return .automaticallyPersist
-      default:
-        return .disabled
-      }
-    }
-  
-  /// Formatting of the GraphQL query string literal that is included in each
-  /// generated operation object.
-  @available(*, deprecated, message: "Query strings are now always in single line format.")
-  public var queryStringLiteralFormat: QueryStringLiteralFormat {
-    return .singleLine
-  }
-  
-  /// Specify the formatting of the GraphQL query string literal.
-  public enum QueryStringLiteralFormat: String, Codable, Equatable {
-    /// The query string will be copied into the operation object with all line break formatting removed.
-    @available(*, deprecated, message: "Query strings are now always in single line format.")
-    case singleLine
-    /// The query string will be copied with original formatting into the operation object.
-    @available(*, deprecated, message: "Query strings are now always in single line format.")
-    case multiline
-  }
-}
-
-extension ApolloCodegenConfiguration.ConversionStrategies {
-  
-  @available(*, deprecated, renamed: "init(enumCases:fieldAccessors:)")
-  @_disfavoredOverload
-  public init(
-    enumCases: CaseConversionStrategy
-  ) {
-    switch enumCases {
-    case .none:
-      self.enumCases = .none
-    case .camelCase:
-      self.enumCases = .camelCase
-    }
-    self.fieldAccessors = Default.fieldAccessors
-    self.inputObjects = Default.inputObjects
-  }
-  
-  /// ``CaseConversionStrategy`` is used to specify the strategy used to convert the casing of
-  /// GraphQL schema values into generated Swift code.
-  @available(*, deprecated, message: "Use EnumCases instead.")
-    public enum CaseConversionStrategy: String, Codable, Equatable {
-      /// Generates swift code using the exact name provided in the GraphQL schema
-      /// performing no conversion.
-      case none
-      /// Convert to lower camel case from `snake_case`, `UpperCamelCase`, or `UPPERCASE`.
-      case camelCase
-  }
-  
-}
-
-extension ApolloCodegenConfiguration.SelectionSetInitializers {
-  /// Option to generate initializers for all local cache mutations.
-  @available(*, deprecated, message: "Local Cache Mutations will now always have initializers generated.")
-  public static let localCacheMutations: ApolloCodegenConfiguration.SelectionSetInitializers = .init([])
-}
-
 private struct AnyCodingKey: CodingKey {
   var stringValue: String
 
@@ -1978,10 +1615,14 @@ func throwIfContainsUnexpectedKey<T, C: CodingKey & CaseIterable>(
   let validKeys = Set(C.allCases.map(\.stringValue))
   guard allKeys.isSubset(of: validKeys) else {
     let invalidKeys = allKeys.subtracting(validKeys).sorted()
-    throw DecodingError.typeMismatch(type, DecodingError.Context.init(
-      codingPath: container.codingPath,
-      debugDescription: "Unrecognized \(invalidKeys.count > 1 ? "keys" : "key") found: \(invalidKeys.joined(separator: ", "))",
-      underlyingError: nil
-    ))
+    throw DecodingError.typeMismatch(
+      type,
+      DecodingError.Context.init(
+        codingPath: container.codingPath,
+        debugDescription:
+          "Unrecognized \(invalidKeys.count > 1 ? "keys" : "key") found: \(invalidKeys.joined(separator: ", "))",
+        underlyingError: nil
+      )
+    )
   }
 }

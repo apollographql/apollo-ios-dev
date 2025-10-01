@@ -1,11 +1,3 @@
-//
-//  URL+QueryDict.swift
-//  ApolloTests
-//
-//  Created by Ellen Shapiro on 10/14/19.
-//  Copyright © 2019 Apollo GraphQL. All rights reserved.
-//
-
 import Foundation
 
 extension URL {

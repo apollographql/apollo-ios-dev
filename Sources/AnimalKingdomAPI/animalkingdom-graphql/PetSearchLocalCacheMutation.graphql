@@ -1,10 +1,11 @@
 query PetSearchLocalCacheMutation($filters: PetSearchFilters = {
   species: ["Dog", "Cat"],
   size: SMALL,
-  measurements: {
+  measurements: [{
     height: 10.5,
     weight: 5.0
     }
+  ]
   }
 ) @apollo_client_ios_localCacheMutation {
   pets(filters: $filters) {

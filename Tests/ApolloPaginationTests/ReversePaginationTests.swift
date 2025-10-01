@@ -1,7 +1,7 @@
 import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
-import Combine
+@preconcurrency import Combine
 import XCTest
 
 @testable import ApolloPagination
@@ -14,27 +14,25 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
     InMemoryTestCacheProvider.self
   }
 
-  var cache: (any NormalizedCache)!
+  var store: ApolloStore!
   var server: MockGraphQLServer!
   var client: ApolloClient!
   var cancellables: [AnyCancellable] = []
 
-  @MainActor
   override func setUp() async throws {
     try await super.setUp()
 
-    cache = try await makeNormalizedCache()
-    let store = ApolloStore(cache: cache)
+    store = try await makeTestStore()
 
     server = MockGraphQLServer()
-    let networkTransport = MockNetworkTransport(server: server, store: store)
+    let networkTransport = MockNetworkTransport(mockServer: server, store: store)
 
     client = ApolloClient(networkTransport: networkTransport, store: store)
-    MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
+    await MockSchemaMetadata.stub_cacheKeyInfoForType_Object(IDCacheKeyProvider.resolver)
   }
 
   override func tearDownWithError() throws {
-    cache = nil
+    store = nil
     server = nil
     client = nil
     cancellables.forEach { $0.cancel() }
@@ -46,7 +44,7 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
   func test_fetchMultiplePages() async throws {
     let pager = createPager()
 
-    let serverExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForLastItem(server: server)
+    let serverExpectation = await Mocks.Hero.ReverseFriendsQuery.expectationForLastItem(server: server)
 
     var results: [Result<PaginationOutput<Query, Query>, any Error>] = []
     let firstPageExpectation = expectation(description: "First page")
@@ -65,7 +63,7 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
       XCTAssertEqual(output.initialPage?.source, .server)
     }
 
-    let secondPageExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForPreviousItem(server: server)
+    let secondPageExpectation = await Mocks.Hero.ReverseFriendsQuery.expectationForPreviousItem(server: server)
     let secondPageFetch = expectation(description: "Second Page")
     secondPageFetch.expectedFulfillmentCount = 2
     subscription = await pager.subscribe(onUpdate: { _ in
@@ -100,8 +98,8 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
   func test_loadAll() async throws {
     let pager = createPager()
 
-    let firstPageExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForLastItem(server: server)
-    let lastPageExpectation = Mocks.Hero.ReverseFriendsQuery.expectationForPreviousItem(server: server)
+    let firstPageExpectation = await Mocks.Hero.ReverseFriendsQuery.expectationForLastItem(server: server)
+    let lastPageExpectation = await Mocks.Hero.ReverseFriendsQuery.expectationForPreviousItem(server: server)
     let loadAllExpectation = expectation(description: "Load all pages")
     await pager.subscribe(onUpdate: { _ in
       loadAllExpectation.fulfill()
@@ -110,13 +108,12 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
     await fulfillment(of: [firstPageExpectation, lastPageExpectation, loadAllExpectation], timeout: 5)
   }
 
-  private func createPager() -> AsyncGraphQLQueryPagerCoordinator<Query, Query> {
+  private func createPager() -> GraphQLQueryPagerCoordinator<Query, Query> {
     let initialQuery = Query()
     initialQuery.__variables = ["id": "2001", "first": 2, "before": "Y3Vyc29yMw=="]
-    return AsyncGraphQLQueryPagerCoordinator<Query, Query>(
+    return GraphQLQueryPagerCoordinator<Query, Query>(
       client: client,
-      initialQuery: initialQuery,
-      watcherDispatchQueue: .main,
+      initialQuery: initialQuery,      
       extractPageInfo: { data in
         switch data {
         case .initial(let data, _), .paginated(let data, _):
@@ -132,7 +129,7 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
         nextQuery.__variables = [
           "id": "2001",
           "first": 2,
-          "before": pageInfo.startCursor,
+          "before": pageInfo.startCursor ?? .null,
         ]
         return nextQuery
       }

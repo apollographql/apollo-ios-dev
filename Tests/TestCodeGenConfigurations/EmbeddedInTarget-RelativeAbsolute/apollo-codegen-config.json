@@ -3,8 +3,6 @@
   "options" : {
     "schemaDocumentation" : "include",
     "deprecatedEnumCases" : "include",
-    "apqs" : "disabled",
-    "cocoapodsCompatibleImportStatements": false,
     "additionalInflectionRules" : [
 
     ],

@@ -2,8 +2,9 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public class HeroDetailsFragmentConditionalInclusionQuery: GraphQLQuery {
+public struct HeroDetailsFragmentConditionalInclusionQuery: GraphQLQuery {
   public static let operationName: String = "HeroDetailsFragmentConditionalInclusion"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "48319024203f115072c25e1c19237ab7699fe8e73936689a5e5c2e412ab9f64e",
@@ -18,15 +19,18 @@ public class HeroDetailsFragmentConditionalInclusionQuery: GraphQLQuery {
     self.includeDetails = includeDetails
   }
 
-  public var __variables: Variables? { ["includeDetails": includeDetails] }
+  @_spi(Unsafe) public var __variables: Variables? { ["includeDetails": includeDetails] }
 
   public struct Data: StarWarsAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self),
+    ] }
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroDetailsFragmentConditionalInclusionQuery.Data.self
     ] }
 
     public var hero: Hero? { __data["hero"] }
@@ -34,35 +38,33 @@ public class HeroDetailsFragmentConditionalInclusionQuery: GraphQLQuery {
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroDetailsFragmentConditionalInclusionQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
     ///
     /// Parent Type: `Character`
     public struct Hero: StarWarsAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .include(if: "includeDetails", .inlineFragment(IfIncludeDetails.self)),
+      ] }
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroDetailsFragmentConditionalInclusionQuery.Data.Hero.self
       ] }
 
       public var ifIncludeDetails: IfIncludeDetails? { _asInlineFragment() }
 
       public struct Fragments: FragmentContainer {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public var heroDetails: HeroDetails? { _toFragment() }
       }
@@ -70,35 +72,35 @@ public class HeroDetailsFragmentConditionalInclusionQuery: GraphQLQuery {
       public init(
         __typename: String
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroDetailsFragmentConditionalInclusionQuery.Data.Hero.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+        ])
       }
 
       /// Hero.IfIncludeDetails
       ///
       /// Parent Type: `Character`
       public struct IfIncludeDetails: StarWarsAPI.InlineFragment {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
         public typealias RootEntityType = HeroDetailsFragmentConditionalInclusionQuery.Data.Hero
-        public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .fragment(HeroDetails.self),
+        ] }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          HeroDetailsFragmentConditionalInclusionQuery.Data.Hero.self,
+          HeroDetailsFragmentConditionalInclusionQuery.Data.Hero.IfIncludeDetails.self,
+          HeroDetails.self
         ] }
 
         /// The name of the character
         public var name: String { __data["name"] }
 
         public struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public var heroDetails: HeroDetails { _toFragment() }
         }
@@ -107,17 +109,10 @@ public class HeroDetailsFragmentConditionalInclusionQuery: GraphQLQuery {
           __typename: String,
           name: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": __typename,
-              "name": name,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(HeroDetailsFragmentConditionalInclusionQuery.Data.Hero.self),
-              ObjectIdentifier(HeroDetailsFragmentConditionalInclusionQuery.Data.Hero.IfIncludeDetails.self),
-              ObjectIdentifier(HeroDetails.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": __typename,
+            "name": name,
+          ])
         }
       }
     }

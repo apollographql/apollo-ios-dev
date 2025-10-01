@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 import Nimble
 @testable import Apollo
-import ApolloAPI
+@_spi(Unsafe) import ApolloAPI
 
 class SelectionSetModelExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase {
 
@@ -41,7 +41,7 @@ class SelectionSetModelExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase
     let actual = objectData["value"]
 
     // then
-    expect(actual as? Int).to(equal(10))
+    expect(actual as? Int32).to(equal(10))
   }
   
   func test__subscript__forInt32ScalarField_returnsValue() throws {
@@ -59,7 +59,7 @@ class SelectionSetModelExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase
     let actual = objectData["value"]
 
     // then
-    expect(actual as? Int).to(equal(10))
+    expect(actual as? Int32).to(equal(10))
   }
   
   func test__subscript__forInt64ScalarField_returnsValue() throws {
@@ -77,7 +77,7 @@ class SelectionSetModelExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase
     let actual = objectData["value"]
 
     // then
-    expect(actual as? Int).to(equal(10))
+    expect(actual as? Int32).to(equal(10))
   }
   
   func test__subscript__forBoolScalarField_returnsValue() throws {
@@ -212,7 +212,7 @@ class SelectionSetModelExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase
     let actual = objectData["values"]?[0]
 
     // then
-    expect(actual as? Int).to(equal(10))
+    expect(actual as? Int32).to(equal(10))
   }
   
   func test__subscript__forListOfInt32ScalarFields_returnsValue() throws {
@@ -230,7 +230,7 @@ class SelectionSetModelExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase
     let actual = objectData["values"]?[0]
 
     // then
-    expect(actual as? Int).to(equal(10))
+    expect(actual as? Int32).to(equal(10))
   }
   
   func test__subscript__forListOfInt64ScalarFields_returnsValue() throws {
@@ -248,7 +248,7 @@ class SelectionSetModelExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase
     let actual = objectData["values"]?[0]
 
     // then
-    expect(actual as? Int).to(equal(10))
+    expect(actual as? Int32).to(equal(10))
   }
   
   func test__subscript__forListOfBoolScalarFields_returnsValue() throws {

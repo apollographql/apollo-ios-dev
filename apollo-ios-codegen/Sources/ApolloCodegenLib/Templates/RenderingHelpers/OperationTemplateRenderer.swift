@@ -49,7 +49,7 @@ extension OperationTemplateRenderer {
     }
 
     return """
-      public var __variables: \(if: !graphQLOperation, "GraphQLOperation.")Variables? { [\(list: variables.map { "\"\($0.name)\": \($0.name.renderAsFieldPropertyName(config: config.config))"})] }
+      @_spi(Unsafe) public var __variables: \(if: !graphQLOperation, "GraphQLOperation.")Variables? { [\(list: variables.map { "\"\($0.name)\": \($0.name.renderAsFieldPropertyName(config: config.config))"})] }
       """
   }
 

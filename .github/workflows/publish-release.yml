@@ -83,16 +83,3 @@ jobs:
           gh workflow run release-new-version.yml -f remoteRef=${{ env.RELEASE_VERSION }} --repo "apollographql/apollo-ios-xcframework"
         env:
           GH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
-
-      # Push Pods for Apollo iOS and Test Support
-      - name: Push Cocoapods
-        shell: bash
-        env:
-          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
-        run: |
-          export COCOAPODS_VALIDATOR_SKIP_XCODEBUILD=true:$PATH
-          gem install cocoapods
-          set -eo pipefail
-          cd apollo-ios
-          pod trunk push Apollo.podspec --allow-warnings
-          pod trunk push ApolloTestSupport.podspec --synchronous --allow-warnings

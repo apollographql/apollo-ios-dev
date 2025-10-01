@@ -34,13 +34,13 @@ For a **multi-module project configuration**, you will need to link this package
 
 <Tip>
 
-Most dependency managers (e.g., SPM and Cocoapods) can automatically include your generated files in the module's directory. _This means that when generated files are added or removed from the generated module, they are linked to your project automatically._
+SPM can automatically include your generated files in the module's directory. _This means that when generated files are added or removed from the generated module, they are linked to your project automatically._
 
 </Tip>
 
-### `.swiftPackageManager`
+### `.swiftPackage`
 
-The [`.swiftPackageManager`](./../code-generation/codegen-configuration#swift-package-manager) option is the quickest and most convenient way to generate your schema types if your project uses SPM.
+The [`.swiftPackage`](./../code-generation/codegen-configuration#swift-package) option is the quickest and most convenient way to generate your schema types if your project uses SPM.
 
 Using this `moduleType`, the code generation engine can automate the creation of a schema module as an SPM package. A `Package.swift` file will be generated using the provided `schemaNamespace` as the package name.
 

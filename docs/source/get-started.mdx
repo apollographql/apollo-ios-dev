@@ -5,25 +5,23 @@ description: Learn how to add Apollo iOS to your app with step-by-step instructi
 sidebar_title: Get Started
 ---
 
+> **Upgrading from Apollo iOS 1.x?** See the [Apollo iOS 2.0 Migration Guide](./migrations/2.0) for detailed migration instructions.
+
 import SPMXcodeInstallationPanel from "../shared/spm-xcode-installation-panel.mdx"
 import SPMPackageInstallationPanel from "../shared/spm-package-installation-panel.mdx"
-import PodsInstallationPanel from "../shared/pods-installation-panel.mdx"
 import SetupCodegen from "../shared/setup-codegen/combined.mdx"
 
 Follow the steps below to add Apollo iOS to your app:
 
 ## 1. Install the Apollo frameworks
 
-You can add Apollo iOS into your project using Swift Package Manager or CocoaPods.
+You can add Apollo iOS into your project using Swift Package Manager.
 
 <a name="spm-package-installation" />
 <SPMPackageInstallationPanel />
 
 <a name="spm-xcode-installation" />
 <SPMXcodeInstallationPanel />
-
-<a name="cocoapods-installation" />
-<PodsInstallationPanel />
 
 ## 2. Add a schema file to your target directory
 
@@ -83,9 +81,13 @@ query HeroName {
 Apollo iOS will generate a `HeroNameQuery` class that you can construct and pass to `ApolloClient.fetch(query:)`:
 
 ```swift
-apolloClient.fetch(query: HeroNameQuery()) { result in
-  guard let data = try? result.get().data else { return }
-  print(data.hero.name) // Luke Skywalker
+Task {
+  do {
+    let response = try await apolloClient.fetch(query: HeroNameQuery())
+    print(response.data?.hero?.name) // Luke Skywalker
+  } catch {
+    print("Error fetching hero: \(error)")
+  }
 }
 ```
 

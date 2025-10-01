@@ -49,8 +49,8 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     )
   }
   
-  private func renderSubject() -> String? {
-    subject.render()?.description
+  private func renderSubject() -> String {
+    subject.render().description
   }
   
   // MARK: - Deferred Inline Fragments
@@ -89,15 +89,17 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine("""
       // MARK: - Deferred Fragment Metadata
 
+      public typealias ResponseFormat = IncrementalDeferredResponseFormat
       enum DeferredFragmentIdentifiers {
         static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
       }
 
-      public static var deferredFragments: [DeferredFragmentIdentifier: any ApolloAPI.SelectionSet.Type]? {[
-        DeferredFragmentIdentifiers.root: Data.AllAnimal.Root.self,
-      ]}
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+        deferredFragments: [
+          DeferredFragmentIdentifiers.root: Data.AllAnimal.Root.self,
+        ]
+      )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -136,15 +138,17 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine("""
       // MARK: - Deferred Fragment Metadata
 
+      public typealias ResponseFormat = IncrementalDeferredResponseFormat
       enum DeferredFragmentIdentifiers {
         static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
       }
 
-      public static var deferredFragments: [DeferredFragmentIdentifier: any ApolloAPI.SelectionSet.Type]? {[
-        DeferredFragmentIdentifiers.root: Data.AllAnimal.Root.self,
-      ]}
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+        deferredFragments: [
+          DeferredFragmentIdentifiers.root: Data.AllAnimal.Root.self,
+        ]
+      )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -188,15 +192,17 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine("""
       // MARK: - Deferred Fragment Metadata
 
+      public typealias ResponseFormat = IncrementalDeferredResponseFormat
       enum DeferredFragmentIdentifiers {
         static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
       }
 
-      public static var deferredFragments: [DeferredFragmentIdentifier: any ApolloAPI.SelectionSet.Type]? {[
-        DeferredFragmentIdentifiers.root: Data.AllAnimal.AsDog.Root.self,
-      ]}
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+        deferredFragments: [
+          DeferredFragmentIdentifiers.root: Data.AllAnimal.AsDog.Root.self,
+        ]
+      )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -245,17 +251,19 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine("""
       // MARK: - Deferred Fragment Metadata
 
+      public typealias ResponseFormat = IncrementalDeferredResponseFormat
       enum DeferredFragmentIdentifiers {
         static let one = DeferredFragmentIdentifier(label: "one", fieldPath: ["allAnimals"])
         static let two = DeferredFragmentIdentifier(label: "two", fieldPath: ["allAnimals"])
       }
 
-      public static var deferredFragments: [DeferredFragmentIdentifier: any ApolloAPI.SelectionSet.Type]? {[
-        DeferredFragmentIdentifiers.one: Data.AllAnimal.AsDog.One.self,
-        DeferredFragmentIdentifiers.two: Data.AllAnimal.AsDog.Two.self,
-      ]}
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+        deferredFragments: [
+          DeferredFragmentIdentifiers.one: Data.AllAnimal.AsDog.One.self,
+          DeferredFragmentIdentifiers.two: Data.AllAnimal.AsDog.Two.self,
+        ]
+      )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -310,17 +318,19 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine("""
       // MARK: - Deferred Fragment Metadata
 
+      public typealias ResponseFormat = IncrementalDeferredResponseFormat
       enum DeferredFragmentIdentifiers {
         static let one = DeferredFragmentIdentifier(label: "one", fieldPath: ["allAnimals"])
         static let two = DeferredFragmentIdentifier(label: "two", fieldPath: ["allAnimals"])
       }
 
-      public static var deferredFragments: [DeferredFragmentIdentifier: any ApolloAPI.SelectionSet.Type]? {[
-        DeferredFragmentIdentifiers.one: Data.AllAnimal.AsDog.One.self,
-        DeferredFragmentIdentifiers.two: Data.AllAnimal.AsCat.Two.self,
-      ]}
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+        deferredFragments: [
+          DeferredFragmentIdentifiers.one: Data.AllAnimal.AsDog.One.self,
+          DeferredFragmentIdentifiers.two: Data.AllAnimal.AsCat.Two.self,
+        ]
+      )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -378,17 +388,19 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine("""
       // MARK: - Deferred Fragment Metadata
 
+      public typealias ResponseFormat = IncrementalDeferredResponseFormat
       enum DeferredFragmentIdentifiers {
         static let outer = DeferredFragmentIdentifier(label: "outer", fieldPath: ["allAnimals"])
         static let inner = DeferredFragmentIdentifier(label: "inner", fieldPath: ["allAnimals", "friend"])
       }
 
-      public static var deferredFragments: [DeferredFragmentIdentifier: any ApolloAPI.SelectionSet.Type]? {[
-        DeferredFragmentIdentifiers.outer: Data.AllAnimal.AsDog.Outer.self,
-        DeferredFragmentIdentifiers.inner: Data.AllAnimal.AsDog.Outer.Friend.AsCat.Inner.self,
-      ]}
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+        deferredFragments: [
+          DeferredFragmentIdentifiers.outer: Data.AllAnimal.AsDog.Outer.self,
+          DeferredFragmentIdentifiers.inner: Data.AllAnimal.AsDog.Outer.Friend.AsCat.Inner.self,
+        ]
+      )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -431,15 +443,17 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine("""
       // MARK: - Deferred Fragment Metadata
 
+      public typealias ResponseFormat = IncrementalDeferredResponseFormat
       enum DeferredFragmentIdentifiers {
         static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
       }
 
-      public static var deferredFragments: [DeferredFragmentIdentifier: any ApolloAPI.SelectionSet.Type]? {[
-        DeferredFragmentIdentifiers.root: AnimalFragment.self,
-      ]}
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+        deferredFragments: [
+          DeferredFragmentIdentifiers.root: AnimalFragment.self,
+        ]
+      )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -484,15 +498,17 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine("""
       // MARK: - Deferred Fragment Metadata
 
+      public typealias ResponseFormat = IncrementalDeferredResponseFormat
       enum DeferredFragmentIdentifiers {
         static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
       }
 
-      public static var deferredFragments: [DeferredFragmentIdentifier: any ApolloAPI.SelectionSet.Type]? {[
-        DeferredFragmentIdentifiers.root: DogFragment.self,
-      ]}
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+        deferredFragments: [
+          DeferredFragmentIdentifiers.root: DogFragment.self,
+        ]
+      )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -540,15 +556,17 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine("""
       // MARK: - Deferred Fragment Metadata
 
+      public typealias ResponseFormat = IncrementalDeferredResponseFormat
       enum DeferredFragmentIdentifiers {
         static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
       }
 
-      public static var deferredFragments: [DeferredFragmentIdentifier: any ApolloAPI.SelectionSet.Type]? {[
-        DeferredFragmentIdentifiers.root: Data.Root.self,
-      ]}
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+        deferredFragments: [
+          DeferredFragmentIdentifiers.root: Data.Root.self,
+        ]
+      )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -596,15 +614,17 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     expect(rendered).to(equalLineByLine("""
       // MARK: - Deferred Fragment Metadata
 
+      public typealias ResponseFormat = IncrementalDeferredResponseFormat
       enum DeferredFragmentIdentifiers {
         static let root = DeferredFragmentIdentifier(label: "root", fieldPath: ["allAnimals"])
       }
 
-      public static var deferredFragments: [DeferredFragmentIdentifier: any ApolloAPI.SelectionSet.Type]? {[
-        DeferredFragmentIdentifiers.root: Data.AsDog.Root.self,
-      ]}
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+        deferredFragments: [
+          DeferredFragmentIdentifiers.root: Data.AsDog.Root.self,
+        ]
+      )
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -649,16 +669,19 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     let rendered = renderSubject()
 
     expect(rendered).to(equalLineByLine("""
+      public typealias ResponseFormat = IncrementalDeferredResponseFormat
       enum DeferredFragmentIdentifiers {
         static let deferredDog = DeferredFragmentIdentifier(label: "deferredDog", fieldPath: ["allAnimals"])
       }
       
-      public static var deferredFragments: [DeferredFragmentIdentifier: any ApolloAPI.SelectionSet.Type]? {[
-        DeferredFragmentIdentifiers.deferredDog: Data.AllAnimal.AsDog.DeferredDog.self,
-        DeferredFragmentIdentifiers.deferredDog: DogFragment.self,
-      ]}
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+        deferredFragments: [
+          DeferredFragmentIdentifiers.deferredDog: Data.AllAnimal.AsDog.DeferredDog.self,
+          DeferredFragmentIdentifiers.deferredDog: DogFragment.self,
+        ]
+      )
       """,
-      atLine: 4,
+      atLine: 3,
       ignoringExtraLines: false)
     )
   }

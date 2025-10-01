@@ -4,12 +4,12 @@
 import ApolloTestSupport
 @testable import AnimalKingdomAPI
 
-public class Height: MockObject {
+public final class Height: MockObject {
   public static let objectType: ApolloAPI.Object = AnimalKingdomAPI.Objects.Height
   public static let _mockFields = MockFields()
   public typealias MockValueCollectionType = Array<Mock<Height>>
 
-  public struct MockFields {
+  public struct MockFields: Sendable {
     @Field<Double>("centimeters") public var centimeters
     @Field<Int>("feet") public var feet
     @Field<Int>("inches") public var inches

@@ -10,7 +10,7 @@ env:
 
 jobs:
   tuist-generation:
-    runs-on: macos-14
+    runs-on: macos-latest
     timeout-minutes: 8
     name: Run Tuist Generation
     steps:
@@ -31,7 +31,7 @@ jobs:
         key: ${{ github.run_id }}-dependencies
 
   run-swift-builds:
-    runs-on: macos-14
+    runs-on: macos-latest
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -53,7 +53,7 @@ jobs:
         cd ${{ matrix.package }} && swift build
 
   build-and-unit-test:
-    runs-on: macos-14
+    runs-on: macos-latest
     needs: tuist-generation
     timeout-minutes: 20
     strategy:
@@ -153,7 +153,7 @@ jobs:
           TestResults/ResultBundle.zip
 
   run-codegen-test-configurations:
-    runs-on: macos-14
+    runs-on: macos-latest
     timeout-minutes: 20
     name: Codegen Test Configurations - macOS
     steps:
@@ -166,32 +166,12 @@ jobs:
       shell: bash
       run: |
         ./scripts/run-test-codegen-configurations.sh -t
-
-  run-cocoapods-integration-tests:
-    runs-on: macos-14
-    timeout-minutes: 20
-    name: Cocoapods Integration Tests - macOS
-    steps:
-    - uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: ${{ env.XCODE_VERSION }}
-    - name: Checkout Repo
-      uses: actions/checkout@v3
-    - name: Export ENV Variables
-      shell: bash
-      working-directory: apollo-ios
-      run: |
-        apollo_ios_sha=$(git rev-parse HEAD)
-        echo "APOLLO_IOS_SHA=$apollo_ios_sha" >> ${GITHUB_ENV}
-    - name: Run CocoaPods Integration Tests
-      id: run-cocoapods-integration-tests
-      uses: ./.github/actions/run-cocoapods-integration-tests
   
   send-slack-status-notification:
-    runs-on: macos-14
+    runs-on: macos-latest
     if: ${{ always() }}
     timeout-minutes: 5
-    needs: [tuist-generation, run-swift-builds, build-and-unit-test, run-codegen-test-configurations, run-cocoapods-integration-tests]
+    needs: [tuist-generation, run-swift-builds, build-and-unit-test, run-codegen-test-configurations]
     name: Send Slack status notification
     steps:
     - uses: slackapi/slack-github-action@v1.26.0
@@ -233,13 +213,6 @@ jobs:
                 "text": {
                   "type": "mrkdwn",
                   "text": "Codegen Test Configurations - macOS: ${{ needs.run-codegen-test-configurations.result }}"
-                }
-              },
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "Cocoapods Integration Tests - macOS: ${{ needs.run-cocoapods-integration-tests.result }}"
                 }
               }
             ]

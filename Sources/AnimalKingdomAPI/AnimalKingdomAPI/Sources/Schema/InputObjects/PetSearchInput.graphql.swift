@@ -1,14 +1,14 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import ApolloAPI
+@_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
 public enum PetSearchInput: OneOfInputObject {
   case ownerID(ID)
   case petID(ID)
   case searchFilters(PetSearchFilters)
 
-  public var __data: InputDict {
+  @_spi(Unsafe) public var __data: InputDict {
     switch self {
     case .ownerID(let value):
       return InputDict(["ownerID": value])

@@ -1,140 +1,133 @@
-@testable import Apollo
-import ApolloAPI
-import ApolloInternalTestHelpers
-import XCTest
+@_spi(Execution) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 import Nimble
+import XCTest
+
+@testable @_spi(Execution) import Apollo
 
 final class ApolloClientOperationTests: XCTestCase {
 
-  var store: MockStore!
+  var cache: MockCache!
   var server: MockGraphQLServer!
   var client: ApolloClient!
+  var store: ApolloStore { client.store }
 
   override func setUpWithError() throws {
     try super.setUpWithError()
 
-    self.store = MockStore()
+    self.cache = MockCache()
     self.server = MockGraphQLServer()
+    let store = ApolloStore(cache: self.cache)
     self.client = ApolloClient(
-      networkTransport: MockNetworkTransport(server: self.server, store: self.store),
-      store: self.store
+      networkTransport: MockNetworkTransport(mockServer: self.server, store: store),
+      store: store
     )
   }
 
-  override func tearDownWithError() throws {    
-    self.store = nil
+  override func tearDownWithError() throws {
+    self.cache = nil
     self.server = nil
     self.client = nil
 
     try super.tearDownWithError()
   }
 
-  class MockStore: ApolloStore {
+  class MockCache: InMemoryNormalizedCache {
     var publishedRecordSets: [RecordSet] = []
-
-    init() {
-      super.init(cache: NoCache())
-    }
-
-    override func publish(records: RecordSet, identifier: UUID? = nil, callbackQueue: DispatchQueue = .main, completion: ((Result<Void, any Swift.Error>) -> Void)? = nil) {
-      publishedRecordSets.append(records)
+    override func merge(records newRecords: RecordSet) throws -> Set<CacheKey> {
+      publishedRecordSets.append(newRecords)
+      return try super.merge(records: newRecords)
     }
   }
 
   // given
-  class GivenSelectionSet: MockSelectionSet {
-    override class var __selections: [Selection] { [
-      .field("createReview", CreateReview.self)
-    ] }
+  class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
+    override class var __selections: [Selection] {
+      [
+        .field("createReview", CreateReview.self)
+      ]
+    }
 
-    class CreateReview: MockSelectionSet {
-      override class var __selections: [Selection] { [
-        .field("__typename", String.self),
-        .field("stars", Int.self),
-        .field("commentary", String?.self)
-      ] }
+    class CreateReview: MockSelectionSet, @unchecked Sendable {
+      override class var __selections: [Selection] {
+        [
+          .field("__typename", String.self),
+          .field("stars", Int.self),
+          .field("commentary", String?.self),
+        ]
+      }
     }
   }
 
-  let jsonObject: JSONObject = [
+  static let jsonObject: JSONObject = [
     "data": [
       "createReview": [
         "__typename": "Review",
         "stars": 3,
-        "commentary": ""
-      ]
-    ]
+        "commentary": "",
+      ] as JSONValue
+    ] as JSONValue
   ]
 
-  func test__performMutation_givenPublishResultToStore_true_publishResultsToStore() throws {
+  func test__performMutation_givenPublishResultToStore_true_publishResultsToStore() async throws {
     let mutation = MockMutation<GivenSelectionSet>()
-    let resultObserver = self.makeResultObserver(for: mutation)
 
-    let serverRequestExpectation = server.expect(MockMutation<GivenSelectionSet>.self) { _ in
-      self.jsonObject
+    let serverRequestExpectation = await server.expect(MockMutation<GivenSelectionSet>.self) { @Sendable _ in
+      Self.jsonObject
     }
 
-    let performResultFromServerExpectation =
-      resultObserver.expectation(description: "Mutation was successful") { result in
-        switch (result) {
-        case .success:
-          break
-        case let .failure(error):
-          fail("Unexpected failure! \(error)")
-        }
-      }
-
     // when
-    self.client.perform(mutation: mutation,
-                        publishResultToStore: true,
-                        resultHandler: resultObserver.handler)
+    _ = try await self.client.perform(
+      mutation: mutation,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: true),
+    )
 
-    self.wait(for: [serverRequestExpectation, performResultFromServerExpectation], timeout: 0.2)
+    await fulfillment(of: [serverRequestExpectation], timeout: 0.2)
 
     // then
-    expect(self.store.publishedRecordSets.count).to(equal(1))
-    
-    let actual = self.store.publishedRecordSets[0]
-    expect(actual["MUTATION_ROOT"]).to(equal(
-      Record(key: "MUTATION_ROOT", [
-        "createReview": CacheReference("MUTATION_ROOT.createReview")
-      ])
-    ))
-    expect(actual["MUTATION_ROOT.createReview"]).to(equal(
-      Record(key: "MUTATION_ROOT.createReview", [
-        "__typename": "Review",
-        "stars": 3,
-        "commentary": ""
-      ])
-    ))
+    expect(self.cache.publishedRecordSets.count).to(equal(1))
+
+    let actual = self.cache.publishedRecordSets[0]
+    expect(actual["MUTATION_ROOT"]).to(
+      equal(
+        Record(
+          key: "MUTATION_ROOT",
+          [
+            "createReview": CacheReference("MUTATION_ROOT.createReview")
+          ]
+        )
+      )
+    )
+    expect(actual["MUTATION_ROOT.createReview"]).to(
+      equal(
+        Record(
+          key: "MUTATION_ROOT.createReview",
+          [
+            "__typename": "Review",
+            "stars": 3,
+            "commentary": "",
+          ]
+        )
+      )
+    )
   }
 
-  func test__performMutation_givenPublishResultToStore_false_doesNotPublishResultsToStore() throws {
+  func test__performMutation_givenPublishResultToStore_false_doesNotPublishResultsToStore() async throws {
     let mutation = MockMutation<GivenSelectionSet>()
-    let resultObserver = self.makeResultObserver(for: mutation)
 
-    let serverRequestExpectation = server.expect(MockMutation<GivenSelectionSet>.self) { _ in
-      self.jsonObject
+    let serverRequestExpectation = await server.expect(MockMutation<GivenSelectionSet>.self) { @Sendable _ in
+      Self.jsonObject
     }
 
-    let performResultFromServerExpectation =
-      resultObserver.expectation(description: "Mutation was successful") { result in
-        switch (result) {
-        case .success:
-          break
-        case let .failure(error):
-          fail("Unexpected failure! \(error)")
-        }
-      }
-
     // when
-    self.client.perform(mutation: mutation,
-                        publishResultToStore: false,
-                        resultHandler: resultObserver.handler)
+    _ = try await self.client.perform(
+      mutation: mutation,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false),
+    )
 
-    self.wait(for: [serverRequestExpectation, performResultFromServerExpectation], timeout: 0.2)
+    await fulfillment(of: [serverRequestExpectation], timeout: 0.2)
 
     // then
-    expect(self.store.publishedRecordSets).to(beEmpty())
+    expect(self.cache.publishedRecordSets).to(beEmpty())
   }
 }

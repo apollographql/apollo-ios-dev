@@ -4,36 +4,16 @@ import Nimble
 import ApolloAPI
 import ApolloInternalTestHelpers
 
-class RequestContextTimeoutTests: XCTestCase {
-  private class Hero: MockSelectionSet {
-    typealias Schema = MockSchemaMetadata
-
-    override class var __selections: [Selection] {[
-      .field("__typename", String.self),
-      .field("name", String.self)
-    ]}
-
-    var name: String { __data["name"] }
-  }
-
-  private struct TwoMinuteTimeoutContext: RequestContextTimeoutConfigurable {
-    let requestTimeout: TimeInterval
-
-    init(requestTimeout: TimeInterval) {
-      self.requestTimeout = requestTimeout
-    }
-  }
-
-  private let twoMinuteTimeout = TwoMinuteTimeoutContext(requestTimeout: 120)
-
+class GraphQLRequest_RequestTimeoutTests: XCTestCase {
   // MARK: JSONRequest tests
 
-  func test__jsonRequest__withoutRequestConfigurationContext_doesNotConfigureRequestTimeout() throws {
+  func test__jsonRequest__givenRequestTimeout_nil_doesNotConfigureRequestTimeout() throws {
     let jsonRequest = JSONRequest(
-      operation: MockQuery<Hero>(),
+      operation: MockQuery<MockSelectionSet>(),
       graphQLEndpoint: TestURL.mockServer.url,
-      clientName: "test-client",
-      clientVersion: "test-client-version"
+      fetchBehavior: .NetworkOnly,
+      writeResultsToCache: false,
+      requestTimeout: nil
     )
 
     let urlRequest = try jsonRequest.toURLRequest()
@@ -41,13 +21,13 @@ class RequestContextTimeoutTests: XCTestCase {
     expect(urlRequest.timeoutInterval).to(equal(60))
   }
 
-  func test__jsonRequest__givenRequestConfigurationContext_shouldConfigureRequestTimeout() throws {
+  func test__jsonRequest__givenRequestTimeout_shouldConfigureRequestTimeout() throws {
     let jsonRequest = JSONRequest(
-      operation: MockQuery<Hero>(),
+      operation: MockQuery<MockSelectionSet>(),
       graphQLEndpoint: TestURL.mockServer.url,
-      clientName: "test-client",
-      clientVersion: "test-client-version",
-      context: twoMinuteTimeout
+      fetchBehavior: .NetworkOnly,
+      writeResultsToCache: false,
+      requestTimeout: 120
     )
 
     let urlRequest = try jsonRequest.toURLRequest()
@@ -59,11 +39,10 @@ class RequestContextTimeoutTests: XCTestCase {
 
   func test__uploadRequest__withoutRequestConfigurationContext_doesNotConfigureRequestTimeout() throws {
     let uploadRequest = UploadRequest(
+      operation: MockQuery<MockSelectionSet>(),
       graphQLEndpoint: TestURL.mockServer.url,
-      operation: MockQuery<Hero>(),
-      clientName: "test-client",
-      clientVersion: "test-client-version",
-      files: [GraphQLFile(fieldName: "x", originalName: "y", data: "z".data(using: .utf8)!)]
+      files: [GraphQLFile(fieldName: "x", originalName: "y", data: "z".data(using: .utf8)!)],
+      writeResultsToCache: false
     )
 
     let urlRequest = try uploadRequest.toURLRequest()
@@ -72,14 +51,14 @@ class RequestContextTimeoutTests: XCTestCase {
   }
 
   func test__uploadRequest__givenRequestConfigurationContext_shouldConfigureRequestTimeout() throws {
-    let uploadRequest = UploadRequest(
+    var uploadRequest = UploadRequest(
+      operation: MockQuery<MockSelectionSet>(),
       graphQLEndpoint: TestURL.mockServer.url,
-      operation: MockQuery<Hero>(),
-      clientName: "test-client",
-      clientVersion: "test-client-version",
       files: [GraphQLFile(fieldName: "x", originalName: "y", data: "z".data(using: .utf8)!)],
-      context: twoMinuteTimeout
+      writeResultsToCache: false
     )
+    
+    uploadRequest.requestTimeout = 120
 
     let urlRequest = try uploadRequest.toURLRequest()
 

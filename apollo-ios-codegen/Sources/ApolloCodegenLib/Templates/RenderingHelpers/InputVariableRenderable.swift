@@ -41,9 +41,9 @@ extension InputVariableRenderable {
       case let .nonNull(.list(listInnerType)),
         let .list(listInnerType):
         return """
-        [\(list.compactMap {
+        [\(list: list.compactMap {
           InputVariable(type: listInnerType, defaultValue: $0).renderVariableDefaultValue(inList: true, config: config)
-        }, separator: ", ")]
+        })]
         """
 
       default:
@@ -56,11 +56,15 @@ extension InputVariableRenderable {
         return inputObjectType.renderInitializer(values: object, config: config)
 
       case let .inputObject(inputObjectType):
-        return """
-        .init(
-          \(inputObjectType.renderInitializer(values: object, config: config))
-        )
-        """
+        if inList {
+          return inputObjectType.renderInitializer(values: object, config: config)
+        } else {
+          return """
+            .init(
+              \(inputObjectType.renderInitializer(values: object, config: config))
+            )
+            """
+        }
 
       default:
         preconditionFailure("Variable type must be InputObject with value of .object type.")
@@ -88,7 +92,7 @@ fileprivate extension GraphQLInputObjectType {
     }
 
     return """
-    \(if: !config.output.operations.isInModule, "\(config.schemaNamespace.firstUppercased).")\(render(as: .typename))(\(list: entries))
+    \(if: !config.output.operations.isInModule, "\(config.schemaNamespace.firstUppercased).")\(render(as: .typename()))(\(list: entries))
     """
   }
 }

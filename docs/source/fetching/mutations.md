@@ -46,9 +46,13 @@ Similar to queries, mutations are represented by instances of generated classes,
 You pass a mutation object to `ApolloClient.perform(mutation:)` to send the mutation to the server, execute it, and receive typed results.
 
 ```swift
-apollo.perform(mutation: UpvotePostMutation(postId: postId)) { result in
-  guard let data = try? result.get().data else { return }
-  print(data.upvotePost?.votes)
+Task {
+  do {
+    let response = try await apollo.perform(mutation: UpvotePostMutation(postId: postId))
+    print(response.data?.upvotePost?.votes)
+  } catch {
+    print("Error performing mutation: \(error)")
+  }
 }
 ```
 
@@ -65,11 +69,21 @@ mutation UpvotePost($postId: Int!) {
 ```
 
 ```swift
-client.perform(mutation: UpvotePostMutation(postId: postId)) { result in
-  guard let data = try? result.get().data else { return }
-  self.configure(with: data.upvotePost?.fragments.postDetails)
+Task {
+  do {
+    let response = try await client.perform(mutation: UpvotePostMutation(postId: postId))
+    self.configure(with: response.data?.upvotePost?.fragments.postDetails)
+  } catch {
+    print("Error performing mutation: \(error)")
+  }
 }
 ```
+
+<Note>
+
+Remember to dispatch your UI updates on the `MainActor`! `ApolloClient` will be called `async`, but will return a response to the `async` context where it is called.
+
+</Note>
 
 ## Passing input objects
 
@@ -86,13 +100,12 @@ mutation CreateReviewForEpisode($episode: Episode!, $review: ReviewInput!) {
 
 ```swift
 let review = ReviewInput(stars: 5, commentary: "This is a great movie!")
-apollo.perform(mutation: CreateReviewForEpisodeMutation(episode: .jedi, review: review))
+Task {
+  do {
+    let response = try await apollo.perform(mutation: CreateReviewForEpisodeMutation(episode: .jedi, review: review))
+    // Handle response as needed
+  } catch {
+    print("Error creating review: \(error)")
+  }
+}
 ```
-
-## Designing mutation results
-
-When people talk about GraphQL, they often focus on the data fetching side of things, because that's where GraphQL brings the most value. Mutations can be pretty nice if done well, but the principles of designing good mutations, and especially good mutation result types, are not yet well-understood in the open source community. So when you are working with mutations it might often feel like you need to make a lot of application-specific decisions.
-
-In GraphQL, mutations can return any type, and that type can be queried just like a regular GraphQL query. So the question is - what type should a particular mutation return?
-
-In most cases, the data available from a mutation result should be the server developer's best guess of the data a client would need to understand what happened on the server. For example, a mutation that creates a new comment on a blog post might return the comment itself. A mutation that reorders an array might need to return the whole array.

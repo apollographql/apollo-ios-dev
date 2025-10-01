@@ -1,6 +1,7 @@
 import Foundation
 import GraphQLCompiler
 @testable import ApolloCodegenLib
+import ApolloInternalTestHelpers
 
 extension GraphQLJSFrontend {
 
@@ -8,14 +9,14 @@ extension GraphQLJSFrontend {
     schema: String,
     document: String,
     config: ApolloCodegen.ConfigurationContext
-  ) async throws -> CompilationResult {
-    async let schemaSource = try makeSource(schema, filePath: "")
-    async let documentSource = try makeSource(document, filePath: "")
+  ) throws -> CompilationResult {
+    let schemaSource = try makeSource(schema, filePath: "")
+    let documentSource = try makeSource(document, filePath: "")
 
-    let schema = try await loadSchema(from: [schemaSource])
-    let document = try await parseDocument(documentSource)
+    let schema = try loadSchema(from: [schemaSource])
+    let document = try parseDocument(documentSource)
 
-    return try await compile(
+    return try compile(
       schema: schema,
       document: document,
       reduceGeneratedSchemaTypes: false,
@@ -26,10 +27,10 @@ extension GraphQLJSFrontend {
   public func compile(
     schema: String,
     document: String
-  ) async throws -> CompilationResult {
+  ) throws -> CompilationResult {
     let config = ApolloCodegen.ConfigurationContext(config: .mock())
 
-    return try await compile(
+    return try compile(
       schema: schema,
       document: document,
       config: config
@@ -40,14 +41,14 @@ extension GraphQLJSFrontend {
     schema: String,
     documents: [String],
     config: ApolloCodegen.ConfigurationContext
-  ) async throws -> CompilationResult {
-    async let schemaSource = try makeSource(schema, filePath: "")
+  ) throws -> CompilationResult {
+    let schemaSource = try makeSource(schema, filePath: "")
 
-    let sources: [GraphQLSource] = try await documents.enumerated().asyncMap {
-      try await makeSource($0.element, filePath: "Doc_\($0.offset)")
+    let sources: [GraphQLSource] = try documents.enumerated().map {
+      try makeSource($0.element, filePath: "Doc_\($0.offset)")
     }
 
-    return try await compile(
+    return try compile(
       schema: schemaSource,
       definitions: sources,
       config: config
@@ -58,15 +59,15 @@ extension GraphQLJSFrontend {
     schema schemaSource: GraphQLSource,
     definitions: [GraphQLSource],
     config: ApolloCodegen.ConfigurationContext
-  ) async throws -> CompilationResult {
-    let schema = try await loadSchema(from: [schemaSource])
+  ) throws -> CompilationResult {
+    let schema = try loadSchema(from: [schemaSource])
 
-    let documents: [GraphQLDocument] = try await definitions.asyncMap {
-      return try await parseDocument($0)
+    let documents: [GraphQLDocument] = try definitions.map {
+      return try parseDocument($0)
     }
 
-    let mergedDocument = try await mergeDocuments(documents)
-    return try await compile(
+    let mergedDocument = try mergeDocuments(documents)
+    return try compile(
       schema: schema,
       document: mergedDocument,
       reduceGeneratedSchemaTypes: false,
@@ -77,10 +78,10 @@ extension GraphQLJSFrontend {
   public func compile(
     schema: String,
     documents: [String]
-  ) async throws -> CompilationResult {
+  ) throws -> CompilationResult {
     let config = ApolloCodegen.ConfigurationContext(config: .mock())
 
-    return try await compile(
+    return try compile(
       schema: schema,
       documents: documents,
       config: config
@@ -91,14 +92,14 @@ extension GraphQLJSFrontend {
     schemaJSON: String,
     document: String,
     config: ApolloCodegen.ConfigurationContext
-  ) async throws -> CompilationResult {
-    async let documentSource = try makeSource(document, filePath: "")
-    async let schemaSource = try makeSource(schemaJSON, filePath: "schema.json")
+  ) throws -> CompilationResult {
+    let documentSource = try makeSource(document, filePath: "")
+    let schemaSource = try makeSource(schemaJSON, filePath: "schema.json")
 
-    let schema = try await loadSchema(from: [schemaSource])
-    let document = try await parseDocument(documentSource)
+    let schema = try loadSchema(from: [schemaSource])
+    let document = try parseDocument(documentSource)
 
-    return try await compile(
+    return try compile(
       schema: schema,
       document: document,
       reduceGeneratedSchemaTypes: false,
@@ -109,10 +110,10 @@ extension GraphQLJSFrontend {
   public func compile(
     schemaJSON: String,
     document: String
-  ) async throws -> CompilationResult {
+  ) throws -> CompilationResult {
     let config = ApolloCodegen.ConfigurationContext(config: .mock())
 
-    return try await compile(
+    return try compile(
       schemaJSON: schemaJSON,
       document: document,
       config: config

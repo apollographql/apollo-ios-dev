@@ -1,18 +1,18 @@
 import Apollo
-import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloInternalTestHelpers
 import XCTest
 
 enum Mocks {
   enum Hero {
-    class BidirectionalFriendsQuery: MockSelectionSet {
+    class BidirectionalFriendsQuery: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero?.self, arguments: ["id": .variable("id")])
       ]}
 
       var hero: Hero { __data["hero"] }
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("id", String.self),
@@ -28,7 +28,7 @@ enum Mocks {
         var id: String { __data["id"] }
         var friendsConnection: FriendsConnection { __data["friendsConnection"] }
 
-        class FriendsConnection: MockSelectionSet {
+        class FriendsConnection: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
             .field("totalCount", Int.self),
@@ -36,11 +36,11 @@ enum Mocks {
             .field("pageInfo", PageInfo.self),
           ]}
 
-          var totalCount: Int { __data["totalCount"] }
+          var totalCount: Int32 { __data["totalCount"] }
           var friends: [Character] { __data["friends"] }
           var pageInfo: PageInfo { __data["pageInfo"] }
 
-          class Character: MockSelectionSet {
+          class Character: MockSelectionSet, @unchecked Sendable {
             override class var __selections: [Selection] {[
               .field("__typename", String.self),
               .field("name", String.self),
@@ -51,7 +51,7 @@ enum Mocks {
             var id: String { __data["id"] }
           }
 
-          class PageInfo: MockSelectionSet {
+          class PageInfo: MockSelectionSet, @unchecked Sendable {
             override class var __selections: [Selection] {[
               .field("__typename", String.self),
               .field("startCursor", Optional<String>.self),
@@ -68,14 +68,14 @@ enum Mocks {
         }
       }
     }
-    class ReverseFriendsQuery: MockSelectionSet {
+    class ReverseFriendsQuery: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero?.self, arguments: ["id": .variable("id")])
       ]}
 
       var hero: Hero { __data["hero"] }
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("id", String.self),
@@ -90,7 +90,7 @@ enum Mocks {
         var id: String { __data["id"] }
         var friendsConnection: FriendsConnection { __data["friendsConnection"] }
 
-        class FriendsConnection: MockSelectionSet {
+        class FriendsConnection: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
             .field("totalCount", Int.self),
@@ -98,11 +98,11 @@ enum Mocks {
             .field("pageInfo", PageInfo.self),
           ]}
 
-          var totalCount: Int { __data["totalCount"] }
+          var totalCount: Int32 { __data["totalCount"] }
           var friends: [Character] { __data["friends"] }
           var pageInfo: PageInfo { __data["pageInfo"] }
 
-          class Character: MockSelectionSet {
+          class Character: MockSelectionSet, @unchecked Sendable {
             override class var __selections: [Selection] {[
               .field("__typename", String.self),
               .field("name", String.self),
@@ -113,7 +113,7 @@ enum Mocks {
             var id: String { __data["id"] }
           }
 
-          class PageInfo: MockSelectionSet {
+          class PageInfo: MockSelectionSet, @unchecked Sendable {
             override class var __selections: [Selection] {[
               .field("__typename", String.self),
               .field("startCursor", Optional<String>.self),
@@ -126,14 +126,14 @@ enum Mocks {
         }
       }
     }
-    class FriendsQuery: MockSelectionSet {
+    class FriendsQuery: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero?.self, arguments: ["id": .variable("id")])
       ]}
 
       var hero: Hero { __data["hero"] }
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("id", String.self),
@@ -148,7 +148,7 @@ enum Mocks {
         var id: String { __data["id"] }
         var friendsConnection: FriendsConnection { __data["friendsConnection"] }
 
-        class FriendsConnection: MockSelectionSet {
+        class FriendsConnection: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
             .field("totalCount", Int.self),
@@ -156,11 +156,11 @@ enum Mocks {
             .field("pageInfo", PageInfo.self),
           ]}
 
-          var totalCount: Int { __data["totalCount"] }
+          var totalCount: Int32 { __data["totalCount"] }
           var friends: [Character] { __data["friends"] }
           var pageInfo: PageInfo { __data["pageInfo"] }
 
-          class Character: MockSelectionSet {
+          class Character: MockSelectionSet, @unchecked Sendable {
             override class var __selections: [Selection] {[
               .field("__typename", String.self),
               .field("name", String.self),
@@ -171,7 +171,7 @@ enum Mocks {
             var id: String { __data["id"] }
           }
 
-          class PageInfo: MockSelectionSet {
+          class PageInfo: MockSelectionSet, @unchecked Sendable {
             override class var __selections: [Selection] {[
               .field("__typename", String.self),
               .field("endCursor", Optional<String>.self),
@@ -185,14 +185,14 @@ enum Mocks {
       }
     }
 
-    class OffsetFriendsQuery: MockSelectionSet {
+    class OffsetFriendsQuery: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("hero", Hero?.self, arguments: ["id": .variable("id")])
       ]}
 
       var hero: Hero { __data["hero"] }
 
-      class Hero: MockSelectionSet {
+      class Hero: MockSelectionSet, @unchecked Sendable {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
           .field("id", String.self),
@@ -207,7 +207,7 @@ enum Mocks {
         var id: String { __data["id"] }
         var friends: [Character] { __data["friends"] }
 
-        class Character: MockSelectionSet {
+        class Character: MockSelectionSet, @unchecked Sendable {
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
             .field("name", String.self),

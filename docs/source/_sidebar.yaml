@@ -3,11 +3,9 @@ switcher:
   versions:
     - label: v2
       latest: true
-      href: ./v2
-    - label: v1
       href: ./
-    - label: v0.x (legacy)
-      href: ./v0-legacy
+    - label: v1
+      href: ./v1
 items:
   - label: Introduction
     href: "."
@@ -27,54 +25,8 @@ items:
         href: ./project-configuration/sdk-components
   - label: Migration Guides
     children:
-      - label: v1.0
-        href: ./migrations/1.0
-      - label: v1.2
-        href: ./migrations/1.2
-      - label: v1.3
-        href: ./migrations/1.3
-      - label: v1.5
-        href: ./migrations/1.5
-      - label: v1.6
-        href: ./migrations/1.6
-      - label: v1.7
-        href: ./migrations/1.7
-      - label: v1.7
-        href: ./v2/migrations/2.0
-  - label: Tutorial
-    children:
-      - label: Code Generation
-        href: ./tutorial/codegen-getting-started
-      - label: Build a project with Apollo
-        children:
-          - label: Introduction
-            href: ./tutorial/tutorial-introduction
-          - label: 1. Configure your project
-            href: ./tutorial/tutorial-configure-project
-          - label: 2. Add the GraphQL schema
-            href: ./tutorial/tutorial-add-graphql-schema
-          - label: 3. Write your first query
-            href: ./tutorial/tutorial-write-your-first-query
-          - label: 4. Running code generation
-            href: ./tutorial/tutorial-running-code-generation
-          - label: 5. Execute your first query
-            href: ./tutorial/tutorial-execute-first-query
-          - label: 6. Connect your queries to your UI
-            href: ./tutorial/tutorial-connect-queries-to-ui
-          - label: 7. Add more info to the list
-            href: ./tutorial/tutorial-add-more-info-to-list
-          - label: 8. Paginate results
-            href: ./tutorial/tutorial-paginate-results
-          - label: 9. Complete the details view
-            href: ./tutorial/tutorial-complete-details-view
-          - label: 10. Write your first mutation
-            href: ./tutorial/tutorial-first-mutation
-          - label: 11. Authenticate your operations
-            href: ./tutorial/tutorial-authenticate-operations
-          - label: 12. Define additional mutations
-            href: ./tutorial/tutorial-define-additional-mutations
-          - label: 13. Write your first subscription
-            href: ./tutorial/tutorial-subscriptions
+      - label: v2.0
+        href: ./migrations/2.0
   - label: API Reference
     children:
       - label: Overview
@@ -170,7 +122,5 @@ items:
       - label: File Uploads
         href: ./advanced/file-uploads
       - label: Request Chain Customization
-        href: ./advanced/request-pipeline
-      - label: Request Configuration
-        href: ./advanced/request-configuration
+        href: ./advanced/request-chain
 

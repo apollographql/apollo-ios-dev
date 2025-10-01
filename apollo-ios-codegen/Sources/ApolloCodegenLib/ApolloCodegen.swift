@@ -8,12 +8,12 @@ import Utilities
 #if os(macOS)
 
 /// A class to facilitate running code generation
-public class ApolloCodegen {
+public final class ApolloCodegen: Sendable {
 
   // MARK: - Public
 
   /// OptionSet used to configure what items should be generated during code generation.
-  public struct ItemsToGenerate: OptionSet {
+  public struct ItemsToGenerate: OptionSet, Sendable {
     public var rawValue: Int
 
     /// Only generate your code (Operations, Fragments, Enums, etc), this option maintains the codegen functionality
@@ -81,7 +81,7 @@ public class ApolloCodegen {
   // MARK: - Internal
 
   @dynamicMemberLookup
-  class ConfigurationContext {
+  struct ConfigurationContext: Sendable, Equatable {
     let config: ApolloCodegenConfiguration
     let pluralizer: Pluralizer
     let rootURL: URL?
@@ -654,7 +654,7 @@ public class ApolloCodegen {
     let filePathsToDelete = await oldGeneratedFilePaths.subtracting(fileManager.writtenFiles)
 
     for path in filePathsToDelete {
-      try fileManager.deleteFile(atPath: path)
+      try await fileManager.deleteFile(atPath: path)
     }
   }
 

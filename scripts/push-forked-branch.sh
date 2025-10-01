@@ -49,4 +49,4 @@ then
 fi
 
 git fetch $remote
-sh $SCRIPT_DIR/../git-subtree.sh push -P $package $remote $branch
+git subtree push -P $package $remote $branch

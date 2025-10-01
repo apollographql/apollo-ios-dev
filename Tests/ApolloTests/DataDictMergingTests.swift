@@ -1,14 +1,14 @@
 import XCTest
-@testable import Apollo
-import ApolloAPI
-import ApolloInternalTestHelpers
+@testable @_spi(Unsafe) import Apollo
+@testable @_spi(Unsafe) import ApolloAPI
+@_spi(Unsafe) import ApolloInternalTestHelpers
 import Nimble
 
 class DataDictMergingTests: XCTestCase {
 
-  class Data: MockSelectionSet {
-    class Animal: MockSelectionSet {
-      class Predator: MockSelectionSet { }
+  class Data: MockSelectionSet, @unchecked Sendable {
+    class Animal: MockSelectionSet, @unchecked Sendable {
+      class Predator: MockSelectionSet, @unchecked Sendable { }
     }
   }
 
@@ -324,3 +324,4 @@ class DataDictMergingTests: XCTestCase {
   }
 
 }
+

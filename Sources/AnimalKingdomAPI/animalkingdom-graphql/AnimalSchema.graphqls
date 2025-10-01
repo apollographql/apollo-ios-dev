@@ -36,9 +36,9 @@ input MeasurementsInput {
 }
 
 input PetSearchFilters {
-  species: [String!]!
+  species: [String]
   size: RelativeSize
-  measurements: MeasurementsInput
+  measurements: [MeasurementsInput]
 }
 
 interface Animal @typePolicy(keyFields: "id") {

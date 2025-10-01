@@ -1,13 +1,14 @@
 import Foundation
 import GraphQLCompiler
+import TemplateString
 
 extension GraphQLNamedType {
 
   enum RenderContext {
     case filename
-    case typename
+    case typename(isInputValue: Bool = false)
   }
-  
+
   func render(
     as context: RenderContext
   ) -> String {
@@ -15,20 +16,21 @@ extension GraphQLNamedType {
     if let customName = name.customName {
       return customName
     }
-    
+
     switch context {
     case .filename:
       return self.name.schemaName
-    case .typename:
-      return renderTypeName()
+    case let .typename(isInputValue):
+      return renderTypeName(isInputValue: isInputValue)
     }
   }
-  
-  private func renderTypeName() -> String {
+
+  private func renderTypeName(isInputValue: Bool) -> String {
+    let swiftName = self.swiftName(isInputValue: isInputValue)
     switch self {
     case let type as GraphQLScalarType:
       if !type.isCustomScalar || self.name.schemaName == "ID" {
-        return self.name.swiftName
+        return swiftName
       }
       fallthrough
     case is GraphQLAbstractType: fallthrough
@@ -38,16 +40,25 @@ extension GraphQLNamedType {
     case is GraphQLInterfaceType: fallthrough
     case is GraphQLUnionType: fallthrough
     case is GraphQLObjectType:
-      let uppercasedName = self.name.swiftName.firstUppercased
+      let uppercasedName = swiftName.firstUppercased
       return SwiftKeywords.TypeNamesToSuffix.contains(uppercasedName) ?
       "\(uppercasedName)\(typenameSuffix)" : uppercasedName
     default:
       break
     }
-    
-    return self.name.swiftName
+
+    return swiftName
   }
-  
+
+  func swiftName(isInputValue: Bool) -> String {
+    switch self.name.schemaName {
+    case "Boolean": return "Bool"
+    case "Float": return "Double"
+    case "Int": return isInputValue ? "Int32" : "Int"
+    default: return self.name.schemaName
+    }
+  }
+
   private var typenameSuffix: String {
     switch self {
     case is GraphQLEnumType:
@@ -66,7 +77,23 @@ extension GraphQLNamedType {
       return "_GraphQL"
     }
   }
-  
+}
+
+extension GraphQLName {
+
+  var typeNameDocumentation: TemplateString? {
+    guard shouldRenderTypeNameDocumentation else { return nil }
+    return """
+    // Renamed from GraphQL schema value: '\(schemaName)'
+    """
+  }
+
+  private var shouldRenderTypeNameDocumentation: Bool {
+    if let customName, !customName.isEmpty {
+      return true
+    }
+    return false
+  }
 }
 
 extension GraphQLEnumValue {

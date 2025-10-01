@@ -2,20 +2,24 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
 public struct CharacterNameAndDroidAppearsIn: StarWarsAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment CharacterNameAndDroidAppearsIn on Character { __typename name ... on Droid { __typename appearsIn } }"#
   }
 
-  public let __data: DataDict
-  public init(_dataDict: DataDict) { __data = _dataDict }
+  @_spi(Unsafe) public let __data: DataDict
+  @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-  public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
-  public static var __selections: [ApolloAPI.Selection] { [
+  @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Interfaces.Character }
+  @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("name", String.self),
     .inlineFragment(AsDroid.self),
+  ] }
+  @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    CharacterNameAndDroidAppearsIn.self
   ] }
 
   /// The name of the character
@@ -27,28 +31,27 @@ public struct CharacterNameAndDroidAppearsIn: StarWarsAPI.SelectionSet, Fragment
     __typename: String,
     name: String
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": __typename,
-        "name": name,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(CharacterNameAndDroidAppearsIn.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": __typename,
+      "name": name,
+    ])
   }
 
   /// AsDroid
   ///
   /// Parent Type: `Droid`
   public struct AsDroid: StarWarsAPI.InlineFragment {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
     public typealias RootEntityType = CharacterNameAndDroidAppearsIn
-    public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("appearsIn", [GraphQLEnum<StarWarsAPI.Episode>?].self),
+    ] }
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      CharacterNameAndDroidAppearsIn.self,
+      CharacterNameAndDroidAppearsIn.AsDroid.self
     ] }
 
     /// The movies this droid appears in
@@ -60,17 +63,11 @@ public struct CharacterNameAndDroidAppearsIn: StarWarsAPI.SelectionSet, Fragment
       appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?],
       name: String
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Droid.typename,
-          "appearsIn": appearsIn,
-          "name": name,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(CharacterNameAndDroidAppearsIn.self),
-          ObjectIdentifier(CharacterNameAndDroidAppearsIn.AsDroid.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Droid.typename,
+        "appearsIn": appearsIn,
+        "name": name,
+      ])
     }
   }
 }

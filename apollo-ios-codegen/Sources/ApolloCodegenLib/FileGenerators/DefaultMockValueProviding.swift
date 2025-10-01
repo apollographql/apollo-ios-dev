@@ -54,7 +54,7 @@ extension GraphQLEnumType: DefaultMockValueProviding {
 
 extension GraphQLObjectType: DefaultMockValueProviding {
   func defaultMockValue(config: ApolloCodegen.ConfigurationContext) -> String {
-    return "Mock<\(self.render(as: .typename))>()"
+    return "Mock<\(self.render(as: .typename()))>()"
   }
 }
 

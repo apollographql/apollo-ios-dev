@@ -45,6 +45,21 @@ class CustomScalarTemplateTests: XCTestCase {
     subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
+  func test__render__shouldGenerateImportStatement() throws {
+    // given
+    buildSubject(name: "aCustomScalar")
+
+    let expected = """
+    @_spi(Internal) @_spi(Execution) import ApolloAPI
+    """
+
+    // when
+    let rendered = subject.render()
+
+    // then
+    expect(rendered.body).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
+  }
+
   // MARK: Casing Tests
 
   func test__render__givenCustomScalar_shouldGenerateTypealiasNameFirstUppercased() throws {

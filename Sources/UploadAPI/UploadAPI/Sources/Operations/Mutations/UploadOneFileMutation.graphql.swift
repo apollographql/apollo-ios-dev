@@ -2,8 +2,9 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public class UploadOneFileMutation: GraphQLMutation {
+public struct UploadOneFileMutation: GraphQLMutation {
   public static let operationName: String = "UploadOneFile"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
@@ -16,15 +17,18 @@ public class UploadOneFileMutation: GraphQLMutation {
     self.file = file
   }
 
-  public var __variables: Variables? { ["file": file] }
+  @_spi(Unsafe) public var __variables: Variables? { ["file": file] }
 
   public struct Data: UploadAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { UploadAPI.Objects.Mutation }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { UploadAPI.Objects.Mutation }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("singleUpload", SingleUpload.self, arguments: ["file": .variable("file")]),
+    ] }
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      UploadOneFileMutation.Data.self
     ] }
 
     public var singleUpload: SingleUpload { __data["singleUpload"] }
@@ -33,16 +37,19 @@ public class UploadOneFileMutation: GraphQLMutation {
     ///
     /// Parent Type: `File`
     public struct SingleUpload: UploadAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { UploadAPI.Objects.File }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { UploadAPI.Objects.File }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("id", UploadAPI.ID.self),
         .field("path", String.self),
         .field("filename", String.self),
         .field("mimetype", String.self),
+      ] }
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        UploadOneFileMutation.Data.SingleUpload.self
       ] }
 
       public var id: UploadAPI.ID { __data["id"] }

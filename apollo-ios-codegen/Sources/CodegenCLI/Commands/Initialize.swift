@@ -6,7 +6,7 @@ public struct Initialize: AsyncParsableCommand {
 
   // MARK: - Configuration
 
-  public static var configuration = CommandConfiguration(
+  public static let configuration = CommandConfiguration(
     commandName: "init",
     abstract: "Initialize a new configuration with defaults."
   )
@@ -132,13 +132,15 @@ public struct Initialize: AsyncParsableCommand {
     fileManager: ApolloFileManager,
     output: OutputClosure? = nil
   ) async throws {
-    if !overwrite && fileManager.doesFileExist(atPath: path) {
-      throw Error(
-        errorDescription: """
+    if !overwrite {
+      if await fileManager.doesFileExist(atPath: path) {
+        throw Error(
+          errorDescription: """
           File already exists at \(path). Hint: use --overwrite to overwrite any existing \
           file at the path.
           """
-      )
+        )
+      }
     }
 
     try await fileManager.createFile(
@@ -176,36 +178,6 @@ extension ApolloCodegenConfiguration {
     moduleType: ModuleTypeExpressibleByArgument,
     targetName: String?
   ) -> String {
-    #if COCOAPODS
-      minimalJSON(
-        schemaNamespace: schemaNamespace,
-        supportCocoaPods: true,
-        moduleType: moduleType,
-        targetName: targetName
-      )
-    #else
-      minimalJSON(
-        schemaNamespace: schemaNamespace,
-        supportCocoaPods: false,
-        moduleType: moduleType,
-        targetName: targetName
-      )
-    #endif
-  }
-
-  static func minimalJSON(
-    schemaNamespace: String,
-    supportCocoaPods: Bool,
-    moduleType: ModuleTypeExpressibleByArgument,
-    targetName: String?
-  ) -> String {
-    let cocoaPodsOption = supportCocoaPods ? """
-
-        "options" : {
-          "cocoapodsCompatibleImportStatements" : true
-        },
-      """ : ""
-
     let moduleTarget: String = {
       guard let targetName = targetName else { return "}" }
 
@@ -217,7 +189,7 @@ extension ApolloCodegenConfiguration {
 
     return """
     {
-      "schemaNamespace" : "\(schemaNamespace)",\(cocoaPodsOption)
+      "schemaNamespace" : "\(schemaNamespace)",
       "input" : {
         "operationSearchPaths" : [
           "**/*.graphql"
@@ -253,6 +225,6 @@ extension ApolloCodegenConfiguration {
 /// parsed from the command line.
 enum ModuleTypeExpressibleByArgument: String, ExpressibleByArgument, CaseIterable {
   case embeddedInTarget
-  case swiftPackageManager
+  case swiftPackage
   case other
 }

@@ -1,29 +1,34 @@
-import XCTest
-@testable import Apollo
-import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 import Nimble
+import XCTest
 
-fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal> {
-  class AnAnimal: MockSelectionSet {
+@testable @_spi(Execution) import Apollo
+
+private class AnimalQuery: MockQuery<AnimalQuery.AnAnimal>, @unchecked Sendable {
+  class AnAnimal: MockSelectionSet, @unchecked Sendable {
     typealias Schema = MockSchemaMetadata
-    
-    override class var __selections: [Selection] {[
-      .field("animal", Animal.self),
-    ]}
-    
+
+    override class var __selections: [Selection] {
+      [
+        .field("animal", Animal.self)
+      ]
+    }
+
     var animal: Animal { __data["animal"] }
-    
-    class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata> {
-      override class var __selections: [Selection] {[
-        .field("__typename", String.self),
-        .field("species", String.self),
-        .deferred(DeferredGenus.self, label: "deferredGenus"),
-        .deferred(DeferredFriend.self, label: "deferredFriend"),
-      ]}
-      
+
+    class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] {
+        [
+          .field("__typename", String.self),
+          .field("species", String.self),
+          .deferred(DeferredGenus.self, label: "deferredGenus"),
+          .deferred(DeferredFriend.self, label: "deferredFriend"),
+        ]
+      }
+
       var species: String { __data["species"] }
-      
+
       struct Fragments: FragmentContainer {
         public let __data: DataDict
         public init(_dataDict: DataDict) {
@@ -31,32 +36,38 @@ fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal> {
           _deferredGenus = Deferred(_dataDict: _dataDict)
           _deferredFriend = Deferred(_dataDict: _dataDict)
         }
-        
+
         @Deferred var deferredGenus: DeferredGenus?
         @Deferred var deferredFriend: DeferredFriend?
       }
-      
-      class DeferredGenus: MockTypeCase {
-        override class var __selections: [Selection] {[
-          .field("genus", String.self),
-        ]}
-        
+
+      class DeferredGenus: MockTypeCase, @unchecked Sendable {
+        override class var __selections: [Selection] {
+          [
+            .field("genus", String.self)
+          ]
+        }
+
         var genus: String { __data["genus"] }
       }
-      
-      class DeferredFriend: MockTypeCase {
-        override class var __selections: [Selection] {[
-          .field("friend", Friend.self),
-        ]}
-        
+
+      class DeferredFriend: MockTypeCase, @unchecked Sendable {
+        override class var __selections: [Selection] {
+          [
+            .field("friend", Friend.self)
+          ]
+        }
+
         var friend: Friend { __data["friend"] }
-        
-        class Friend: AbstractMockSelectionSet<Friend.Fragments, MockSchemaMetadata> {
-          override class var __selections: [Selection] {[
-            .field("name", String.self),
-            .deferred(DeferredFriendSpecies.self, label: "deferredFriendSpecies"),
-          ]}
-          
+
+        class Friend: AbstractMockSelectionSet<Friend.Fragments, MockSchemaMetadata>, @unchecked Sendable {
+          override class var __selections: [Selection] {
+            [
+              .field("name", String.self),
+              .deferred(DeferredFriendSpecies.self, label: "deferredFriendSpecies"),
+            ]
+          }
+
           var name: String { __data["name"] }
 
           struct Fragments: FragmentContainer {
@@ -69,10 +80,12 @@ fileprivate class AnimalQuery: MockQuery<AnimalQuery.AnAnimal> {
             @Deferred var deferredFriendSpecies: DeferredFriendSpecies?
           }
 
-          class DeferredFriendSpecies: MockTypeCase {
-            override class var __selections: [Selection] {[
-              .field("species", String.self),
-            ]}
+          class DeferredFriendSpecies: MockTypeCase, @unchecked Sendable {
+            override class var __selections: [Selection] {
+              [
+                .field("species", String.self)
+              ]
+            }
 
             var species: String { __data["species"] }
           }
@@ -89,18 +102,17 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
     InMemoryTestCacheProvider.self
   }
 
-  var cache: (any NormalizedCache)!
+  var store: ApolloStore!
   var server: MockGraphQLServer!
   var client: ApolloClient!
 
   override func setUp() async throws {
     try await super.setUp()
 
-    cache = try await makeNormalizedCache()
-    let store = ApolloStore(cache: cache)
+    store = try await makeTestStore()
 
     server = MockGraphQLServer()
-    let networkTransport = MockNetworkTransport(server: server, store: store)
+    let networkTransport = MockNetworkTransport(mockServer: server, store: store)
 
     client = ApolloClient(networkTransport: networkTransport, store: store)
   }
@@ -108,15 +120,15 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
   override func tearDownWithError() throws {
     try super.tearDownWithError()
 
-    cache = nil
+    store = nil
     server = nil
     client = nil
   }
 
-  func test__fetch__givenPartialAndIncrementalDataIsCached_returnsAllDeferredFragmentsAsFulfilled() throws {
-    mergeRecordsIntoCache([
+  func test__fetch__givenPartialAndIncrementalDataIsCached_returnsAllDeferredFragmentsAsFulfilled() async throws {
+    try await store.publish(records: [
       "QUERY_ROOT": [
-        "animal": CacheReference("QUERY_ROOT.animal"),
+        "animal": CacheReference("QUERY_ROOT.animal")
       ],
       "QUERY_ROOT.animal": [
         "__typename": "animal",
@@ -127,115 +139,79 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
       "QUERY_ROOT.animal.friend": [
         "name": "American Badger",
         "species": "Taxidea taxus",
-      ]
+      ],
     ])
 
     let query = AnimalQuery()
-    let resultObserver = makeResultObserver(for: query)
 
-    let fetchResultFromCacheExpectation = resultObserver.expectation(
-      description: "Received result from cache"
-    ) { result in
-      expect(result).to(beSuccess())
+    let result = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+    let animal = try unwrap(result?.data?.animal)
 
-      let animal = try unwrap(try result.get().data?.animal)
-
-      expect(animal.__typename).to(equal("animal"))
-      expect(animal.species).to(equal("Canis latrans"))
-      expect(animal.fragments.deferredGenus?.genus).to(equal("Canis"))
-      expect(animal.fragments.deferredFriend?.friend.name).to(equal("American Badger"))
-      expect(animal.fragments.deferredFriend?.friend.fragments.deferredFriendSpecies?.species).to(equal("Taxidea taxus"))
-    }
-
-    client.fetch(
-      query: query,
-      cachePolicy: .returnCacheDataDontFetch,
-      resultHandler: resultObserver.handler
-    )
-
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    expect(animal.__typename).to(equal("animal"))
+    expect(animal.species).to(equal("Canis latrans"))
+    expect(animal.fragments.deferredGenus?.genus).to(equal("Canis"))
+    expect(animal.fragments.deferredFriend?.friend.name).to(equal("American Badger"))
+    expect(animal.fragments.deferredFriend?.friend.fragments.deferredFriendSpecies?.species).to(equal("Taxidea taxus"))
   }
 
-  func test__fetch__givenOnlyPartialDataIsCached_returnsAllDeferredFragmentsAsPending() throws {
-    mergeRecordsIntoCache([
+  func test__fetch__givenOnlyPartialDataIsCached_returnsAllDeferredFragmentsAsPending() async throws {
+    try await store.publish(records: [
       "QUERY_ROOT": [
-        "animal": CacheReference("QUERY_ROOT.animal"),
+        "animal": CacheReference("QUERY_ROOT.animal")
       ],
       "QUERY_ROOT.animal": [
         "__typename": "animal",
         "species": "Canis latrans",
-        // 'genus' not cached
-        // 'friend' not cached
+          // 'genus' not cached
+          // 'friend' not cached
       ],
     ])
 
     let query = AnimalQuery()
-    let resultObserver = makeResultObserver(for: query)
 
-    let fetchResultFromCacheExpectation = resultObserver.expectation(
-      description: "Received result from cache"
-    ) { result in
-      expect(result).to(beSuccess())
+    let result = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+    let animal = try unwrap(result?.data?.animal)
 
-      let animal = try unwrap(try result.get().data?.animal)
-
-      expect(animal.__typename).to(equal("animal"))
-      expect(animal.species).to(equal("Canis latrans"))
-      expect(animal.fragments.$deferredGenus).to(equal(.pending))
-      expect(animal.fragments.$deferredFriend).to(equal(.pending))
-    }
-
-    client.fetch(
-      query: query,
-      cachePolicy: .returnCacheDataDontFetch,
-      resultHandler: resultObserver.handler
-    )
-
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    expect(animal.__typename).to(equal("animal"))
+    expect(animal.species).to(equal("Canis latrans"))
+    expect(animal.fragments.$deferredGenus).to(equal(.pending))
+    expect(animal.fragments.$deferredFriend).to(equal(.pending))
   }
 
-  func test__fetch__givenPartialAndSomeIncrementalDataIsCached_returnsCachedDeferredFragmentAsFulfilledAndUncachedDeferredFragmentsAsPending() throws {
-    mergeRecordsIntoCache([
+  func
+    test__fetch__givenPartialAndSomeIncrementalDataIsCached_returnsCachedDeferredFragmentAsFulfilledAndUncachedDeferredFragmentsAsPending()
+    async throws
+  {
+    try await store.publish(records: [
       "QUERY_ROOT": [
-        "animal": CacheReference("QUERY_ROOT.animal"),
+        "animal": CacheReference("QUERY_ROOT.animal")
       ],
       "QUERY_ROOT.animal": [
         "__typename": "animal",
         "species": "Canis latrans",
         "genus": "Canis",
-        // 'friend' not cached
+          // 'friend' not cached
       ],
     ])
 
     let query = AnimalQuery()
-    let resultObserver = makeResultObserver(for: query)
 
-    let fetchResultFromCacheExpectation = resultObserver.expectation(
-      description: "Received result from cache"
-    ) { result in
-      expect(result).to(beSuccess())
+    let result = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+    let animal = try unwrap(result?.data?.animal)
 
-      let animal = try unwrap(try result.get().data?.animal)
-
-      expect(animal.__typename).to(equal("animal"))
-      expect(animal.species).to(equal("Canis latrans"))
-      expect(animal.fragments.deferredGenus?.genus).to(equal("Canis"))
-      expect(animal.fragments.$deferredFriend).to(equal(.pending))
-    }
-
-    client.fetch(
-      query: query,
-      cachePolicy: .returnCacheDataDontFetch,
-      resultHandler: resultObserver.handler
-    )
-
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    expect(animal.__typename).to(equal("animal"))
+    expect(animal.species).to(equal("Canis latrans"))
+    expect(animal.fragments.deferredGenus?.genus).to(equal("Canis"))
+    expect(animal.fragments.$deferredFriend).to(equal(.pending))
   }
 
-  func test__fetch__givenNestedIncrementalDataIsNotCached_returnsNestedDeferredFragmentsAsPending_otherDeferredFragmentsAsFulfilled() throws {
-    mergeRecordsIntoCache([
+  func
+    test__fetch__givenNestedIncrementalDataIsNotCached_returnsNestedDeferredFragmentsAsPending_otherDeferredFragmentsAsFulfilled()
+    async throws
+  {
+    try await store.publish(records: [
       "QUERY_ROOT": [
-        "animal": CacheReference("QUERY_ROOT.animal"),
+        "animal": CacheReference("QUERY_ROOT.animal")
       ],
       "QUERY_ROOT.animal": [
         "__typename": "animal",
@@ -244,41 +220,31 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
         "friend": CacheReference("QUERY_ROOT.animal.friend"),
       ],
       "QUERY_ROOT.animal.friend": [
-        "name": "American Badger",
-        // 'species' not cached
-      ]
+        "name": "American Badger"
+          // 'species' not cached
+      ],
     ])
 
     let query = AnimalQuery()
-    let resultObserver = makeResultObserver(for: query)
 
-    let fetchResultFromCacheExpectation = resultObserver.expectation(
-      description: "Received result from cache"
-    ) { result in
-      expect(result).to(beSuccess())
+    let result = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+    let animal = try unwrap(result?.data?.animal)
 
-      let animal = try unwrap(try result.get().data?.animal)
+    expect(animal.__typename).to(equal("animal"))
+    expect(animal.species).to(equal("Canis latrans"))
+    expect(animal.fragments.deferredGenus?.genus).to(equal("Canis"))
+    expect(animal.fragments.deferredFriend?.friend.name).to(equal("American Badger"))
+    expect(animal.fragments.deferredFriend?.friend.fragments.$deferredFriendSpecies).to(equal(.pending))
 
-      expect(animal.__typename).to(equal("animal"))
-      expect(animal.species).to(equal("Canis latrans"))
-      expect(animal.fragments.deferredGenus?.genus).to(equal("Canis"))
-      expect(animal.fragments.deferredFriend?.friend.name).to(equal("American Badger"))
-      expect(animal.fragments.deferredFriend?.friend.fragments.$deferredFriendSpecies).to(equal(.pending))
-    }
-
-    client.fetch(
-      query: query,
-      cachePolicy: .returnCacheDataDontFetch,
-      resultHandler: resultObserver.handler
-    )
-
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test__fetch__givenMissingValueInDeferredFragment_returnsDeferredFragmentAsPending_otherDeferredFragmentsAsFulfilled() throws {
-    mergeRecordsIntoCache([
+  func
+    test__fetch__givenMissingValueInDeferredFragment_returnsDeferredFragmentAsPending_otherDeferredFragmentsAsFulfilled()
+    async throws
+  {
+    try await store.publish(records: [
       "QUERY_ROOT": [
-        "animal": CacheReference("QUERY_ROOT.animal"),
+        "animal": CacheReference("QUERY_ROOT.animal")
       ],
       "QUERY_ROOT.animal": [
         "__typename": "animal",
@@ -288,39 +254,26 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
       ],
       "QUERY_ROOT.animal.friend": [
         // 'name' missing
-        "species": "Taxidea taxus",
-      ]
+        "species": "Taxidea taxus"
+      ],
     ])
 
     let query = AnimalQuery()
-    let resultObserver = makeResultObserver(for: query)
 
-    let fetchResultFromCacheExpectation = resultObserver.expectation(
-      description: "Received result from cache"
-    ) { result in
-      expect(result).to(beSuccess())
+    let result = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+    let animal = try unwrap(result?.data?.animal)
 
-      let animal = try unwrap(try result.get().data?.animal)
+    expect(animal.__typename).to(equal("animal"))
+    expect(animal.species).to(equal("Canis latrans"))
+    expect(animal.fragments.deferredGenus?.genus).to(equal("Canis"))
+    expect(animal.fragments.$deferredFriend).to(equal(.pending))
 
-      expect(animal.__typename).to(equal("animal"))
-      expect(animal.species).to(equal("Canis latrans"))
-      expect(animal.fragments.deferredGenus?.genus).to(equal("Canis"))
-      expect(animal.fragments.$deferredFriend).to(equal(.pending))
-    }
-
-    client.fetch(
-      query: query,
-      cachePolicy: .returnCacheDataDontFetch,
-      resultHandler: resultObserver.handler
-    )
-
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
   }
 
-  func test__fetch__givenMissingValueInPartialData_shouldFailFetch() throws {
-    mergeRecordsIntoCache([
+  func test__fetch__givenMissingValueInPartialData_shouldReturnNil() async throws {
+    try await store.publish(records: [
       "QUERY_ROOT": [
-        "animal": CacheReference("QUERY_ROOT.animal"),
+        "animal": CacheReference("QUERY_ROOT.animal")
       ],
       "QUERY_ROOT.animal": [
         "__typename": "animal",
@@ -331,34 +284,12 @@ class DeferOperationCacheReadTests: XCTestCase, CacheDependentTesting {
       "QUERY_ROOT.animal.friend": [
         "name": "American Badger",
         "species": "Taxidea taxus",
-      ]
+      ],
     ])
 
     let query = AnimalQuery()
-    let resultObserver = makeResultObserver(for: query)
 
-    let fetchResultFromCacheExpectation = resultObserver.expectation(
-      description: "Received result from cache"
-    ) { result in
-      expect(result).to(beFailure { error in
-        guard let error = error as? GraphQLExecutionError else {
-          fail("Unexpected error - \(error)")
-          return
-        }
-
-        expect(error.path).to(equal(["animal", "species"]))
-        expect(error.underlying).to(matchError(JSONDecodingError.missingValue))
-      })
-
-
-    }
-
-    client.fetch(
-      query: query,
-      cachePolicy: .returnCacheDataDontFetch,
-      resultHandler: resultObserver.handler
-    )
-
-    wait(for: [fetchResultFromCacheExpectation], timeout: Self.defaultWaitTimeout)
+    await expect { try await self.client.fetch(query: query, cachePolicy: .cacheOnly) }
+      .to(beNil())
   }
 }

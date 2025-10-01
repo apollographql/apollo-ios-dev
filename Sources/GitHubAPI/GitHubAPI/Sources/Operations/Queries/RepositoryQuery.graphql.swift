@@ -2,8 +2,9 @@
 // This file was automatically generated and should not be edited.
 
 @_exported import ApolloAPI
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public class RepositoryQuery: GraphQLQuery {
+public struct RepositoryQuery: GraphQLQuery {
   public static let operationName: String = "Repository"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
@@ -13,15 +14,18 @@ public class RepositoryQuery: GraphQLQuery {
   public init() {}
 
   public struct Data: GitHubAPI.SelectionSet {
-    public let __data: DataDict
-    public init(_dataDict: DataDict) { __data = _dataDict }
+    @_spi(Unsafe) public let __data: DataDict
+    @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-    public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Query }
-    public static var __selections: [ApolloAPI.Selection] { [
+    @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Query }
+    @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
       .field("repository", Repository?.self, arguments: [
         "owner": "apollographql",
         "name": "apollo-ios"
       ]),
+    ] }
+    @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      RepositoryQuery.Data.self
     ] }
 
     /// Lookup a given repository by the owner and repository name.
@@ -31,13 +35,16 @@ public class RepositoryQuery: GraphQLQuery {
     ///
     /// Parent Type: `Repository`
     public struct Repository: GitHubAPI.SelectionSet {
-      public let __data: DataDict
-      public init(_dataDict: DataDict) { __data = _dataDict }
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-      public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Repository }
-      public static var __selections: [ApolloAPI.Selection] { [
+      @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Repository }
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("issueOrPullRequest", IssueOrPullRequest?.self, arguments: ["number": 13]),
+      ] }
+      @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        RepositoryQuery.Data.Repository.self
       ] }
 
       /// Returns a single issue-like object from the current repository by number.
@@ -47,14 +54,17 @@ public class RepositoryQuery: GraphQLQuery {
       ///
       /// Parent Type: `IssueOrPullRequest`
       public struct IssueOrPullRequest: GitHubAPI.SelectionSet {
-        public let __data: DataDict
-        public init(_dataDict: DataDict) { __data = _dataDict }
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-        public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Unions.IssueOrPullRequest }
-        public static var __selections: [ApolloAPI.Selection] { [
+        @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Unions.IssueOrPullRequest }
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .inlineFragment(AsIssue.self),
           .inlineFragment(AsReactable.self),
+        ] }
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          RepositoryQuery.Data.Repository.IssueOrPullRequest.self
         ] }
 
         public var asIssue: AsIssue? { _asInlineFragment() }
@@ -64,15 +74,20 @@ public class RepositoryQuery: GraphQLQuery {
         ///
         /// Parent Type: `Issue`
         public struct AsIssue: GitHubAPI.InlineFragment {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = RepositoryQuery.Data.Repository.IssueOrPullRequest
-          public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Issue }
-          public static var __selections: [ApolloAPI.Selection] { [
+          @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.Issue }
+          @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
             .field("body", String.self),
             .field("url", GitHubAPI.URI.self),
             .field("author", Author?.self),
+          ] }
+          @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+            RepositoryQuery.Data.Repository.IssueOrPullRequest.self,
+            RepositoryQuery.Data.Repository.IssueOrPullRequest.AsIssue.self,
+            RepositoryQuery.Data.Repository.IssueOrPullRequest.AsReactable.self
           ] }
 
           /// Identifies the body of the issue.
@@ -88,13 +103,17 @@ public class RepositoryQuery: GraphQLQuery {
           ///
           /// Parent Type: `Actor`
           public struct Author: GitHubAPI.SelectionSet {
-            public let __data: DataDict
-            public init(_dataDict: DataDict) { __data = _dataDict }
+            @_spi(Unsafe) public let __data: DataDict
+            @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-            public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Actor }
-            public static var __selections: [ApolloAPI.Selection] { [
+            @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Actor }
+            @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
               .field("__typename", String.self),
               .field("avatarUrl", GitHubAPI.URI.self),
+            ] }
+            @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+              RepositoryQuery.Data.Repository.IssueOrPullRequest.AsIssue.Author.self,
+              RepositoryQuery.Data.Repository.IssueOrPullRequest.AsReactable.AsComment.Author.self
             ] }
 
             /// A URL pointing to the actor's public avatar.
@@ -108,14 +127,18 @@ public class RepositoryQuery: GraphQLQuery {
         ///
         /// Parent Type: `Reactable`
         public struct AsReactable: GitHubAPI.InlineFragment {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) { __data = _dataDict }
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
           public typealias RootEntityType = RepositoryQuery.Data.Repository.IssueOrPullRequest
-          public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Reactable }
-          public static var __selections: [ApolloAPI.Selection] { [
+          @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Reactable }
+          @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
             .field("viewerCanReact", Bool.self),
             .inlineFragment(AsComment.self),
+          ] }
+          @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+            RepositoryQuery.Data.Repository.IssueOrPullRequest.self,
+            RepositoryQuery.Data.Repository.IssueOrPullRequest.AsReactable.self
           ] }
 
           /// Can user react to this subject
@@ -127,13 +150,18 @@ public class RepositoryQuery: GraphQLQuery {
           ///
           /// Parent Type: `Comment`
           public struct AsComment: GitHubAPI.InlineFragment {
-            public let __data: DataDict
-            public init(_dataDict: DataDict) { __data = _dataDict }
+            @_spi(Unsafe) public let __data: DataDict
+            @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
             public typealias RootEntityType = RepositoryQuery.Data.Repository.IssueOrPullRequest
-            public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Comment }
-            public static var __selections: [ApolloAPI.Selection] { [
+            @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Comment }
+            @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
               .field("author", Author?.self),
+            ] }
+            @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+              RepositoryQuery.Data.Repository.IssueOrPullRequest.self,
+              RepositoryQuery.Data.Repository.IssueOrPullRequest.AsReactable.self,
+              RepositoryQuery.Data.Repository.IssueOrPullRequest.AsReactable.AsComment.self
             ] }
 
             /// The actor who authored the comment.
@@ -145,13 +173,16 @@ public class RepositoryQuery: GraphQLQuery {
             ///
             /// Parent Type: `Actor`
             public struct Author: GitHubAPI.SelectionSet {
-              public let __data: DataDict
-              public init(_dataDict: DataDict) { __data = _dataDict }
+              @_spi(Unsafe) public let __data: DataDict
+              @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
-              public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Actor }
-              public static var __selections: [ApolloAPI.Selection] { [
+              @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Interfaces.Actor }
+              @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
                 .field("__typename", String.self),
                 .field("login", String.self),
+              ] }
+              @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+                RepositoryQuery.Data.Repository.IssueOrPullRequest.AsReactable.AsComment.Author.self
               ] }
 
               /// The username of the actor.

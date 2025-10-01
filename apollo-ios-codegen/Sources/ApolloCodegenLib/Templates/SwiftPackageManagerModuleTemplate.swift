@@ -40,17 +40,18 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
     let casedSchemaNamespace = config.schemaNamespace.firstUppercased
 
     return TemplateString("""
-    // swift-tools-version:5.9
+    // swift-tools-version:6.1
 
     import PackageDescription
 
     let package = Package(
       name: "\(casedSchemaNamespace)",
       platforms: [
-        .iOS(.v12),
-        .macOS(.v10_14),
-        .tvOS(.v12),
-        .watchOS(.v5),
+        .iOS(.v15),
+        .macOS(.v12),
+        .tvOS(.v15),
+        .watchOS(.v8),
+        .visionOS(.v1),
       ],
       products: [
         .library(name: "\(casedSchemaNamespace)", targets: ["\(casedSchemaNamespace)"]),
@@ -79,7 +80,8 @@ struct SwiftPackageManagerModuleTemplate: TemplateRenderer {
           path: "\($0.path)"
         ),
         """})
-      ]
+      ],
+      swiftLanguageModes: [.v6, .v5]
     )
     
     """)

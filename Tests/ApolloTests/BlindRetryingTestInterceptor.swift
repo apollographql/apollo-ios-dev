@@ -1,26 +1,17 @@
-import Foundation
 import Apollo
 import ApolloAPI
+import Foundation
 
-// An interceptor which blindly retries every time it receives a request. 
-class BlindRetryingTestInterceptor: ApolloInterceptor {
+// An interceptor which blindly retries every time it receives a request.
+class BlindRetryingTestInterceptor: GraphQLInterceptor, @unchecked Sendable {
   var hitCount = 0
-  private(set) var hasBeenCancelled = false
 
-  public var id: String = UUID().uuidString
-
-  func interceptAsync<Operation: GraphQLOperation>(
-    chain: any RequestChain,
-    request: HTTPRequest<Operation>,
-    response: HTTPResponse<Operation>?,
-    completion: @escaping (Result<GraphQLResult<Operation.Data>, any Error>) -> Void) {
+  func intercept<Request: GraphQLRequest>(
+    request: Request,
+    next: (Request) async -> InterceptorResultStream<Request>
+  ) async throws -> InterceptorResultStream<Request> {
     self.hitCount += 1
-    chain.retry(request: request,
-                completion: completion)
+    throw RequestChain.Retry(request: request)
   }
-  
-  // Purposely not adhering to `Cancellable` here to make sure non `Cancellable` interceptors don't have this called.
-  func cancel() {
-    self.hasBeenCancelled = true
-  }
+
 }

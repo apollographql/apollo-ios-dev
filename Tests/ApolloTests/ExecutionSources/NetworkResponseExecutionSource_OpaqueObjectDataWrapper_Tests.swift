@@ -1,7 +1,7 @@
 import Foundation
 import XCTest
 import Nimble
-@_spi(Execution) @testable import Apollo
+@_spi(Execution) @_spi(Internal) @testable import Apollo
 import ApolloAPI
 
 class NetworkResponseExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase {
@@ -47,7 +47,7 @@ class NetworkResponseExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase {
     let actual = objectData["value"]
     
     // then
-    expect(actual as? Int).to(equal(10))
+    expect(actual as? Int32).to(equal(10))
   }
   
   func test__subscript_forInt32ScalarField_returnsValue() throws {
@@ -62,7 +62,7 @@ class NetworkResponseExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase {
     let actual = objectData["value"]
     
     // then
-    expect(actual as? Int).to(equal(10))
+    expect(actual as? Int32).to(equal(10))
   }
   
   func test__subscript_forInt64ScalarField_returnsValue() throws {
@@ -77,7 +77,7 @@ class NetworkResponseExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase {
     let actual = objectData["value"]
     
     // then
-    expect(actual as? Int).to(equal(10))
+    expect(actual as? Int32).to(equal(10))
   }
   
   func test__subscript_forBoolScalarField_returnsScalarTypeValue() throws {
@@ -136,7 +136,7 @@ class NetworkResponseExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase {
     }
     """.data(using: .utf8)!
 
-    let deserialized = try JSONSerializationFormat.deserialize(data: data) as! JSONObject
+    let deserialized = try JSONSerializationFormat.deserialize(data: data) as JSONObject
     let objectData = subject.opaqueObjectDataWrapper(for: deserialized)
 
     // when
@@ -147,7 +147,7 @@ class NetworkResponseExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase {
 
     // then
     expect(actualString as? String).to(equal("string"))
-    expect(actualInt as? Int).to(equal(321))
+    expect(actualInt as? Int32).to(equal(321))
     expect(actualBool as? Bool).to(equal(true))
     expect(actualDouble as? Double).to(equal(10.5))
   }
@@ -220,7 +220,7 @@ class NetworkResponseExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase {
     let actual = objectData["values"]?[0]
     
     // then
-    expect(actual as? Int).to(equal(10))
+    expect(actual as? Int32).to(equal(10))
   }
   
   func test__subscript__forListOfInt32Fields_returnsValue() throws {
@@ -236,7 +236,7 @@ class NetworkResponseExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase {
     let actual = objectData["values"]?[0]
     
     // then
-    expect(actual as? Int).to(equal(10))
+    expect(actual as? Int32).to(equal(10))
   }
   
   func test__subscript__forListOfInt64Fields_returnsValue() throws {
@@ -252,7 +252,7 @@ class NetworkResponseExecutionSource_OpaqueObjectDataWrapper_Tests: XCTestCase {
     let actual = objectData["values"]?[0]
     
     // then
-    expect(actual as? Int).to(equal(10))
+    expect(actual as? Int32).to(equal(10))
   }
   
   func test__subscript__forListOfBoolFields_returnsValue() throws {

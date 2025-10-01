@@ -1,13 +1,13 @@
 import XCTest
 @testable import Apollo
-import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 import Nimble
 
 @MainActor
 class SelectionSet_JSONInitializerTests: XCTestCase {
 
-  func test__initFromJSON__withFragment_canAccessFragment() throws {
+  func test__initFromJSON__withFragment_canAccessFragment() async throws {
     // given
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
@@ -20,7 +20,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       }
     })
 
-    class GivenFragment: MockFragment {
+    class GivenFragment: MockFragment, @unchecked Sendable {
       override class var __parentType: any ParentType { Types.Human }
       override class var __selections: [Selection] {[
         .field("height", Float.self)
@@ -28,7 +28,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       var height: Float { __data["height"] }
     }
 
-    class Hero: AbstractMockSelectionSet<Hero.Fragments, MockSchemaMetadata> {
+    class Hero: AbstractMockSelectionSet<Hero.Fragments, MockSchemaMetadata>, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __parentType: any ParentType { Types.Human }
@@ -52,13 +52,13 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       "__typename": "Human", "name": "Luke Skywalker", "height": 1.72
     ]
 
-    let data = try Hero(data: jsonObject)
+    let data = try await Hero(data: jsonObject)
 
 
     expect(data.fragments.givenFragment.height).to(equal(1.72))
   }
 
-  func test__initFromJSON__withInclusionConditionOnField_canAccessFieldWhenVariableIsTrue() throws {
+  func test__initFromJSON__withInclusionConditionOnField_canAccessFieldWhenVariableIsTrue() async throws {
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
     }
@@ -70,7 +70,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       }
     })
 
-    class Hero: MockSelectionSet {
+    class Hero: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __parentType: any ParentType { Types.Human }
@@ -86,14 +86,14 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       "__typename": "Hero", "name": "R2-D2"
     ]
 
-    let data = try Hero(data: jsonObject, variables: ["includeName" : true])
+    let data = try await Hero(data: jsonObject, variables: ["includeName" : true])
     expect(data.name).to(equal("R2-D2"))
 
-    let dataWithNoName = try Hero(data: jsonObject, variables: ["includeName" : false])
+    let dataWithNoName = try await Hero(data: jsonObject, variables: ["includeName" : false])
     expect(dataWithNoName.name).to(beNil())
   }
 
-  func test__initFromJSON__withInclusionConditionOnField_variableNotPresent_fieldIsNil() throws {
+  func test__initFromJSON__withInclusionConditionOnField_variableNotPresent_fieldIsNil() async throws {
     struct Types {
       static let Human = Object(typename: "Human", implementedInterfaces: [])
     }
@@ -105,7 +105,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       }
     })
 
-    class Hero: MockSelectionSet {
+    class Hero: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __parentType: any ParentType { Types.Human }
@@ -121,14 +121,14 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       "__typename": "Hero", "name": "R2-D2"
     ]
 
-    let dataWithNoName = try Hero(data: jsonObject)
+    let dataWithNoName = try await Hero(data: jsonObject)
     expect(dataWithNoName.name).to(beNil())
   }
 
   // MARK: - Merged Only Selection Set Tests
 
   /// Confirms bug fix for issue [#2915](https://github.com/apollographql/apollo-ios/issues/2915).
-  func test__initFromJSON__givenMergedOnlyNestedSelectionSet_withTypeCase_canConvertToTypeCase() throws {
+  func test__initFromJSON__givenMergedOnlyNestedSelectionSet_withTypeCase_canConvertToTypeCase() async throws {
     struct Types {
       static let Character = Interface(name: "Character", implementingObjects: ["Human"])
       static let Hero = Interface(name: "Hero", implementingObjects: ["Human"])
@@ -142,7 +142,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       }
     })
 
-    class Character: MockSelectionSet {
+    class Character: MockSelectionSet, @unchecked Sendable {
       typealias Schema = MockSchemaMetadata
 
       override class var __parentType: any ParentType { Types.Character }
@@ -157,7 +157,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       var asHero: AsHero? { _asInlineFragment() }
       var asHuman: AsHuman? { _asInlineFragment() }
 
-      class Friend: MockSelectionSet {
+      class Friend: MockSelectionSet, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
 
         override class var __parentType: any ParentType { Types.Character }
@@ -168,7 +168,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
 
         var asHuman: AsHuman? { _asInlineFragment() }
 
-        class AsHuman: ConcreteMockTypeCase<Character.Friend> {
+        class AsHuman: ConcreteMockTypeCase<Character.Friend>, @unchecked Sendable {
           typealias Schema = MockSchemaMetadata
 
           override class var __parentType: any ParentType { Types.Human }
@@ -180,7 +180,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
         }
       }
 
-      class AsHero: ConcreteMockTypeCase<Character> {
+      class AsHero: ConcreteMockTypeCase<Character>, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
 
         override class var __parentType: any ParentType { Types.Hero }
@@ -190,7 +190,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
 
         var friend: Friend { __data["friend"] }
 
-        class Friend: MockSelectionSet {
+        class Friend: MockSelectionSet, @unchecked Sendable {
           typealias Schema = MockSchemaMetadata
 
           override class var __parentType: any ParentType { Types.Character }
@@ -202,7 +202,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
         }
       }
 
-      class AsHuman: MockTypeCase {
+      class AsHuman: MockTypeCase, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
 
         override class var __parentType: any ParentType { Types.Human }
@@ -213,7 +213,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
         var name: String? { __data["name"] }
         var friend: Friend { __data["friend"] }
 
-        class Friend: MockSelectionSet {
+        class Friend: MockSelectionSet, @unchecked Sendable {
           typealias Schema = MockSchemaMetadata
 
           override class var __parentType: any ParentType { Types.Character }
@@ -221,7 +221,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
           var heroName: String? { __data["heroName"] }
           var asHuman: AsHuman? { _asInlineFragment() }
 
-          class AsHuman: ConcreteMockTypeCase<Character.AsHuman.Friend>, CompositeInlineFragment {
+          class AsHuman: ConcreteMockTypeCase<Character.AsHuman.Friend>, CompositeInlineFragment, @unchecked Sendable {
             typealias Schema = MockSchemaMetadata
 
             override class var __parentType: any ParentType { Types.Human }
@@ -245,7 +245,7 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
       ]
     ]
 
-    let data = try Character(data: jsonObject)
+    let data = try await Character(data: jsonObject)
     expect(data.asHuman?.friend.asHuman).toNot(beNil())
     expect(data.asHuman?.friend.asHuman?.heroName).to(equal("Han Solo"))
   }

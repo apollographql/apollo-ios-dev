@@ -4,7 +4,7 @@ import ApolloInternalTestHelpers
 @testable import ApolloCodegenLib
 import IR
 import GraphQLCompiler
-import Nimble
+@preconcurrency import Nimble
 
 class ApolloCodegenTests: XCTestCase {
   private var directoryURL: URL { testFileManager.directoryURL }
@@ -65,8 +65,8 @@ class ApolloCodegenTests: XCTestCase {
     containing data: Data,
     named filename: String,
     inDirectory directory: String? = nil
-  ) throws -> String {
-    return try self.testFileManager.createFile(
+  ) async throws -> String {
+    return try await self.testFileManager.createFile(
       containing: data,
       named: filename,
       inDirectory: directory
@@ -75,11 +75,11 @@ class ApolloCodegenTests: XCTestCase {
 
   @discardableResult
   private func createFile(
-    body: @autoclosure () -> String = "Test File",
+    body: @autoclosure @Sendable () -> String = "Test File",
     filename: String,
     inDirectory directory: String? = nil
-  ) throws -> String {
-    return try self.testFileManager.createFile(
+  ) async throws -> String {
+    return try await self.testFileManager.createFile(
       body: body(),
       named: filename,
       inDirectory: directory
@@ -92,7 +92,7 @@ class ApolloCodegenTests: XCTestCase {
     named operationName: String,
     filename: String,
     inDirectory directory: String? = nil
-  ) throws -> String {
+  ) async throws -> String {
     let query: String =
       """
       \(type.rawValue) \(operationName) {
@@ -101,14 +101,14 @@ class ApolloCodegenTests: XCTestCase {
         }
       }
       """
-    return try createFile(body: query, filename: filename, inDirectory: directory)
+    return try await createFile(body: query, filename: filename, inDirectory: directory)
   }
 
   // MARK: CompilationResult Tests
 
   func test_compileResults_givenOperation_withGraphQLErrors_shouldThrow() async throws {
     // given
-    let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
+    let schemaPath = try await createFile(containing: schemaData, named: "schema.graphqls")
 
     let operationData: Data =
       """
@@ -119,7 +119,7 @@ class ApolloCodegenTests: XCTestCase {
         }
       }
       """.data(using: .utf8)!
-    try createFile(containing: operationData, named: "operation.graphql")
+    try await createFile(containing: operationData, named: "operation.graphql")
 
     let config = ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock(input: .init(
       schemaPath: schemaPath,
@@ -150,7 +150,7 @@ class ApolloCodegenTests: XCTestCase {
 
   func test_compileResults_givenOperations_withNoErrors_shouldReturn() async throws {
     // given
-    let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
+    let schemaPath = try await createFile(containing: schemaData, named: "schema.graphqls")
 
     let booksData: Data =
       """
@@ -160,7 +160,7 @@ class ApolloCodegenTests: XCTestCase {
         }
       }
       """.data(using: .utf8)!
-    try createFile(containing: booksData, named: "books-operation.graphql")
+    try await createFile(containing: booksData, named: "books-operation.graphql")
 
     let authorsData: Data =
       """
@@ -170,7 +170,7 @@ class ApolloCodegenTests: XCTestCase {
         }
       }
       """.data(using: .utf8)!
-    try createFile(containing: authorsData, named: "authors-operation.graphql")
+    try await createFile(containing: authorsData, named: "authors-operation.graphql")
 
     let config = ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock(input: .init(
       schemaPath: schemaPath,
@@ -189,9 +189,9 @@ class ApolloCodegenTests: XCTestCase {
 
   func test_compileResults_givenIDScalarIsReferenced_referencedTypesShouldIncludeScalar() async throws {
     // given
-    try createFile(containing: schemaData, named: "schema.graphqls", inDirectory: "CustomRoot")
+    try await createFile(containing: schemaData, named: "schema.graphqls", inDirectory: "CustomRoot")
 
-    try createFile(
+    try await createFile(
       body: """
       query getAuthors {
         authors {
@@ -225,7 +225,7 @@ class ApolloCodegenTests: XCTestCase {
 
   func test_compileResults_givenRelativeSearchPath_relativeToRootURL_hasOperations_shouldReturnOperationsRelativeToRoot() async throws {
     // given
-    let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
+    let schemaPath = try await createFile(containing: schemaData, named: "schema.graphqls")
 
     let rootURL = directoryURL.appendingPathComponent("CustomRoot")
 
@@ -237,7 +237,7 @@ class ApolloCodegenTests: XCTestCase {
         }
       }
       """.data(using: .utf8)!
-    try createFile(containing: booksData, named: "books-operation.graphql", inDirectory: "CustomRoot")
+    try await createFile(containing: booksData, named: "books-operation.graphql", inDirectory: "CustomRoot")
 
     let authorsData: Data =
       """
@@ -247,7 +247,7 @@ class ApolloCodegenTests: XCTestCase {
         }
       }
       """.data(using: .utf8)!
-    try createFile(containing: authorsData, named: "authors-operation.graphql")
+    try await createFile(containing: authorsData, named: "authors-operation.graphql")
 
     let config = ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock(input: .init(
       schemaPath: schemaPath,
@@ -269,7 +269,7 @@ class ApolloCodegenTests: XCTestCase {
 
   func test_compileResults_givenRelativeSchemaSearchPath_relativeToRootURL_shouldReturnSchemaRelativeToRoot() async throws {
     // given
-    try createFile(
+    try await createFile(
       body: """
       type QueryTwo {
         string: String!
@@ -277,9 +277,9 @@ class ApolloCodegenTests: XCTestCase {
       """,
       filename: "schema1.graphqls")
 
-    try createFile(containing: schemaData, named: "schema.graphqls", inDirectory: "CustomRoot")
+    try await createFile(containing: schemaData, named: "schema.graphqls", inDirectory: "CustomRoot")
 
-    try createFile(
+    try await createFile(
       body: """
       query getAuthors {
         authors {
@@ -311,7 +311,7 @@ class ApolloCodegenTests: XCTestCase {
 
   func test__compileResults__givenMultipleSchemaFiles_withDependentTypes_compilesResult() async throws {
     // given
-    try createFile(
+    try await createFile(
       body: """
       type Query {
         books: [Book!]!
@@ -320,7 +320,7 @@ class ApolloCodegenTests: XCTestCase {
       """,
       filename: "schema1.graphqls")
 
-    try createFile(
+    try await createFile(
       body: """
       type Book {
         title: String!
@@ -334,7 +334,7 @@ class ApolloCodegenTests: XCTestCase {
       """,
       filename: "schema2.graphqls")
 
-    try createFile(
+    try await createFile(
       body: """
       query getAuthors {
         authors {
@@ -362,7 +362,7 @@ class ApolloCodegenTests: XCTestCase {
 
   func test__compileResults__givenMultipleSchemaFiles_withDifferentRootTypes_compilesResult() async throws {
     // given
-    try createFile(
+    try await createFile(
       body: """
       type Query {
         string: String!
@@ -370,7 +370,7 @@ class ApolloCodegenTests: XCTestCase {
       """,
       filename: "schema1.graphqls")
 
-    try createFile(
+    try await createFile(
       body: """
       type Subscription {
         bool: Boolean!
@@ -378,7 +378,7 @@ class ApolloCodegenTests: XCTestCase {
       """,
       filename: "schema2.graphqls")
 
-    try createFile(
+    try await createFile(
       body: """
       query TestQuery {
         string
@@ -386,7 +386,7 @@ class ApolloCodegenTests: XCTestCase {
       """,
       filename: "TestQuery.graphql")
 
-    try createFile(
+    try await createFile(
       body: """
       subscription TestSubscription {
         bool
@@ -414,7 +414,7 @@ class ApolloCodegenTests: XCTestCase {
 
   func test__compileResults__givenMultipleSchemaFiles_withSchemaTypeExtension_compilesResultWithExtension() async throws {
     // given
-    try createFile(
+    try await createFile(
       body: """
       type Query {
         string: String!
@@ -422,7 +422,7 @@ class ApolloCodegenTests: XCTestCase {
       """,
       filename: "schema1.graphqls")
 
-    try createFile(
+    try await createFile(
       body: """
       extend type Query {
         bool: Boolean!
@@ -430,7 +430,7 @@ class ApolloCodegenTests: XCTestCase {
       """,
       filename: "schemaExtension.graphqls")
 
-    try createFile(
+    try await createFile(
       body: """
       query TestQuery {
         string
@@ -463,9 +463,9 @@ class ApolloCodegenTests: XCTestCase {
       contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema
     )
 
-    try createFile(body: introspectionJSON, filename: "schemaJSON.json")
+    try await createFile(body: introspectionJSON, filename: "schemaJSON.json")
 
-    try createFile(
+    try await createFile(
       body: """
       extend type Query {
         testExtensionField: Boolean!
@@ -473,7 +473,7 @@ class ApolloCodegenTests: XCTestCase {
       """,
       filename: "schemaExtension.graphqls")
 
-    try createFile(
+    try await createFile(
       body: """
       query TestQuery {
         testExtensionField
@@ -508,8 +508,8 @@ class ApolloCodegenTests: XCTestCase {
       contentsOf: ApolloCodegenInternalTestHelpers.Resources.StarWars.JSONSchema
     )
 
-    try createFile(body: introspectionJSON, filename: "schemaJSON1.json")
-    try createFile(body: introspectionJSON, filename: "schemaJSON2.json")
+    try await createFile(body: introspectionJSON, filename: "schemaJSON1.json")
+    try await createFile(body: introspectionJSON, filename: "schemaJSON2.json")
 
     // when
     let config = ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock(input: .init(
@@ -548,9 +548,9 @@ class ApolloCodegenTests: XCTestCase {
 
   func test__compileResults__givenSchemaSearchPaths_withMixedMatches_doesNotThrowError() async throws {
     // given
-    let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
+    let schemaPath = try await createFile(containing: schemaData, named: "schema.graphqls")
 
-    let operationPath = try createOperationFile(
+    let operationPath = try await createOperationFile(
       type: .query,
       named: "TestQuery",
       filename: "TestQuery.graphql"
@@ -577,7 +577,7 @@ class ApolloCodegenTests: XCTestCase {
 
   func test__compileResults__givenOperationSearchPath_withNoMatches_throwsError() async throws {
     // given
-    let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
+    let schemaPath = try await createFile(containing: schemaData, named: "schema.graphqls")
 
     let config = ApolloCodegen.ConfigurationContext(config: .mock(
       input: .init(
@@ -598,9 +598,9 @@ class ApolloCodegenTests: XCTestCase {
 
   func test__compileResults__givenOperationSearchPaths_withMixedMatches_doesNotThrowError() async throws {
     // given
-    let schemaPath = try createFile(containing: schemaData, named: "schema.graphqls")
+    let schemaPath = try await createFile(containing: schemaData, named: "schema.graphqls")
 
-    let operationPath = try createOperationFile(
+    let operationPath = try await createOperationFile(
       type: .query,
       named: "TestQuery",
       filename: "TestQuery.graphql"
@@ -655,13 +655,7 @@ class ApolloCodegenTests: XCTestCase {
 
     let fileManager = MockApolloFileManager(strict: false)
 
-    let filePathStore = ApolloFileManager.WrittenFiles()
-    let concurrentTasks = ConcurrentTaskContainer()
-
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      concurrentTasks.dispatch {
-        await filePathStore.addWrittenFile(path: path)
-      }
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
     }))
 
@@ -702,6 +696,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/ID.swift").path,
 
       directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsQuery.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsDeferQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsIncludeSkipQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Operations/Queries/ClassroomPetsQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Operations/Queries/DogQuery.graphql.swift").path,
@@ -733,12 +728,11 @@ class ApolloCodegenTests: XCTestCase {
       ir: ir,
       fileManager: fileManager
     )
-    await concurrentTasks.waitForAllTasks()
-    let filePaths = await filePathStore.value
+    let filePaths = await fileManager.writtenFiles
 
     // then
     expect(filePaths).to(equal(expectedPaths))
-    expect(fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await fileManager.allClosuresCalled }.to(beTrue())
   }
 
   func test_fileGenerators_givenSchemaAndMultipleOperationDocuments_operations_absolute_shouldGenerateSchemaAndOperationsFiles() async throws {
@@ -771,13 +765,7 @@ class ApolloCodegenTests: XCTestCase {
 
     let fileManager = MockApolloFileManager(strict: false)
 
-    let filePathStore = ApolloFileManager.WrittenFiles()
-    let concurrentTasks = ConcurrentTaskContainer()
-
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      concurrentTasks.dispatch {
-        await filePathStore.addWrittenFile(path: path)
-      }
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
     }))
 
@@ -813,6 +801,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("Sources/CustomScalars/ID.swift").path,
 
       operationsOutputURL.appendingPathComponent("Queries/AllAnimalsQuery.graphql.swift").path,
+      operationsOutputURL.appendingPathComponent("Queries/AllAnimalsDeferQuery.graphql.swift").path,
       operationsOutputURL.appendingPathComponent("Queries/DogQuery.graphql.swift").path,
       operationsOutputURL.appendingPathComponent("Queries/AllAnimalsIncludeSkipQuery.graphql.swift").path,
       operationsOutputURL.appendingPathComponent("Queries/ClassroomPetsQuery.graphql.swift").path,
@@ -844,12 +833,11 @@ class ApolloCodegenTests: XCTestCase {
       ir: ir,
       fileManager: fileManager
     )
-    await concurrentTasks.waitForAllTasks()
-    let filePaths = await filePathStore.value
+    let filePaths = await fileManager.writtenFiles
 
     // then
     expect(filePaths).to(equal(expectedPaths))
-    expect(fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await fileManager.allClosuresCalled }.to(beTrue())
   }
 
   func test_fileGenerators_givenSchemaAndOperationDocuments_whenAppendingFileSuffix_shouldGenerateSchemaFilenamesWithSuffix() async throws {
@@ -882,13 +870,7 @@ class ApolloCodegenTests: XCTestCase {
 
     let fileManager = MockApolloFileManager(strict: false)
 
-    let filePathStore = ApolloFileManager.WrittenFiles()
-    let concurrentTasks = ConcurrentTaskContainer()
-
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      concurrentTasks.dispatch {
-        await filePathStore.addWrittenFile(path: path)
-      }
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
     }))
 
@@ -899,7 +881,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("Sources/Schema/Enums/SkinCovering.enum.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Schema/Enums/SkinCovering.enum.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Schema/Enums/RelativeSize.enum.graphql.swift").path,
-      
+
       directoryURL.appendingPathComponent("Sources/Schema/Interfaces/Pet.interface.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Schema/Interfaces/Animal.interface.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Schema/Interfaces/WarmBlooded.interface.graphql.swift").path,
@@ -929,6 +911,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("Sources/Schema/CustomScalars/ID.scalar.swift").path,
 
       directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsQuery.graphql.swift").path,
+      directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsDeferQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Operations/Queries/AllAnimalsIncludeSkipQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Operations/Queries/ClassroomPetsQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("Sources/Operations/Queries/DogQuery.graphql.swift").path,
@@ -960,12 +943,11 @@ class ApolloCodegenTests: XCTestCase {
       ir: ir,
       fileManager: fileManager
     )
-    await concurrentTasks.waitForAllTasks()
-    let filePaths = await filePathStore.value
+    let filePaths = await fileManager.writtenFiles
 
     // then
     expect(filePaths).to(equal(expectedPaths))
-    expect(fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await fileManager.allClosuresCalled }.to(beTrue())
   }
 
   func test_fileGenerators_givenTestMockOutput_absolutePath_shouldGenerateTestMocks() async throws {
@@ -994,19 +976,11 @@ class ApolloCodegenTests: XCTestCase {
 
     let fileManager = MockApolloFileManager(strict: false)
 
-    let filePathStore = ApolloFileManager.WrittenFiles()
-    let concurrentTasks = ConcurrentTaskContainer()
-
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      if path.contains("/TestMocks/") {
-        concurrentTasks.dispatch {
-          await filePathStore.addWrittenFile(path: path)
-        }
-      }
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
     }))
 
-    let expectedPaths: Set<String> = [
+    let expectedPaths = [
       directoryURL.appendingPathComponent("TestMocks/Height+Mock.graphql.swift").path,
       directoryURL.appendingPathComponent("TestMocks/Query+Mock.graphql.swift").path,
       directoryURL.appendingPathComponent("TestMocks/Cat+Mock.graphql.swift").path,
@@ -1032,12 +1006,11 @@ class ApolloCodegenTests: XCTestCase {
       ir: ir,
       fileManager: fileManager
     )
-    await concurrentTasks.waitForAllTasks()
-    let filePaths = await filePathStore.value
+    let filePaths = await fileManager.writtenFiles
 
     // then
-    expect(filePaths).to(equal(expectedPaths))
-    expect(fileManager.allClosuresCalled).to(beTrue())
+    expect(filePaths).to(contain(expectedPaths))
+    await expect{ await fileManager.allClosuresCalled }.to(beTrue())
   }
 
   // MARK: Custom Root URL Tests
@@ -1070,13 +1043,7 @@ class ApolloCodegenTests: XCTestCase {
 
     let fileManager = MockApolloFileManager(strict: false)
 
-    let filePathStore = ApolloFileManager.WrittenFiles()
-    let concurrentTasks = ConcurrentTaskContainer()
-
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      concurrentTasks.dispatch {
-        await filePathStore.addWrittenFile(path: path)
-      }
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
     }))
 
@@ -1117,6 +1084,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("RelativePath/Sources/Schema/CustomScalars/ID.swift").path,
 
       directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Queries/AllAnimalsQuery.graphql.swift").path,
+      directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Queries/AllAnimalsDeferQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Queries/DogQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Queries/AllAnimalsIncludeSkipQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativePath/Sources/Operations/Queries/ClassroomPetsQuery.graphql.swift").path,
@@ -1149,14 +1117,14 @@ class ApolloCodegenTests: XCTestCase {
       ir: ir,
       fileManager: fileManager
     )
-    await concurrentTasks.waitForAllTasks()
-    let filePaths = await filePathStore.value
+    let filePaths = await fileManager.writtenFiles
 
     // then
     expect(filePaths).to(equal(expectedPaths))
-    expect(fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await fileManager.allClosuresCalled }.to(beTrue())
   }
 
+  @MainActor
   func test_fileGenerators_givenCustomRootDirectoryPath_operations_absolute__shouldGenerateFilesWithCustomRootPath() async throws {
     // given
     let schemaPath = ApolloCodegenInternalTestHelpers.Resources.AnimalKingdom.Schema.path
@@ -1185,13 +1153,7 @@ class ApolloCodegenTests: XCTestCase {
 
     let fileManager = MockApolloFileManager(strict: false)
 
-    let filePathStore = ApolloFileManager.WrittenFiles()
-    let concurrentTasks = ConcurrentTaskContainer()
-
-    fileManager.mock(closure: .createFile({ path, data, attributes in
-      concurrentTasks.dispatch {
-        await filePathStore.addWrittenFile(path: path)
-      }
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       return true
     }))
 
@@ -1232,6 +1194,7 @@ class ApolloCodegenTests: XCTestCase {
       directoryURL.appendingPathComponent("RelativePath/Sources/CustomScalars/ID.swift").path,
 
       directoryURL.appendingPathComponent("RelativeOperations/Queries/AllAnimalsQuery.graphql.swift").path,
+      directoryURL.appendingPathComponent("RelativeOperations/Queries/AllAnimalsDeferQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativeOperations/Queries/DogQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativeOperations/Queries/AllAnimalsIncludeSkipQuery.graphql.swift").path,
       directoryURL.appendingPathComponent("RelativeOperations/Queries/ClassroomPetsQuery.graphql.swift").path,
@@ -1264,35 +1227,34 @@ class ApolloCodegenTests: XCTestCase {
       ir: ir,
       fileManager: fileManager
     )
-    await concurrentTasks.waitForAllTasks()
-    let filePaths = await filePathStore.value
+    let filePaths = await fileManager.writtenFiles
 
     // then
     expect(filePaths).to(equal(expectedPaths))
-    expect(fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await fileManager.allClosuresCalled }.to(beTrue())
   }
 
   // MARK: Old File Deletion Tests
 
   func test__fileDeletion__givenPruneGeneratedFiles_false__doesNotDeleteUnusedGeneratedFiles() async throws {
     // given
-    try createFile(containing: schemaData, named: "schema.graphqls")
+    try await createFile(containing: schemaData, named: "schema.graphqls")
 
-    try createOperationFile(
+    try await createOperationFile(
       type: .query,
       named: "TestQuery",
       filename: "TestQuery.graphql"
     )
 
-    let testFile = try createFile(
+    let testFile = try await createFile(
       filename: "TestGeneratedA.graphql.swift",
       inDirectory: "SchemaModule"
     )
-    let testInSourcesFile = try createFile(
+    let testInSourcesFile = try await createFile(
       filename: "TestGeneratedB.graphql.swift",
       inDirectory: "SchemaModule/Sources"
     )
-    let testInOtherFolderFile = try createFile(
+    let testInOtherFolderFile = try await createFile(
       filename: "TestGeneratedC.graphql.swift",
       inDirectory: "SchemaModule/OtherFolder"
     )
@@ -1314,43 +1276,43 @@ class ApolloCodegenTests: XCTestCase {
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
-    expect(ApolloFileManager.default.doesFileExist(atPath: testFile)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInSourcesFile)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInOtherFolderFile)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testFile) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInSourcesFile) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInOtherFolderFile) }.to(beTrue())
   }
 
   func test__fileDeletion__givenGeneratedFilesExist_InSchemaModuleDirectory_deletesOnlyGeneratedFiles() async throws {
     // given
-    try createFile(containing: schemaData, named: "schema.graphqls")
+    try await createFile(containing: schemaData, named: "schema.graphqls")
 
-    try createOperationFile(
+    try await createOperationFile(
       type: .query,
       named: "TestQuery",
       filename: "TestQuery.graphql"
     )
 
-    let testFile = try createFile(
+    let testFile = try await createFile(
       filename: "TestGeneratedA.graphql.swift",
       inDirectory: "SchemaModule"
     )
-    let testInSourcesFile = try createFile(
+    let testInSourcesFile = try await createFile(
       filename: "TestGeneratedB.graphql.swift",
       inDirectory: "SchemaModule/Sources"
     )
-    let testInOtherFolderFile = try createFile(
+    let testInOtherFolderFile = try await createFile(
       filename: "TestGeneratedC.graphql.swift",
       inDirectory: "SchemaModule/OtherFolder"
     )
 
-    let testUserFile = try createFile(
+    let testUserFile = try await createFile(
       filename: "TestUserFileA.swift",
       inDirectory: "SchemaModule"
     )
-    let testInSourcesUserFile = try createFile(
+    let testInSourcesUserFile = try await createFile(
       filename: "TestUserFileB.swift",
       inDirectory: "SchemaModule/Sources"
     )
-    let testInOtherFolderUserFile = try createFile(
+    let testInOtherFolderUserFile = try await createFile(
       filename: "TestUserFileC.swift",
       inDirectory: "SchemaModule/OtherFolder"
     )
@@ -1371,40 +1333,40 @@ class ApolloCodegenTests: XCTestCase {
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
-    expect(ApolloFileManager.default.doesFileExist(atPath: testFile)).to(beFalse())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInSourcesFile)).to(beFalse())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInOtherFolderFile)).to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testFile) }.to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInSourcesFile) }.to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInOtherFolderFile) }.to(beFalse())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFile)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInSourcesUserFile)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInOtherFolderUserFile)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFile) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInSourcesUserFile) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInOtherFolderUserFile) }.to(beTrue())
   }
 
   func test__fileDeletion__givenGeneratedFilesExist_InOperationAbsoluteDirectory_deletesOnlyGeneratedFiles() async throws {
     // given
     let absolutePath = "OperationPath"
-    try createFile(containing: schemaData, named: "schema.graphqls")
+    try await createFile(containing: schemaData, named: "schema.graphqls")
 
-    try createOperationFile(
+    try await createOperationFile(
       type: .query,
       named: "TestQuery",
       filename: "TestQuery.graphql"
     )
 
-    let testFile = try createFile(
+    let testFile = try await createFile(
       filename: "TestGeneratedA.graphql.swift",
       inDirectory: absolutePath
     )
-    let testInChildFile = try createFile(
+    let testInChildFile = try await createFile(
       filename: "TestGeneratedB.graphql.swift",
       inDirectory: "\(absolutePath)/Child"
     )
 
-    let testUserFile = try createFile(
+    let testUserFile = try await createFile(
       filename: "TestFileA.swift",
       inDirectory: absolutePath
     )
-    let testInChildUserFile = try createFile(
+    let testInChildUserFile = try await createFile(
       filename: "TestFileB.swift",
       inDirectory: "\(absolutePath)/Child"
     )
@@ -1425,55 +1387,54 @@ class ApolloCodegenTests: XCTestCase {
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
-    expect(ApolloFileManager.default.doesFileExist(atPath: testFile)).to(beFalse())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInChildFile)).to(beFalse())
-
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFile)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInChildUserFile)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testFile) }.to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInChildFile) }.to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFile) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInChildUserFile) }.to(beTrue())
   }
 
   func test__fileDeletion__givenGeneratedFilesExist_InOperationRelativeDirectories_deletesOnlyRelativeGeneratedFilesInOperationSearchPaths() async throws {
     // given
-    try createFile(containing: schemaData, named: "schema.graphqls")
+    try await createFile(containing: schemaData, named: "schema.graphqls")
 
-    try createOperationFile(
+    try await createOperationFile(
       type: .query,
       named: "TestQuery",
       filename: "TestQuery.graphql",
       inDirectory: "code"
     )
 
-    let testGeneratedFileInRootPath = try createFile(
+    let testGeneratedFileInRootPath = try await createFile(
       filename: "TestGeneratedA.graphql.swift",
       inDirectory: "code"
     )
-    let testGeneratedFileInChildPath = try createFile(
+    let testGeneratedFileInChildPath = try await createFile(
       filename: "TestGeneratedB.graphql.swift",
       inDirectory: "code/child"
     )
-    let testGeneratedFileInNestedChildPath = try createFile(
+    let testGeneratedFileInNestedChildPath = try await createFile(
       filename: "TestGeneratedC.graphql.swift",
       inDirectory: "code/one/two"
     )
 
-    let testGeneratedFileNotInRelativePath = try createFile(
+    let testGeneratedFileNotInRelativePath = try await createFile(
       filename: "TestGeneratedD.graphql.swift",
       inDirectory: nil
     )
-    let testGeneratedFileNotInRelativeChildPath = try createFile(
+    let testGeneratedFileNotInRelativeChildPath = try await createFile(
       filename: "TestGeneratedE.graphql.swift",
       inDirectory: "other/child"
     )
 
-    let testUserFileInRootPath = try createFile(
+    let testUserFileInRootPath = try await createFile(
       filename: "TestUserFileA.swift",
       inDirectory: "code"
     )
-    let testUserFileInChildPath = try createFile(
+    let testUserFileInChildPath = try await createFile(
       filename: "TestUserFileB.swift",
       inDirectory: "code/child"
     )
-    let testUserFileInNestedChildPath = try createFile(
+    let testUserFileInNestedChildPath = try await createFile(
       filename: "TestUserFileC.swift",
       inDirectory: "code/one/two"
     )
@@ -1494,59 +1455,57 @@ class ApolloCodegenTests: XCTestCase {
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPath)).to(beFalse())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPath)).to(beFalse())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPath)).to(beFalse())
-
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPath)).to(beTrue())
-
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInRootPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInChildPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInNestedChildPath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPath) }.to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPath) }.to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPath) }.to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFileInRootPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFileInChildPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFileInNestedChildPath) }.to(beTrue())
   }
 
   func test__fileDeletion__givenGeneratedFilesExist_InOperationRelativeDirectories_operationSearchPathWithoutDirectories_deletesOnlyRelativeGeneratedFilesInOperationSearchPaths() async throws {
     // given
-    try createFile(containing: schemaData, named: "schema.graphqls")
+    try await createFile(containing: schemaData, named: "schema.graphqls")
 
-    try createOperationFile(
+    try await createOperationFile(
       type: .query,
       named: "TestQuery",
       filename: "code.graphql"
     )
 
-    let testGeneratedFileInRootPath = try createFile(
+    let testGeneratedFileInRootPath = try await createFile(
       filename: "TestGeneratedA.graphql.swift",
       inDirectory: "code"
     )
-    let testGeneratedFileInChildPath = try createFile(
+    let testGeneratedFileInChildPath = try await createFile(
       filename: "TestGeneratedB.graphql.swift",
       inDirectory: "code/child"
     )
-    let testGeneratedFileInNestedChildPath = try createFile(
+    let testGeneratedFileInNestedChildPath = try await createFile(
       filename: "TestGeneratedC.graphql.swift",
       inDirectory: "code/one/two"
     )
 
-    let testGeneratedFileNotInRelativePath = try createFile(
+    let testGeneratedFileNotInRelativePath = try await createFile(
       filename: "TestGeneratedD.graphql.swift",
       inDirectory: nil
     )
-    let testGeneratedFileNotInRelativeChildPath = try createFile(
+    let testGeneratedFileNotInRelativeChildPath = try await createFile(
       filename: "TestGeneratedE.graphql.swift",
       inDirectory: "other/child"
     )
 
-    let testUserFileInRootPath = try createFile(
+    let testUserFileInRootPath = try await createFile(
       filename: "TestUserFileA.swift",
       inDirectory: "code"
     )
-    let testUserFileInChildPath = try createFile(
+    let testUserFileInChildPath = try await createFile(
       filename: "TestUserFileB.swift",
       inDirectory: "code/child"
     )
-    let testUserFileInNestedChildPath = try createFile(
+    let testUserFileInNestedChildPath = try await createFile(
       filename: "TestUserFileC.swift",
       inDirectory: "code/one/two"
     )
@@ -1567,28 +1526,29 @@ class ApolloCodegenTests: XCTestCase {
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPath)).to(beFalse())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPath)).to(beTrue())
-
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPath)).to(beTrue())
-
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInRootPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInChildPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInNestedChildPath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPath) }.to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPath) }
+      .to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePath) }
+      .to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPath) }
+      .to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFileInRootPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFileInChildPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFileInNestedChildPath) }.to(beTrue())
   }
 
   func test__fileDeletion__inOperationRelativeDirectory__whenSymlinkIsUsed() async throws {
     // given
-    try createFile(containing: schemaData, named: "schema.graphqls")
+    try await createFile(containing: schemaData, named: "schema.graphqls")
 
     let schemaDirectory = "SchemaModule"
     let codeDirectory = "code"
     let relativeSubPath = "Operations"
     let operationFilename = "TestQuery.graphql"
 
-    try createOperationFile(
+    try await createOperationFile(
       type: .query,
       named: "TestQuery",
       filename: operationFilename,
@@ -1600,8 +1560,8 @@ class ApolloCodegenTests: XCTestCase {
     let fileValidationPath = symLinkDestURL.appendingPathComponent("\(operationFilename).swift").path
 
     //setup symlink folder
-    try testFileManager.fileManager.createDirectory(at: symLinkDestURL, withIntermediateDirectories: true)
-    try testFileManager.fileManager.createSymbolicLink(at: symLinkURL, withDestinationURL: symLinkDestURL)
+    try await testFileManager.fileManager.createDirectory(at: symLinkDestURL, withIntermediateDirectories: true)
+    try await testFileManager.fileManager.createSymbolicLink(at: symLinkURL, withDestinationURL: symLinkDestURL)
 
     // when
     let config = ApolloCodegenConfiguration.mock(
@@ -1623,77 +1583,77 @@ class ApolloCodegenTests: XCTestCase {
 
     // running codegen multiple times to validate symlink related file creation/deletion bug
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
-    expect(ApolloFileManager.default.doesFileExist(atPath: fileValidationPath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: fileValidationPath) }.to(beTrue())
 
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
-    expect(ApolloFileManager.default.doesFileExist(atPath: fileValidationPath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: fileValidationPath) }.to(beTrue())
 
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
-    expect(ApolloFileManager.default.doesFileExist(atPath: fileValidationPath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: fileValidationPath) }.to(beTrue())
 
   }
 
   func test__fileDeletion__givenGeneratedFilesExist_InOperationRelativeDirectoriesWithSubPath_deletesOnlyRelativeGeneratedFilesInOperationSearchPaths() async throws {
     // given
-    try createFile(containing: schemaData, named: "schema.graphqls")
+    try await createFile(containing: schemaData, named: "schema.graphqls")
 
-    let testGeneratedFileInRootPath = try createFile(
+    let testGeneratedFileInRootPath = try await createFile(
       filename: "TestGeneratedA.graphql.swift",
       inDirectory: "code"
     )
-    let testGeneratedFileInChildPath = try createFile(
+    let testGeneratedFileInChildPath = try await createFile(
       filename: "TestGeneratedB.graphql.swift",
       inDirectory: "code/child"
     )
-    let testGeneratedFileInNestedChildPath = try createFile(
+    let testGeneratedFileInNestedChildPath = try await createFile(
       filename: "TestGeneratedC.graphql.swift",
       inDirectory: "code/one/two"
     )
 
-    let testGeneratedFileNotInRelativePath = try createFile(
+    let testGeneratedFileNotInRelativePath = try await createFile(
       filename: "TestGeneratedD.graphql.swift",
       inDirectory: nil
     )
-    let testGeneratedFileNotInRelativeChildPath = try createFile(
+    let testGeneratedFileNotInRelativeChildPath = try await createFile(
       filename: "TestGeneratedE.graphql.swift",
       inDirectory: "other/child"
     )
 
-    let testGeneratedFileInRootPathSubpath = try createFile(
+    let testGeneratedFileInRootPathSubpath = try await createFile(
       filename: "TestGeneratedA.graphql.swift",
       inDirectory: "code/subpath"
     )
-    let testGeneratedFileInChildPathSubpath = try createFile(
+    let testGeneratedFileInChildPathSubpath = try await createFile(
       filename: "TestGeneratedB.graphql.swift",
       inDirectory: "code/child/subpath"
     )
-    let testGeneratedFileInNestedChildPathSubpath = try createFile(
+    let testGeneratedFileInNestedChildPathSubpath = try await createFile(
       filename: "TestGeneratedC.graphql.swift",
       inDirectory: "code/one/two/subpath"
     )
 
-    let testGeneratedFileNotInRelativePathSubpath = try createFile(
+    let testGeneratedFileNotInRelativePathSubpath = try await createFile(
       filename: "TestGeneratedD.graphql.swift",
       inDirectory: "subpath"
     )
-    let testGeneratedFileNotInRelativeChildPathSubpath = try createFile(
+    let testGeneratedFileNotInRelativeChildPathSubpath = try await createFile(
       filename: "TestGeneratedE.graphql.swift",
       inDirectory: "other/child/subpath"
     )
 
-    let testUserFileInRootPath = try createOperationFile(
+    let testUserFileInRootPath = try await createOperationFile(
       type: .query,
       named: "OperationA",
       filename: "TestUserFileOperationA.graphql",
       inDirectory: "code"
     )
-    let testUserFileInChildPath = try createOperationFile(
+    let testUserFileInChildPath = try await createOperationFile(
       type: .query,
       named: "OperationB",
       filename: "TestUserFileOperationB.graphql",
       inDirectory: "code/child"
     )
-    let testUserFileInNestedChildPath = try createOperationFile(
+    let testUserFileInNestedChildPath = try await createOperationFile(
       type: .query,
       named: "OperationC",
       filename: "TestUserFileOperationC.graphql",
@@ -1716,92 +1676,102 @@ class ApolloCodegenTests: XCTestCase {
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPath) }
+      .to(beTrue())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePath) }
+      .to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPath) }
+      .to(beTrue())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPathSubpath)).to(beFalse())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPathSubpath)).to(beFalse())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPathSubpath)).to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPathSubpath) }
+      .to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPathSubpath) }
+      .to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPathSubpath) }
+      .to(beFalse())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePathSubpath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPathSubpath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePathSubpath) }
+      .to(beTrue())
+    await expect {
+      await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPathSubpath)
+    }
+    .to(beTrue())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInRootPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInChildPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInNestedChildPath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFileInRootPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFileInChildPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFileInNestedChildPath) }.to(beTrue())
   }
 
   func test__fileDeletion__givenGeneratedFilesExist_InOperationRelativeDirectoriesWithSubPath_operationSearchPathWithNoDirectories_deletesOnlyRelativeGeneratedFilesInOperationSearchPaths() async throws {
     // given
-    try createFile(containing: schemaData, named: "schema.graphqls")
+    try await createFile(containing: schemaData, named: "schema.graphqls")
 
-    try createOperationFile(
+    try await createOperationFile(
       type: .query,
       named: "TestQuery",
       filename: "code.graphql"
     )
 
-    let testGeneratedFileInRootPath = try createFile(
+    let testGeneratedFileInRootPath = try await createFile(
       filename: "TestGeneratedA.graphql.swift",
       inDirectory: "code"
     )
-    let testGeneratedFileInChildPath = try createFile(
+    let testGeneratedFileInChildPath = try await createFile(
       filename: "TestGeneratedB.graphql.swift",
       inDirectory: "code/child"
     )
-    let testGeneratedFileInNestedChildPath = try createFile(
+    let testGeneratedFileInNestedChildPath = try await createFile(
       filename: "TestGeneratedC.graphql.swift",
       inDirectory: "code/one/two"
     )
 
-    let testGeneratedFileNotInRelativePath = try createFile(
+    let testGeneratedFileNotInRelativePath = try await createFile(
       filename: "TestGeneratedD.graphql.swift",
       inDirectory: nil
     )
-    let testGeneratedFileNotInRelativeChildPath = try createFile(
+    let testGeneratedFileNotInRelativeChildPath = try await createFile(
       filename: "TestGeneratedE.graphql.swift",
       inDirectory: "other/child"
     )
 
-    let testGeneratedFileInRootPathSubpath = try createFile(
+    let testGeneratedFileInRootPathSubpath = try await createFile(
       filename: "TestGeneratedA.graphql.swift",
       inDirectory: "code/subpath"
     )
-    let testGeneratedFileInChildPathSubpath = try createFile(
+    let testGeneratedFileInChildPathSubpath = try await createFile(
       filename: "TestGeneratedB.graphql.swift",
       inDirectory: "code/child/subpath"
     )
-    let testGeneratedFileInNestedChildPathSubpath = try createFile(
+    let testGeneratedFileInNestedChildPathSubpath = try await createFile(
       filename: "TestGeneratedC.graphql.swift",
       inDirectory: "code/one/two/subpath"
     )
 
-    let testGeneratedFileNotInRelativePathSubpath = try createFile(
+    let testGeneratedFileNotInRelativePathSubpath = try await createFile(
       filename: "TestGeneratedD.graphql.swift",
       inDirectory: "subpath"
     )
-    let testGeneratedFileNotInRelativeChildPathSubpath = try createFile(
+    let testGeneratedFileNotInRelativeChildPathSubpath = try await createFile(
       filename: "TestGeneratedE.graphql.swift",
       inDirectory: "other/child/subpath"
     )
 
-    let testUserFileInRootPath = try createOperationFile(
+    let testUserFileInRootPath = try await createOperationFile(
       type: .query,
       named: "OperationA",
       filename: "TestUserFileOperationA.graphql",
       inDirectory: "code"
     )
-    let testUserFileInChildPath = try createOperationFile(
+    let testUserFileInChildPath = try await createOperationFile(
       type: .query,
       named: "OperationB",
       filename: "TestUserFileOperationB.graphql",
       inDirectory: "code/child"
     )
-    let testUserFileInNestedChildPath = try createOperationFile(
+    let testUserFileInNestedChildPath = try await createOperationFile(
       type: .query,
       named: "OperationC",
       filename: "TestUserFileOperationC.graphql",
@@ -1824,86 +1794,92 @@ class ApolloCodegenTests: XCTestCase {
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPath) }
+      .to(beTrue())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePath) }
+      .to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPath) }
+      .to(beTrue())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPathSubpath)).to(beFalse())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPathSubpath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPathSubpath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPathSubpath) }
+      .to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPathSubpath) }
+      .to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPathSubpath) }
+      .to(beTrue())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePathSubpath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPathSubpath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePathSubpath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPathSubpath) }.to(beTrue())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInRootPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInChildPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInNestedChildPath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFileInRootPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFileInChildPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFileInNestedChildPath) }.to(beTrue())
   }
 
   func test__fileDeletion__givenGeneratedFilesExist_InOperationRelativeDirectoriesWithSubPath_operationSearchPathWithoutGlobstar_deletesOnlyRelativeGeneratedFilesInOperationSearchPaths() async throws {
     // given
-    try createFile(containing: schemaData, named: "schema.graphqls")
+    try await createFile(containing: schemaData, named: "schema.graphqls")
 
-    let testGeneratedFileInRootPath = try createFile(
+    let testGeneratedFileInRootPath = try await createFile(
       filename: "TestGeneratedA.graphql.swift",
       inDirectory: "code"
     )
-    let testGeneratedFileInChildPath = try createFile(
+    let testGeneratedFileInChildPath = try await createFile(
       filename: "TestGeneratedB.graphql.swift",
       inDirectory: "code/child"
     )
-    let testGeneratedFileInNestedChildPath = try createFile(
+    let testGeneratedFileInNestedChildPath = try await createFile(
       filename: "TestGeneratedC.graphql.swift",
       inDirectory: "code/child/A"
     )
 
-    let testGeneratedFileNotInRelativePath = try createFile(
+    let testGeneratedFileNotInRelativePath = try await createFile(
       filename: "TestGeneratedD.graphql.swift",
       inDirectory: nil
     )
-    let testGeneratedFileNotInRelativeChildPath = try createFile(
+    let testGeneratedFileNotInRelativeChildPath = try await createFile(
       filename: "TestGeneratedE.graphql.swift",
       inDirectory: "other/child"
     )
 
-    let testGeneratedFileInRootPathSubpath = try createFile(
+    let testGeneratedFileInRootPathSubpath = try await createFile(
       filename: "TestGeneratedA.graphql.swift",
       inDirectory: "code/subpath"
     )
-    let testGeneratedFileInChildPathSubpath = try createFile(
+    let testGeneratedFileInChildPathSubpath = try await createFile(
       filename: "TestGeneratedB.graphql.swift",
       inDirectory: "code/child/subpath"
     )
-    let testGeneratedFileInNestedChildPathSubpath = try createFile(
+    let testGeneratedFileInNestedChildPathSubpath = try await createFile(
       filename: "TestGeneratedC.graphql.swift",
       inDirectory: "code/child/next/subpath"
     )
 
-    let testGeneratedFileNotInRelativePathSubpath = try createFile(
+    let testGeneratedFileNotInRelativePathSubpath = try await createFile(
       filename: "TestGeneratedD.graphql.swift",
       inDirectory: "subpath"
     )
-    let testGeneratedFileNotInRelativeChildPathSubpath = try createFile(
+    let testGeneratedFileNotInRelativeChildPathSubpath = try await createFile(
       filename: "TestGeneratedE.graphql.swift",
       inDirectory: "other/child/subpath"
     )
 
-    let testUserFileInRootPath = try createOperationFile(
+    let testUserFileInRootPath = try await createOperationFile(
       type: .query,
       named: "OperationA",
       filename: "TestUserFileOperationA.graphql",
       inDirectory: "code"
     )
-    let testUserFileInChildPath = try createOperationFile(
+    let testUserFileInChildPath = try await createOperationFile(
       type: .query,
       named: "OperationB",
       filename: "TestUserFileOperationB.graphql",
       inDirectory: "code/child"
     )
-    let testUserFileInNestedChildPath = try createOperationFile(
+    let testUserFileInNestedChildPath = try await createOperationFile(
       type: .query,
       named: "OperationC",
       filename: "TestUserFileOperationC.graphql",
@@ -1926,50 +1902,56 @@ class ApolloCodegenTests: XCTestCase {
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPath) }
+      .to(beTrue())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePath) }
+      .to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPath) }
+      .to(beTrue())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPathSubpath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPathSubpath)).to(beFalse())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPathSubpath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInRootPathSubpath) }
+      .to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInChildPathSubpath) }
+      .to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileInNestedChildPathSubpath) }
+      .to(beTrue())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePathSubpath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPathSubpath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativePathSubpath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testGeneratedFileNotInRelativeChildPathSubpath) }.to(beTrue())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInRootPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInChildPath)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFileInNestedChildPath)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFileInRootPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFileInChildPath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFileInNestedChildPath) }.to(beTrue())
   }
 
   func test__fileDeletion__givenGeneratedTestMockFilesExist_InAbsoluteDirectory_deletesOnlyGeneratedFiles() async throws {
     // given
     let absolutePath = "TestMocksPath"
-    try createFile(containing: schemaData, named: "schema.graphqls")
+    try await createFile(containing: schemaData, named: "schema.graphqls")
 
-    try createOperationFile(
+    try await createOperationFile(
       type: .query,
       named: "TestQuery",
       filename: "TestQuery.graphql"
     )
 
-    let testFile = try createFile(
+    let testFile = try await createFile(
       filename: "TestGeneratedA.graphql.swift",
       inDirectory: absolutePath
     )
-    let testInChildFile = try createFile(
+    let testInChildFile = try await createFile(
       filename: "TestGeneratedB.graphql.swift",
       inDirectory: "\(absolutePath)/Child"
     )
 
-    let testUserFile = try createFile(
+    let testUserFile = try await createFile(
       filename: "TestFileA.swift",
       inDirectory: absolutePath
     )
-    let testInChildUserFile = try createFile(
+    let testInChildUserFile = try await createFile(
       filename: "TestFileB.swift",
       inDirectory: "\(absolutePath)/Child"
     )
@@ -1991,41 +1973,41 @@ class ApolloCodegenTests: XCTestCase {
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
-    expect(ApolloFileManager.default.doesFileExist(atPath: testFile)).to(beFalse())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInChildFile)).to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testFile) }.to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInChildFile) }.to(beFalse())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFile)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInChildUserFile)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFile) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInChildUserFile) }.to(beTrue())
   }
 
   func test__fileDeletion__givenGeneratedTestMockFilesExist_InSwiftPackageDirectory_deletesOnlyGeneratedFiles() async throws {
     // given
-    try createFile(containing: schemaData, named: "schema.graphqls")
+    try await createFile(containing: schemaData, named: "schema.graphqls")
 
-    try createOperationFile(
+    try await createOperationFile(
       type: .query,
       named: "TestQuery",
       filename: "TestQuery.graphql"
     )
 
-    let testInTestMocksFolderFile = try createFile(
+    let testInTestMocksFolderFile = try await createFile(
       filename: "TestGeneratedD.graphql.swift",
       inDirectory: "SchemaModule/TestMocks"
     )
 
-    let testUserFile = try createFile(
+    let testUserFile = try await createFile(
       filename: "TestUserFileA.swift",
       inDirectory: "SchemaModule"
     )
-    let testInSourcesUserFile = try createFile(
+    let testInSourcesUserFile = try await createFile(
       filename: "TestUserFileB.swift",
       inDirectory: "SchemaModule/Sources"
     )
-    let testInOtherFolderUserFile = try createFile(
+    let testInOtherFolderUserFile = try await createFile(
       filename: "TestUserFileC.swift",
       inDirectory: "SchemaModule/OtherFolder"
     )
-    let testInTestMocksFolderUserFile = try createFile(
+    let testInTestMocksFolderUserFile = try await createFile(
       filename: "TestUserFileD.swift",
       inDirectory: "SchemaModule/TestMocks"
     )
@@ -2047,43 +2029,43 @@ class ApolloCodegenTests: XCTestCase {
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInTestMocksFolderFile)).to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInTestMocksFolderFile) }.to(beFalse())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFile)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInSourcesUserFile)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInOtherFolderUserFile)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInTestMocksFolderUserFile)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFile) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInSourcesUserFile) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInOtherFolderUserFile) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInTestMocksFolderUserFile) }.to(beTrue())
   }
 
   func test__fileDeletion__givenGeneratedTestMockFilesExist_InSwiftPackageWithCustomTargetNameDirectory_deletesOnlyGeneratedFiles() async throws {
     // given
     let testMockTargetName = "ApolloTestTarget"
-    try createFile(containing: schemaData, named: "schema.graphqls")
+    try await createFile(containing: schemaData, named: "schema.graphqls")
 
-    try createOperationFile(
+    try await createOperationFile(
       type: .query,
       named: "TestQuery",
       filename: "TestQuery.graphql"
     )
 
-    let testInTestMocksFolderFile = try createFile(
+    let testInTestMocksFolderFile = try await createFile(
       filename: "TestGeneratedD.graphql.swift",
       inDirectory: "SchemaModule/\(testMockTargetName)"
     )
 
-    let testUserFile = try createFile(
+    let testUserFile = try await createFile(
       filename: "TestUserFileA.swift",
       inDirectory: "SchemaModule"
     )
-    let testInSourcesUserFile = try createFile(
+    let testInSourcesUserFile = try await createFile(
       filename: "TestUserFileB.swift",
       inDirectory: "SchemaModule/Sources"
     )
-    let testInOtherFolderUserFile = try createFile(
+    let testInOtherFolderUserFile = try await createFile(
       filename: "TestUserFileC.swift",
       inDirectory: "SchemaModule/OtherFolder"
     )
-    let testInTestMocksFolderUserFile = try createFile(
+    let testInTestMocksFolderUserFile = try await createFile(
       filename: "TestUserFileD.swift",
       inDirectory: "SchemaModule/\(testMockTargetName)"
     )
@@ -2105,19 +2087,19 @@ class ApolloCodegenTests: XCTestCase {
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInTestMocksFolderFile)).to(beFalse())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInTestMocksFolderFile) }.to(beFalse())
 
-    expect(ApolloFileManager.default.doesFileExist(atPath: testUserFile)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInSourcesUserFile)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInOtherFolderUserFile)).to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(atPath: testInTestMocksFolderUserFile)).to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testUserFile) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInSourcesUserFile) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInOtherFolderUserFile) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testInTestMocksFolderUserFile) }.to(beTrue())
   }
 
   // MARK: Suffix Renaming Tests
 
   func test__fileRenaming__givenGeneratedPreSuffixFilesExist_withAppendSchemaFilenameSuffix_true_shouldRenameFileWithSuffix() async throws {
     // given
-    try createFile(
+    try await createFile(
       containing: """
       type Query {
         allBooks: [Book!]!
@@ -2137,7 +2119,7 @@ class ApolloCodegenTests: XCTestCase {
       named: "schema.graphqls"
     )
 
-    try createFile(
+    try await createFile(
       containing: """
       query AllBooks {
         allBooks {
@@ -2155,10 +2137,10 @@ class ApolloCodegenTests: XCTestCase {
     let customScalarsDirectory = "SchemaModule/Sources/Schema/CustomScalars"
     let preSuffixFilename = "CustomDate.swift"
 
-    try createFile(filename: preSuffixFilename, inDirectory: customScalarsDirectory)
+    try await createFile(filename: preSuffixFilename, inDirectory: customScalarsDirectory)
 
-    expect(ApolloFileManager.default.doesFileExist(
-      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)"))
+    await expect { await ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)") }
     .to(beTrue())
 
     // when
@@ -2179,17 +2161,17 @@ class ApolloCodegenTests: XCTestCase {
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
-    expect(ApolloFileManager.default.doesFileExist(
-      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/CustomDate.scalar.swift"))
+    await expect { await ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/CustomDate.scalar.swift") }
     .to(beTrue())
-    expect(ApolloFileManager.default.doesFileExist(
-      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)"))
+    await expect { await ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)") }
     .to(beFalse())
   }
 
   func test__fileRenaming__givenGeneratedPreSuffixFilesExist_withAppendSchemaFilenameSuffix_false_shouldNotRenameFile() async throws {
     // given
-    try createFile(
+    try await createFile(
       containing: """
       type Query {
         allBooks: [Book!]!
@@ -2209,7 +2191,7 @@ class ApolloCodegenTests: XCTestCase {
       named: "schema.graphqls"
     )
 
-    try createFile(
+    try await createFile(
       containing: """
       query AllBooks {
         allBooks {
@@ -2227,10 +2209,10 @@ class ApolloCodegenTests: XCTestCase {
     let customScalarsDirectory = "SchemaModule/Sources/Schema/CustomScalars"
     let preSuffixFilename = "CustomDate.swift"
 
-    try createFile(filename: preSuffixFilename, inDirectory: customScalarsDirectory)
+    try await createFile(filename: preSuffixFilename, inDirectory: customScalarsDirectory)
 
-    expect(ApolloFileManager.default.doesFileExist(
-      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)"))
+    await expect { await ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)") }
     .to(beTrue())
 
     // when
@@ -2251,11 +2233,11 @@ class ApolloCodegenTests: XCTestCase {
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
 
     // then
-    expect(ApolloFileManager.default.doesFileExist(
-      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/CustomDate.scalar.swift"))
+    await expect { await ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/CustomDate.scalar.swift") }
     .to(beFalse())
-    expect(ApolloFileManager.default.doesFileExist(
-      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)"))
+    await expect { await ApolloFileManager.default.doesFileExist(
+      atPath: self.directoryURL.relativePath + "/\(customScalarsDirectory)/\(preSuffixFilename)") }
     .to(beTrue())
   }
 
@@ -2550,55 +2532,6 @@ class ApolloCodegenTests: XCTestCase {
     expect(try configContext.validate(compilationResult)).notTo(throwError())
   }
 
-  func test__validation__givenSchemaTypesModule_swiftPackageManager_withCocoapodsCompatibleImportStatements_true_shouldThrow() throws {
-    // given
-    let config = ApolloCodegenConfiguration.mock(
-      .swiftPackage(),
-      options: .init(cocoapodsCompatibleImportStatements: true)
-    )
-
-    // then
-    expect(try ApolloCodegen._validate(config: config))
-      .to(throwError(ApolloCodegen.Error.invalidConfiguration(message: """
-        cocoapodsCompatibleImportStatements cannot be set to 'true' when the output schema types \
-        module type is Swift Package Manager. Change the cocoapodsCompatibleImportStatements \
-        value to 'false' to resolve the conflict.
-        """)))
-  }
-
-  func test__validation__givenSchemaTypesModule_swiftPackageManager_withCocoapodsCompatibleImportStatements_false_shouldNotThrow() throws {
-    // given
-    let config = ApolloCodegenConfiguration.mock(
-      .swiftPackage(),
-      options: .init(cocoapodsCompatibleImportStatements: false)
-    )
-
-    // then
-    expect(try ApolloCodegen._validate(config: config)).notTo(throwError())
-  }
-
-  func test__validation__givenSchemaTypesModule_embeddedInTarget_withCocoapodsCompatibleImportStatements_true_shouldNotThrow() throws {
-    // given
-    let config = ApolloCodegenConfiguration.mock(
-      .embeddedInTarget(name: "TestTarget"),
-      options: .init(cocoapodsCompatibleImportStatements: true)
-    )
-
-    // then
-    expect(try ApolloCodegen._validate(config: config)).notTo(throwError())
-  }
-
-  func test__validation__givenSchemaTypesModule_other_withCocoapodsCompatibleImportStatements_true_shouldNotThrow() throws {
-    // given
-    let config = ApolloCodegenConfiguration.mock(
-      .other,
-      options: .init(cocoapodsCompatibleImportStatements: true)
-    )
-
-    // then
-    expect(try ApolloCodegen._validate(config: config)).notTo(throwError())
-  }
-
   func test__validation__selectionSet_typeConflicts_shouldThrowError() async throws {
     let schemaDefData: Data = {
       """
@@ -2645,8 +2578,8 @@ class ApolloCodegenTests: XCTestCase {
       }
       """.data(using: .utf8)!
 
-    try createFile(containing: schemaDefData, named: "schema.graphqls")
-    try createFile(containing: operationData, named: "operation.graphql")
+    try await createFile(containing: schemaDefData, named: "schema.graphqls")
+    try await createFile(containing: operationData, named: "operation.graphql")
 
     let config = ApolloCodegenConfiguration.mock(
       input: .init(
@@ -2724,27 +2657,27 @@ class ApolloCodegenTests: XCTestCase {
 
   // MARK: Path Match Exclusion Tests
 
-  func test__match__givenFilesInSpecialExcludedPaths_shouldNotReturnExcludedPaths() throws {
+  func test__match__givenFilesInSpecialExcludedPaths_shouldNotReturnExcludedPaths() async throws {
     // given
-    try createFile(filename: "included.file")
+    try await createFile(filename: "included.file")
 
-    try createFile(filename: "excludedBuildFolder.file", inDirectory: ".build")
-    try createFile(filename: "excludedBuildSubfolderOne.file", inDirectory: ".build/subfolder")
-    try createFile(filename: "excludedBuildSubfolderTwo.file", inDirectory: ".build/subfolder/two")
-    try createFile(filename: "excludedNestedOneBuildFolder.file", inDirectory: "nested/.build")
-    try createFile(filename: "excludedNestedTwoBuildFolder.file", inDirectory: "nested/two/.build")
+    try await createFile(filename: "excludedBuildFolder.file", inDirectory: ".build")
+    try await createFile(filename: "excludedBuildSubfolderOne.file", inDirectory: ".build/subfolder")
+    try await createFile(filename: "excludedBuildSubfolderTwo.file", inDirectory: ".build/subfolder/two")
+    try await createFile(filename: "excludedNestedOneBuildFolder.file", inDirectory: "nested/.build")
+    try await createFile(filename: "excludedNestedTwoBuildFolder.file", inDirectory: "nested/two/.build")
 
-    try createFile(filename: "excludedSwiftpmFolder.file", inDirectory: ".swiftpm")
-    try createFile(filename: "excludedSwiftpmSubfolderOne.file", inDirectory: ".swiftpm/subfolder")
-    try createFile(filename: "excludedSwiftpmSubfolderTwo.file", inDirectory: ".swiftpm/subfolder/two")
-    try createFile(filename: "excludedNestedOneSwiftpmFolder.file", inDirectory: "nested/.swiftpm")
-    try createFile(filename: "excludedNestedTwoSwiftpmFolder.file", inDirectory: "nested/two/.swiftpm")
+    try await createFile(filename: "excludedSwiftpmFolder.file", inDirectory: ".swiftpm")
+    try await createFile(filename: "excludedSwiftpmSubfolderOne.file", inDirectory: ".swiftpm/subfolder")
+    try await createFile(filename: "excludedSwiftpmSubfolderTwo.file", inDirectory: ".swiftpm/subfolder/two")
+    try await createFile(filename: "excludedNestedOneSwiftpmFolder.file", inDirectory: "nested/.swiftpm")
+    try await createFile(filename: "excludedNestedTwoSwiftpmFolder.file", inDirectory: "nested/two/.swiftpm")
 
-    try createFile(filename: "excludedPodsFolder.file", inDirectory: ".Pods")
-    try createFile(filename: "excludedPodsSubfolderOne.file", inDirectory: ".Pods/subfolder")
-    try createFile(filename: "excludedPodsSubfolderTwo.file", inDirectory: ".Pods/subfolder/two")
-    try createFile(filename: "excludedNestedOnePodsFolder.file", inDirectory: "nested/.Pods")
-    try createFile(filename: "excludedNestedTwoPodsFolder.file", inDirectory: "nested/two/.Pods")
+    try await createFile(filename: "excludedPodsFolder.file", inDirectory: ".Pods")
+    try await createFile(filename: "excludedPodsSubfolderOne.file", inDirectory: ".Pods/subfolder")
+    try await createFile(filename: "excludedPodsSubfolderTwo.file", inDirectory: ".Pods/subfolder/two")
+    try await createFile(filename: "excludedNestedOnePodsFolder.file", inDirectory: "nested/.Pods")
+    try await createFile(filename: "excludedNestedTwoPodsFolder.file", inDirectory: "nested/two/.Pods")
 
     // when
     let matches = try ApolloCodegen.match(
@@ -2758,27 +2691,27 @@ class ApolloCodegenTests: XCTestCase {
     expect(matches.contains(where: { $0.contains(".Pods") })).to(beFalse())
   }
 
-  func test__match__givenFilesInSpecialExcludedPaths_usingRelativeDirectory_shouldNotReturnExcludedPaths() throws {
+  func test__match__givenFilesInSpecialExcludedPaths_usingRelativeDirectory_shouldNotReturnExcludedPaths() async throws {
     // given
-    try createFile(filename: "included.file")
+    try await createFile(filename: "included.file")
 
-    try createFile(filename: "excludedBuildFolder.file", inDirectory: ".build")
-    try createFile(filename: "excludedBuildSubfolderOne.file", inDirectory: ".build/subfolder")
-    try createFile(filename: "excludedBuildSubfolderTwo.file", inDirectory: ".build/subfolder/two")
-    try createFile(filename: "excludedNestedOneBuildFolder.file", inDirectory: "nested/.build")
-    try createFile(filename: "excludedNestedTwoBuildFolder.file", inDirectory: "nested/two/.build")
+    try await createFile(filename: "excludedBuildFolder.file", inDirectory: ".build")
+    try await createFile(filename: "excludedBuildSubfolderOne.file", inDirectory: ".build/subfolder")
+    try await createFile(filename: "excludedBuildSubfolderTwo.file", inDirectory: ".build/subfolder/two")
+    try await createFile(filename: "excludedNestedOneBuildFolder.file", inDirectory: "nested/.build")
+    try await createFile(filename: "excludedNestedTwoBuildFolder.file", inDirectory: "nested/two/.build")
 
-    try createFile(filename: "excludedSwiftpmFolder.file", inDirectory: ".swiftpm")
-    try createFile(filename: "excludedSwiftpmSubfolderOne.file", inDirectory: ".swiftpm/subfolder")
-    try createFile(filename: "excludedSwiftpmSubfolderTwo.file", inDirectory: ".swiftpm/subfolder/two")
-    try createFile(filename: "excludedNestedOneSwiftpmFolder.file", inDirectory: "nested/.swiftpm")
-    try createFile(filename: "excludedNestedTwoSwiftpmFolder.file", inDirectory: "nested/two/.swiftpm")
+    try await createFile(filename: "excludedSwiftpmFolder.file", inDirectory: ".swiftpm")
+    try await createFile(filename: "excludedSwiftpmSubfolderOne.file", inDirectory: ".swiftpm/subfolder")
+    try await createFile(filename: "excludedSwiftpmSubfolderTwo.file", inDirectory: ".swiftpm/subfolder/two")
+    try await createFile(filename: "excludedNestedOneSwiftpmFolder.file", inDirectory: "nested/.swiftpm")
+    try await createFile(filename: "excludedNestedTwoSwiftpmFolder.file", inDirectory: "nested/two/.swiftpm")
 
-    try createFile(filename: "excludedPodsFolder.file", inDirectory: ".Pods")
-    try createFile(filename: "excludedPodsSubfolderOne.file", inDirectory: ".Pods/subfolder")
-    try createFile(filename: "excludedPodsSubfolderTwo.file", inDirectory: ".Pods/subfolder/two")
-    try createFile(filename: "excludedNestedOnePodsFolder.file", inDirectory: "nested/.Pods")
-    try createFile(filename: "excludedNestedTwoPodsFolder.file", inDirectory: "nested/two/.Pods")
+    try await createFile(filename: "excludedPodsFolder.file", inDirectory: ".Pods")
+    try await createFile(filename: "excludedPodsSubfolderOne.file", inDirectory: ".Pods/subfolder")
+    try await createFile(filename: "excludedPodsSubfolderTwo.file", inDirectory: ".Pods/subfolder/two")
+    try await createFile(filename: "excludedNestedOnePodsFolder.file", inDirectory: "nested/.Pods")
+    try await createFile(filename: "excludedNestedTwoPodsFolder.file", inDirectory: "nested/two/.Pods")
 
     // when
     let matches = try ApolloCodegen.match(
@@ -2911,7 +2844,7 @@ class ApolloCodegenTests: XCTestCase {
 
   func test__fileRendering__givenLocalCacheMutationQuery_whenSelectionSetInitializersEmpty_andFileMergingNone_shouldGenerateFullSelectionSetInitializers() async throws {
     // given
-    try createFile(
+    try await createFile(
       body: """
       type Query {
         allAnimals: [Animal!]
@@ -2924,7 +2857,7 @@ class ApolloCodegenTests: XCTestCase {
       filename: "schema.graphqls"
     )
 
-    try createFile(
+    try await createFile(
       body: """
       query TestOperation @apollo_client_ios_localCacheMutation {
         allAnimals {
@@ -2938,13 +2871,13 @@ class ApolloCodegenTests: XCTestCase {
     let fileManager = MockApolloFileManager(strict: false)
     let expectation = expectation(description: "Received local cache mutation file data.")
 
-    fileManager.mock(closure: .createFile({ path, data, attributes in
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       if path.hasSuffix("TestOperationLocalCacheMutation.graphql.swift") {
         expect(data?.asString).to(equalLineByLine("""
                 init(
                   allAnimals: [AllAnimal]? = nil
                 ) {
-          """, atLine: 26, ignoringExtraLines: true))
+          """, atLine: 1, inSection: .selectionSet.initializer, ignoringExtraLines: true))
 
         expectation.fulfill()
       }
@@ -2983,14 +2916,14 @@ class ApolloCodegenTests: XCTestCase {
     )
 
     // then
-    expect(fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await fileManager.allClosuresCalled }.to(beTrue())
 
     await fulfillment(of: [expectation], timeout: 1)
   }
 
   func test__fileRendering__givenLocalCacheMutationFragment_whenSelectionSetInitializersEmpty_andFileMergingNone_shouldGenerateFullSelectionSetInitializers() async throws {
     // given
-    try createFile(
+    try await createFile(
       body: """
       type Query {
         allAnimals: [Animal!]
@@ -3003,7 +2936,7 @@ class ApolloCodegenTests: XCTestCase {
       filename: "schema.graphqls"
     )
 
-    try createFile(
+    try await createFile(
       body: """
       query TestOperation {
         allAnimals {
@@ -3021,14 +2954,14 @@ class ApolloCodegenTests: XCTestCase {
     let fileManager = MockApolloFileManager(strict: false)
     let expectation = expectation(description: "Received local cache mutation file data.")
 
-    fileManager.mock(closure: .createFile({ path, data, attributes in
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
       if path.hasSuffix("PredatorFragment.graphql.swift") {
         expect(data?.asString).to(equalLineByLine("""
               init(
                 __typename: String,
                 species: String? = nil
               ) {
-          """, atLine: 26, ignoringExtraLines: true))
+          """, atLine: 1, inSection: .selectionSet.initializer, ignoringExtraLines: true))
 
         expectation.fulfill()
       }
@@ -3067,7 +3000,7 @@ class ApolloCodegenTests: XCTestCase {
     )
 
     // then
-    expect(fileManager.allClosuresCalled).to(beTrue())
+    await expect{ await fileManager.allClosuresCalled }.to(beTrue())
 
     await fulfillment(of: [expectation], timeout: 1)
   }

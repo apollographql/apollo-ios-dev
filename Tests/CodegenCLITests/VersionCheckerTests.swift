@@ -97,20 +97,20 @@ class VersionCheckerTests: XCTestCase {
     packageVersion: packageResolvedVersion,
     inDirectory directory: String? = nil,
     apolloVersion: String,
-    _ test: (() throws -> Void)
-  ) rethrows {
-    expect(try self.fileManager.createFile(
+    _ test: (() async throws -> Void)
+  ) async rethrows {
+    await expect { try await self.fileManager.createFile(
       body: packageVersion.fileBody(apolloVersion: apolloVersion),
       named: "Package.resolved",
       inDirectory: directory
-    )).notTo(throwError())
+    ) }.notTo(throwError())
 
-    try test()
+    try await test()
   }
 
-  func test__matchCLIVersionToApolloVersion__givenNoPackageResolvedFileInProject_returnsNoApolloVersionFound() throws {
+  func test__matchCLIVersionToApolloVersion__givenNoPackageResolvedFileInProject_returnsNoApolloVersionFound() async throws {
     // when
-    let result = try VersionChecker.matchCLIVersionToApolloVersion(
+    let result = try await VersionChecker.matchCLIVersionToApolloVersion(
       projectRootURL: fileManager.directoryURL
     )
 
@@ -118,16 +118,16 @@ class VersionCheckerTests: XCTestCase {
     expect(result).to(equal(.noApolloVersionFound))
   }
 
-  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInProjectRoot_withKnownResolvedFileFormats_hasMatchingVersion_returns_versionMatch() throws {
+  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInProjectRoot_withKnownResolvedFileFormats_hasMatchingVersion_returns_versionMatch() async throws {
     // given
     for packageVersion in packageResolvedVersion.allCases {
-      try testPackageResolvedFile(
+      try await testPackageResolvedFile(
         packageVersion: packageVersion,
         apolloVersion: Constants.CLIVersion
       ) {
 
         // when
-        let result = try VersionChecker.matchCLIVersionToApolloVersion(
+        let result = try await VersionChecker.matchCLIVersionToApolloVersion(
           projectRootURL: fileManager.directoryURL
         )
 
@@ -137,18 +137,18 @@ class VersionCheckerTests: XCTestCase {
     }
   }
 
-  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInProjectRoot_withKnownResolvedFileFormats_hasNonMatchingVersion_returns_versionMismatch() throws {
+  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInProjectRoot_withKnownResolvedFileFormats_hasNonMatchingVersion_returns_versionMismatch() async throws {
     // given
     let apolloVersion = "1.0.0.test-1"
 
     for packageVersion in packageResolvedVersion.allCases {
-      try testPackageResolvedFile(
+      try await testPackageResolvedFile(
         packageVersion: packageVersion,
         apolloVersion: apolloVersion
       ) {
 
         // when
-        let result = try VersionChecker.matchCLIVersionToApolloVersion(
+        let result = try await VersionChecker.matchCLIVersionToApolloVersion(
           projectRootURL: fileManager.directoryURL
         )
 
@@ -160,17 +160,17 @@ class VersionCheckerTests: XCTestCase {
     }
   }
 
-  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInXcodeWorkspace_withKnownResolvedFileFormats_hasMatchingVersion_returns_versionMatch() throws {
+  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInXcodeWorkspace_withKnownResolvedFileFormats_hasMatchingVersion_returns_versionMatch() async throws {
     // given
     for packageVersion in packageResolvedVersion.allCases {
-      try testPackageResolvedFile(
+      try await testPackageResolvedFile(
         packageVersion: packageVersion,
         inDirectory: "MyProject.xcworkspace/xcshareddata/swiftpm",
         apolloVersion: Constants.CLIVersion
       ) {
 
         // when
-        let result = try VersionChecker.matchCLIVersionToApolloVersion(
+        let result = try await VersionChecker.matchCLIVersionToApolloVersion(
           projectRootURL: fileManager.directoryURL
         )
 
@@ -180,19 +180,19 @@ class VersionCheckerTests: XCTestCase {
     }
   }
 
-  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInXcodeWorkspace_withKnownResolvedFileFormats_hasNonMatchingVersion_returns_versionMismatch() throws {
+  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInXcodeWorkspace_withKnownResolvedFileFormats_hasNonMatchingVersion_returns_versionMismatch() async throws {
     // given
     let apolloVersion = "1.0.0.test-1"
 
     for packageVersion in packageResolvedVersion.allCases {
-      try testPackageResolvedFile(
+      try await testPackageResolvedFile(
         packageVersion: packageVersion,
         inDirectory: "MyProject.xcworkspace/xcshareddata/swiftpm",
         apolloVersion: apolloVersion
       ) {
 
         // when
-        let result = try VersionChecker.matchCLIVersionToApolloVersion(
+        let result = try await VersionChecker.matchCLIVersionToApolloVersion(
           projectRootURL: fileManager.directoryURL
         )
 
@@ -204,17 +204,17 @@ class VersionCheckerTests: XCTestCase {
     }
   }
 
-  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInXcodeProject_withKnownResolvedFileFormats_hasMatchingVersion_returns_versionMatch() throws {
+  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInXcodeProject_withKnownResolvedFileFormats_hasMatchingVersion_returns_versionMatch() async throws {
     // given
     for packageVersion in packageResolvedVersion.allCases {
-      try testPackageResolvedFile(
+      try await testPackageResolvedFile(
         packageVersion: packageVersion,
         inDirectory: "MyProject.xcodeproj/project.xcworkspace/xcshareddata/swiftpm",
         apolloVersion: Constants.CLIVersion
       ) {
 
         // when
-        let result = try VersionChecker.matchCLIVersionToApolloVersion(
+        let result = try await VersionChecker.matchCLIVersionToApolloVersion(
           projectRootURL: fileManager.directoryURL
         )
 
@@ -224,19 +224,19 @@ class VersionCheckerTests: XCTestCase {
     }
   }
 
-  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInXcodeProject_withKnownResolvedFileFormats_hasNonMatchingVersion_returns_versionMismatch() throws {
+  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInXcodeProject_withKnownResolvedFileFormats_hasNonMatchingVersion_returns_versionMismatch() async throws {
     // given
     let apolloVersion = "1.0.0.test-1"
 
     for packageVersion in packageResolvedVersion.allCases {
-      try testPackageResolvedFile(
+      try await testPackageResolvedFile(
         packageVersion: packageVersion,
         inDirectory: "MyProject.xcodeproj/project.xcworkspace/xcshareddata/swiftpm",
         apolloVersion: apolloVersion
       ) {
 
         // when
-        let result = try VersionChecker.matchCLIVersionToApolloVersion(
+        let result = try await VersionChecker.matchCLIVersionToApolloVersion(
           projectRootURL: fileManager.directoryURL
         )
 
@@ -248,23 +248,23 @@ class VersionCheckerTests: XCTestCase {
     }
   }
   
-  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInXcodeWorkspaceAndProject_withKnownResolvedFileFormats_hasMatchingVersion_returns_versionMatch_fromWorkspace() throws {
+  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInXcodeWorkspaceAndProject_withKnownResolvedFileFormats_hasMatchingVersion_returns_versionMatch_fromWorkspace() async throws {
     // given
     for packageVersion in packageResolvedVersion.allCases {
-      try fileManager.createFile(
+      try await fileManager.createFile(
         body: packageVersion.fileBody(apolloVersion: Constants.CLIVersion),
         named: "Package.resolved",
         inDirectory: "MyProject.xcworkspace/xcshareddata/swiftpm"
       )
 
-      try fileManager.createFile(
+      try await fileManager.createFile(
         body: packageVersion.fileBody(apolloVersion: Constants.CLIVersion),
         named: "Package.resolved",
         inDirectory: "MyProject.xcodeproj/project.xcworkspace/xcshareddata/swiftpm"
       )
 
       // when
-      let result = try VersionChecker.matchCLIVersionToApolloVersion(
+      let result = try await VersionChecker.matchCLIVersionToApolloVersion(
         projectRootURL: fileManager.directoryURL
       )
 
@@ -273,24 +273,24 @@ class VersionCheckerTests: XCTestCase {
     }
   }
 
-  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInXcodeWorkspaceAndProject_withKnownResolvedFileFormats_hasNonMatchingVersion_returns_versionMatch_fromWorkspace() throws {
+  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileInXcodeWorkspaceAndProject_withKnownResolvedFileFormats_hasNonMatchingVersion_returns_versionMatch_fromWorkspace() async throws {
     // given
     for packageVersion in packageResolvedVersion.allCases {
-      try fileManager.createFile(
+      try await fileManager.createFile(
         body: packageVersion.fileBody(apolloVersion: Constants.CLIVersion),
         named: "Package.resolved",
         inDirectory: "MyProject.xcworkspace/xcshareddata/swiftpm"
       )
 
       let apolloProjectVersion = "1.0.0.test-1"
-      try fileManager.createFile(
+      try await fileManager.createFile(
         body: packageVersion.fileBody(apolloVersion: apolloProjectVersion),
         named: "Package.resolved",
         inDirectory: "MyProject.xcodeproj/project.xcworkspace/xcshareddata/swiftpm"
       )
 
       // when
-      let result = try VersionChecker.matchCLIVersionToApolloVersion(
+      let result = try await VersionChecker.matchCLIVersionToApolloVersion(
         projectRootURL: fileManager.directoryURL
       )
 
