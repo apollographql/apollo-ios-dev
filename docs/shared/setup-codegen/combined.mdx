@@ -1,6 +1,5 @@
 import SPMInstallCLI from "../cli-install/spm.mdx"
 import SPMXcodeInstallCLI from "../cli-install/spm-xcode.mdx"
-import PodsInstallCLI from "../cli-install/pods.mdx"
 import SetupCodegenPanel from "./single-panel.mdx"
 
 <a name="spm-setup-codegen" />
@@ -12,10 +11,6 @@ import SetupCodegenPanel from "./single-panel.mdx"
   title: "SPM with Xcode Project",
   cliPath: "./apollo-ios-cli",
   moduleTypeOption: "`.swiftPackageManager`",
-}, {
-  title: "Cocoapods",
-  cliPath: "./Pods/Apollo/apollo-ios-cli",
-  moduleTypeOption: "`.other`",
 }]} as="installType">
   <a name={`spm-${installType.title.toLowerCase().replace(/ /g, "-")}`} />
 
@@ -55,18 +50,6 @@ import SetupCodegenPanel from "./single-panel.mdx"
         After the plugin installs, it creates a symbolic link to the Codegen CLI (named `apollo-ios-cli`) in your project root folder. You can now run the CLI from the command line with `./apollo-ios-cli`.
 
         > **Note:** Because the `apollo-ios-cli` in your project root is only a symbolic link, it only works if the compiled CLI executable exists. This is generally located in your Xcode Derived Data or the `.build` folder. If these are cleared, you can rerun the Install CLI plugin to rebuild the CLI executable.
-      </If>
-
-      <If condition={installType.title === "Cocoapods"}>
-        If you use Cocoapods, Apollo iOS compiles the Codegen CLI into an executable shell application during `pod install` (located in `Pods/Apollo/apollo-ios-cli`).
-
-        After installing the Apollo iOS pod, you can run the Codegen CLI from the directory of your `Podfile`:
-
-        ```bash
-        ./Pods/Apollo/apollo-ios-cli ${Command Name} -${Command Arguments}
-        ```
-
-        > **Note:** If you are using `:path` in your Podfile to link to a local copy of Apollo iOS, the CLI will not be automatically available. You will need to manually build the Codegen CLI. See the [CLI installation guide](/ios/code-generation/codegen-cli#installation) for directions on how to do that.
       </If>
 
       </ExpansionPanelListItem>
