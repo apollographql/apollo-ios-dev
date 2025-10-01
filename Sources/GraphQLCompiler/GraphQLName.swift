@@ -10,28 +10,6 @@ public class GraphQLName: Hashable, CustomDebugStringConvertible {
   
   public var customName: String?
   
-  public var swiftName: String {
-    switch schemaName {
-    case "Boolean": return "Bool"
-    case "Float": return "Double"
-    default: return schemaName
-    }
-  }
-  
-  private var shouldRenderDocumentation: Bool {
-    if let customName, !customName.isEmpty {
-      return true
-    }
-    return false
-  }
-  
-  public var typeNameDocumentation: TemplateString? {
-    guard shouldRenderDocumentation else { return nil }
-    return """
-    // Renamed from GraphQL schema value: '\(schemaName)'
-    """
-  }
-  
   public init(
     schemaName: String
   ) {

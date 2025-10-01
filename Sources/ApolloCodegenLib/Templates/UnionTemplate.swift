@@ -19,7 +19,7 @@ struct UnionTemplate: TemplateRenderer {
     """
     \(documentation: graphqlUnion.documentation, config: config)
     \(graphqlUnion.name.typeNameDocumentation)
-    static let \(graphqlUnion.render(as: .typename)) = Union(
+    static let \(graphqlUnion.render(as: .typename())) = Union(
       name: "\(graphqlUnion.name.schemaName)",
       possibleTypes: \(PossibleTypesTemplate())
     )
@@ -36,7 +36,7 @@ struct UnionTemplate: TemplateRenderer {
   ) -> TemplateString {
     """
     \(if: !config.output.schemaTypes.isInModule, "\(config.schemaNamespace.firstUppercased).")\
-    Objects.\(type.render(as: .typename)).self
+    Objects.\(type.render(as: .typename())).self
     """
   }
 
