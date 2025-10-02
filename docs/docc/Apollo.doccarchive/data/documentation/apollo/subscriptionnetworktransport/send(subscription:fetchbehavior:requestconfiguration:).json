@@ -144,6 +144,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "NetworkTransport.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/NetworkTransport.swift#L55"
+    },
     "required" : true,
     "role" : "symbol",
     "roleHeading" : "Instance Method",
@@ -298,6 +302,7 @@
               "text" : " : "
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLSubscription",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI19GraphQLSubscriptionP",
               "text" : "GraphQLSubscription"
@@ -876,6 +881,74 @@
   "title" : "send(subscription:fetchBehavior:requestConfiguration:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/subscriptionnetworktransport\/send(subscription:fetchbehavior:requestconfiguration:)"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLSubscription": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLSubscription"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP",
+      "text" : "GraphQLOperation"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "where"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Self"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP14ResponseFormatQa",
+      "text" : "ResponseFormat"
+    },
+    {
+      "kind" : "text",
+      "text" : " == "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI26SubscriptionResponseFormatV",
+      "text" : "SubscriptionResponseFormat"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLSubscription",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "GraphQLSubscription",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqlsubscription"
 }
 }
 }

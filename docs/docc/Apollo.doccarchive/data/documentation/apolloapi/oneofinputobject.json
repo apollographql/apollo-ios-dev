@@ -38,6 +38,10 @@
         "text" : "OneOfInputObject"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "InputObject.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/SchemaTypes\/InputObject.swift#L81"
+    },
     "role" : "symbol",
     "roleHeading" : "Protocol",
     "symbolKind" : "protocol",

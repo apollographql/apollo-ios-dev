@@ -44,6 +44,10 @@
         "text" : "NetworkSession"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "URLDownloader.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/URLDownloader.swift#L4"
+    },
     "role" : "symbol",
     "roleHeading" : "Protocol",
     "symbolKind" : "protocol",

@@ -81,6 +81,10 @@
         "text" : "AsyncHTTPResponseChunkSequence"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "AsyncHTTPResponseChunkSequence.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/ResponseParsing\/AsyncHTTPResponseChunkSequence.swift#L14"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

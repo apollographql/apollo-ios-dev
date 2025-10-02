@@ -38,6 +38,10 @@
         "text" : "PaginationError"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "PaginationError.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/PaginationError.swift#L1"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

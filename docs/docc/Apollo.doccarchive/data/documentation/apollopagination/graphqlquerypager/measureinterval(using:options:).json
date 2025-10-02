@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.measureInterval(using:options:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Measures and emits the time interval between events received from an upstream publisher.",
       "type" : "text"
     }
   ],
@@ -316,6 +308,152 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A scheduler to use for tracking the timing of events.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "scheduler"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Options that customize the delivery of elements.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "options"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that emits elements representing the time interval between the elements it receives.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/measureInterval(using:options:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to measure the time between events delivered from an upstream publisher.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, a 1-second ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Foundation\/Timer",
+              "type" : "text"
+            },
+            {
+              "text" : " is used as the data source for an event publisher; the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/measureInterval(using:options:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator reports the elapsed time between the reception of events on the main run loop:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "cancellable = Timer.publish(every: 1, on: .main, in: .default)",
+            "    .autoconnect()",
+            "    .measureInterval(using: RunLoop.main)",
+            "    .sink { print(\"\\($0)\", terminator: \"\\n\") }",
+            "",
+            "\/\/ Prints:",
+            "\/\/      Stride(magnitude: 1.0013610124588013)",
+            "\/\/      Stride(magnitude: 0.9992760419845581)"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The output type of the returned publisher is the time interval of the provided scheduler.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "This operator uses the provided scheduler’s ",
+              "type" : "text"
+            },
+            {
+              "code" : "Scheduler\/now",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " property to measure intervals between events.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -395,7 +533,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/measureInterval(using:options:)": {
   "abstract" : [
-
+    {
+      "text" : "Measures and emits the time interval between events received from an upstream publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

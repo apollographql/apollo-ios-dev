@@ -69,6 +69,10 @@
         "name" : "ApolloAPI"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "SchemaMetadata.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/SchemaMetadata.swift#L11"
+    },
     "required" : true,
     "role" : "symbol",
     "roleHeading" : "Type Property",

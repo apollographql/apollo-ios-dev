@@ -66,6 +66,10 @@
         "text" : "DefaultCacheInterceptor"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "CacheInterceptor.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/RequestChain\/Interceptors\/CacheInterceptor.swift#L51"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

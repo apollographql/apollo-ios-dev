@@ -54,6 +54,10 @@
         "text" : "Conditions"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "Selection+Conditions.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/Selection+Conditions.swift#L7"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

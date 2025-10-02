@@ -139,7 +139,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/Glob/MatchError/localizedDescription": {
   "abstract" : [
-
+    {
+      "text" : "Retrieve the localized description for this error.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.flatMap(maxPublishers:_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Transforms all elements from an upstream publisher into a new publisher up to a maximum number of publishers you specify.",
       "type" : "text"
     }
   ],
@@ -427,6 +419,228 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Specifies the maximum number of concurrent publisher subscriptions, or ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "Combine\/Subscribers\/Demand\/unlimited",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " if unspecified.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "maxPublishers"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that takes an element as a parameter and returns a publisher that produces elements of that type.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "transform"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that transforms elements from an upstream  publisher into a publisher of that element’s type.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Combine‘s ",
+              "type" : "text"
+            },
+            {
+              "code" : "flatMap(maxPublishers:_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator performs a similar function to the ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Swift\/Sequence\/flatMap(_:)-jo2y",
+              "type" : "text"
+            },
+            {
+              "text" : " operator in the Swift standard library, but turns the elements from one kind of publisher into a new publisher that is sent to subscribers. Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "flatMap(maxPublishers:_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " when you want to create a new series of events for downstream subscribers based on the received value. The closure creates the new ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " based on the received value. The new ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " can emit more than one event, and successful completion of the new ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " does not complete the overall stream. Failure of the new ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " causes the overall stream to fail.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, a ",
+              "type" : "text"
+            },
+            {
+              "code" : "PassthroughSubject",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " publishes ",
+              "type" : "text"
+            },
+            {
+              "code" : "WeatherStation",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " elements. The ",
+              "type" : "text"
+            },
+            {
+              "code" : "flatMap(maxPublishers:_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " receives each element, creates a ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Foundation\/URL",
+              "type" : "text"
+            },
+            {
+              "text" : " from it, and produces a new ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Foundation\/URLSession\/DataTaskPublisher",
+              "type" : "text"
+            },
+            {
+              "text" : ", which will publish the data loaded from that ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Foundation\/URL",
+              "type" : "text"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "public struct WeatherStation {",
+            "    public let stationID: String",
+            "}",
+            "",
+            "var weatherPublisher = PassthroughSubject<WeatherStation, URLError>()",
+            "",
+            "cancellable = weatherPublisher.flatMap { station -> URLSession.DataTaskPublisher in",
+            "    let url = URL(string:\"https:\/\/weatherapi.example.com\/stations\/\\(station.stationID)\/observations\/latest\")!",
+            "    return URLSession.shared.dataTaskPublisher(for: url)",
+            "}",
+            ".sink(",
+            "    receiveCompletion: { completion in",
+            "        \/\/ Handle publisher completion (normal or error).",
+            "    },",
+            "    receiveValue: {",
+            "        \/\/ Process the received data.",
+            "    }",
+            " )",
+            "",
+            "weatherPublisher.send(WeatherStation(stationID: \"KSFO\")) \/\/ San Francisco, CA",
+            "weatherPublisher.send(WeatherStation(stationID: \"EGLC\")) \/\/ London, UK",
+            "weatherPublisher.send(WeatherStation(stationID: \"ZBBB\")) \/\/ Beijing, CN"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -506,7 +720,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/flatMap(maxPublishers:_:)-v65z": {
   "abstract" : [
-
+    {
+      "text" : "Transforms all elements from an upstream publisher into a new publisher up to a maximum number of publishers you specify.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

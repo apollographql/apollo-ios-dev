@@ -2,46 +2,14 @@ import Foundation
 import ApolloCodegenLib
 import SwiftScriptHelpers
 
-enum Target: String, CaseIterable {
-  case Apollo
-  case ApolloAPI  
-  case ApolloSQLite
-  case ApolloWebSocket
-  case ApolloCodegenLib
-  case ApolloPagination
-
-  var name: String {
-    self.rawValue
-  }
-
-  var outputPath: URL {
-    DocumentationGenerator.doccFolder
-      .appendingPathComponent(name)
-      .appendingPathExtension("doccarchive")
-  }
-
-}
-
 struct DocumentationGenerator {
   static func main() {
-    var currentTarget: Target?
     do {
-      for target in Target.allCases {
-        currentTarget = target
-        defer { currentTarget = nil }
-
-        try shell(docBuildCommand(for: target))
-        CodegenLogger.log("Generated docs for \(target.name)")
-        try moveDocsIntoApolloDocCArchive(for: target)
-      }
+      try shell(docBuildCommand())
+      CodegenLogger.log("Combined Docs Generation Complete!")
 
     } catch {
-      if let currentTarget = currentTarget {
-        CodegenLogger.log("Error generating docs for \(currentTarget.name): \(error)", logLevel: .error)
-
-      } else {
-        CodegenLogger.log("Error: \(error)", logLevel: .error)
-      }
+      CodegenLogger.log("Error: \(error)", logLevel: .error)
       exit(1)
     }
   }
@@ -53,18 +21,31 @@ struct DocumentationGenerator {
   static let sourceRootURL = parentFolderOfScriptFile
     .deletingLastPathComponent() // Sources
     .deletingLastPathComponent() // SwiftScripts
-    .deletingLastPathComponent() // apollo-ios
+    .deletingLastPathComponent() // apollo-ios-dev
 
   static let doccFolder = sourceRootURL.appendingPathComponent("docs/docc")
 
-  static func docBuildCommand(for target: Target) -> String {
+  static func docBuildCommand() -> String {
+    let outputPath = DocumentationGenerator.doccFolder
+      .appendingPathComponent("Apollo")
+      .appendingPathExtension("doccarchive")
+
     return """
     swift package \
-    --allow-writing-to-directory \(target.outputPath.relativePath) \
-    generate-documentation \
-    --target \(target.name) \
+    --allow-writing-to-directory \(outputPath) \
+    generate-documentation \    
+    --target Apollo \
+    --target ApolloAPI \
+    --target ApolloSQLite \
+    --target ApolloCodegenLib \
+    --target ApolloPagination \
+    --enable-experimental-combined-documentation \
+    --enable-inherited-docs \
+    --source-service github \
+    --source-service-base-url https://github.com/apollographql/apollo-ios-dev/blob/main \
+    --checkout-path \(sourceRootURL.relativePath) \
     --disable-indexing \
-    --output-path \(target.outputPath.relativePath) \
+    --output-path \(outputPath) \
     --hosting-base-path docs/ios/docc
     """
   }
@@ -85,33 +66,13 @@ struct DocumentationGenerator {
 
     task.currentDirectoryURL = sourceRootURL.appendingPathComponent("SwiftScripts")
     task.environment?["OS_ACTIVITY_DT_MODE"] = nil
-    task.environment?["DOCC_JSON_PRETTYPRINT"] = "YES"
-    task.environment?["DOCC_HTML_DIR"] = sourceRootURL
-      .appendingPathComponent("docs/renderer/dist").relativePath
+    task.environment?["DOCC_JSON_PRETTYPRINT"] = "YES"    
     task.arguments = ["-c", command]
 
     task.executableURL = URL(fileURLWithPath: "/bin/zsh")
     task.standardInput = nil
     try task.run()
     task.waitUntilExit()
-  }
-
-  static func moveDocsIntoApolloDocCArchive(for target: Target) throws {
-    guard target != .Apollo else { return }
-
-    let docsFromURL = doccFolder
-      .appendingPathComponent("\(target.name).doccarchive/data/documentation/\(target.name.lowercased())")
-    let docsToURL = doccFolder
-      .appendingPathComponent("Apollo.doccarchive/data/documentation/\(target.name.lowercased())")
-    try FileManager.default.moveItem(at: docsFromURL, to: docsToURL)
-
-    let indexJSONFromURL = doccFolder
-      .appendingPathComponent("\(target.name).doccarchive/data/documentation/\(target.name.lowercased()).json")
-    let indexJSONToURL = doccFolder
-      .appendingPathComponent("Apollo.doccarchive/data/documentation/\(target.name.lowercased()).json")
-    try FileManager.default.moveItem(at: indexJSONFromURL, to: indexJSONToURL)
-
-    try FileManager.default.removeItem(at: target.outputPath)
   }
 
   enum Error: Swift.Error {

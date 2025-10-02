@@ -62,6 +62,10 @@
         "text" : "InputValue"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "InputValue.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/InputValue.swift#L5"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

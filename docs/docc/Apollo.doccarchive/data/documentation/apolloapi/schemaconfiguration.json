@@ -44,6 +44,10 @@
         "text" : "SchemaConfiguration"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "SchemaConfiguration.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/SchemaConfiguration.swift#L5"
+    },
     "role" : "symbol",
     "roleHeading" : "Protocol",
     "symbolKind" : "protocol",

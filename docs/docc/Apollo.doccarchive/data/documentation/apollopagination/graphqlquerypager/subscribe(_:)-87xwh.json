@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.subscribe(_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Attaches the specified subject to this publisher.",
       "type" : "text"
     }
   ],
@@ -272,6 +264,25 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The subject to attach to this publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "subject"
+        }
+      ]
     }
   ],
   "schemaVersion" : {
@@ -351,7 +362,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/subscribe(_:)-87xwh": {
   "abstract" : [
-
+    {
+      "text" : "Attaches the specified subject to this publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

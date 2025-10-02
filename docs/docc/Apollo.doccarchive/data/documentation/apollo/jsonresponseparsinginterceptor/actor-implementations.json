@@ -41,6 +41,18 @@
       ],
       "title" : "Instance Methods"
     }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/jsonresponseparsinginterceptor\/actor-implementations"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
   ]
 , 
 "references": {
@@ -176,7 +188,18 @@
 },
 "doc://Apollo/documentation/Apollo/JSONResponseParsingInterceptor/assertIsolated(_:file:line:)": {
   "abstract" : [
-
+    {
+      "text" : "Stops program execution if the current task is not executing on this",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "actor’s serial executor.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -256,7 +279,18 @@
 },
 "doc://Apollo/documentation/Apollo/JSONResponseParsingInterceptor/assumeIsolated(_:file:line:)": {
   "abstract" : [
-
+    {
+      "text" : "Assume that the current task is executing on this actor’s serial executor,",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "or stop program execution otherwise.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -371,7 +405,18 @@
 },
 "doc://Apollo/documentation/Apollo/JSONResponseParsingInterceptor/preconditionIsolated(_:file:line:)": {
   "abstract" : [
-
+    {
+      "text" : "Stops program execution if the current task is not executing on this",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "actor’s serial executor.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -30,23 +30,7 @@ items:
       - label: v2.0
         href: ./migrations/2.0
   - label: API Reference
-    children:
-      - label: Overview
-        href: https://www.apollographql.com/docs/ios/docc/documentation/index
-      - label: Apollo Client
-        href: https://www.apollographql.com/docs/ios/docc/documentation/Apollo
-      - label: ApolloAPI
-        href: https://www.apollographql.com/docs/ios/docc/documentation/ApolloAPI
-      - label: ApolloWebSocket
-        href: https://www.apollographql.com/docs/ios/docc/documentation/ApolloWebSocket
-      - label: ApolloSQLite
-        href: https://www.apollographql.com/docs/ios/docc/documentation/ApolloSQLite
-      - label: ApolloCodegenLib
-        href: https://www.apollographql.com/docs/ios/docc/documentation/ApolloCodegenLib
-      - label: ApolloPagination
-        href: https://www.apollographql.com/docs/ios/docc/documentation/ApolloPagination
-      - label: Client Directives
-        href: ./client-directives
+    href: https://www.apollographql.com/docs/ios/docc/documentation
   - label: Code Generation
     children:
       - label: Introduction
@@ -125,4 +109,6 @@ items:
         href: ./advanced/file-uploads
       - label: Request Chain Customization
         href: ./advanced/request-chain
+      - label: Client Directives
+        href: ./client-directives
 

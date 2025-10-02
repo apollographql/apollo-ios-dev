@@ -45,6 +45,10 @@
         "text" : "ItemsToGenerate"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloCodegen.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/ApolloCodegen.swift#L16"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

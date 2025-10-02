@@ -44,6 +44,10 @@
         "text" : "GraphQLHTTPRequestError"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLHTTPRequestError.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/GraphQLHTTPRequestError.swift#L4"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

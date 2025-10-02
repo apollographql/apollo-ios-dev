@@ -52,6 +52,10 @@
         "text" : "Deferred"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "Deferred.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/Deferred.swift#L6"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

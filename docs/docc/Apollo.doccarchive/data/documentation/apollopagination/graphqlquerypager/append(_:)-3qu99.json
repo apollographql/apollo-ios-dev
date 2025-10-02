@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.append(_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Appends a publisher’s output with the specified sequence.",
       "type" : "text"
     }
   ],
@@ -362,6 +354,119 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A sequence of elements to publish after this publisher’s elements.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "elements"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that appends the sequence of elements after this publisher’s elements.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/append(_:)-69sdn",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to append a sequence to the end of a publisher’s output.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/append(_:)-69sdn",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " publisher republishes all elements from ",
+              "type" : "text"
+            },
+            {
+              "code" : "groundTransport",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " until it finishes, then publishes the members of ",
+              "type" : "text"
+            },
+            {
+              "code" : "airTransport",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ":",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let groundTransport = [\"car\", \"bus\", \"truck\", \"subway\", \"bicycle\"]",
+            "let airTransport = [\"parasail\", \"jet\", \"helicopter\", \"rocket\"]",
+            "cancellable = groundTransport.publisher",
+            "    .append(airTransport)",
+            "    .sink { print(\"\\($0)\", terminator: \" \") }",
+            "",
+            "\/\/ Prints: \"car bus truck subway bicycle parasail jet helicopter rocket\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -441,7 +546,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/append(_:)-3qu99": {
   "abstract" : [
-
+    {
+      "text" : "Appends a publisher’s output with the specified sequence.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

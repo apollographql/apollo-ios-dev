@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.sink(receiveCompletion:receiveValue:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Attaches a subscriber with closure-based behavior.",
       "type" : "text"
     }
   ],
@@ -319,6 +311,170 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The closure to execute on completion.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "receiveComplete"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The closure to execute on receipt of a value.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "receiveValue"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A cancellable instance, which you use when you end assignment of the received value. Deallocation of the result will tear down the subscription stream.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/sink(receiveCompletion:receiveValue:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to observe values received by the publisher and process them using a closure you specify.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In this example, a ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Swift\/Range",
+              "type" : "text"
+            },
+            {
+              "text" : " publisher publishes integers to a ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/sink(receiveCompletion:receiveValue:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator’s ",
+              "type" : "text"
+            },
+            {
+              "code" : "receiveValue",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " closure that prints them to the console. Upon completion the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/sink(receiveCompletion:receiveValue:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator’s ",
+              "type" : "text"
+            },
+            {
+              "code" : "receiveCompletion",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " closure indicates the successful termination of the stream.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let myRange = (0...3)",
+            "cancellable = myRange.publisher",
+            "    .sink(receiveCompletion: { print (\"completion: \\($0)\") },",
+            "          receiveValue: { print (\"value: \\($0)\") })",
+            "",
+            "\/\/ Prints:",
+            "\/\/  value: 0",
+            "\/\/  value: 1",
+            "\/\/  value: 2",
+            "\/\/  value: 3",
+            "\/\/  completion: finished"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "This method creates the subscriber and immediately requests an unlimited number of values, prior to returning the subscriber.",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "The return value should be held, otherwise the stream will be canceled.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -398,7 +554,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/sink(receiveCompletion:receiveValue:)": {
   "abstract" : [
-
+    {
+      "text" : "Attaches a subscriber with closure-based behavior.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

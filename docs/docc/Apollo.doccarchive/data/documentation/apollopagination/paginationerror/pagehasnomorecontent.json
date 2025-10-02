@@ -33,6 +33,10 @@
         "name" : "ApolloPagination"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "PaginationError.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/PaginationError.swift#L3"
+    },
     "role" : "symbol",
     "roleHeading" : "Case",
     "symbolKind" : "case",

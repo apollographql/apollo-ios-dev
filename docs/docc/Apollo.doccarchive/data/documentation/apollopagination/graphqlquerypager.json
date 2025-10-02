@@ -52,6 +52,10 @@
         "text" : "GraphQLQueryPager"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLQueryPager.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/GraphQLQueryPager.swift#L8"
+    },
     "role" : "symbol",
     "roleHeading" : "Class",
     "symbolKind" : "class",

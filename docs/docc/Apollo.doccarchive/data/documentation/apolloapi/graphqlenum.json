@@ -53,6 +53,10 @@
         "text" : "GraphQLEnum"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLEnum.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/GraphQLEnum.swift#L6"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",
@@ -752,7 +756,10 @@
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLEnum/!=(_:_:)-4co00": {
   "abstract" : [
-
+    {
+      "text" : "Returns a Boolean value indicating whether two values are not equal.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

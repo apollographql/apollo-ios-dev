@@ -158,7 +158,10 @@
 },
 "doc://ApolloAPI/documentation/ApolloAPI/GraphQLNullable/!=(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a Boolean value indicating whether two values are not equal.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

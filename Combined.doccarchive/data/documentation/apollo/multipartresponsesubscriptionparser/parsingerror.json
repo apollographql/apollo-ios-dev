@@ -1,0 +1,494 @@
+{
+  "hierarchy" : {
+    "paths" : [
+      [
+        "doc:\/\/Apollo\/documentation\/Apollo",
+        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser"
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "s:6Apollo35MultipartResponseSubscriptionParserV12ParsingErrorO",
+    "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "enum"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "ParsingError"
+      }
+    ],
+    "modules" : [
+      {
+        "name" : "Apollo"
+      }
+    ],
+    "navigatorTitle" : [
+      {
+        "kind" : "identifier",
+        "text" : "ParsingError"
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Enumeration",
+    "symbolKind" : "enum",
+    "title" : "MultipartResponseSubscriptionParser.ParsingError"
+  },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "enum"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "ParsingError"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    }
+  ],
+  "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/Apollo\/10Foundation14LocalizedErrorP",
+        "doc:\/\/Apollo\/SQ",
+        "doc:\/\/Apollo\/s5ErrorP",
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforms To",
+      "type" : "conformsTo"
+    }
+  ],
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "topicSections" : [
+    {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/cannotParseChunkData",
+        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/cannotParsePayloadData",
+        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/irrecoverableErrors(_:)",
+        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/unsupportedContentType(type:)"
+      ],
+      "title" : "Enumeration Cases"
+    },
+    {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/errorDescription"
+      ],
+      "title" : "Instance Properties"
+    },
+    {
+      "anchor" : "Default-Implementations",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/Equatable-Implementations",
+        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/Error-Implementations",
+        "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/LocalizedError-Implementations"
+      ],
+      "title" : "Default Implementations"
+    }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/multipartresponsesubscriptionparser\/parsingerror"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://Apollo/10Foundation14LocalizedErrorP": {
+  "identifier" : "doc:\/\/Apollo\/10Foundation14LocalizedErrorP",
+  "title" : "Foundation.LocalizedError",
+  "type" : "unresolvable"
+},
+"doc://Apollo/SQ": {
+  "identifier" : "doc:\/\/Apollo\/SQ",
+  "title" : "Swift.Equatable",
+  "type" : "unresolvable"
+},
+"doc://Apollo/documentation/Apollo": {
+  "abstract" : [
+    {
+      "text" : "A Strongly typed, Swift-first, GraphQL client.",
+      "type" : "text"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "Apollo",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo"
+},
+"doc://Apollo/documentation/Apollo/MultipartResponseSubscriptionParser": {
+  "abstract" : [
+    {
+      "text" : "A ",
+      "type" : "text"
+    },
+    {
+      "code" : "MultipartResponseSpecificationParser",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " that parses response data for GraphQL subscriptions over HTTP as defined by",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "the ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "https:\/\/www.apollographql.com\/docs\/graphos\/routing\/operations\/subscriptions\/multipart-protocol",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "specification.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "MultipartResponseSubscriptionParser"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "MultipartResponseSubscriptionParser"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "MultipartResponseSubscriptionParser",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/multipartresponsesubscriptionparser"
+},
+"doc://Apollo/documentation/Apollo/MultipartResponseSubscriptionParser/ParsingError": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ParsingError"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ParsingError"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "MultipartResponseSubscriptionParser.ParsingError",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/multipartresponsesubscriptionparser\/parsingerror"
+},
+"doc://Apollo/documentation/Apollo/MultipartResponseSubscriptionParser/ParsingError/Equatable-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/Equatable-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "Equatable Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/multipartresponsesubscriptionparser\/parsingerror\/equatable-implementations"
+},
+"doc://Apollo/documentation/Apollo/MultipartResponseSubscriptionParser/ParsingError/Error-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/Error-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "Error Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/multipartresponsesubscriptionparser\/parsingerror\/error-implementations"
+},
+"doc://Apollo/documentation/Apollo/MultipartResponseSubscriptionParser/ParsingError/LocalizedError-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/LocalizedError-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "LocalizedError Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/multipartresponsesubscriptionparser\/parsingerror\/localizederror-implementations"
+},
+"doc://Apollo/documentation/Apollo/MultipartResponseSubscriptionParser/ParsingError/cannotParseChunkData": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "cannotParseChunkData"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/cannotParseChunkData",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "MultipartResponseSubscriptionParser.ParsingError.cannotParseChunkData",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/multipartresponsesubscriptionparser\/parsingerror\/cannotparsechunkdata"
+},
+"doc://Apollo/documentation/Apollo/MultipartResponseSubscriptionParser/ParsingError/cannotParsePayloadData": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "cannotParsePayloadData"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/cannotParsePayloadData",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "MultipartResponseSubscriptionParser.ParsingError.cannotParsePayloadData",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/multipartresponsesubscriptionparser\/parsingerror\/cannotparsepayloaddata"
+},
+"doc://Apollo/documentation/Apollo/MultipartResponseSubscriptionParser/ParsingError/errorDescription": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "errorDescription"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : "?"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/errorDescription",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "errorDescription",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/multipartresponsesubscriptionparser\/parsingerror\/errordescription"
+},
+"doc://Apollo/documentation/Apollo/MultipartResponseSubscriptionParser/ParsingError/irrecoverableErrors(_:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "irrecoverableErrors"
+    },
+    {
+      "kind" : "text",
+      "text" : "(["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo12GraphQLErrorV",
+      "text" : "GraphQLError"
+    },
+    {
+      "kind" : "text",
+      "text" : "])"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/irrecoverableErrors(_:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "MultipartResponseSubscriptionParser.ParsingError.irrecoverableErrors(_:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/multipartresponsesubscriptionparser\/parsingerror\/irrecoverableerrors(_:)"
+},
+"doc://Apollo/documentation/Apollo/MultipartResponseSubscriptionParser/ParsingError/unsupportedContentType(type:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "unsupportedContentType"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "type"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/MultipartResponseSubscriptionParser\/ParsingError\/unsupportedContentType(type:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "MultipartResponseSubscriptionParser.ParsingError.unsupportedContentType(type:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/multipartresponsesubscriptionparser\/parsingerror\/unsupportedcontenttype(type:)"
+},
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s5ErrorP": {
+  "identifier" : "doc:\/\/Apollo\/s5ErrorP",
+  "title" : "Swift.Error",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
+},
+"https://www.apollographql.com/docs/graphos/routing/operations/subscriptions/multipart-protocol": {
+  "identifier" : "https:\/\/www.apollographql.com\/docs\/graphos\/routing\/operations\/subscriptions\/multipart-protocol",
+  "title" : "subscriptionSpec=1.0",
+  "titleInlineContent" : [
+    {
+      "code" : "subscriptionSpec=1.0",
+      "type" : "codeVoice"
+    }
+  ],
+  "type" : "link",
+  "url" : "https:\/\/www.apollographql.com\/docs\/graphos\/routing\/operations\/subscriptions\/multipart-protocol"
+}
+}
+}

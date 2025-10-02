@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.last(where:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Publishes the last element of a stream that satisfies a predicate closure, after upstream finishes.",
       "type" : "text"
     }
   ],
@@ -257,6 +249,94 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that takes an element as its parameter and returns a Boolean value that indicates whether to publish the element.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "predicate"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that only publishes the last element satisfying the given predicate.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/last(where:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " when you need to republish only the last element of a stream that satisfies a closure you specify.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, a range publisher emits the last element that satisfies the closure’s criteria, then finishes normally:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let numbers = (-10...10)",
+            "cancellable = numbers.publisher",
+            "    .last { $0 < 6 }",
+            "    .sink { print(\"\\($0)\") }",
+            "",
+            "\/\/ Prints: \"5\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -336,7 +416,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/last(where:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the last element of a stream that satisfies a predicate closure, after upstream finishes.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

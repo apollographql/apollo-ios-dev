@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.zip(_:_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Combines elements from another publisher and delivers a transformed output.",
       "type" : "text"
     }
   ],
@@ -468,6 +460,198 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Another publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "other"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that receives the most-recent value from each publisher and returns a new value to publish.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "transform"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that uses the ",
+              "type" : "text"
+            },
+            {
+              "code" : "transform",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " closure to emit new elements, produced by combining the most recent value from two upstream publishers.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/zip(_:_:)-4xn21",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to return a new publisher that combines the elements from two publishers using a transformation you specify to publish a new value to the downstream.  The returned publisher waits until both publishers have emitted an event, then delivers the oldest unconsumed event from each publisher together that the operator uses in the transformation.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In this example, ",
+              "type" : "text"
+            },
+            {
+              "code" : "PassthroughSubject",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " instances ",
+              "type" : "text"
+            },
+            {
+              "code" : "numbersPub",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " and ",
+              "type" : "text"
+            },
+            {
+              "code" : "lettersPub",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " emit values; ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/zip(_:_:)-4xn21",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " receives the oldest value from each publisher, uses the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Int",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " from ",
+              "type" : "text"
+            },
+            {
+              "code" : "numbersPub",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " and publishes a string that repeats the ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Swift\/String",
+              "type" : "text"
+            },
+            {
+              "text" : " from ",
+              "type" : "text"
+            },
+            {
+              "code" : "lettersPub",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " that many times.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let numbersPub = PassthroughSubject<Int, Never>()",
+            "let lettersPub = PassthroughSubject<String, Never>()",
+            "cancellable = numbersPub",
+            "    .zip(lettersPub) { anInt, aLetter in",
+            "        String(repeating: aLetter, count: anInt)",
+            "    }",
+            "    .sink { print(\"\\($0)\") }",
+            "numbersPub.send(1)     \/\/ numbersPub: 1      lettersPub:       zip output: <none>",
+            "numbersPub.send(2)     \/\/ numbersPub: 1,2    lettersPub:       zip output: <none>",
+            "numbersPub.send(3)     \/\/ numbersPub: 1,2,3  lettersPub:       zip output: <none>",
+            "lettersPub.send(\"A\")   \/\/ numbersPub: 1,2,3  lettersPub: \"A\"   zip output: \"A\"",
+            "lettersPub.send(\"B\")   \/\/ numbersPub: 2,3    lettersPub: \"B\"   zip output: \"BB\"",
+            "\/\/ Prints:",
+            "\/\/  A",
+            "\/\/  BB"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "If either upstream publisher finishes successfully or fails with an error, the zipped publisher does the same.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -547,7 +731,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/zip(_:_:)-3oklf": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from another publisher and delivers a transformed output.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

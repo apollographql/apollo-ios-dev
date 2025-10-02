@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.values",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "The elements produced by the publisher, as an asynchronous sequence.",
       "type" : "text"
     }
   ],
@@ -195,6 +187,177 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "This property provides an ",
+              "type" : "text"
+            },
+            {
+              "code" : "AsyncPublisher",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", which allows you to use the Swift ",
+              "type" : "text"
+            },
+            {
+              "code" : "async",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : "-",
+              "type" : "text"
+            },
+            {
+              "code" : "await",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " syntax to receive the publisher’s elements. Because ",
+              "type" : "text"
+            },
+            {
+              "code" : "AsyncPublisher",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " conforms to ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Swift\/AsyncSequence",
+              "type" : "text"
+            },
+            {
+              "text" : ", you iterate over its elements with a ",
+              "type" : "text"
+            },
+            {
+              "code" : "for",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : "-",
+              "type" : "text"
+            },
+            {
+              "code" : "await",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : "-",
+              "type" : "text"
+            },
+            {
+              "code" : "in",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " loop, rather than attaching a subscriber.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The following example shows how to use the ",
+              "type" : "text"
+            },
+            {
+              "code" : "values",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " property to receive elements asynchronously. The example adapts a code snippet from the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/filter(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator’s documentation, which filters a sequence to only emit even integers. This example replaces the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Subscribers\/Sink",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " subscriber with a ",
+              "type" : "text"
+            },
+            {
+              "code" : "for",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : "-",
+              "type" : "text"
+            },
+            {
+              "code" : "await",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : "-",
+              "type" : "text"
+            },
+            {
+              "code" : "in",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " loop that iterates over the ",
+              "type" : "text"
+            },
+            {
+              "code" : "AsyncPublisher",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " provided by the ",
+              "type" : "text"
+            },
+            {
+              "code" : "values",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " property.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let numbers: [Int] = [1, 2, 3, 4, 5]",
+            "let filtered = numbers.publisher",
+            "    .filter { $0 % 2 == 0 }",
+            "",
+            "for await number in filtered.values",
+            "{",
+            "    print(\"\\(number)\", terminator: \" \")",
+            "}"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -274,7 +437,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/values-3l0lz": {
   "abstract" : [
-
+    {
+      "text" : "The elements produced by the publisher, as an asynchronous sequence.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [

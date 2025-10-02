@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.tryMap(_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Transforms all elements from the upstream publisher with a provided error-throwing closure.",
       "type" : "text"
     }
   ],
@@ -295,6 +287,187 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that takes one element as its parameter and returns a new element. If the closure throws an error, the publisher fails with the thrown error.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "transform"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that uses the provided closure to map elements from the upstream publisher to new elements that it then publishes.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Combine’s ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryMap(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator performs a function similar to that of ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Swift\/Sequence\/map(_:)",
+              "type" : "text"
+            },
+            {
+              "text" : " in the Swift standard library: it uses a closure to transform each element it receives from the upstream publisher. You use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryMap(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to transform from one kind of element to another, and to terminate publishing when the map’s closure throws an error.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The following example uses an array of numbers as the source for a collection based publisher. A ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryMap(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator consumes each integer from the publisher and uses a dictionary to transform it from its Arabic numeral to a Roman equivalent, as a ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Swift\/String",
+              "type" : "text"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "If the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryMap(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : "’s closure fails to look up a Roman numeral, it throws an error. The ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryMap(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator catches this error and terminates publishing, sending a ",
+              "type" : "text"
+            },
+            {
+              "code" : "Subscribers\/Completion\/failure(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " that wraps the error.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "struct ParseError: Error {}",
+            "func romanNumeral(from:Int) throws -> String {",
+            "    let romanNumeralDict: [Int : String] =",
+            "        [1:\"I\", 2:\"II\", 3:\"III\", 4:\"IV\", 5:\"V\"]",
+            "    guard let numeral = romanNumeralDict[from] else {",
+            "        throw ParseError()",
+            "    }",
+            "    return numeral",
+            "}",
+            "let numbers = [5, 4, 3, 2, 1, 0]",
+            "cancellable = numbers.publisher",
+            "    .tryMap { try romanNumeral(from: $0) }",
+            "    .sink(",
+            "        receiveCompletion: { print (\"completion: \\($0)\") },",
+            "        receiveValue: { print (\"\\($0)\", terminator: \" \") }",
+            "     )",
+            "",
+            "\/\/ Prints: \"V IV III II I completion: failure(ParseError())\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "If your closure doesn’t throw, use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/map(_:)-99evh",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " instead.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -374,7 +547,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryMap(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Transforms all elements from the upstream publisher with a provided error-throwing closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

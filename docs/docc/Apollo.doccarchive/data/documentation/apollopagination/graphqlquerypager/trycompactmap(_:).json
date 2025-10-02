@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.tryCompactMap(_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Calls an error-throwing closure with each received element and publishes any returned optional that has a value.",
       "type" : "text"
     }
   ],
@@ -295,6 +287,210 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "An error-throwing closure that receives a value and returns an optional value.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "transform"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Any non-",
+              "type" : "text"
+            },
+            {
+              "code" : "nil",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " optional results of calling the supplied closure.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryCompactMap(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to remove ",
+              "type" : "text"
+            },
+            {
+              "code" : "nil",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " elements from a publisher’s stream based on an error-throwing closure you provide. If the closure throws an error, the publisher cancels the upstream publisher and sends the thrown error to the downstream subscriber as a ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/Failure",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The following example uses an array of numbers as the source for a collection-based publisher. A ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryCompactMap(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator consumes each integer from the publisher and uses a dictionary to transform the numbers from its Arabic to Roman numerals, as an optional ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Swift\/String",
+              "type" : "text"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "If the closure called by ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryCompactMap(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " fails to look up a Roman numeral, it returns the optional String ",
+              "type" : "text"
+            },
+            {
+              "code" : "(unknown)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "If the closure called by ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryCompactMap(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " determines the input is ",
+              "type" : "text"
+            },
+            {
+              "code" : "0",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", it throws an error. The ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryCompactMap(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator catches this error and stops publishing, sending a ",
+              "type" : "text"
+            },
+            {
+              "code" : "Subscribers\/Completion\/failure(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " that wraps the error.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "struct ParseError: Error {}",
+            "func romanNumeral(from: Int) throws -> String? {",
+            "    let romanNumeralDict: [Int : String] =",
+            "        [1: \"I\", 2: \"II\", 3: \"III\", 4: \"IV\", 5: \"V\"]",
+            "    guard from != 0 else { throw ParseError() }",
+            "    return romanNumeralDict[from]",
+            "}",
+            "let numbers = [6, 5, 4, 3, 2, 1, 0]",
+            "cancellable = numbers.publisher",
+            "    .tryCompactMap { try romanNumeral(from: $0) }",
+            "    .sink(",
+            "          receiveCompletion: { print (\"\\($0)\") },",
+            "          receiveValue: { print (\"\\($0)\", terminator: \" \") }",
+            "     )",
+            "",
+            "\/\/ Prints: \"(Unknown) V IV III II I failure(ParseError())\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -374,7 +570,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryCompactMap(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Calls an error-throwing closure with each received element and publishes any returned optional that has a value.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

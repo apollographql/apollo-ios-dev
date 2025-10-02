@@ -54,6 +54,10 @@
         "text" : "ReadTransaction"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloStore.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/Caching\/ApolloStore.swift#L202"
+    },
     "role" : "symbol",
     "roleHeading" : "Class",
     "symbolKind" : "class",

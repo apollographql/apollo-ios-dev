@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.contains(where:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Publishes a Boolean value upon receiving an element that satisfies the predicate closure.",
       "type" : "text"
     }
   ],
@@ -257,6 +249,143 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that takes an element as its parameter and returns a Boolean value that indicates whether the element satisfies the closure’s comparison logic.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "predicate"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that emits the Boolean value ",
+              "type" : "text"
+            },
+            {
+              "code" : "true",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " when the upstream  publisher emits a matching value.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/contains(where:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to find the first element in an upstream that satisfies the closure you provide. This operator consumes elements produced from the upstream publisher until the upstream publisher produces a matching element.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "This operator is useful when the upstream publisher produces elements that don’t conform to ",
+              "type" : "text"
+            },
+            {
+              "code" : "Equatable",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/contains(where:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator tests elements against the supplied closure and emits ",
+              "type" : "text"
+            },
+            {
+              "code" : "true",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " for the first elements that’s greater than ",
+              "type" : "text"
+            },
+            {
+              "code" : "4",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", and then finishes normally.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let numbers = [-1, 0, 10, 5]",
+            "numbers.publisher",
+            "    .contains {$0 > 4}",
+            "    .sink { print(\"\\($0)\") }",
+            "",
+            "\/\/ Prints: \"true\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -336,7 +465,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/contains(where:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes a Boolean value upon receiving an element that satisfies the predicate closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "CodingKey.debugDescription",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "A textual representation of this key, suitable for debugging.",
       "type" : "text"
     }
   ],
@@ -267,7 +259,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ConversionStrategies/CodingKeys/debugDescription": {
   "abstract" : [
-
+    {
+      "text" : "A textual representation of this key, suitable for debugging.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

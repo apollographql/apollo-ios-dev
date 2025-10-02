@@ -38,6 +38,10 @@
         "text" : "FileManagerActor"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "FileManager+Apollo.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/FileManager+Apollo.swift#L5"
+    },
     "role" : "symbol",
     "roleHeading" : "Class",
     "symbolKind" : "class",

@@ -77,6 +77,10 @@
         "text" : "MultipartResponseDeferParser"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "MultipartResponseDeferParser.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/ResponseParsing\/MultipartResponseDeferParser.swift#L7"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

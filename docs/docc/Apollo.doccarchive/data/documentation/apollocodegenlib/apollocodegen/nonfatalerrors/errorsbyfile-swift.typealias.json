@@ -40,6 +40,10 @@
         "text" : "ErrorsByFile"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloCodegen+Errors.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/ApolloCodegen+Errors.swift#L110"
+    },
     "role" : "symbol",
     "roleHeading" : "Type Alias",
     "symbolKind" : "typealias",

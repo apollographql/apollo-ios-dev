@@ -52,6 +52,10 @@
         "text" : "IncrementalDeferredResponseFormat"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLOperation.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/GraphQLOperation.swift#L164"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

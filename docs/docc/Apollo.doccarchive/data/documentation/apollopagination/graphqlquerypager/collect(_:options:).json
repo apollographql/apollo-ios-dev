@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.collect(_:options:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Collects elements by a given time-grouping strategy, and emits a single array of the collection.",
       "type" : "text"
     }
   ],
@@ -344,6 +336,191 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The timing group strategy used by the operator to collect and publish elements.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "strategy"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Scheduler options to use for the strategy.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "options"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that collects elements by a given strategy, and emits a single array of the collection.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/collect(_:options:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to emit arrays of elements on a schedule specified by a ",
+              "type" : "text"
+            },
+            {
+              "code" : "Scheduler",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " and ",
+              "type" : "text"
+            },
+            {
+              "code" : "Stride",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " that you provide. At the end of each scheduled interval, the publisher sends an array that contains the items it collected. If the upstream publisher finishes before filling the buffer, the publisher sends an array that contains items it received. This may be fewer than the number of elements specified in the requested ",
+              "type" : "text"
+            },
+            {
+              "code" : "Stride",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "If the upstream publisher fails with an error, this publisher forwards the error to the downstream receiver instead of sending its output.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The example above collects timestamps generated on a one-second ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Foundation\/Timer",
+              "type" : "text"
+            },
+            {
+              "text" : " in groups (",
+              "type" : "text"
+            },
+            {
+              "code" : "Stride",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ") of five.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let sub = Timer.publish(every: 1, on: .main, in: .default)",
+            "    .autoconnect()",
+            "    .collect(.byTime(RunLoop.main, .seconds(5)))",
+            "    .sink { print(\"\\($0)\", terminator: \"\\n\\n\") }",
+            "",
+            "\/\/ Prints: \"[2020-01-24 00:54:46 +0000, 2020-01-24 00:54:47 +0000,",
+            "\/\/          2020-01-24 00:54:48 +0000, 2020-01-24 00:54:49 +0000,",
+            "\/\/          2020-01-24 00:54:50 +0000]\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "When this publisher receives a request for ",
+                  "type" : "text"
+                },
+                {
+                  "code" : ".max(n)",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " elements, it requests ",
+                  "type" : "text"
+                },
+                {
+                  "code" : ".max(count * n)",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " from the upstream publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "Note",
+          "style" : "note",
+          "type" : "aside"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -423,7 +600,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/collect(_:options:)": {
   "abstract" : [
-
+    {
+      "text" : "Collects elements by a given time-grouping strategy, and emits a single array of the collection.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -73,6 +73,10 @@
         "text" : "MultipartResponseSubscriptionParser"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "MultipartResponseSubscriptionParser.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/ResponseParsing\/MultipartResponseSubscriptionParser.swift#L7"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

@@ -62,6 +62,18 @@
       ],
       "title" : "Instance Methods"
     }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/asynchttpresponsechunksequence\/asyncsequence-implementations"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
   ]
 , 
 "references": {
@@ -202,7 +214,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/allSatisfy(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a Boolean value that indicates whether all elements produced by the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "asynchronous sequence satisfy the given predicate.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -294,7 +317,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/compactMap(_:)-2cyck": {
   "abstract" : [
-
+    {
+      "text" : "Creates an asynchronous sequence that maps an error-throwing closure over",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "the base sequence’s elements, omitting results that don’t return a value.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -397,7 +431,26 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/compactMap(_:)-3fbud": {
   "abstract" : [
-
+    {
+      "text" : "Creates an asynchronous sequence that maps the given closure over the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "asynchronous sequence’s elements, omitting results that don’t return a",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "value.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -492,7 +545,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/contains(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a Boolean value that indicates whether the asynchronous sequence",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "contains the given element.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [
@@ -591,7 +655,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/contains(where:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a Boolean value that indicates whether the asynchronous sequence",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "contains an element that satisfies the given predicate.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -691,7 +766,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/drop(while:)-1pkgr": {
   "abstract" : [
-
+    {
+      "text" : "Omits elements from the base asynchronous sequence until a given closure",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "returns false, after which it passes through all remaining elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -779,7 +865,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/drop(while:)-1tr2m": {
   "abstract" : [
-
+    {
+      "text" : "Omits elements from the base sequence until a given error-throwing closure",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "returns false, after which it passes through all remaining elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -875,7 +972,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/dropFirst(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Omits a specified number of elements from the base asynchronous sequence,",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "then passes through all remaining elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -930,7 +1038,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/filter(_:)-83pnr": {
   "abstract" : [
-
+    {
+      "text" : "Creates an asynchronous sequence that contains, in order, the elements of",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "the base sequence that satisfy the given predicate.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1010,7 +1129,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/filter(_:)-8ljjh": {
   "abstract" : [
-
+    {
+      "text" : "Creates an asynchronous sequence that contains, in order, the elements of",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "the base sequence that satisfy the given error-throwing predicate.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1098,7 +1228,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/first(where:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns the first element of the sequence that satisfies the given",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "predicate.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1210,7 +1351,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/flatMap(_:)-3ro29": {
   "abstract" : [
-
+    {
+      "text" : "Creates an asynchronous sequence that concatenates the results of calling",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "the given transformation with each element of this sequence.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1305,7 +1457,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/flatMap(_:)-6cqbw": {
   "abstract" : [
-
+    {
+      "text" : "Creates an asynchronous sequence that concatenates the results of calling",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "the given transformation with each element of this sequence.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1400,7 +1563,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/flatMap(_:)-74tsa": {
   "abstract" : [
-
+    {
+      "text" : "Creates an asynchronous sequence that concatenates the results of calling",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "the given transformation with each element of this sequence.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1495,7 +1669,26 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/flatMap(_:)-jo8o": {
   "abstract" : [
-
+    {
+      "text" : "Creates an asynchronous sequence that concatenates the results of calling",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "the given error-throwing transformation with each element of this",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "sequence.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1598,7 +1791,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/map(_:)-1k278": {
   "abstract" : [
-
+    {
+      "text" : "Creates an asynchronous sequence that maps the given closure over the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "asynchronous sequence’s elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1693,7 +1897,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/map(_:)-6ut8j": {
   "abstract" : [
-
+    {
+      "text" : "Creates an asynchronous sequence that maps the given error-throwing",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "closure over the asynchronous sequence’s elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1796,7 +2011,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/max(by:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns the maximum element in the asynchronous sequence, using the given",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "predicate as the comparison between elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1925,7 +2151,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/min(by:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns the minimum element in the asynchronous sequence, using the given",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "predicate as the comparison between elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -2054,7 +2291,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/prefix(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns an asynchronous sequence, up to the specified maximum length,",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "containing the initial elements of the base asynchronous sequence.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -2109,7 +2357,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/prefix(while:)-2wbwj": {
   "abstract" : [
-
+    {
+      "text" : "Returns an asynchronous sequence, containing the initial, consecutive",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "elements of the base sequence that satisfy the given predicate.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -2205,7 +2464,26 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/prefix(while:)-8xfnf": {
   "abstract" : [
-
+    {
+      "text" : "Returns an asynchronous sequence, containing the initial, consecutive",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "elements of the base sequence that satisfy the given error-throwing",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "predicate.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -2309,7 +2587,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/reduce(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns the result of combining the elements of the asynchronous sequence",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "using the given closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -2423,7 +2712,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/reduce(into:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns the result of combining the elements of the asynchronous sequence",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "using the given closure, given a mutable initial value.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

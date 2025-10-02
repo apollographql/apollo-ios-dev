@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "SetAlgebra.subtract(_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Removes the elements of the given set from this set.",
       "type" : "text"
     }
   ],
@@ -132,6 +124,112 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A set of the same type as the current set.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "other"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the following example, the elements of the ",
+              "type" : "text"
+            },
+            {
+              "code" : "employees",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " set that are",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "also members of the ",
+              "type" : "text"
+            },
+            {
+              "code" : "neighbors",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " set are removed. In particular, the",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "names ",
+              "type" : "text"
+            },
+            {
+              "code" : "\"Bethany\"",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " and ",
+              "type" : "text"
+            },
+            {
+              "code" : "\"Eric\"",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " are removed from ",
+              "type" : "text"
+            },
+            {
+              "code" : "employees",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "var employees: Set = [\"Alicia\", \"Bethany\", \"Chris\", \"Diana\", \"Eric\"]",
+            "let neighbors: Set = [\"Bethany\", \"Eric\", \"Forlani\", \"Greta\"]",
+            "employees.subtract(neighbors)",
+            "print(employees)",
+            "\/\/ Prints \"[\"Diana\", \"Chris\", \"Alicia\"]\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -237,7 +335,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/OperationDocumentFormat/subtract(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Removes the elements of the given set from this set.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

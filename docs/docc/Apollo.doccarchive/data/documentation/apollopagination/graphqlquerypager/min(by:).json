@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.min(by:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Publishes the minimum value received from the upstream publisher, after it finishes.",
       "type" : "text"
     }
   ],
@@ -291,6 +283,142 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that receives two elements and returns true if they’re in increasing order.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "areInIncreasingOrder"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that publishes the minimum value received from the upstream publisher, after the upstream publisher finishes.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/min(by:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to determine the minimum value in the stream of elements from an upstream publisher using a comparison operation you specify.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "This operator is useful when the value received from the upstream publisher isn’t ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Swift\/Comparable",
+              "type" : "text"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below an array publishes enumeration elements representing playing card ranks. The ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/min(by:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator compares the current and next elements using the ",
+              "type" : "text"
+            },
+            {
+              "code" : "rawValue",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " property of each enumeration value in the user supplied closure and prints the minimum value found after publishing all of the elements.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "enum Rank: Int {",
+            "    case ace = 1, two, three, four, five, six, seven, eight, nine, ten, jack, queen, king",
+            "}",
+            "",
+            "let cards: [Rank] = [.five, .queen, .ace, .eight, .king]",
+            "cancellable = cards.publisher",
+            "    .min {",
+            "        return  $0.rawValue < $1.rawValue",
+            "    }",
+            "    .sink { print(\"\\($0)\") }",
+            "",
+            "\/\/ Prints: \"ace\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "After this publisher receives a request for more than 0 items, it requests unlimited items from its upstream publisher.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -370,7 +498,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/min(by:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the minimum value received from the upstream publisher, after it finishes.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

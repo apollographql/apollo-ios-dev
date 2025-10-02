@@ -92,6 +92,10 @@
         "unavailable" : false
       }
     ],
+    "remoteSource" : {
+      "fileName" : "RequestChainNetworkTransport.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/RequestChain\/RequestChainNetworkTransport.swift#L216"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Property",
     "symbolKind" : "property",

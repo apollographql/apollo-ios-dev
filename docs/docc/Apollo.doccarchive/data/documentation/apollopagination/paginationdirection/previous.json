@@ -33,6 +33,10 @@
         "name" : "ApolloPagination"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "PaginationDirection.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/PaginationDirection.swift#L6"
+    },
     "role" : "symbol",
     "roleHeading" : "Case",
     "symbolKind" : "case",

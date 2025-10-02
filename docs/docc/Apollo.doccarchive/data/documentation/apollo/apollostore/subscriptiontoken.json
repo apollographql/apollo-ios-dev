@@ -63,6 +63,10 @@
         "text" : "SubscriptionToken"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloStore.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/Caching\/ApolloStore.swift#L182"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

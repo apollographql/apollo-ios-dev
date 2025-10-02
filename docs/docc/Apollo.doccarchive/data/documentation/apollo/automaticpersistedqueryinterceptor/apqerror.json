@@ -39,6 +39,10 @@
         "text" : "APQError"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "AutomaticPersistedQueryInterceptor.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/RequestChain\/Interceptors\/AutomaticPersistedQueryInterceptor.swift#L10"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

@@ -53,6 +53,10 @@
         "text" : "AutomaticPersistedQueryInterceptor"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "AutomaticPersistedQueryInterceptor.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/RequestChain\/Interceptors\/AutomaticPersistedQueryInterceptor.swift#L8"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",
@@ -512,7 +516,7 @@
       "type" : "text"
     },
     {
-      "code" : "GraphQLOperation",
+      "code" : "\/ApolloAPI\/GraphQLOperation",
       "type" : "codeVoice"
     },
     {

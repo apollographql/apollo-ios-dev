@@ -34,6 +34,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "FetchBehavior.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/FetchBehavior.swift#L46"
+    },
     "role" : "symbol",
     "roleHeading" : "Case",
     "symbolKind" : "case",

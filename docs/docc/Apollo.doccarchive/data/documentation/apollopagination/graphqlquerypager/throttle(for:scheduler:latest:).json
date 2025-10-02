@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.throttle(for:scheduler:latest:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Publishes either the most-recent or first element published by the upstream publisher in the specified time interval.",
       "type" : "text"
     }
   ],
@@ -368,6 +360,157 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The interval at which to find and emit either the most recent or the first element, expressed in the time system of the scheduler.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "interval"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The scheduler on which to publish elements.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "scheduler"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A Boolean value that indicates whether to publish the most recent element. If ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "false",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ", the publisher emits the first element received during the interval.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "latest"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that emits either the most-recent or first element received during the specified interval.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/throttle(for:scheduler:latest:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to selectively republish elements from an upstream publisher during an interval you specify. Other elements received from the upstream in the throttling interval aren’t republished.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, a ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Foundation\/Timer\/TimerPublisher",
+              "type" : "text"
+            },
+            {
+              "text" : " produces elements on one-second intervals; the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/throttle(for:scheduler:latest:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator delivers the first event, then republishes only the latest event in the following ten second intervals:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "cancellable = Timer.publish(every: 3.0, on: .main, in: .default)",
+            "    .autoconnect()",
+            "    .print(\"\\(Date().description)\")",
+            "    .throttle(for: 10.0, scheduler: RunLoop.main, latest: true)",
+            "    .sink(",
+            "        receiveCompletion: { print (\"Completion: \\($0).\") },",
+            "        receiveValue: { print(\"Received Timestamp \\($0).\") }",
+            "     )",
+            "",
+            "\/\/ Prints:",
+            " \/\/    Publish at: 2020-03-19 18:26:54 +0000: receive value: (2020-03-19 18:26:57 +0000)",
+            " \/\/    Received Timestamp 2020-03-19 18:26:57 +0000.",
+            " \/\/    Publish at: 2020-03-19 18:26:54 +0000: receive value: (2020-03-19 18:27:00 +0000)",
+            " \/\/    Publish at: 2020-03-19 18:26:54 +0000: receive value: (2020-03-19 18:27:03 +0000)",
+            " \/\/    Publish at: 2020-03-19 18:26:54 +0000: receive value: (2020-03-19 18:27:06 +0000)",
+            " \/\/    Publish at: 2020-03-19 18:26:54 +0000: receive value: (2020-03-19 18:27:09 +0000)",
+            " \/\/    Received Timestamp 2020-03-19 18:27:09 +0000."
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -447,7 +590,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/throttle(for:scheduler:latest:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes either the most-recent or first element published by the upstream publisher in the specified time interval.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

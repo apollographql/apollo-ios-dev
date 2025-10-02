@@ -95,6 +95,10 @@
         "unavailable" : false
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLQueryWatcher.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/GraphQLQueryWatcher.swift#L300"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",

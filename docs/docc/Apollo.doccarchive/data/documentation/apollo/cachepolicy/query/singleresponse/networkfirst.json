@@ -41,6 +41,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "CachePolicy.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/Caching\/CachePolicy.swift#L15"
+    },
     "role" : "symbol",
     "roleHeading" : "Case",
     "symbolKind" : "case",

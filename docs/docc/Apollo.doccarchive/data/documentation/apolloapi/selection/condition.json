@@ -40,6 +40,10 @@
         "text" : "Condition"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "Selection+Conditions.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/Selection+Conditions.swift#L33"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

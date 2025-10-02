@@ -185,7 +185,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ConversionStrategies/CodingKeys/debugDescription": {
   "abstract" : [
-
+    {
+      "text" : "A textual representation of this key, suitable for debugging.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -219,7 +222,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ConversionStrategies/CodingKeys/description": {
   "abstract" : [
-
+    {
+      "text" : "A textual representation of this key.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

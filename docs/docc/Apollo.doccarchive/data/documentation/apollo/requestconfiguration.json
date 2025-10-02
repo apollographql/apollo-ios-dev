@@ -102,6 +102,10 @@
         "text" : "RequestConfiguration"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "RequestConfiguration.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/RequestConfiguration.swift#L5"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

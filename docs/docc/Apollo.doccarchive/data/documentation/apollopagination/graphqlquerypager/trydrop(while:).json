@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.tryDrop(while:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Omits elements from the upstream publisher until an error-throwing closure returns false, before republishing all remaining elements.",
       "type" : "text"
     }
   ],
@@ -273,6 +265,135 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that takes an element as a parameter and returns a Boolean value indicating whether to drop the element from the publisher’s output.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "predicate"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that skips over elements until the provided closure returns ",
+              "type" : "text"
+            },
+            {
+              "code" : "false",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", and then republishes all remaining elements. If the predicate closure throws, the publisher fails with an error.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryDrop(while:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to omit elements from an upstream until an error-throwing closure you provide returns false, after which the remaining items in the stream are published. If the closure throws, no elements are emitted and the publisher fails with an error.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, elements are ignored until ",
+              "type" : "text"
+            },
+            {
+              "code" : "-1",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " is encountered in the stream and the closure returns ",
+              "type" : "text"
+            },
+            {
+              "code" : "false",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ". The publisher then republishes the remaining elements and finishes normally. Conversely, if the ",
+              "type" : "text"
+            },
+            {
+              "code" : "guard",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " value in the closure had been encountered, the closure would throw and the publisher would fail with an error.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "struct RangeError: Error {}",
+            "var numbers = [1, 2, 3, 4, 5, 6, -1, 7, 8, 9, 10]",
+            "let range: CountableClosedRange<Int> = (1...100)",
+            "cancellable = numbers.publisher",
+            "    .tryDrop {",
+            "        guard $0 != 0 else { throw RangeError() }",
+            "        return range.contains($0)",
+            "    }",
+            "    .sink(",
+            "        receiveCompletion: { print (\"completion: \\($0)\") },",
+            "        receiveValue: { print (\"value: \\($0)\") }",
+            "    )",
+            "",
+            "\/\/ Prints: \"-1 7 8 9 10 completion: finished\"",
+            "\/\/ If instead numbers was [1, 2, 3, 4, 5, 6, 0, -1, 7, 8, 9, 10], tryDrop(while:) would fail with a RangeError."
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -352,7 +473,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryDrop(while:)": {
   "abstract" : [
-
+    {
+      "text" : "Omits elements from the upstream publisher until an error-throwing closure returns false, before republishing all remaining elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -52,6 +52,10 @@
         "text" : "InlineFragment"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "SelectionSet.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/SelectionSet.swift#L28"
+    },
     "role" : "symbol",
     "roleHeading" : "Protocol",
     "symbolKind" : "protocol",

@@ -40,6 +40,10 @@
         "text" : "SchemaCustomization"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloCodegenConfiguration+SchemaCustomization.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/CodegenConfiguration\/ApolloCodegenConfiguration+SchemaCustomization.swift#L5"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

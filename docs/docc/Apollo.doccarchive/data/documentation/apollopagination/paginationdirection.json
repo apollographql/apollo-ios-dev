@@ -44,6 +44,10 @@
         "text" : "PaginationDirection"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "PaginationDirection.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/PaginationDirection.swift#L4"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

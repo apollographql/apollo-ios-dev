@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.prepend(_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Prefixes the output of this publisher with the elements emitted by the given publisher.",
       "type" : "text"
     }
   ],
@@ -326,6 +318,111 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The prefixing publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "publisher"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that prefixes the prefixing publisher’s elements prior to this publisher’s elements.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/prepend(_:)-5dj9c",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to publish values from two publishers when you need to prepend one publisher’s elements to another.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, a publisher of ",
+              "type" : "text"
+            },
+            {
+              "code" : "prefixValues",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " publishes its elements before the ",
+              "type" : "text"
+            },
+            {
+              "code" : "dataElements",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " publishes its elements:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let prefixValues = [0, 1, 255]",
+            "let dataElements = (0...10)",
+            "cancellable = dataElements.publisher",
+            "    .prepend(prefixValues.publisher)",
+            "    .sink { print(\"\\($0)\", terminator: \" \") }",
+            "",
+            "\/\/ Prints: \"0 1 255 0 1 2 3 4 5 6 7 8 9 10\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -405,7 +502,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/prepend(_:)-4j7e1": {
   "abstract" : [
-
+    {
+      "text" : "Prefixes the output of this publisher with the elements emitted by the given publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

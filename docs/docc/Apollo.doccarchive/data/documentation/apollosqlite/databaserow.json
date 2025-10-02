@@ -38,6 +38,10 @@
         "text" : "DatabaseRow"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "SQLiteDatabase.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloSQLite\/SQLiteDatabase.swift#L4"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

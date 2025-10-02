@@ -38,6 +38,10 @@
         "text" : "PaginationInfo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "PaginationInfo.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/PaginationInfo.swift#L1"
+    },
     "role" : "symbol",
     "roleHeading" : "Protocol",
     "symbolKind" : "protocol",

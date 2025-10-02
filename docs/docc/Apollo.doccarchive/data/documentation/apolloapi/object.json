@@ -52,6 +52,10 @@
         "text" : "Object"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "Object.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/SchemaTypes\/Object.swift#L6"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

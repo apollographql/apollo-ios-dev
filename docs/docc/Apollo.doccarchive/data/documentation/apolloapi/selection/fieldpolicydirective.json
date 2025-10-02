@@ -39,6 +39,10 @@
         "text" : "FieldPolicyDirective"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "Selection.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/Selection.swift#L61"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

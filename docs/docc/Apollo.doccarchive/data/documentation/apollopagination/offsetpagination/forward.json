@@ -40,6 +40,10 @@
         "text" : "Forward"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ForwardOffset.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/OffsetBasedPagination\/ForwardOffset.swift#L2"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

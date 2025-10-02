@@ -44,6 +44,10 @@
         "text" : "ApolloSchemaDownloader"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloSchemaDownloader.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/ApolloSchemaDownloader.swift#L8"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

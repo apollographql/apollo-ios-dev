@@ -80,6 +80,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "NormalizedCache.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/Caching\/NormalizedCache.swift#L29"
+    },
     "required" : true,
     "role" : "symbol",
     "roleHeading" : "Instance Method",

@@ -39,6 +39,10 @@
         "name" : "ApolloSQLite"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "JournalMode.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloSQLite\/JournalMode.swift#L19"
+    },
     "role" : "symbol",
     "roleHeading" : "Case",
     "symbolKind" : "case",

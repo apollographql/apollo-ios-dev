@@ -44,6 +44,10 @@
         "text" : "UploadingNetworkTransport"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "NetworkTransport.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/NetworkTransport.swift#L69"
+    },
     "role" : "symbol",
     "roleHeading" : "Protocol",
     "symbolKind" : "protocol",

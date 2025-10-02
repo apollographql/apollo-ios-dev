@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.subscribe(_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Attaches the specified subscriber to this publisher.",
       "type" : "text"
     }
   ],
@@ -258,6 +250,101 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The subscriber to attach to this publisher. After attaching, the subscriber can start to receive values.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "subscriber"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Always call this function instead of ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/receive(subscriber:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "Adopters of ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " must implement ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/receive(subscriber:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ". The implementation of ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/subscribe(_:)-4u8kn",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " provided by ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " calls through to ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/receive(subscriber:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -337,7 +424,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/subscribe(_:)-5vwe3": {
   "abstract" : [
-
+    {
+      "text" : "Attaches the specified subscriber to this publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

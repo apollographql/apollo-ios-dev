@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.first()",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Publishes the first element of a stream, then finishes.",
       "type" : "text"
     }
   ],
@@ -173,6 +165,115 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that only publishes the first element of a stream.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/first()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to publish just the first element from an upstream publisher, then finish normally. The ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/first()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator requests ",
+              "type" : "text"
+            },
+            {
+              "code" : "Subscribers\/Demand\/unlimited",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " from its upstream as soon as downstream requests at least one element. If the upstream completes before ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/first()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " receives any elements, it completes without emitting any values.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In this example, the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/first()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " publisher republishes the first element received from the sequence publisher, ",
+              "type" : "text"
+            },
+            {
+              "code" : "-10",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", then finishes normally.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let numbers = (-10...10)",
+            "cancellable = numbers.publisher",
+            "    .first()",
+            "    .sink { print(\"\\($0)\") }",
+            "",
+            "\/\/ Print: \"-10\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -252,7 +353,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/first()": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the first element of a stream, then finishes.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -53,6 +53,10 @@
         "text" : "Fragment"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "FragmentProtocols.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/FragmentProtocols.swift#L7"
+    },
     "role" : "symbol",
     "roleHeading" : "Protocol",
     "symbolKind" : "protocol",

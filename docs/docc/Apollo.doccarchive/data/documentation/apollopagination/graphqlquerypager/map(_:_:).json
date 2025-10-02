@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.map(_:_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Publishes the values of two key paths as a tuple.",
       "type" : "text"
     }
   ],
@@ -405,6 +397,178 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The key path of a property on ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "Output",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "keyPath0"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The key path of another property on ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "Output",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "keyPath1"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that publishes the values of two key paths as a tuple.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the following example, the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/map(_:_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator uses the Swift key path syntax to access the ",
+              "type" : "text"
+            },
+            {
+              "code" : "die1",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " and ",
+              "type" : "text"
+            },
+            {
+              "code" : "die2",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " members of the ",
+              "type" : "text"
+            },
+            {
+              "code" : "DiceRoll",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " structure published by the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Just",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " publisher.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The downstream sink subscriber receives only these two values (as an ",
+              "type" : "text"
+            },
+            {
+              "code" : "(Int, Int)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " tuple), not the entire ",
+              "type" : "text"
+            },
+            {
+              "code" : "DiceRoll",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "struct DiceRoll {",
+            "    let die1: Int",
+            "    let die2: Int",
+            "}",
+            "",
+            "cancellable = Just(DiceRoll(die1:Int.random(in:1...6),",
+            "                            die2: Int.random(in:1...6)))",
+            "    .map(\\.die1, \\.die2)",
+            "    .sink { values in",
+            "        print (\"Rolled: \\(values.0), \\(values.1) (total: \\(values.0 + values.1))\")",
+            "    }",
+            "\/\/ Prints \"Rolled: 6, 4 (total: 10)\" (or other random values)."
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -484,7 +648,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/map(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the values of two key paths as a tuple.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

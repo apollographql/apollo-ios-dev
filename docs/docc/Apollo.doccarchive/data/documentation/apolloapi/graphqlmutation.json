@@ -38,6 +38,10 @@
         "text" : "GraphQLMutation"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLOperation.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/GraphQLOperation.swift#L136"
+    },
     "role" : "symbol",
     "roleHeading" : "Protocol",
     "symbolKind" : "protocol",

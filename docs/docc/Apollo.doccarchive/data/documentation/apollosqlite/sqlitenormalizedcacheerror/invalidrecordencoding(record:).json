@@ -54,6 +54,10 @@
         "name" : "ApolloSQLite"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "SQLiteNormalizedCache.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloSQLite\/SQLiteNormalizedCache.swift#L5"
+    },
     "role" : "symbol",
     "roleHeading" : "Case",
     "symbolKind" : "case",

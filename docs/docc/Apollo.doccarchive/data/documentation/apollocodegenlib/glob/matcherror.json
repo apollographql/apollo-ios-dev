@@ -45,6 +45,10 @@
         "text" : "MatchError"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "Glob.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/Glob.swift#L32"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

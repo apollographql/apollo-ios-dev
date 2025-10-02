@@ -61,6 +61,10 @@
         "text" : "ResponseCodeInterceptor"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ResponseCodeInterceptor.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/RequestChain\/Interceptors\/ResponseCodeInterceptor.swift#L6"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

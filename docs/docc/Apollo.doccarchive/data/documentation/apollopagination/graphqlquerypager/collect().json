@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.collect()",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Collects all received elements, and emits a single array of the collection when the upstream publisher finishes.",
       "type" : "text"
     }
   ],
@@ -173,6 +165,118 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that collects all received items and returns them as an array upon completion.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/collect()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to gather elements into an array that the operator emits after the upstream publisher finishes.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "If the upstream publisher fails with an error, this publisher forwards the error to the downstream receiver instead of sending its output.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "This publisher requests an unlimited number of elements from the upstream publisher and uses an unbounded amount of memory to store the received values. The publisher may exert memory pressure on the system for very large sets of elements.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/collect()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator only sends the collected array to its downstream receiver after a request whose demand is greater than 0 items. Otherwise, ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/collect()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " waits until it receives a non-zero request.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, an Integer range is a publisher that emits an array of integers:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let numbers = (0...10)",
+            "cancellable = numbers.publisher",
+            "    .collect()",
+            "    .sink { print(\"\\($0)\") }",
+            "",
+            "\/\/ Prints: \"[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -252,7 +356,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/collect()": {
   "abstract" : [
-
+    {
+      "text" : "Collects all received elements, and emits a single array of the collection when the upstream publisher finishes.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

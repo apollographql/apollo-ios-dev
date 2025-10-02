@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.debounce(for:scheduler:options:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Publishes elements only after a specified time interval elapses between events.",
       "type" : "text"
     }
   ],
@@ -384,6 +376,209 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The time the publisher should wait before publishing an element.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "dueTime"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The scheduler on which this publisher delivers elements",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "scheduler"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Scheduler options that customize this publisher’s delivery of elements.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "options"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that publishes events only after a specified time elapses.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/debounce(for:scheduler:options:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator to control the number of values and time between delivery of values from the upstream publisher. This operator is useful to process bursty or high-volume event streams where you need to reduce the number of values delivered to the downstream to a rate you specify.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In this example, a ",
+              "type" : "text"
+            },
+            {
+              "code" : "PassthroughSubject",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " publishes elements on a schedule defined by the ",
+              "type" : "text"
+            },
+            {
+              "code" : "bounces",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " array. The array is composed of tuples representing a value sent by the ",
+              "type" : "text"
+            },
+            {
+              "code" : "PassthroughSubject",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", and a ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Foundation\/TimeInterval",
+              "type" : "text"
+            },
+            {
+              "text" : " ranging from one-quarter second up to 2 seconds that drives a delivery timer. As the queue builds, elements arriving faster than one-half second ",
+              "type" : "text"
+            },
+            {
+              "code" : "debounceInterval",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " are discarded, while elements arriving at a rate slower than ",
+              "type" : "text"
+            },
+            {
+              "code" : "debounceInterval",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " are passed through to the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/sink(receiveValue:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let bounces:[(Int,TimeInterval)] = [",
+            "    (0, 0),",
+            "    (1, 0.25),  \/\/ 0.25s interval since last index",
+            "    (2, 1),     \/\/ 0.75s interval since last index",
+            "    (3, 1.25),  \/\/ 0.25s interval since last index",
+            "    (4, 1.5),   \/\/ 0.25s interval since last index",
+            "    (5, 2)      \/\/ 0.5s interval since last index",
+            "]",
+            "",
+            "let subject = PassthroughSubject<Int, Never>()",
+            "cancellable = subject",
+            "    .debounce(for: .seconds(0.5), scheduler: RunLoop.main)",
+            "    .sink { index in",
+            "        print (\"Received index \\(index)\")",
+            "    }",
+            "",
+            "for bounce in bounces {",
+            "    DispatchQueue.main.asyncAfter(deadline: .now() + bounce.1) {",
+            "        subject.send(bounce.0)",
+            "    }",
+            "}",
+            "",
+            "\/\/ Prints:",
+            "\/\/  Received index 1",
+            "\/\/  Received index 4",
+            "\/\/  Received index 5",
+            "",
+            "\/\/  Here is the event flow shown from the perspective of time, showing value delivery through the `debounce()` operator:",
+            "",
+            "\/\/  Time 0: Send index 0.",
+            "\/\/  Time 0.25: Send index 1. Index 0 was waiting and is discarded.",
+            "\/\/  Time 0.75: Debounce period ends, publish index 1.",
+            "\/\/  Time 1: Send index 2.",
+            "\/\/  Time 1.25: Send index 3. Index 2 was waiting and is discarded.",
+            "\/\/  Time 1.5: Send index 4. Index 3 was waiting and is discarded.",
+            "\/\/  Time 2: Debounce period ends, publish index 4. Also, send index 5.",
+            "\/\/  Time 2.5: Debounce period ends, publish index 5."
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -463,7 +658,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/debounce(for:scheduler:options:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes elements only after a specified time interval elapses between events.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

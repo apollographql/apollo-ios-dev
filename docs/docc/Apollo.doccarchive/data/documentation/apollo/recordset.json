@@ -44,6 +44,10 @@
         "text" : "RecordSet"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "RecordSet.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/Caching\/RecordSet.swift#L2"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

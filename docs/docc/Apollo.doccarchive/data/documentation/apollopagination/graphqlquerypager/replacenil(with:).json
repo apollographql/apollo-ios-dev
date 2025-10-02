@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.replaceNil(with:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Replaces nil elements in the stream with the provided element.",
       "type" : "text"
     }
   ],
@@ -278,6 +270,125 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The element to use when replacing ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "nil",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "output"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that replaces ",
+              "type" : "text"
+            },
+            {
+              "code" : "nil",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " elements from the upstream publisher with the provided element.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/replaceNil(with:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator enables replacement of ",
+              "type" : "text"
+            },
+            {
+              "code" : "nil",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " values in a stream with a substitute value. In the example below, a collection publisher contains a nil value. The ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/replaceNil(with:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator replaces this with ",
+              "type" : "text"
+            },
+            {
+              "code" : "0.0",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let numbers: [Double?] = [1.0, 2.0, nil, 3.0]",
+            "numbers.publisher",
+            "    .replaceNil(with: 0.0)",
+            "    .sink { print(\"\\($0)\", terminator: \" \") }",
+            "",
+            "\/\/ Prints: \"Optional(1.0) Optional(2.0) Optional(0.0) Optional(3.0)\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -357,7 +468,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/replaceNil(with:)": {
   "abstract" : [
-
+    {
+      "text" : "Replaces nil elements in the stream with the provided element.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

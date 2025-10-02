@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.tryRemoveDuplicates(by:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Publishes only elements that don’t match the previous element, as evaluated by a provided error-throwing closure.",
       "type" : "text"
     }
   ],
@@ -307,6 +299,171 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure to evaluate whether two elements are equivalent, for purposes of filtering. Return ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "true",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " from this closure to indicate that the second element is a duplicate of the first. If this closure throws an error, the publisher terminates with the thrown error.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "predicate"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that consumes — rather than publishes — duplicate elements.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryRemoveDuplicates(by:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to remove repeating elements from an upstream publisher based upon the evaluation of elements using an error-throwing closure you provide. If your closure throws an error, the publisher terminates with the error.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, the closure provided to ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryRemoveDuplicates(by:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " returns ",
+              "type" : "text"
+            },
+            {
+              "code" : "true",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " when two consecutive elements are equal, thereby filtering out ",
+              "type" : "text"
+            },
+            {
+              "code" : "0",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ",",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "code" : "1",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", ",
+              "type" : "text"
+            },
+            {
+              "code" : "2",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", and ",
+              "type" : "text"
+            },
+            {
+              "code" : "3",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ". However, the closure throws an error when it encounters ",
+              "type" : "text"
+            },
+            {
+              "code" : "4",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ". The publisher then terminates with this error.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "struct BadValuesError: Error {}",
+            "let numbers = [0, 0, 0, 0, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4]",
+            "cancellable = numbers.publisher",
+            "    .tryRemoveDuplicates { first, second -> Bool in",
+            "        if (first == 4 && second == 4) {",
+            "            throw BadValuesError()",
+            "        }",
+            "        return first == second",
+            "    }",
+            "    .sink(",
+            "        receiveCompletion: { print (\"\\($0)\") },",
+            "        receiveValue: { print (\"\\($0)\", terminator: \" \") }",
+            "     )",
+            "",
+            " \/\/ Prints: \"0 1 2 3 4 failure(BadValuesError()\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -386,7 +543,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryRemoveDuplicates(by:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes only elements that don’t match the previous element, as evaluated by a provided error-throwing closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

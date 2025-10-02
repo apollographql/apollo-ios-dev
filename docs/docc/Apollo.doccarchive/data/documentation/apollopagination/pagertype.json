@@ -38,6 +38,10 @@
         "text" : "PagerType"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLQueryPagerCoordinator.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/GraphQLQueryPagerCoordinator.swift#L7"
+    },
     "role" : "symbol",
     "roleHeading" : "Protocol",
     "symbolKind" : "protocol",

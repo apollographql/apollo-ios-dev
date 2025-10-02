@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.catch(_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Handles errors from an upstream publisher by replacing it with another publisher.",
       "type" : "text"
     }
   ],
@@ -334,6 +326,169 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that accepts the upstream failure as input and returns a publisher to replace the upstream publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "handler"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that handles errors from an upstream publisher by replacing the failed publisher with another publisher.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "catch()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to replace an error from an upstream publisher with a new publisher.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, the ",
+              "type" : "text"
+            },
+            {
+              "code" : "catch()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator handles the ",
+              "type" : "text"
+            },
+            {
+              "code" : "SimpleError",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " thrown by the upstream publisher by replacing the error with a ",
+              "type" : "text"
+            },
+            {
+              "code" : "Just",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " publisher. This continues the stream by publishing a single value and completing normally.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "struct SimpleError: Error {}",
+            "let numbers = [5, 4, 3, 2, 1, 0, 9, 8, 7, 6]",
+            "cancellable = numbers.publisher",
+            "    .tryLast(where: {",
+            "        guard $0 != 0 else {throw SimpleError()}",
+            "        return true",
+            "    })",
+            "    .catch({ (error) in",
+            "        Just(-1)",
+            "    })",
+            "    .sink { print(\"\\($0)\") }",
+            "    \/\/ Prints: -1"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Backpressure note: This publisher passes through ",
+              "type" : "text"
+            },
+            {
+              "code" : "request",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " and ",
+              "type" : "text"
+            },
+            {
+              "code" : "cancel",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to the upstream. After receiving an error, the publisher sends sends any unfulfilled demand to the new ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "SeeAlso: ",
+              "type" : "text"
+            },
+            {
+              "code" : "replaceError",
+              "type" : "codeVoice"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -413,7 +568,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/catch(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Handles errors from an upstream publisher by replacing it with another publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

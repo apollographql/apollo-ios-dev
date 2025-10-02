@@ -52,6 +52,10 @@
         "text" : "JSONDecodingError"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "JSONDecodingError.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/JSONDecodingError.swift#L7"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

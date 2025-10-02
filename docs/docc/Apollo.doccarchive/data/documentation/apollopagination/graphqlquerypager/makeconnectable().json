@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.makeConnectable()",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Creates a connectable wrapper around the publisher.",
       "type" : "text"
     }
   ],
@@ -205,6 +197,141 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A ",
+              "type" : "text"
+            },
+            {
+              "code" : "ConnectablePublisher",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " wrapping this publisher.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the following example, ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/makeConnectable()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " wraps its upstream publisher (an instance of ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publishers\/Share",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ") with a ",
+              "type" : "text"
+            },
+            {
+              "code" : "ConnectablePublisher",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ". Without this, the first sink subscriber would receive all the elements from the sequence publisher and cause it to complete before the second subscriber attaches. By making the publisher connectable, the publisher doesn’t produce any elements until after the ",
+              "type" : "text"
+            },
+            {
+              "code" : "ConnectablePublisher\/connect()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " call.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            " let subject = Just<String>(\"Sent\")",
+            " let pub = subject",
+            "     .share()",
+            "     .makeConnectable()",
+            " cancellable1 = pub.sink { print (\"Stream 1 received: \\($0)\")  }",
+            "",
+            " \/\/ For example purposes, use DispatchQueue to add a second subscriber",
+            " \/\/ a second later, and then connect to the publisher a second after that.",
+            " DispatchQueue.main.asyncAfter(deadline: .now() + 1) {",
+            "     self.cancellable2 = pub.sink { print (\"Stream 2 received: \\($0)\") }",
+            " }",
+            " DispatchQueue.main.asyncAfter(deadline: .now() + 2) {",
+            "     self.connectable = pub.connect()",
+            " }",
+            " \/\/ Prints:",
+            " \/\/ Stream 2 received: Sent",
+            " \/\/ Stream 1 received: Sent"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "ConnectablePublisher\/connect()",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " operator returns a ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "Cancellable",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " instance that you must retain. You can also use this instance to cancel publishing.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "Note",
+          "style" : "note",
+          "type" : "aside"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -284,7 +411,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/makeConnectable()": {
   "abstract" : [
-
+    {
+      "text" : "Creates a connectable wrapper around the publisher.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [

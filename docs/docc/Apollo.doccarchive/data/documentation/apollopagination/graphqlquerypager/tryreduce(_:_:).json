@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.tryReduce(_:_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Applies an error-throwing closure that collects each element of a stream and publishes a final result upon completion.",
       "type" : "text"
     }
   ],
@@ -343,6 +335,145 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The value that the closure receives the first time it’s called.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "initialResult"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "An error-throwing closure that takes the previously-accumulated value and the next element from the upstream publisher to produce a new value.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "nextPartialResult"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that applies the closure to all received elements and produces an accumulated value when the upstream publisher finishes.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryReduce(_:_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to collect a stream of elements and produce an accumulated value based on an error-throwing closure you provide.",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "If the closure throws an error, the publisher fails and passes the error to its subscriber.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, the publisher’s ",
+              "type" : "text"
+            },
+            {
+              "code" : "0",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " element causes the ",
+              "type" : "text"
+            },
+            {
+              "code" : "myDivide(_:_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " function to throw an error and publish the ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Swift\/Double\/nan",
+              "type" : "text"
+            },
+            {
+              "text" : " result:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "struct DivisionByZeroError: Error {}",
+            "func myDivide(_ dividend: Double, _ divisor: Double) throws -> Double {",
+            "    guard divisor != 0 else { throw DivisionByZeroError() }",
+            "    return dividend \/ divisor",
+            "}",
+            "",
+            "var numbers: [Double] = [5, 4, 3, 2, 1, 0]",
+            "numbers.publisher",
+            "    .tryReduce(numbers.first!, { accum, next in try myDivide(accum, next) })",
+            "    .catch({ _ in Just(Double.nan) })",
+            "    .sink { print(\"\\($0)\") }"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -422,7 +553,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryReduce(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Applies an error-throwing closure that collects each element of a stream and publishes a final result upon completion.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

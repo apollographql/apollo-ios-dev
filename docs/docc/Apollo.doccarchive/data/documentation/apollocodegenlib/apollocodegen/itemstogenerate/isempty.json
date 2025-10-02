@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "SetAlgebra.isEmpty",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "A Boolean value that indicates whether the set has no elements.",
       "type" : "text"
     }
   ],
@@ -222,7 +214,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/ItemsToGenerate/isEmpty": {
   "abstract" : [
-
+    {
+      "text" : "A Boolean value that indicates whether the set has no elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.setFailureType(to:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Changes the failure type declared by the upstream publisher.",
       "type" : "text"
     }
   ],
@@ -298,6 +290,204 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "Failure",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " type presented by this publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "failureType"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that appears to send the specified failure type.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/setFailureType(to:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " when you need set the error type of a publisher that cannot fail.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Conversely, if the upstream can fail, you would use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/mapError(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to provide instructions on converting the error types to needed by the downstream publisher’s inputs.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The following example has two publishers with mismatched error types: ",
+              "type" : "text"
+            },
+            {
+              "code" : "pub1",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : "’s error type is ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Swift\/Never",
+              "type" : "text"
+            },
+            {
+              "text" : ", and ",
+              "type" : "text"
+            },
+            {
+              "code" : "pub2",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : "’s error type is ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Swift\/Error",
+              "type" : "text"
+            },
+            {
+              "text" : ". Because of the mismatch, the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/combineLatest(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator requires that ",
+              "type" : "text"
+            },
+            {
+              "code" : "pub1",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/setFailureType(to:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to make it appear that ",
+              "type" : "text"
+            },
+            {
+              "code" : "pub1",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " can produce the ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Swift\/Error",
+              "type" : "text"
+            },
+            {
+              "text" : " type, like ",
+              "type" : "text"
+            },
+            {
+              "code" : "pub2",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " can.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let pub1 = [0, 1, 2, 3, 4, 5].publisher",
+            "let pub2 = CurrentValueSubject<Int, Error>(0)",
+            "let cancellable = pub1",
+            "    .setFailureType(to: Error.self)",
+            "    .combineLatest(pub2)",
+            "    .sink(",
+            "        receiveCompletion: { print (\"completed: \\($0)\") },",
+            "        receiveValue: { print (\"value: \\($0)\")}",
+            "     )",
+            "",
+            "\/\/ Prints: \"value: (5, 0)\"."
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -377,7 +567,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/setFailureType(to:)": {
   "abstract" : [
-
+    {
+      "text" : "Changes the failure type declared by the upstream publisher.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [

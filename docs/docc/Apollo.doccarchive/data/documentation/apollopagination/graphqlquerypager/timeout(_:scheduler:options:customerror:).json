@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.timeout(_:scheduler:options:customError:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Terminates publishing if the upstream publisher exceeds the specified time interval without producing an element.",
       "type" : "text"
     }
   ],
@@ -426,6 +418,211 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The maximum time interval the publisher can go without emitting an element, expressed in the time system of the scheduler.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "interval"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The scheduler on which to deliver events.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "scheduler"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Scheduler options that customize the delivery of elements.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "options"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that executes if the publisher times out. The publisher sends the failure returned by this closure to the subscriber as the reason for termination.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "customError"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that terminates if the specified interval elapses with no events received from the upstream publisher.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/timeout(_:scheduler:options:customError:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to terminate a publisher if an element isn’t delivered within a timeout interval you specify.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, a ",
+              "type" : "text"
+            },
+            {
+              "code" : "PassthroughSubject",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " publishes ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Swift\/String",
+              "type" : "text"
+            },
+            {
+              "text" : " elements and is configured to time out if no new elements are received within its ",
+              "type" : "text"
+            },
+            {
+              "code" : "TIME_OUT",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " window of 5 seconds. A single value is published after the specified 2-second ",
+              "type" : "text"
+            },
+            {
+              "code" : "WAIT_TIME",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", after which no more elements are available; the publisher then times out and completes normally.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "var WAIT_TIME : Int = 2",
+            "var TIMEOUT_TIME : Int = 5",
+            "",
+            "let subject = PassthroughSubject<String, Never>()",
+            "let cancellable = subject",
+            "    .timeout(.seconds(TIMEOUT_TIME), scheduler: DispatchQueue.main, options: nil, customError:nil)",
+            "    .sink(",
+            "          receiveCompletion: { print (\"completion: \\($0) at \\(Date())\") },",
+            "          receiveValue: { print (\"value: \\($0) at \\(Date())\") }",
+            "     )",
+            "",
+            "DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(WAIT_TIME),",
+            "                              execute: { subject.send(\"Some data - sent after a delay of \\(WAIT_TIME) seconds\") } )",
+            "",
+            "\/\/ Prints: value: Some data - sent after a delay of 2 seconds at 2020-03-10 23:47:59 +0000",
+            "\/\/         completion: finished at 2020-03-10 23:48:04 +0000"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "If ",
+              "type" : "text"
+            },
+            {
+              "code" : "customError",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " is ",
+              "type" : "text"
+            },
+            {
+              "code" : "nil",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", the publisher completes normally; if you provide a closure for the ",
+              "type" : "text"
+            },
+            {
+              "code" : "customError",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " argument, the upstream publisher is instead terminated upon timeout, and the error is delivered to the downstream.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -505,7 +702,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/timeout(_:scheduler:options:customError:)": {
   "abstract" : [
-
+    {
+      "text" : "Terminates publishing if the upstream publisher exceeds the specified time interval without producing an element.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

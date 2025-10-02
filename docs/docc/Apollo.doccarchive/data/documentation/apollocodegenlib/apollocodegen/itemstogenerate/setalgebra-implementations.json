@@ -162,7 +162,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/ItemsToGenerate/init(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Creates a new set from a finite sequence of items.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -199,7 +202,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/ItemsToGenerate/init(arrayLiteral:)": {
   "abstract" : [
-
+    {
+      "text" : "Creates a set containing the elements of the given array literal.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [
@@ -277,7 +283,18 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/ItemsToGenerate/isDisjoint(with:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a Boolean value that indicates whether the set has no members in",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "common with the given set.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -327,7 +344,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/ItemsToGenerate/isEmpty": {
   "abstract" : [
-
+    {
+      "text" : "A Boolean value that indicates whether the set has no elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -361,7 +381,18 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/ItemsToGenerate/isStrictSubset(of:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a Boolean value that indicates whether this set is a strict",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "subset of the given set.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -411,7 +442,18 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/ItemsToGenerate/isStrictSuperset(of:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a Boolean value that indicates whether this set is a strict",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "superset of the given set.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -461,7 +503,18 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/ItemsToGenerate/isSubset(of:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a Boolean value that indicates whether the set is a subset of",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "another set.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -511,7 +564,18 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/ItemsToGenerate/isSuperset(of:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a Boolean value that indicates whether the set is a superset of",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "the given set.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -561,7 +625,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/ItemsToGenerate/subtract(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Removes the elements of the given set from this set.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -598,7 +665,18 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/ItemsToGenerate/subtracting(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a new set containing the elements of this set that do not occur",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "in the given set.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

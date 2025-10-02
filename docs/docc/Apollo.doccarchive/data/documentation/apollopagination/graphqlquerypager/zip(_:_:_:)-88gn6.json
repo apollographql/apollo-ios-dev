@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.zip(_:_:_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Combines elements from three other publishers and delivers groups of elements as tuples.",
       "type" : "text"
     }
   ],
@@ -522,6 +514,161 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A second publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "publisher1"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A third publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "publisher2"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A fourth publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "publisher3"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that emits groups of elements from the upstream publishers as tuples.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/zip(_:_:_:)-16rcy",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to return a new publisher that combines the elements from three other publishers to publish a tuple to the downstream subscriber. The returned publisher waits until all four publishers have emitted an event, then delivers the oldest unconsumed event from each publisher as a tuple to the subscriber.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In this example, several ",
+              "type" : "text"
+            },
+            {
+              "code" : "PassthroughSubject",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " instances emit values; ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/zip(_:_:_:)-16rcy",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " receives the oldest unconsumed value from each publisher and combines them into a tuple that it republishes to the downstream:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let numbersPub = PassthroughSubject<Int, Never>()",
+            "let lettersPub = PassthroughSubject<String, Never>()",
+            "let emojiPub = PassthroughSubject<String, Never>()",
+            "let fractionsPub  = PassthroughSubject<Double, Never>()",
+            "",
+            "cancellable = numbersPub",
+            "    .zip(lettersPub, emojiPub, fractionsPub)",
+            "    .sink { print(\"\\($0)\") }",
+            "numbersPub.send(1)         \/\/ numbersPub: 1       lettersPub:        emojiPub:       fractionsPub:         zip output: <none>",
+            "numbersPub.send(2)         \/\/ numbersPub: 1,2     lettersPub:        emojiPub:       fractionsPub:         zip output: <none>",
+            "numbersPub.send(3)         \/\/ numbersPub: 1,2,3   lettersPub:        emojiPub:       fractionsPub:         zip output: <none>",
+            "fractionsPub.send(0.1)     \/\/ numbersPub: 1,2,3   lettersPub: \"A\"    emojiPub:       fractionsPub: 0.1     zip output: <none>",
+            "lettersPub.send(\"A\")       \/\/ numbersPub: 1,2,3   lettersPub: \"A\"    emojiPub:       fractionsPub: 0.1     zip output: <none>",
+            "emojiPub.send(\"😀\")        \/\/ numbersPub: 2,3     lettersPub: \"A\"    emojiPub: \"😀\"  fractionsPub: 0.1     zip output: (1, \"A\", \"😀\", 0.1)",
+            "lettersPub.send(\"B\")       \/\/ numbersPub: 2,3     lettersPub: \"B\"    emojiPub:       fractionsPub:         zip output: <none>",
+            "fractionsPub.send(0.8)     \/\/ numbersPub: 2,3     lettersPub: \"B\"    emojiPub:       fractionsPub: 0.8     zip output: <none>",
+            "emojiPub.send(\"🥰\")        \/\/ numbersPub: 3       lettersPub: \"B\"    emojiPub:       fractionsPub: 0.8     zip output: (2, \"B\", \"🥰\", 0.8)",
+            "\/\/ Prints:",
+            "\/\/  (1, \"A\", \"😀\", 0.1)",
+            "\/\/  (2, \"B\", \"🥰\", 0.8)"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "If any upstream publisher finishes successfully or fails with an error, so too does the zipped publisher.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -601,7 +748,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/zip(_:_:_:)-88gn6": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from three other publishers and delivers groups of elements as tuples.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

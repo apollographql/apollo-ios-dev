@@ -45,6 +45,10 @@
         "text" : "DownloadMethod"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloSchemaDownloadConfiguration.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/ApolloSchemaDownloadConfiguration.swift#L9"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

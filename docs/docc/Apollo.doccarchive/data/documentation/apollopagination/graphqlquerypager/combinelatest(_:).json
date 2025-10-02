@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.combineLatest(_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Subscribes to an additional publisher and publishes a tuple upon receiving output from either publisher.",
       "type" : "text"
     }
   ],
@@ -292,6 +284,210 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Another publisher to combine with this one.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "other"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that receives and combines elements from this and another publisher.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/combineLatest(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " when you want the downstream subscriber to receive a tuple of the most-recent element from multiple publishers when any of them emit a value. To pair elements from multiple publishers, use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/zip(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " instead. To receive just the most-recent element from multiple publishers rather than tuples, use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/merge(with:)-7qt71",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The combined publisher doesn’t produce elements until each of its upstream publishers publishes at least one element.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "Tip",
+          "style" : "tip",
+          "type" : "aside"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The combined publisher passes through any requests to ",
+              "type" : "text"
+            },
+            {
+              "inlineContent" : [
+                {
+                  "text" : "all",
+                  "type" : "text"
+                }
+              ],
+              "type" : "emphasis"
+            },
+            {
+              "text" : " upstream publishers. However, it still obeys the demand-fulfilling rule of only sending the request amount downstream. If the demand isn’t ",
+              "type" : "text"
+            },
+            {
+              "code" : "Subscribers\/Demand\/unlimited",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", it drops values from upstream publishers. It implements this by using a buffer size of 1 for each upstream, and holds the most-recent value in each buffer.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In this example, ",
+              "type" : "text"
+            },
+            {
+              "code" : "PassthroughSubject",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "code" : "pub1",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " and also ",
+              "type" : "text"
+            },
+            {
+              "code" : "pub2",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " emit values; as ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/combineLatest(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " receives input from either upstream publisher, it combines the latest value from each publisher into a tuple and publishes it.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let pub1 = PassthroughSubject<Int, Never>()",
+            "let pub2 = PassthroughSubject<Int, Never>()",
+            "",
+            "cancellable = pub1",
+            "    .combineLatest(pub2)",
+            "    .sink { print(\"Result: \\($0).\") }",
+            "",
+            "pub1.send(1)",
+            "pub1.send(2)",
+            "pub2.send(2)",
+            "pub1.send(3)",
+            "pub1.send(45)",
+            "pub2.send(22)",
+            "",
+            "\/\/ Prints:",
+            "\/\/    Result: (2, 2).    \/\/ pub1 latest = 2, pub2 latest = 2",
+            "\/\/    Result: (3, 2).    \/\/ pub1 latest = 3, pub2 latest = 2",
+            "\/\/    Result: (45, 2).   \/\/ pub1 latest = 45, pub2 latest = 2",
+            "\/\/    Result: (45, 22).  \/\/ pub1 latest = 45, pub2 latest = 22"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "When all upstream publishers finish, this publisher finishes. If an upstream publisher never publishes a value, this publisher never finishes.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -371,7 +567,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/combineLatest(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Subscribes to an additional publisher and publishes a tuple upon receiving output from either publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
