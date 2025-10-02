@@ -89,6 +89,13 @@ final class ReversePaginationTests: XCTestCase, CacheDependentTesting {
         last: \(last)
         data equal: \(first?.data == last?.data)
         data.hero equal: \(first?.data?.hero == last?.data?.hero)
+        data.hero.__typename equal: \(first?.data?.hero.__typename == last?.data?.hero.__typename)
+        data.hero.id equal: \(first?.data?.hero.id == last?.data?.hero.id)
+        data.hero.name equal: \(first?.data?.hero.name == last?.data?.hero.name)
+        data.hero.friendsConnection.__typename equal: \(first?.data?.hero.friendsConnection.__typename == last?.data?.hero.friendsConnection.__typename)
+        data.hero.friendsConnection.totalCount equal: \(first?.data?.hero.friendsConnection.totalCount == last?.data?.hero.friendsConnection.totalCount)
+        data.hero.friendsConnection.friends equal: \(first?.data?.hero.friendsConnection.friends == last?.data?.hero.friendsConnection.friends)
+        data.hero.friendsConnection.pageInfo equal: \(first?.data?.hero.friendsConnection.pageInfo == last?.data?.hero.friendsConnection.pageInfo)
         """)
       XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 
