@@ -7,7 +7,7 @@ let project = Project(
   name: "ApolloDev",
   organizationName: "apollographql",
   packages: [
-    .package(url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "13.7.0")),
+    .package(url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "13.8.0")),
     .package(path: "apollo-ios"),
     .package(path: "apollo-ios-codegen"),
     .package(path: "apollo-ios-pagination"),
