@@ -76,7 +76,7 @@ jobs:
           - destination: platform=tvOS Simulator,OS=18.5,name=Apple TV
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
-            name: Apollo Unit Tests - tvOS ${{ vars.TVOS_VERSION }}
+            name: Apollo Unit Tests - tvOS 18.5
             run-js-tests: false
           # Codegen CLI Test
           - destination: platform=macOS,arch=arm64
