@@ -81,6 +81,15 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
 
     try XCTAssertSuccessResult(result) { output in
       // Assert first page is unchanged
+      let first = try? results.first?.get().initialPage
+      let last = try? results.last?.get().initialPage
+      print("""
+        \(#function) - equality
+        first: \(first)
+        last: \(last)
+        data equal: \(first?.data == last?.data)
+        data.hero equal: \(first?.data?.hero == last?.data?.hero) 
+        """)
       XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 
       XCTAssertFalse(output.nextPages.isEmpty)
@@ -204,6 +213,15 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
     let newResult = try await XCTUnwrapping(await pager.currentValue)
     try XCTAssertSuccessResult(newResult) { output in
       // Assert first page is unchanged
+      let first = try? result.get().initialPage
+      let last = try? newResult.get().initialPage
+      print("""
+        \(#function) - equality
+        first: \(first)
+        last: \(last)
+        data equal: \(first?.data == last?.data)
+        data.hero equal: \(first?.data?.hero == last?.data?.hero) 
+        """)
       XCTAssertEqual(try? result.get().initialPage, try? newResult.get().initialPage)
       XCTAssertFalse(output.nextPages.isEmpty)
       XCTAssertEqual(output.nextPages.count, 1)

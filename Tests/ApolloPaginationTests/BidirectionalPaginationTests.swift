@@ -126,6 +126,15 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
 
     try XCTAssertSuccessResult(result) { output in
       // Assert first page is unchanged
+      let first = try? results.first?.get().initialPage
+      let last = try? results.last?.get().initialPage
+      print("""
+        \(#function) - equality
+        first: \(first)
+        last: \(last)
+        data equal: \(first?.data == last?.data)
+        data.hero equal: \(first?.data?.hero == last?.data?.hero) 
+        """)
       XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 
       XCTAssertFalse(output.nextPages.isEmpty)
@@ -242,6 +251,15 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
 
     try XCTAssertSuccessResult(result) { output in
       // Assert first page is unchanged
+      let first = try? results.first?.get().initialPage
+      let last = try? results.last?.get().initialPage
+      print("""
+        \(#function) - equality
+        first: \(first)
+        last: \(last)
+        data equal: \(first?.data == last?.data)
+        data.hero equal: \(first?.data?.hero == last?.data?.hero) 
+        """)
       XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 
       XCTAssertFalse(output.nextPages.isEmpty)
