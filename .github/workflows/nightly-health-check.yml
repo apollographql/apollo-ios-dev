@@ -67,7 +67,7 @@ jobs:
             name: Apollo Unit Tests - macOS
             run-js-tests: false
           # iOS_current
-          - destination: platform=iOS Simulator,OS=18.5,name=iPhone 15
+          - destination: platform=iOS Simulator,OS=18.5,name=iPhone 16
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
             name: Apollo Unit Tests - iOS 18.5
