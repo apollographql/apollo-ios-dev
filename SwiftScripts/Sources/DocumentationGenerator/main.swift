@@ -85,9 +85,7 @@ struct DocumentationGenerator {
 
     task.currentDirectoryURL = sourceRootURL.appendingPathComponent("SwiftScripts")
     task.environment?["OS_ACTIVITY_DT_MODE"] = nil
-    task.environment?["DOCC_JSON_PRETTYPRINT"] = "YES"
-    task.environment?["DOCC_HTML_DIR"] = sourceRootURL
-      .appendingPathComponent("docs/renderer/dist").relativePath
+    task.environment?["DOCC_JSON_PRETTYPRINT"] = "YES"    
     task.arguments = ["-c", command]
 
     task.executableURL = URL(fileURLWithPath: "/bin/zsh")
