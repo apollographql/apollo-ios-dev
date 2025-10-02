@@ -67,16 +67,16 @@ jobs:
             name: Apollo Unit Tests - macOS
             run-js-tests: false
           # iOS_current
-          - destination: platform=iOS Simulator,OS=17.0,name=iPhone 15
+          - destination: platform=iOS Simulator,OS=18.5,name=iPhone 15
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
-            name: Apollo Unit Tests - iOS 17.0
+            name: Apollo Unit Tests - iOS 18.5
             run-js-tests: false
           # tvOS_current
-          - destination: platform=tvOS Simulator,OS=17.0,name=Apple TV
+          - destination: platform=tvOS Simulator,OS=18.5,name=Apple TV
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
-            name: Apollo Unit Tests - tvOS ${{ vars.TVOS_VERSION }}
+            name: Apollo Unit Tests - tvOS 18.5
             run-js-tests: false
           # Codegen CLI Test
           - destination: platform=macOS,arch=arm64
