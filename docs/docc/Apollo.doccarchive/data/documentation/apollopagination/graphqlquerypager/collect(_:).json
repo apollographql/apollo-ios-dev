@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.collect(_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Collects up to the specified number of elements, and then emits a single array of the collection.",
       "type" : "text"
     }
   ],
@@ -207,6 +199,167 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The maximum number of received elements to buffer before publishing.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "count"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that collects up to the specified number of elements, and then publishes them as an array.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/collect(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to emit arrays of at most ",
+              "type" : "text"
+            },
+            {
+              "code" : "count",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " elements from an upstream publisher. If the upstream publisher finishes before collecting the specified number of elements, the publisher sends an array of only the items it received. This may be fewer than ",
+              "type" : "text"
+            },
+            {
+              "code" : "count",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " elements.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "If the upstream publisher fails with an error, this publisher forwards the error to the downstream receiver instead of sending its output.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/collect(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator emits one partial and two full arrays based on the requested collection size of ",
+              "type" : "text"
+            },
+            {
+              "code" : "5",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ":",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let numbers = (0...10)",
+            "cancellable = numbers.publisher",
+            "    .collect(5)",
+            "    .sink { print(\"\\($0), terminator: \" \"\") }",
+            "",
+            "\/\/ Prints \"[0, 1, 2, 3, 4] [5, 6, 7, 8, 9] [10] \""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "When this publisher receives a request for ",
+                  "type" : "text"
+                },
+                {
+                  "code" : ".max(n)",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " elements, it requests ",
+                  "type" : "text"
+                },
+                {
+                  "code" : ".max(count * n)",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " from the upstream publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "Note",
+          "style" : "note",
+          "type" : "aside"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -286,7 +439,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/collect(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Collects up to the specified number of elements, and then emits a single array of the collection.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -42,6 +42,10 @@
         "name" : "ApolloPagination"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLQueryPagerCoordinator.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/GraphQLQueryPagerCoordinator.swift#L9"
+    },
     "required" : true,
     "role" : "symbol",
     "roleHeading" : "Associated Type",
@@ -76,6 +80,7 @@
               "text" : " : "
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLQuery",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI12GraphQLQueryP",
               "text" : "GraphQLQuery"
@@ -108,6 +113,40 @@
   ]
 , 
 "references": {
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLQuery": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLQuery"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP",
+      "text" : "GraphQLOperation"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLQuery",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "GraphQLQuery",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqlquery"
+},
 "doc://ApolloPagination/documentation/ApolloPagination": {
   "abstract" : [
 

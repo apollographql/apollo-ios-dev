@@ -76,6 +76,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLFile.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/GraphQLFile.swift#L74"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",

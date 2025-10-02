@@ -98,7 +98,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/PaginationError/localizedDescription": {
   "abstract" : [
-
+    {
+      "text" : "Retrieve the localized description for this error.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -39,6 +39,10 @@
         "text" : "LogLevel"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "CodegenLogger.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/CodegenLogger.swift#L5"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

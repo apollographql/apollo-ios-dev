@@ -46,6 +46,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "InMemoryNormalizedCache.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/Caching\/InMemoryNormalizedCache.swift#L7"
+    },
     "role" : "symbol",
     "roleHeading" : "Initializer",
     "symbolKind" : "init",

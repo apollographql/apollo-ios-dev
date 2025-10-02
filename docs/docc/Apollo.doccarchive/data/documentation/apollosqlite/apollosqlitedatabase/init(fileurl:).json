@@ -1,18 +1,4 @@
 {
-  "abstract" : [
-    {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "SQLiteDatabase.init(fileURL:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -64,6 +50,10 @@
         "name" : "ApolloSQLite"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloSQLiteDatabase.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloSQLite\/ApolloSQLiteDatabase.swift#L18"
+    },
     "role" : "symbol",
     "roleHeading" : "Initializer",
     "symbolKind" : "init",

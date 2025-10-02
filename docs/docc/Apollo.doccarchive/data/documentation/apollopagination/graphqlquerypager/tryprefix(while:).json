@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.tryPrefix(while:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Republishes elements while an error-throwing predicate closure indicates publishing should continue.",
       "type" : "text"
     }
   ],
@@ -273,6 +265,109 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that takes an element as its parameter and returns a Boolean value indicating whether publishing should continue.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "predicate"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that passes through elements until the predicate throws or indicates publishing should finish.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryPrefix(while:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to emit values from the upstream publisher that meet a condition you specify in an error-throwing closure.",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "The publisher finishes when the closure returns ",
+              "type" : "text"
+            },
+            {
+              "code" : "false",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ". If the closure throws an error, the publisher fails with that error.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "struct OutOfRangeError: Error {}",
+            "",
+            "let numbers = (0...10).reversed()",
+            "cancellable = numbers.publisher",
+            "    .tryPrefix {",
+            "        guard $0 != 0 else {throw OutOfRangeError()}",
+            "        return $0 <= numbers.max()!",
+            "    }",
+            "    .sink(",
+            "        receiveCompletion: { print (\"completion: \\($0)\", terminator: \" \") },",
+            "        receiveValue: { print (\"\\($0)\", terminator: \" \") }",
+            "    )",
+            "",
+            "\/\/ Prints: \"10 9 8 7 6 5 4 3 2 1 completion: failure(OutOfRangeError()) \""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -352,7 +447,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryPrefix(while:)": {
   "abstract" : [
-
+    {
+      "text" : "Republishes elements while an error-throwing predicate closure indicates publishing should continue.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

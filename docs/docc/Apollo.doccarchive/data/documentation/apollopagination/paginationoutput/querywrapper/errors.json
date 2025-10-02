@@ -96,6 +96,10 @@
         "name" : "ApolloPagination"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLQueryPagerOutput.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/GraphQLQueryPagerOutput.swift#L44"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Property",
     "symbolKind" : "property",
@@ -129,6 +133,7 @@
               "text" : ": ["
             },
             {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:6Apollo12GraphQLErrorV",
               "text" : "GraphQLError"
@@ -173,6 +178,34 @@
   ]
 , 
 "references": {
+"doc://Apollo/documentation/Apollo/GraphQLError": {
+  "abstract" : [
+    {
+      "text" : "Represents an error encountered during the execution of a GraphQL operation.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLError"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "GraphQLError",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlerror"
+},
 "doc://ApolloPagination/documentation/ApolloPagination": {
   "abstract" : [
 

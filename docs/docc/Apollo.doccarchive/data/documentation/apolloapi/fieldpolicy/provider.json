@@ -54,6 +54,10 @@
         "text" : "Provider"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "FieldPolicy.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/FieldPolicy.swift#L7"
+    },
     "role" : "symbol",
     "roleHeading" : "Protocol",
     "symbolKind" : "protocol",

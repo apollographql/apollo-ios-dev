@@ -61,6 +61,10 @@
         "name" : "ApolloAPI"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "Selection.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/Selection.swift#L17"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Property",
     "symbolKind" : "property",

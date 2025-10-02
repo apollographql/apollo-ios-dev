@@ -39,6 +39,18 @@
       ],
       "title" : "Operators"
     }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/autopersistedqueryconfiguration\/equatable-implementations"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
   ]
 , 
 "references": {
@@ -109,7 +121,10 @@
 },
 "doc://Apollo/documentation/Apollo/AutoPersistedQueryConfiguration/!=(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a Boolean value indicating whether two values are not equal.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

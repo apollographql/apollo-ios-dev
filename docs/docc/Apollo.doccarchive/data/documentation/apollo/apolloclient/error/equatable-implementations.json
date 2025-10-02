@@ -40,6 +40,18 @@
       ],
       "title" : "Operators"
     }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/apolloclient\/error\/equatable-implementations"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
   ]
 , 
 "references": {
@@ -137,7 +149,10 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/Error/!=(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a Boolean value indicating whether two values are not equal.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

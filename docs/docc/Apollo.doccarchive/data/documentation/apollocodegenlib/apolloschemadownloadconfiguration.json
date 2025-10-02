@@ -44,6 +44,10 @@
         "text" : "ApolloSchemaDownloadConfiguration"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloSchemaDownloadConfiguration.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/ApolloSchemaDownloadConfiguration.swift#L4"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

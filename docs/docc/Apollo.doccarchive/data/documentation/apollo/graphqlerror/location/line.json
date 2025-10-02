@@ -49,6 +49,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLError.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/GraphQLError.swift#L47"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Property",
     "symbolKind" : "property",

@@ -39,6 +39,18 @@
       ],
       "title" : "Operators"
     }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/recordset\/equatable-implementations"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
   ]
 , 
 "references": {
@@ -92,7 +104,10 @@
 },
 "doc://Apollo/documentation/Apollo/RecordSet/!=(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a Boolean value indicating whether two values are not equal.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

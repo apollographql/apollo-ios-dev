@@ -136,6 +136,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "UploadRequest.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/RequestChain\/UploadRequest.swift#L45"
+    },
     "role" : "symbol",
     "roleHeading" : "Initializer",
     "symbolKind" : "init",

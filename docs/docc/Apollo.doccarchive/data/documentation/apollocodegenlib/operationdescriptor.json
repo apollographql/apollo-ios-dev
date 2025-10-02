@@ -38,6 +38,10 @@
         "text" : "OperationDescriptor"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "OperationDescriptor.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/OperationDescriptor.swift#L4"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

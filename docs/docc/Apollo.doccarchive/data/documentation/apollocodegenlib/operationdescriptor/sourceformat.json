@@ -39,6 +39,10 @@
         "text" : "SourceFormat"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "OperationDescriptor.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/OperationDescriptor.swift#L11"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

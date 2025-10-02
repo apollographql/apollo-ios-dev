@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.reduce(_:_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Applies a closure that collects each element of a stream and publishes a final result upon completion.",
       "type" : "text"
     }
   ],
@@ -327,6 +319,124 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The value that the closure receives the first time it’s called.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "initialResult"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that produces a new value by taking the previously-accumulated value and the next element it receives from the upstream publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "nextPartialResult"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that applies the closure to all received elements and produces an accumulated value when the upstream publisher finishes. If ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/reduce(_:_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " receives an error from the upstream publisher, the operator delivers it to the downstream subscriber, the publisher terminates and publishes no value.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/reduce(_:_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to collect a stream of elements and produce an accumulated value based on a closure you provide.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the following example, the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/reduce(_:_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator collects all the integer values it receives from its upstream publisher:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let numbers = (0...10)",
+            "cancellable = numbers.publisher",
+            "    .reduce(0, { accum, next in accum + next })",
+            "    .sink { print(\"\\($0)\") }",
+            "",
+            "\/\/ Prints: \"55\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -406,7 +516,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/reduce(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Applies a closure that collects each element of a stream and publishes a final result upon completion.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

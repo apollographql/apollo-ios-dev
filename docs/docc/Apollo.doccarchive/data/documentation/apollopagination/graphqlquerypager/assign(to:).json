@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.assign(to:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Republishes elements received from a publisher, by assigning them to a property marked as a publisher.",
       "type" : "text"
     }
   ],
@@ -263,6 +255,266 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A property marked with the ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "@Published",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " attribute, which receives and republishes all elements received from the upstream publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "published"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use this operator when you want to receive elements from a publisher and republish them through a property marked with the ",
+              "type" : "text"
+            },
+            {
+              "code" : "@Published",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " attribute. The ",
+              "type" : "text"
+            },
+            {
+              "code" : "assign(to:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator manages the life cycle of the subscription, canceling the subscription automatically when the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Published",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " instance deinitializes. Because of this, the ",
+              "type" : "text"
+            },
+            {
+              "code" : "assign(to:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator doesn’t return an ",
+              "type" : "text"
+            },
+            {
+              "code" : "AnyCancellable",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " that you’re responsible for like ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/assign(to:on:)",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " does.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The example below shows a model class that receives elements from an internal ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Foundation\/Timer\/TimerPublisher",
+              "type" : "text"
+            },
+            {
+              "text" : ", and assigns them to a ",
+              "type" : "text"
+            },
+            {
+              "code" : "@Published",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " property called ",
+              "type" : "text"
+            },
+            {
+              "code" : "lastUpdated",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ". Because the ",
+              "type" : "text"
+            },
+            {
+              "code" : "to",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " parameter has the ",
+              "type" : "text"
+            },
+            {
+              "code" : "inout",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " keyword, you need to use the ",
+              "type" : "text"
+            },
+            {
+              "code" : "&",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator when calling this method.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "class MyModel: ObservableObject {",
+            "    @Published var lastUpdated: Date = Date()",
+            "    init() {",
+            "         Timer.publish(every: 1.0, on: .main, in: .common)",
+            "             .autoconnect()",
+            "             .assign(to: &$lastUpdated)",
+            "    }",
+            "}"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "If you instead implemented ",
+              "type" : "text"
+            },
+            {
+              "code" : "MyModel",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " with ",
+              "type" : "text"
+            },
+            {
+              "code" : "assign(to: lastUpdated, on: self)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", storing the returned ",
+              "type" : "text"
+            },
+            {
+              "code" : "AnyCancellable",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " instance could cause a reference cycle, because the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Subscribers\/Assign",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " subscriber would hold a strong reference to ",
+              "type" : "text"
+            },
+            {
+              "code" : "self",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ". Using ",
+              "type" : "text"
+            },
+            {
+              "code" : "assign(to:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " solves this problem.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "While the ",
+              "type" : "text"
+            },
+            {
+              "code" : "to",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " parameter uses the ",
+              "type" : "text"
+            },
+            {
+              "code" : "inout",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " keyword, this method doesn’t replace a reference type passed to it. Instead, this notation indicates that the operator may modify members of the assigned object, as seen in the following example:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "    class MyModel2: ObservableObject {",
+            "        @Published var id: Int = 0",
+            "    }",
+            "    let model2 = MyModel2()",
+            "    Just(100).assign(to: &model2.$id)"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -342,7 +594,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/assign(to:)": {
   "abstract" : [
-
+    {
+      "text" : "Republishes elements received from a publisher, by assigning them to a property marked as a publisher.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [
@@ -451,6 +706,141 @@
   "title" : "assign(to:)",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/graphqlquerypager\/assign(to:)"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/assign(to:on:)": {
+  "abstract" : [
+    {
+      "text" : "Assigns each element from a publisher to a property on an object.",
+      "type" : "text"
+    }
+  ],
+  "conformance" : {
+    "availabilityPrefix" : [
+      {
+        "text" : "Available when",
+        "type" : "text"
+      }
+    ],
+    "conformancePrefix" : [
+      {
+        "text" : "Conforms when",
+        "type" : "text"
+      }
+    ],
+    "constraints" : [
+      {
+        "code" : "Failure",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : " is ",
+        "type" : "text"
+      },
+      {
+        "code" : "Never",
+        "type" : "codeVoice"
+      },
+      {
+        "text" : ".",
+        "type" : "text"
+      }
+    ]
+  },
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "assign"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Root"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "to"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s24ReferenceWritableKeyPathC",
+      "text" : "ReferenceWritableKeyPath"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Root"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Self"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:7Combine9PublisherP6OutputQa",
+      "text" : "Output"
+    },
+    {
+      "kind" : "text",
+      "text" : ">, "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "on"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Root"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:7Combine14AnyCancellableC",
+      "text" : "AnyCancellable"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/GraphQLQueryPager\/assign(to:on:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "assign(to:on:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/graphqlquerypager\/assign(to:on:)"
 }
 }
 }

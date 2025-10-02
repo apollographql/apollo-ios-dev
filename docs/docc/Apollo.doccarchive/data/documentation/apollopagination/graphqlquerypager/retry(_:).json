@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.retry(_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Attempts to recreate a failed subscription with the upstream publisher up to the number of times you specify.",
       "type" : "text"
     }
   ],
@@ -207,6 +199,133 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The number of times to attempt to recreate the subscription.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "retries"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that attempts to recreate its subscription to a failed upstream publisher.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/retry(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to try a connecting to an upstream publisher after a failed connection attempt.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, a ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Foundation\/URLSession\/DataTaskPublisher",
+              "type" : "text"
+            },
+            {
+              "text" : " attempts to connect to a remote URL. If the connection attempt succeeds, it publishes the remote service’s HTML to the downstream publisher and completes normally. Otherwise, the retry operator attempts to reestablish the connection. If after three attempts the publisher still can’t connect to the remote URL, the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/catch(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator replaces the error with a new publisher that publishes a “connection timed out” HTML page. After the downstream subscriber receives the timed out message, the stream completes normally.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "struct WebSiteData: Codable {",
+            "    var rawHTML: String",
+            "}",
+            "",
+            "let myURL = URL(string: \"https:\/\/www.example.com\")",
+            "",
+            "cancellable = URLSession.shared.dataTaskPublisher(for: myURL!)",
+            "    .retry(3)",
+            "    .map({ (page) -> WebSiteData in",
+            "        return WebSiteData(rawHTML: String(decoding: page.data, as: UTF8.self))",
+            "    })",
+            "    .catch { error in",
+            "        return Just(WebSiteData(rawHTML: \"<HTML>Unable to load page - timed out.<\/HTML>\"))",
+            "}",
+            ".sink(receiveCompletion: { print (\"completion: \\($0)\") },",
+            "      receiveValue: { print (\"value: \\($0)\") }",
+            " )",
+            "",
+            "\/\/ Prints: The HTML content from the remote URL upon a successful connection,",
+            "\/\/         or returns \"<HTML>Unable to load page - timed out.<\/HTML>\" if the number of retries exceeds the specified value."
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "After exceeding the specified number of retries, the publisher passes the failure to the downstream receiver.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -286,7 +405,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/retry(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Attempts to recreate a failed subscription with the upstream publisher up to the number of times you specify.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

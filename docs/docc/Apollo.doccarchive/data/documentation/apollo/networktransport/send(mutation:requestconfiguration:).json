@@ -127,6 +127,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "NetworkTransport.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/NetworkTransport.swift#L32"
+    },
     "required" : true,
     "role" : "symbol",
     "roleHeading" : "Instance Method",
@@ -263,6 +267,7 @@
               "text" : " : "
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLMutation",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI15GraphQLMutationP",
               "text" : "GraphQLMutation"
@@ -752,6 +757,40 @@
   "title" : "RequestConfiguration",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestconfiguration"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLMutation": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLMutation"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP",
+      "text" : "GraphQLOperation"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLMutation",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "GraphQLMutation",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqlmutation"
 }
 }
 }

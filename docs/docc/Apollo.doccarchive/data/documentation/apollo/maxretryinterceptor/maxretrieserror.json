@@ -39,6 +39,10 @@
         "text" : "MaxRetriesError"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "MaxRetryInterceptor.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/RequestChain\/Interceptors\/MaxRetryInterceptor.swift#L48"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

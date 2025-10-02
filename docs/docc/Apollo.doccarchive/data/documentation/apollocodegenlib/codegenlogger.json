@@ -44,6 +44,10 @@
         "text" : "CodegenLogger"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "CodegenLogger.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/CodegenLogger.swift#L4"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

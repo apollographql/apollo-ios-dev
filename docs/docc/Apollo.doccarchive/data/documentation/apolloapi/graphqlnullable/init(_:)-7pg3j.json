@@ -93,6 +93,10 @@
         "name" : "ApolloAPI"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLNullable.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/GraphQLNullable.swift#L234"
+    },
     "role" : "symbol",
     "roleHeading" : "Initializer",
     "symbolKind" : "init",

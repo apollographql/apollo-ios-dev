@@ -1,11 +1,23 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
+      "text" : "Encodes this value into the given encoder, when the type’s ",
       "type" : "text"
     },
     {
-      "code" : "RawRepresentable.encode(to:)",
+      "code" : "RawValue",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "is ",
+      "type" : "text"
+    },
+    {
+      "code" : "String",
       "type" : "codeVoice"
     },
     {
@@ -191,6 +203,53 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The encoder to write data to.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "encoder"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "This function throws an error if any values are invalid for the given",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "encoder’s format.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -349,7 +408,30 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloSchemaDownloadConfiguration/DownloadMethod-swift.enum/OutputFormat/encode(to:)": {
   "abstract" : [
-
+    {
+      "text" : "Encodes this value into the given encoder, when the type’s ",
+      "type" : "text"
+    },
+    {
+      "code" : "RawValue",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "is ",
+      "type" : "text"
+    },
+    {
+      "code" : "String",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [

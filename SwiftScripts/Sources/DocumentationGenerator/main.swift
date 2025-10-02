@@ -4,11 +4,11 @@ import SwiftScriptHelpers
 
 enum Target: String, CaseIterable {
   case Apollo
-  case ApolloAPI  
-  case ApolloSQLite
-  case ApolloWebSocket
-  case ApolloCodegenLib
-  case ApolloPagination
+//  case ApolloAPI  
+//  case ApolloSQLite
+//  case ApolloWebSocket
+//  case ApolloCodegenLib
+//  case ApolloPagination
 
   var name: String {
     self.rawValue
@@ -32,7 +32,7 @@ struct DocumentationGenerator {
 
         try shell(docBuildCommand(for: target))
         CodegenLogger.log("Generated docs for \(target.name)")
-        try moveDocsIntoApolloDocCArchive(for: target)
+//        try moveDocsIntoApolloDocCArchive(for: target)
       }
 
     } catch {
@@ -53,7 +53,7 @@ struct DocumentationGenerator {
   static let sourceRootURL = parentFolderOfScriptFile
     .deletingLastPathComponent() // Sources
     .deletingLastPathComponent() // SwiftScripts
-    .deletingLastPathComponent() // apollo-ios
+    .deletingLastPathComponent() // apollo-ios-dev
 
   static let doccFolder = sourceRootURL.appendingPathComponent("docs/docc")
 
@@ -61,8 +61,17 @@ struct DocumentationGenerator {
     return """
     swift package \
     --allow-writing-to-directory \(target.outputPath.relativePath) \
-    generate-documentation \
-    --target \(target.name) \
+    generate-documentation \    
+    --target Apollo \
+    --target ApolloAPI \
+    --target ApolloSQLite \
+    --target ApolloCodegenLib \
+    --target ApolloPagination \
+    --enable-experimental-combined-documentation \
+    --enable-inherited-docs \
+    --source-service github \
+    --source-service-base-url https://github.com/apollographql/apollo-ios-dev/blob/main \
+    --checkout-path \(sourceRootURL.relativePath) \
     --disable-indexing \
     --output-path \(target.outputPath.relativePath) \
     --hosting-base-path docs/ios/docc

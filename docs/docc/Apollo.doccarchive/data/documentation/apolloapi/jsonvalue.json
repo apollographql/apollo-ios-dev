@@ -49,6 +49,10 @@
         "text" : "JSONValue"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "JSON.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/JSON.swift#L7"
+    },
     "role" : "symbol",
     "roleHeading" : "Type Alias",
     "symbolKind" : "typealias",

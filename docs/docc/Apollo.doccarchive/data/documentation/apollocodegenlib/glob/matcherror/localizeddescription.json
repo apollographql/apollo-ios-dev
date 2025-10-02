@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Error.localizedDescription",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Retrieve the localized description for this error.",
       "type" : "text"
     }
   ],
@@ -252,7 +244,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/Glob/MatchError/localizedDescription": {
   "abstract" : [
-
+    {
+      "text" : "Retrieve the localized description for this error.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

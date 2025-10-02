@@ -38,6 +38,10 @@
         "text" : "Constants"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "Constants.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/Constants.swift#L3"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

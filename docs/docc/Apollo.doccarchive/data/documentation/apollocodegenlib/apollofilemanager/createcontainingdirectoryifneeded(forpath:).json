@@ -72,6 +72,10 @@
         "name" : "ApolloCodegenLib"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "FileManager+Apollo.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/FileManager+Apollo.swift#L113"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",

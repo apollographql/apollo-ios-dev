@@ -1,0 +1,296 @@
+{
+  "hierarchy" : {
+    "paths" : [
+      [
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination",
+        "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Reverse"
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Reverse\/init(hasPrevious:startCursor:)"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "s:16ApolloPagination011CursorBasedB0O7ReverseV11hasPrevious05startC0AESb_SSSgtcfc",
+    "fragments" : [
+      {
+        "kind" : "identifier",
+        "text" : "init"
+      },
+      {
+        "kind" : "text",
+        "text" : "("
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "hasPrevious"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:Sb",
+        "text" : "Bool"
+      },
+      {
+        "kind" : "text",
+        "text" : ", "
+      },
+      {
+        "kind" : "externalParam",
+        "text" : "startCursor"
+      },
+      {
+        "kind" : "text",
+        "text" : ": "
+      },
+      {
+        "kind" : "typeIdentifier",
+        "preciseIdentifier" : "s:SS",
+        "text" : "String"
+      },
+      {
+        "kind" : "text",
+        "text" : "?)"
+      }
+    ],
+    "modules" : [
+      {
+        "name" : "ApolloPagination"
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Initializer",
+    "symbolKind" : "init",
+    "title" : "init(hasPrevious:startCursor:)"
+  },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "init"
+            },
+            {
+              "kind" : "text",
+              "text" : "("
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "hasPrevious"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:Sb",
+              "text" : "Bool"
+            },
+            {
+              "kind" : "text",
+              "text" : ", "
+            },
+            {
+              "kind" : "externalParam",
+              "text" : "startCursor"
+            },
+            {
+              "kind" : "text",
+              "text" : ": "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:SS",
+              "text" : "String"
+            },
+            {
+              "kind" : "text",
+              "text" : "?)"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    }
+  ],
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollopagination\/cursorbasedpagination\/reverse\/init(hasprevious:startcursor:)"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://ApolloPagination/documentation/ApolloPagination": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "ApolloPagination",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/CursorBasedPagination": {
+  "abstract" : [
+    {
+      "text" : "A namespace to handle cursor based pagination strategies.",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "For more information on cursor based pagination strategies, see: https:\/\/www.apollographql.com\/docs\/react\/pagination\/cursor-based\/",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "CursorBasedPagination"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "CursorBasedPagination"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "CursorBasedPagination",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/cursorbasedpagination"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/CursorBasedPagination/Reverse": {
+  "abstract" : [
+    {
+      "text" : "A cursor-basd pagination strategy that can support fetching previous pages.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Reverse"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Reverse",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Reverse"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "CursorBasedPagination.Reverse",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/cursorbasedpagination\/reverse"
+},
+"doc://ApolloPagination/documentation/ApolloPagination/CursorBasedPagination/Reverse/init(hasPrevious:startCursor:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "hasPrevious"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:Sb",
+      "text" : "Bool"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "startCursor"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : "?)"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloPagination\/documentation\/ApolloPagination\/CursorBasedPagination\/Reverse\/init(hasPrevious:startCursor:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(hasPrevious:startCursor:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollopagination\/cursorbasedpagination\/reverse\/init(hasprevious:startcursor:)"
+}
+}
+}

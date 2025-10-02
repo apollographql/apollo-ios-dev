@@ -1,0 +1,325 @@
+{
+  "hierarchy" : {
+    "paths" : [
+      [
+        "doc:\/\/Apollo\/documentation\/Apollo",
+        "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior"
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior\/CacheReadBehavior"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "s:6Apollo13FetchBehaviorV09CacheReadC0O",
+    "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "enum"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "CacheReadBehavior"
+      }
+    ],
+    "modules" : [
+      {
+        "name" : "Apollo"
+      }
+    ],
+    "navigatorTitle" : [
+      {
+        "kind" : "identifier",
+        "text" : "CacheReadBehavior"
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Enumeration",
+    "symbolKind" : "enum",
+    "title" : "FetchBehavior.CacheReadBehavior"
+  },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "enum"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "CacheReadBehavior"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    }
+  ],
+  "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/Apollo\/SQ",
+        "doc:\/\/Apollo\/SH",
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforms To",
+      "type" : "conformsTo"
+    }
+  ],
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "topicSections" : [
+    {
+      "anchor" : "Enumeration-Cases",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior\/CacheReadBehavior\/beforeNetworkFetch",
+        "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior\/CacheReadBehavior\/never",
+        "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior\/CacheReadBehavior\/onNetworkFailure"
+      ],
+      "title" : "Enumeration Cases"
+    },
+    {
+      "anchor" : "Default-Implementations",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior\/CacheReadBehavior\/Equatable-Implementations"
+      ],
+      "title" : "Default Implementations"
+    }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/fetchbehavior\/cachereadbehavior"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://Apollo/SH": {
+  "identifier" : "doc:\/\/Apollo\/SH",
+  "title" : "Swift.Hashable",
+  "type" : "unresolvable"
+},
+"doc://Apollo/SQ": {
+  "identifier" : "doc:\/\/Apollo\/SQ",
+  "title" : "Swift.Equatable",
+  "type" : "unresolvable"
+},
+"doc://Apollo/documentation/Apollo": {
+  "abstract" : [
+    {
+      "text" : "A Strongly typed, Swift-first, GraphQL client.",
+      "type" : "text"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "Apollo",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo"
+},
+"doc://Apollo/documentation/Apollo/FetchBehavior": {
+  "abstract" : [
+    {
+      "text" : "Describes the cache\/networking behaviors that should be used for the execution of a GraphQL",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "request.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "FetchBehavior"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "FetchBehavior"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "FetchBehavior",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/fetchbehavior"
+},
+"doc://Apollo/documentation/Apollo/FetchBehavior/CacheReadBehavior": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "CacheReadBehavior"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior\/CacheReadBehavior",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "CacheReadBehavior"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "FetchBehavior.CacheReadBehavior",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/fetchbehavior\/cachereadbehavior"
+},
+"doc://Apollo/documentation/Apollo/FetchBehavior/CacheReadBehavior/Equatable-Implementations": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior\/CacheReadBehavior\/Equatable-Implementations",
+  "kind" : "article",
+  "role" : "collectionGroup",
+  "title" : "Equatable Implementations",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/fetchbehavior\/cachereadbehavior\/equatable-implementations"
+},
+"doc://Apollo/documentation/Apollo/FetchBehavior/CacheReadBehavior/beforeNetworkFetch": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "beforeNetworkFetch"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior\/CacheReadBehavior\/beforeNetworkFetch",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "FetchBehavior.CacheReadBehavior.beforeNetworkFetch",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/fetchbehavior\/cachereadbehavior\/beforenetworkfetch"
+},
+"doc://Apollo/documentation/Apollo/FetchBehavior/CacheReadBehavior/never": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "never"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior\/CacheReadBehavior\/never",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "FetchBehavior.CacheReadBehavior.never",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/fetchbehavior\/cachereadbehavior\/never"
+},
+"doc://Apollo/documentation/Apollo/FetchBehavior/CacheReadBehavior/onNetworkFailure": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "case"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "onNetworkFailure"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior\/CacheReadBehavior\/onNetworkFailure",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "FetchBehavior.CacheReadBehavior.onNetworkFailure",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/fetchbehavior\/cachereadbehavior\/onnetworkfailure"
+},
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
+}
+}
+}

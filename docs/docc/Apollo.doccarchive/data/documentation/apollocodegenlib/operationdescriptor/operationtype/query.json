@@ -34,6 +34,10 @@
         "name" : "ApolloCodegenLib"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "OperationDescriptor.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/OperationDescriptor.swift#L6"
+    },
     "role" : "symbol",
     "roleHeading" : "Case",
     "symbolKind" : "case",

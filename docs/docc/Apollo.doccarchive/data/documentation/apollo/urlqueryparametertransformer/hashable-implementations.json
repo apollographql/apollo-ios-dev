@@ -39,6 +39,18 @@
       ],
       "title" : "Instance Methods"
     }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/urlqueryparametertransformer\/hashable-implementations"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
   ]
 , 
 "references": {

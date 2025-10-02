@@ -40,6 +40,10 @@
         "text" : "SingleResponse"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "CachePolicy.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/Caching\/CachePolicy.swift#L11"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

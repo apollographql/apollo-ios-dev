@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.zip(_:_:_:_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Combines elements from three other publishers and delivers a transformed output.",
       "type" : "text"
     }
   ],
@@ -766,6 +758,270 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A second publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "publisher1"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A third publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "publisher2"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A fourth publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "publisher3"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that receives the most-recent value from each publisher and returns a new value to publish.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "transform"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that uses the ",
+              "type" : "text"
+            },
+            {
+              "code" : "transform",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " closure to emit new elements, produced by combining the most recent value from four upstream publishers.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/zip(_:_:_:_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to return a new publisher that combines the elements from three other publishers using a transformation you specify to publish a new value to the downstream subscriber. The returned publisher waits until all four publishers have emitted an event, then delivers the oldest unconsumed event from each publisher together that the operator uses in the transformation.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In this example, the ",
+              "type" : "text"
+            },
+            {
+              "code" : "PassthroughSubject",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " publishers, ",
+              "type" : "text"
+            },
+            {
+              "code" : "numbersPub",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ",",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "code" : "fractionsPub",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", ",
+              "type" : "text"
+            },
+            {
+              "code" : "lettersPub",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", and ",
+              "type" : "text"
+            },
+            {
+              "code" : "emojiPub",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " emit values. The ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/zip(_:_:_:_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator receives the oldest value from each publisher and uses the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Int",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " from ",
+              "type" : "text"
+            },
+            {
+              "code" : "numbersPub",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " and publishes a string that repeats the ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Swift\/String",
+              "type" : "text"
+            },
+            {
+              "text" : " from ",
+              "type" : "text"
+            },
+            {
+              "code" : "lettersPub",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " and ",
+              "type" : "text"
+            },
+            {
+              "code" : "emojiPub",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " that many times and prints out the value in ",
+              "type" : "text"
+            },
+            {
+              "code" : "fractionsPub",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let numbersPub = PassthroughSubject<Int, Never>()      \/\/ first publisher",
+            "let lettersPub = PassthroughSubject<String, Never>()   \/\/ second",
+            "let emojiPub = PassthroughSubject<String, Never>()     \/\/ third",
+            "let fractionsPub  = PassthroughSubject<Double, Never>()\/\/ fourth",
+            "",
+            "cancellable = numbersPub",
+            "    .zip(lettersPub, emojiPub, fractionsPub) { anInt, aLetter, anEmoji, aFraction  in",
+            "        (\"\\(String(repeating: anEmoji, count: anInt)) \\(String(repeating: aLetter, count: anInt)) \\(aFraction)\")",
+            "    }",
+            "    .sink { print(\"\\($0)\") }",
+            "",
+            "numbersPub.send(1)         \/\/ numbersPub: 1       lettersPub:          emojiPub:          zip output: <none>",
+            "numbersPub.send(2)         \/\/ numbersPub: 1,2     lettersPub:          emojiPub:          zip output: <none>",
+            "numbersPub.send(3)         \/\/ numbersPub: 1,2,3   lettersPub:          emojiPub:          zip output: <none>",
+            "fractionsPub.send(0.1)     \/\/ numbersPub: 1,2,3   lettersPub: \"A\"      emojiPub:          zip output: <none>",
+            "lettersPub.send(\"A\")       \/\/ numbersPub: 1,2,3   lettersPub: \"A\"      emojiPub:          zip output: <none>",
+            "emojiPub.send(\"😀\")        \/\/ numbersPub: 1,2,3   lettersPub: \"A\"      emojiPub:\"😀\"      zip output: \"😀 A\"",
+            "lettersPub.send(\"B\")       \/\/ numbersPub: 2,3     lettersPub: \"B\"      emojiPub:          zip output: <none>",
+            "fractionsPub.send(0.8)     \/\/ numbersPub: 2,3     lettersPub: \"A\"      emojiPub:          zip output: <none>",
+            "emojiPub.send(\"🥰\")        \/\/ numbersPub: 3       lettersPub: \"B\"      emojiPub:          zip output: \"🥰🥰 BB\"",
+            "\/\/ Prints:",
+            "\/\/1 😀 A 0.1",
+            "\/\/2 🥰🥰 BB 0.8"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "If any upstream publisher finishes successfully or fails with an error, so too does the zipped publisher.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -845,7 +1101,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/zip(_:_:_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from three other publishers and delivers a transformed output.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

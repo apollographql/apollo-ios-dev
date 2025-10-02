@@ -1,0 +1,2884 @@
+{
+  "abstract" : [
+    {
+      "text" : "Manages a chain of steps taken to execute a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ". ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " enables customization of each step",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "of a request by injection of ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Interceptors",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "hierarchy" : {
+    "paths" : [
+      [
+        "doc:\/\/Apollo\/documentation\/Apollo"
+      ]
+    ]
+  },
+  "identifier" : {
+    "interfaceLanguage" : "swift",
+    "url" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain"
+  },
+  "kind" : "symbol",
+  "metadata" : {
+    "externalID" : "s:6Apollo12RequestChainV",
+    "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "struct"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "RequestChain"
+      }
+    ],
+    "modules" : [
+      {
+        "name" : "Apollo"
+      }
+    ],
+    "navigatorTitle" : [
+      {
+        "kind" : "identifier",
+        "text" : "RequestChain"
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Structure",
+    "symbolKind" : "struct",
+    "title" : "RequestChain"
+  },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "struct"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "RequestChain"
+            },
+            {
+              "kind" : "text",
+              "text" : "<"
+            },
+            {
+              "kind" : "genericParameter",
+              "text" : "Request"
+            },
+            {
+              "kind" : "text",
+              "text" : "> "
+            },
+            {
+              "kind" : "keyword",
+              "text" : "where"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "text" : "Request"
+            },
+            {
+              "kind" : "text",
+              "text" : " : "
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:6Apollo14GraphQLRequestP",
+              "text" : "GraphQLRequest"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "Custom-Functionality-via-Interceptors",
+          "level" : 2,
+          "text" : "Custom Functionality via Interceptors",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " allows complete control over the execution of a request. It manages the flow of data through",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "a series of steps, but the implementation logic for each step can be controlled by using custom interceptors.",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "You can control the logic of cache reads\/writes (via ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CacheInterceptor",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : "), networking (via ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloURLSession",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : "),",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "and response parsing\/GraphQL execution (via ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponseParsingInterceptor",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : "). The ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " also provides",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "the ability to add additional behaviors by inspecting and\/or mutating the ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " and ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "(via ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLInterceptor",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : "s), and the ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " and raw ",
+              "type" : "text"
+            },
+            {
+              "code" : "Data",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " stream (via ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPInterceptor",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : "s).",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "anchor" : "Response-Streams",
+          "level" : 2,
+          "text" : "Response Streams",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Because some requests may have a multi-part response, such as subscriptions or operations using ",
+              "type" : "text"
+            },
+            {
+              "code" : "@defer",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", the",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "results of a ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " are processed through ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : "s. Interceptors may use the",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "mapping functions of these streams to inspect and\/or mutate the resulting elements. The transformed results",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "returned from the mapping functions will be passed to the next step in the chain for each element. For requests",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "that should have a single response, these streams will emit a single value and then terminate.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "anchor" : "Request-Chain-Flow",
+          "level" : 2,
+          "text" : "Request Chain Flow",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " sends a request “down” the chain of it’s interceptors, executes the request, and then sends",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "the result back “up” through the chain. This means the first interceptor will receive the request first and the",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "response last.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "When ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/kickoff(request:)",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " is called, the ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " processes the request through each of its",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "interceptors using the following process:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "1. GraphQL Interceptors (Pre-flight)",
+                  "type" : "text"
+                }
+              ],
+              "type" : "strong"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " is passed “down” through the ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLInterceptor",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : "s in sequential order. Each interceptor may",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "inspect and\/or mutate the request and proceeds by calling the provided ",
+              "type" : "text"
+            },
+            {
+              "code" : "next",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " closure.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "2. Cache Read",
+                  "type" : "text"
+                }
+              ],
+              "type" : "strong"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " uses the ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest\/fetchBehavior",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " of the request to determine if a pre-flight cache",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "read is necessary. If so, it attempts a cache read by calling the provided ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CacheInterceptor",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : "’s",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CacheInterceptor\/readCacheData(from:request:)",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " function.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "3. URLRequest Creation",
+                  "type" : "text"
+                }
+              ],
+              "type" : "strong"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " uses the ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest\/fetchBehavior",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " of the request to determine if a network fetch should",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "be executed. If so, it calls ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest\/toURLRequest()",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " to convert the request into a",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "code" : "URLRequest",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "4. HTTP Interceptors (Pre-flight)",
+                  "type" : "text"
+                }
+              ],
+              "type" : "strong"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The ",
+              "type" : "text"
+            },
+            {
+              "code" : "URLRequest",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " is passed “down” through the ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPInterceptor",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : "s in sequential order. Each interceptor may inspect",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "and\/or mutate the request and proceeds by calling the provided ",
+              "type" : "text"
+            },
+            {
+              "code" : "next",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " closure.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "5. Network Fetch",
+                  "type" : "text"
+                }
+              ],
+              "type" : "strong"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The ",
+              "type" : "text"
+            },
+            {
+              "code" : "URLRequest",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " is passed to the provided ",
+              "type" : "text"
+            },
+            {
+              "code" : "urlSession",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : "’s ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloURLSession\/chunks(for:)",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " for fetching via",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "the network.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "6. HTTP Interceptors (Post-flight)",
+                  "type" : "text"
+                }
+              ],
+              "type" : "strong"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The received ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " is passed back “up” through the ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPInterceptor",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : "s in reverse order, starting with the",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "last interceptor and ending with the first. As ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/chunks",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " are received by the stream, each",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPInterceptor",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " may inspect and\/or mutate the raw response ",
+              "type" : "text"
+            },
+            {
+              "code" : "Data",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " before proceeding.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "7. Response Parsing",
+                  "type" : "text"
+                }
+              ],
+              "type" : "strong"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " is passed to the provided ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponseParsingInterceptor",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : ", which parses the stream of",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/chunks",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " as they are received and returns an ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorResultStream",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " which emits",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ParsedResult",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : "s as each chunk is parsed.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "8. GraphQL Interceptors (Post-flight)",
+                  "type" : "text"
+                }
+              ],
+              "type" : "strong"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorResultStream",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " is passed back “up” through the ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLInterceptor",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : "s in reverse order, starting",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "with the last interceptor and ending with the first. As ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ParsedResult",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : "s are received by the stream, each",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLInterceptor",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " may inspect and\/or mutate the result before proceeding.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "9. Cache Write",
+                  "type" : "text"
+                }
+              ],
+              "type" : "strong"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " uses the ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest\/fetchBehavior",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " of the request to determine if a cache write",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "should be performed. If so, it attempts a cache write by calling the provided ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CacheInterceptor",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : "’s",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CacheInterceptor\/writeCacheData(to:request:response:)",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " function.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "10. Return a ResultStream",
+                  "type" : "text"
+                }
+              ],
+              "type" : "strong"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The final ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " values of the ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ParsedResult",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ParsedResult\/result",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " emitted by the",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorResultStream",
+              "isActive" : true,
+              "type" : "reference"
+            },
+            {
+              "text" : " are returned as an ",
+              "type" : "text"
+            },
+            {
+              "code" : "AsyncThrowingStream",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to the caller.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    }
+  ],
+  "relationshipsSections" : [
+    {
+      "identifiers" : [
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP"
+      ],
+      "kind" : "relationships",
+      "title" : "Conforms To",
+      "type" : "conformsTo"
+    }
+  ],
+  "schemaVersion" : {
+    "major" : 0,
+    "minor" : 3,
+    "patch" : 0
+  },
+  "sections" : [
+
+  ],
+  "topicSections" : [
+    {
+      "anchor" : "Structures",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/Retry"
+      ],
+      "title" : "Structures"
+    },
+    {
+      "anchor" : "Initializers",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/init(urlSession:interceptors:store:)"
+      ],
+      "title" : "Initializers"
+    },
+    {
+      "anchor" : "Instance-Methods",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/kickoff(request:)"
+      ],
+      "title" : "Instance Methods"
+    },
+    {
+      "anchor" : "Type-Aliases",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/ResultStream"
+      ],
+      "title" : "Type Aliases"
+    }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/requestchain"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
+  ]
+, 
+"references": {
+"doc://Apollo/documentation/Apollo": {
+  "abstract" : [
+    {
+      "text" : "A Strongly typed, Swift-first, GraphQL client.",
+      "type" : "text"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo",
+  "kind" : "symbol",
+  "role" : "collection",
+  "title" : "Apollo",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo"
+},
+"doc://Apollo/documentation/Apollo/ApolloStore": {
+  "abstract" : [
+    {
+      "text" : "The ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " class manages access to a local cache for reading\/writing normalized GraphQL results.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "class"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ApolloStore"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ApolloStore"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloStore",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollostore"
+},
+"doc://Apollo/documentation/Apollo/ApolloURLSession": {
+  "abstract" : [
+    {
+      "text" : "A protocol for a networking session used by Apollo to execute network requests.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ApolloURLSession"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloURLSession",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ApolloURLSession"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ApolloURLSession",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollourlsession"
+},
+"doc://Apollo/documentation/Apollo/ApolloURLSession/chunks(for:)": {
+  "abstract" : [
+    {
+      "text" : "Returns a data stream of the response chunks for the request.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "chunks"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "for"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation10URLRequestV",
+      "text" : "URLRequest"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> (any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo18AsyncChunkSequenceP",
+      "text" : "AsyncChunkSequence"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)NSURLResponse",
+      "text" : "URLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloURLSession\/chunks(for:)",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "chunks(for:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/apollourlsession\/chunks(for:)"
+},
+"doc://Apollo/documentation/Apollo/CacheInterceptor": {
+  "abstract" : [
+    {
+      "text" : "A protocol for an interceptor in a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that handles cache reads and writes.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "CacheInterceptor"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CacheInterceptor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "CacheInterceptor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "CacheInterceptor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cacheinterceptor"
+},
+"doc://Apollo/documentation/Apollo/CacheInterceptor/readCacheData(from:request:)": {
+  "abstract" : [
+    {
+      "text" : "Reads cache data from the given ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " for the request.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "readCacheData"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Request"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "from"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC",
+      "text" : "ApolloStore"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "request"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Request"
+    },
+    {
+      "kind" : "text",
+      "text" : ") "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Request"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo14GraphQLRequestP9OperationQa",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">?"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CacheInterceptor\/readCacheData(from:request:)",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "readCacheData(from:request:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cacheinterceptor\/readcachedata(from:request:)"
+},
+"doc://Apollo/documentation/Apollo/CacheInterceptor/writeCacheData(to:request:response:)": {
+  "abstract" : [
+    {
+      "text" : "Writes response data for a request to the given ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloStore",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "writeCacheData"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "Request"
+    },
+    {
+      "kind" : "text",
+      "text" : ">("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "to"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC",
+      "text" : "ApolloStore"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "request"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Request"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "response"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo12ParsedResultV",
+      "text" : "ParsedResult"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Request"
+    },
+    {
+      "kind" : "text",
+      "text" : "."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo14GraphQLRequestP9OperationQa",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">) "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "async"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CacheInterceptor\/writeCacheData(to:request:response:)",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "writeCacheData(to:request:response:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cacheinterceptor\/writecachedata(to:request:response:)"
+},
+"doc://Apollo/documentation/Apollo/FetchBehavior": {
+  "abstract" : [
+    {
+      "text" : "Describes the cache\/networking behaviors that should be used for the execution of a GraphQL",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "request.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "FetchBehavior"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "FetchBehavior"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "FetchBehavior",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/fetchbehavior"
+},
+"doc://Apollo/documentation/Apollo/GraphQLError": {
+  "abstract" : [
+    {
+      "text" : "Represents an error encountered during the execution of a GraphQL operation.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLError"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLError"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "GraphQLError",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlerror"
+},
+"doc://Apollo/documentation/Apollo/GraphQLInterceptor": {
+  "abstract" : [
+    {
+      "text" : "A protocol for an interceptor in a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that can perform a unit of work that operates on a",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " and ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ParsedResult",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLInterceptor"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLInterceptor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLInterceptor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "GraphQLInterceptor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlinterceptor"
+},
+"doc://Apollo/documentation/Apollo/GraphQLRequest": {
+  "abstract" : [
+    {
+      "text" : "A protocol for a type that represents a request to fetch a ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLOperation",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLRequest"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLRequest"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "GraphQLRequest",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlrequest"
+},
+"doc://Apollo/documentation/Apollo/GraphQLRequest/fetchBehavior": {
+  "abstract" : [
+    {
+      "text" : "The ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/FetchBehavior",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " to use for this request.",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "Determines if fetching will include cache\/network.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "var"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "fetchBehavior"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo13FetchBehaviorV",
+      "text" : "FetchBehavior"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest\/fetchBehavior",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "fetchBehavior",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlrequest\/fetchbehavior"
+},
+"doc://Apollo/documentation/Apollo/GraphQLRequest/toURLRequest()": {
+  "abstract" : [
+    {
+      "text" : "Converts the receiver into a ",
+      "type" : "text"
+    },
+    {
+      "code" : "URLRequest",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " to be used for networking operations.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "toURLRequest"
+    },
+    {
+      "kind" : "text",
+      "text" : "() "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "throws"
+    },
+    {
+      "kind" : "text",
+      "text" : " -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation10URLRequestV",
+      "text" : "URLRequest"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest\/toURLRequest()",
+  "kind" : "symbol",
+  "required" : true,
+  "role" : "symbol",
+  "title" : "toURLRequest()",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlrequest\/tourlrequest()"
+},
+"doc://Apollo/documentation/Apollo/GraphQLResponse": {
+  "abstract" : [
+    {
+      "text" : "Represents the result of a GraphQL operation, including the response data as well as any ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLError",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : "s",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "or extension data included in the response.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLResponse"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLResponse"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "GraphQLResponse",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/graphqlresponse"
+},
+"doc://Apollo/documentation/Apollo/HTTPInterceptor": {
+  "abstract" : [
+    {
+      "text" : "A protocol for an interceptor in a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that can perform a unit of work that operates on an",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "code" : "URLRequest",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " and ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "HTTPInterceptor"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPInterceptor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "HTTPInterceptor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "HTTPInterceptor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/httpinterceptor"
+},
+"doc://Apollo/documentation/Apollo/HTTPResponse": {
+  "abstract" : [
+    {
+      "text" : "A response from an HTTP request that is sent through a series of ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPInterceptor",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : "s in a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " after",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "being fetched by an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloURLSession",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "HTTPResponse"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "HTTPResponse"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "HTTPResponse",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/httpresponse"
+},
+"doc://Apollo/documentation/Apollo/HTTPResponse/chunks": {
+  "abstract" : [
+    {
+      "text" : "The stream of chunks received for the ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/response",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " as raw ",
+      "type" : "text"
+    },
+    {
+      "code" : "Data",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "chunks"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo30NonCopyableAsyncThrowingStreamV",
+      "text" : "NonCopyableAsyncThrowingStream"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:10Foundation4DataV",
+      "text" : "Data"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/chunks",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "chunks",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/httpresponse\/chunks"
+},
+"doc://Apollo/documentation/Apollo/HTTPResponse/response": {
+  "abstract" : [
+    {
+      "text" : "The HTTP response info received for the request",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "response"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "c:objc(cs)NSHTTPURLResponse",
+      "text" : "HTTPURLResponse"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/HTTPResponse\/response",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "response",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/httpresponse\/response"
+},
+"doc://Apollo/documentation/Apollo/InterceptorResultStream": {
+  "abstract" : [
+    {
+      "text" : "The stream of results passed through a series of ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLInterceptor",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : "s by a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "typealias"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "InterceptorResultStream"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/InterceptorResultStream",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "InterceptorResultStream"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "InterceptorResultStream",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/interceptorresultstream"
+},
+"doc://Apollo/documentation/Apollo/Interceptors": {
+  "abstract" : [
+    {
+      "text" : "A data structure containing all of the interceptors required by a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Interceptors"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Interceptors",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Interceptors"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "Interceptors",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/interceptors"
+},
+"doc://Apollo/documentation/Apollo/NonCopyableAsyncThrowingStream": {
+  "abstract" : [
+    {
+      "text" : "A move-only wrapper around an ",
+      "type" : "text"
+    },
+    {
+      "code" : "AsyncThrowingStream",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " that conforms to ",
+      "type" : "text"
+    },
+    {
+      "code" : "~Copyable",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " used to",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "protect against multiple concurrent consumers receiving partial data.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "NonCopyableAsyncThrowingStream"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NonCopyableAsyncThrowingStream",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "NonCopyableAsyncThrowingStream"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "NonCopyableAsyncThrowingStream",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/noncopyableasyncthrowingstream"
+},
+"doc://Apollo/documentation/Apollo/ParsedResult": {
+  "abstract" : [
+    {
+      "text" : "A result parsed from GraphQL specification compliant response data.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ParsedResult"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ParsedResult",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ParsedResult"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ParsedResult",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/parsedresult"
+},
+"doc://Apollo/documentation/Apollo/ParsedResult/result": {
+  "abstract" : [
+    {
+      "text" : "The parsed ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLResponse",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " for the operation.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "result"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo15GraphQLResponseV",
+      "text" : "GraphQLResponse"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Operation"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ParsedResult\/result",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "result",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/parsedresult\/result"
+},
+"doc://Apollo/documentation/Apollo/RequestChain": {
+  "abstract" : [
+    {
+      "text" : "Manages a chain of steps taken to execute a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ". ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " enables customization of each step",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "of a request by injection of ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Interceptors",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "RequestChain"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "RequestChain"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "RequestChain",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestchain"
+},
+"doc://Apollo/documentation/Apollo/RequestChain#Request-Chain-Flow": {
+  "abstract" : [
+
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain#Request-Chain-Flow",
+  "kind" : "section",
+  "title" : "Request Chain Flow",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestchain#Request-Chain-Flow"
+},
+"doc://Apollo/documentation/Apollo/RequestChain/ResultStream": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "typealias"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ResultStream"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/ResultStream",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ResultStream"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "RequestChain.ResultStream",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestchain\/resultstream"
+},
+"doc://Apollo/documentation/Apollo/RequestChain/Retry": {
+  "abstract" : [
+    {
+      "text" : "An error that can be thrown by a component of a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " to indicate that the request should be retried.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Retry"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/Retry",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Retry"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "RequestChain.Retry",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestchain\/retry"
+},
+"doc://Apollo/documentation/Apollo/RequestChain/init(urlSession:interceptors:store:)": {
+  "abstract" : [
+    {
+      "text" : "Designated initializer",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "urlSession"
+    },
+    {
+      "kind" : "text",
+      "text" : ": any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A10URLSessionP",
+      "text" : "ApolloURLSession"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "interceptors"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo12InterceptorsV",
+      "text" : "Interceptors"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "store"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo0A5StoreC",
+      "text" : "ApolloStore"
+    },
+    {
+      "kind" : "text",
+      "text" : ")"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/init(urlSession:interceptors:store:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(urlSession:interceptors:store:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestchain\/init(urlsession:interceptors:store:)"
+},
+"doc://Apollo/documentation/Apollo/RequestChain/kickoff(request:)": {
+  "abstract" : [
+    {
+      "text" : "Kicks off a request from step 1 of the ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain#Request-Chain-Flow",
+      "isActive" : true,
+      "overridingTitle" : "Request Chain Flow",
+      "overridingTitleInlineContent" : [
+        {
+          "text" : "Request Chain Flow",
+          "type" : "text"
+        }
+      ],
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "func"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "kickoff"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "request"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Request"
+    },
+    {
+      "kind" : "text",
+      "text" : ") -> "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo12RequestChainV",
+      "text" : "RequestChain"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "typeIdentifier",
+      "text" : "Request"
+    },
+    {
+      "kind" : "text",
+      "text" : ">."
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo12RequestChainV12ResultStreama",
+      "text" : "ResultStream"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain\/kickoff(request:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "kickoff(request:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/requestchain\/kickoff(request:)"
+},
+"doc://Apollo/documentation/Apollo/ResponseParsingInterceptor": {
+  "abstract" : [
+    {
+      "text" : "A protocol for an interceptor in a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/RequestChain",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that handles the parsing of response data for a",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/GraphQLRequest",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ResponseParsingInterceptor"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ResponseParsingInterceptor",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "ResponseParsingInterceptor"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "ResponseParsingInterceptor",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/responseparsinginterceptor"
+},
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s8SendableP": {
+  "identifier" : "doc:\/\/Apollo\/s8SendableP",
+  "title" : "Swift.Sendable",
+  "type" : "unresolvable"
+}
+}
+}

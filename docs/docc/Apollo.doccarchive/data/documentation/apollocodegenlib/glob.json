@@ -44,6 +44,10 @@
         "text" : "Glob"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "Glob.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/Glob.swift#L21"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

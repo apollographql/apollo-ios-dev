@@ -1,18 +1,4 @@
 {
-  "abstract" : [
-    {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.Output",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -53,6 +39,10 @@
         "text" : "Output"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLQueryPager.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/GraphQLQueryPager.swift#L10"
+    },
     "role" : "symbol",
     "roleHeading" : "Type Alias",
     "symbolKind" : "typealias",

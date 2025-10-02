@@ -38,6 +38,10 @@
         "text" : "SQLiteError"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "SQLiteDatabase.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloSQLite\/SQLiteDatabase.swift#L14"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

@@ -55,6 +55,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "AutomaticPersistedQueryInterceptor.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/RequestChain\/Interceptors\/AutomaticPersistedQueryInterceptor.swift#L12"
+    },
     "role" : "symbol",
     "roleHeading" : "Case",
     "symbolKind" : "case",

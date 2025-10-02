@@ -39,6 +39,18 @@
       ],
       "title" : "Operators"
     }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/cachepolicy_v1\/equatable-implementations"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
   ]
 , 
 "references": {
@@ -90,7 +102,10 @@
 },
 "doc://Apollo/documentation/Apollo/CachePolicy_v1/!=(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a Boolean value indicating whether two values are not equal.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

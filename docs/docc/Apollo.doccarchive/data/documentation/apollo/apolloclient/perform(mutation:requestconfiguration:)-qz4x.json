@@ -125,6 +125,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloClient.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/ApolloClient.swift#L445"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
@@ -250,6 +254,7 @@
               "text" : " : "
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLMutation",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI15GraphQLMutationP",
               "text" : "GraphQLMutation"
@@ -267,6 +272,7 @@
               "text" : "."
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/ResponseFormat-swift.associatedtype",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP14ResponseFormatQa",
               "text" : "ResponseFormat"
@@ -276,6 +282,7 @@
               "text" : " == "
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SingleResponseFormat",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI20SingleResponseFormatV",
               "text" : "SingleResponseFormat"
@@ -864,6 +871,111 @@
   "title" : "RequestConfiguration",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestconfiguration"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLMutation": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLMutation"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP",
+      "text" : "GraphQLOperation"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLMutation",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "GraphQLMutation",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqlmutation"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation/ResponseFormat-swift.associatedtype": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "associatedtype"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ResponseFormat"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI23OperationResponseFormatP",
+      "text" : "OperationResponseFormat"
+    },
+    {
+      "kind" : "text",
+      "text" : " = "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI20SingleResponseFormatV",
+      "text" : "SingleResponseFormat"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/ResponseFormat-swift.associatedtype",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "ResponseFormat",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqloperation\/responseformat-swift.associatedtype"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/SingleResponseFormat": {
+  "abstract" : [
+    {
+      "text" : "A response format for an operation that expects a single network response.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "struct"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "SingleResponseFormat"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SingleResponseFormat",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "SingleResponseFormat",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/singleresponseformat"
 }
 }
 }

@@ -93,6 +93,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "URLQueryParameterTransformer.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/URLQueryParameterTransformer.swift#L15"
+    },
     "role" : "symbol",
     "roleHeading" : "Initializer",
     "symbolKind" : "init",
@@ -126,6 +130,7 @@
               "text" : ": "
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONEncodableDictionary",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI23JSONEncodableDictionarya",
               "text" : "JSONEncodableDictionary"
@@ -381,6 +386,61 @@
   "title" : "init(body:url:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/urlqueryparametertransformer\/init(body:url:)"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/JSONEncodableDictionary": {
+  "abstract" : [
+    {
+      "text" : "Represents a Dictionary that can be converted into a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONObject",
+      "isActive" : true,
+      "type" : "reference"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "typealias"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "JSONEncodableDictionary"
+    },
+    {
+      "kind" : "text",
+      "text" : " = ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : " : any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI13JSONEncodableP",
+      "text" : "JSONEncodable"
+    },
+    {
+      "kind" : "text",
+      "text" : "]"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONEncodableDictionary",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "JSONEncodableDictionary",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/jsonencodabledictionary"
 }
 }
 }

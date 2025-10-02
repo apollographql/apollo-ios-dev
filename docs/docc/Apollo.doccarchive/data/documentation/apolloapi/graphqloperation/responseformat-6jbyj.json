@@ -68,6 +68,10 @@
         "name" : "ApolloAPI"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLOperation.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/GraphQLOperation.swift#L77"
+    },
     "required" : true,
     "role" : "symbol",
     "roleHeading" : "Type Property",

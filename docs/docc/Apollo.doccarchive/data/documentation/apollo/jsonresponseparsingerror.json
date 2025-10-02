@@ -38,6 +38,10 @@
         "text" : "JSONResponseParsingError"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "JSONResponseParser.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/ResponseParsing\/JSONResponseParser.swift#L4"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

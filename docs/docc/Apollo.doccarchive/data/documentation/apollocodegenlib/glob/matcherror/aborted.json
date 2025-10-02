@@ -34,6 +34,10 @@
         "name" : "ApolloCodegenLib"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "Glob.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/Glob.swift#L34"
+    },
     "role" : "symbol",
     "roleHeading" : "Case",
     "symbolKind" : "case",

@@ -44,6 +44,10 @@
         "text" : "GraphQLExecutionError"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLExecutor.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/Execution\/GraphQLExecutor.swift#L154"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

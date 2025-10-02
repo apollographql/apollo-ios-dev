@@ -38,6 +38,10 @@
         "text" : "OffsetPagination"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "OffsetPagination.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/OffsetBasedPagination\/OffsetPagination.swift#L1"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

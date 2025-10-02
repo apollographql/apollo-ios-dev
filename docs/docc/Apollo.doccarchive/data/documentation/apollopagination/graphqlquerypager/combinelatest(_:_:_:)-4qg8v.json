@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.combineLatest(_:_:_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Subscribes to three additional publishers and publishes a tuple upon receiving output from any of the publishers.",
       "type" : "text"
     }
   ],
@@ -522,6 +514,230 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A second publisher to combine with the first publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "publisher1"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A third publisher to combine with the first publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "publisher2"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A fourth publisher to combine with the first publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "publisher3"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that receives and combines elements from this publisher and three other publishers.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/combineLatest(_:_:_:)-48buc",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " when you want the downstream subscriber to receive a tuple of the most-recent element from multiple publishers when any of them emit a value. To combine elements from multiple publishers, use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/zip(_:_:_:)-16rcy",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " instead. To receive just the most-recent element from multiple publishers rather than tuples, use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/merge(with:_:_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The combined publisher doesn’t produce elements until each of its upstream publishers publishes at least one element.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "Tip",
+          "style" : "tip",
+          "type" : "aside"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The combined publisher passes through any requests to ",
+              "type" : "text"
+            },
+            {
+              "inlineContent" : [
+                {
+                  "text" : "all",
+                  "type" : "text"
+                }
+              ],
+              "type" : "emphasis"
+            },
+            {
+              "text" : " upstream publishers. However, it still obeys the demand-fulfilling rule of only sending the request amount downstream. If the demand isn’t ",
+              "type" : "text"
+            },
+            {
+              "code" : "Subscribers\/Demand\/unlimited",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", it drops values from upstream publishers. It implements this by using a buffer size of 1 for each upstream, and holds the most-recent value in each buffer.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "All upstream publishers need to finish for this publisher to finish. If an upstream publisher never publishes a value, this publisher never finishes.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/combineLatest(_:_:_:)-48buc",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " receives input from any of the publishers, combines the latest value from each publisher into a tuple and publishes it:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let pub = PassthroughSubject<Int, Never>()",
+            "let pub2 = PassthroughSubject<Int, Never>()",
+            "let pub3 = PassthroughSubject<Int, Never>()",
+            "let pub4 = PassthroughSubject<Int, Never>()",
+            "",
+            "cancellable = pub",
+            "    .combineLatest(pub2, pub3, pub4)",
+            "    .sink { print(\"Result: \\($0).\") }",
+            "",
+            "pub.send(1)",
+            "pub.send(2)",
+            "pub2.send(2)",
+            "pub3.send(9)",
+            "pub4.send(1)",
+            "",
+            "pub.send(3)",
+            "pub2.send(12)",
+            "pub.send(13)",
+            "pub3.send(19)",
+            "\/\/",
+            "\/\/ Prints:",
+            "\/\/  Result: (2, 2, 9, 1).",
+            "\/\/  Result: (3, 2, 9, 1).",
+            "\/\/  Result: (3, 12, 9, 1).",
+            "\/\/  Result: (13, 12, 9, 1).",
+            "\/\/  Result: (13, 12, 19, 1)."
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "If any individual publisher of the combined set terminates with a failure, this publisher also fails.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -601,7 +817,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/combineLatest(_:_:_:)-4qg8v": {
   "abstract" : [
-
+    {
+      "text" : "Subscribes to three additional publishers and publishes a tuple upon receiving output from any of the publishers.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

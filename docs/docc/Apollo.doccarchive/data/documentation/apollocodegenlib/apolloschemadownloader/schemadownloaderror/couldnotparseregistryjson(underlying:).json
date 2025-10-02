@@ -55,6 +55,10 @@
         "name" : "ApolloCodegenLib"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloSchemaDownloader.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/ApolloSchemaDownloader.swift#L13"
+    },
     "role" : "symbol",
     "roleHeading" : "Case",
     "symbolKind" : "case",

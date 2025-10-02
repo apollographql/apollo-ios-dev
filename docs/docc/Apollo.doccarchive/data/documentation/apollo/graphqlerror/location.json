@@ -45,6 +45,10 @@
         "text" : "Location"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLError.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/GraphQLError.swift#L45"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

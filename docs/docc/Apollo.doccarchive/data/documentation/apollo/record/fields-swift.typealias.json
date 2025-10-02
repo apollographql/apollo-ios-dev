@@ -39,6 +39,10 @@
         "text" : "Fields"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "Record.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/Caching\/Record.swift#L11"
+    },
     "role" : "symbol",
     "roleHeading" : "Type Alias",
     "symbolKind" : "typealias",

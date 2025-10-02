@@ -1,15 +1,39 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
+      "text" : "Default implementation of ",
       "type" : "text"
     },
     {
-      "code" : "AsyncIteratorProtocol.next(isolation:)",
+      "code" : "next(isolation:)",
       "type" : "codeVoice"
     },
     {
-      "text" : ".",
+      "text" : " in terms of ",
+      "type" : "text"
+    },
+    {
+      "code" : "next()",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ", which",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "is required to maintain backward compatibility with existing async",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "iterators.",
       "type" : "text"
     }
   ],
@@ -487,7 +511,42 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/AsyncIterator/next(isolation:)": {
   "abstract" : [
-
+    {
+      "text" : "Default implementation of ",
+      "type" : "text"
+    },
+    {
+      "code" : "next(isolation:)",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " in terms of ",
+      "type" : "text"
+    },
+    {
+      "code" : "next()",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ", which",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "is required to maintain backward compatibility with existing async",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "iterators.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

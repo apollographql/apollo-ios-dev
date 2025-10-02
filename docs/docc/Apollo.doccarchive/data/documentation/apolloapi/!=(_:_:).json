@@ -78,6 +78,10 @@
         "name" : "ApolloAPI"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLEnum.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/GraphQLEnum.swift#L106"
+    },
     "role" : "symbol",
     "roleHeading" : "Operator",
     "symbolKind" : "op",

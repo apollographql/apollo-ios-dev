@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Error.localizedDescription",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Retrieve the localized description for this error.",
       "type" : "text"
     }
   ],
@@ -189,7 +181,7 @@
       "type" : "text"
     },
     {
-      "code" : "GraphQLOperation",
+      "code" : "\/ApolloAPI\/GraphQLOperation",
       "type" : "codeVoice"
     },
     {
@@ -381,7 +373,10 @@
 },
 "doc://Apollo/documentation/Apollo/RequestChain/Retry/localizedDescription": {
   "abstract" : [
-
+    {
+      "text" : "Retrieve the localized description for this error.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

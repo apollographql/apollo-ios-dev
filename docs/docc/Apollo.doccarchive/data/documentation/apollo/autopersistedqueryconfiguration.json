@@ -61,6 +61,10 @@
         "text" : "AutoPersistedQueryConfiguration"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "AutoPersistedQueryConfiguration.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/AutoPersistedQueryConfiguration.swift#L7"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

@@ -1,6 +1,6 @@
 {
-  "bundleDisplayName" : "Apollo",
-  "bundleID" : "Apollo",
+  "bundleDisplayName" : "ApolloCodegenLib",
+  "bundleID" : "ApolloCodegenLib",
   "schemaVersion" : {
     "major" : 0,
     "minor" : 1,

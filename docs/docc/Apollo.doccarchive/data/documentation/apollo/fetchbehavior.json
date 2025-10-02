@@ -52,6 +52,10 @@
         "text" : "FetchBehavior"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "FetchBehavior.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/FetchBehavior.swift#L44"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",
@@ -836,7 +840,7 @@
       "type" : "text"
     },
     {
-      "code" : "GraphQLOperation",
+      "code" : "\/ApolloAPI\/GraphQLOperation",
       "type" : "codeVoice"
     },
     {

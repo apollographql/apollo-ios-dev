@@ -52,6 +52,10 @@
         "text" : "Interface"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "Interface.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/SchemaTypes\/Interface.swift#L7"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

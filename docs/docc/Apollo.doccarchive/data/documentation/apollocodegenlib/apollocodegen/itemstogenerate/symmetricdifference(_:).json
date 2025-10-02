@@ -1,15 +1,15 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
+      "text" : "Returns a new option set with the elements contained in this set or in",
       "type" : "text"
     },
     {
-      "code" : "OptionSet.symmetricDifference(_:)",
-      "type" : "codeVoice"
+      "text" : " ",
+      "type" : "text"
     },
     {
-      "text" : ".",
+      "text" : "the given set, but not in both.",
       "type" : "text"
     }
   ],
@@ -132,6 +132,61 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "An option set.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "other"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A new option set with only the elements contained in either",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "this set or ",
+              "type" : "text"
+            },
+            {
+              "code" : "other",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", but not in both.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -240,7 +295,18 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegen/ItemsToGenerate/symmetricDifference(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a new option set with the elements contained in this set or in",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "the given set, but not in both.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

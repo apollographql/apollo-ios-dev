@@ -144,6 +144,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "NetworkTransport.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/NetworkTransport.swift#L18"
+    },
     "required" : true,
     "role" : "symbol",
     "roleHeading" : "Instance Method",
@@ -298,6 +302,7 @@
               "text" : " : "
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLQuery",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI12GraphQLQueryP",
               "text" : "GraphQLQuery"
@@ -876,6 +881,40 @@
   "title" : "RequestConfiguration",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/requestconfiguration"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLQuery": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLQuery"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP",
+      "text" : "GraphQLOperation"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLQuery",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "GraphQLQuery",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqlquery"
 }
 }
 }

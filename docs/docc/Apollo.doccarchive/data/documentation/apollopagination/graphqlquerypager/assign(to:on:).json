@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.assign(to:on:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Assigns each element from a publisher to a property on an object.",
       "type" : "text"
     }
   ],
@@ -311,6 +303,218 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A key path that indicates the property to assign. See ",
+                  "type" : "text"
+                },
+                {
+                  "identifier" : "https:\/\/developer.apple.com\/library\/archive\/documentation\/Swift\/Conceptual\/Swift_Programming_Language\/Expressions.html#\/\/apple_ref\/doc\/uid\/TP40014097-CH32-ID563",
+                  "isActive" : true,
+                  "type" : "reference"
+                },
+                {
+                  "text" : " in ",
+                  "type" : "text"
+                },
+                {
+                  "inlineContent" : [
+                    {
+                      "text" : "The Swift Programming Language",
+                      "type" : "text"
+                    }
+                  ],
+                  "type" : "emphasis"
+                },
+                {
+                  "text" : " to learn how to use key paths to specify a property of an object.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "keyPath"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The object that contains the property. The subscriber assigns the object’s property every time it receives a new value.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "object"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "An ",
+              "type" : "text"
+            },
+            {
+              "code" : "AnyCancellable",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " instance. Call ",
+              "type" : "text"
+            },
+            {
+              "code" : "Cancellable\/cancel()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " on this instance when you no longer want the publisher to automatically assign the property. Deinitializing this instance will also cancel automatic assignment.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/assign(to:on:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " subscriber when you want to set a given property each time a publisher produces a value.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In this example, the ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/assign(to:on:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " sets the value of the ",
+              "type" : "text"
+            },
+            {
+              "code" : "anInt",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " property on an instance of ",
+              "type" : "text"
+            },
+            {
+              "code" : "MyClass",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ":",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "class MyClass {",
+            "    var anInt: Int = 0 {",
+            "        didSet {",
+            "            print(\"anInt was set to: \\(anInt)\", terminator: \"; \")",
+            "        }",
+            "    }",
+            "}",
+            "",
+            "var myObject = MyClass()",
+            "let myRange = (0...2)",
+            "cancellable = myRange.publisher",
+            "    .assign(to: \\.anInt, on: myObject)",
+            "",
+            "\/\/ Prints: \"anInt was set to: 0; anInt was set to: 1; anInt was set to: 2\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "Subscribers\/Assign",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " instance created by this operator maintains a strong reference to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "object",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ", and sets it to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "nil",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " when the upstream publisher completes (either normally or with an error).",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "Important",
+          "style" : "important",
+          "type" : "aside"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -390,7 +594,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/assign(to:on:)": {
   "abstract" : [
-
+    {
+      "text" : "Assigns each element from a publisher to a property on an object.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [
@@ -519,6 +726,18 @@
   "title" : "assign(to:on:)",
   "type" : "topic",
   "url" : "\/documentation\/apollopagination\/graphqlquerypager\/assign(to:on:)"
+},
+"https://developer.apple.com/library/archive/documentation/Swift/Conceptual/Swift_Programming_Language/Expressions.html#//apple_ref/doc/uid/TP40014097-CH32-ID563": {
+  "identifier" : "https:\/\/developer.apple.com\/library\/archive\/documentation\/Swift\/Conceptual\/Swift_Programming_Language\/Expressions.html#\/\/apple_ref\/doc\/uid\/TP40014097-CH32-ID563",
+  "title" : "Key-Path Expression",
+  "titleInlineContent" : [
+    {
+      "text" : "Key-Path Expression",
+      "type" : "text"
+    }
+  ],
+  "type" : "link",
+  "url" : "https:\/\/developer.apple.com\/library\/archive\/documentation\/Swift\/Conceptual\/Swift_Programming_Language\/Expressions.html#\/\/apple_ref\/doc\/uid\/TP40014097-CH32-ID563"
 }
 }
 }

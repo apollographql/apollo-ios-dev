@@ -111,6 +111,10 @@
         ]
       }
     ],
+    "remoteSource" : {
+      "fileName" : "SelectionSet+DictionaryIntializer.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/SelectionSet+DictionaryIntializer.swift#L19"
+    },
     "role" : "symbol",
     "roleHeading" : "Initializer",
     "symbolKind" : "init",
@@ -178,6 +182,7 @@
               "text" : " : any "
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableValue",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI29GraphQLOperationVariableValueP",
               "text" : "GraphQLOperationVariableValue"
@@ -482,6 +487,40 @@
   "title" : "init(data:variables:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/apolloapi\/rootselectionset\/init(data:variables:)-8jhke"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperationVariableValue": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLOperationVariableValue"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s8SendableP",
+      "text" : "Sendable"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperationVariableValue",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "GraphQLOperationVariableValue",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqloperationvariablevalue"
 }
 }
 }

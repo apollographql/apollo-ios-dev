@@ -134,6 +134,10 @@
         "unavailable" : false
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloClient.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/ApolloClient.swift#L800"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
@@ -286,6 +290,7 @@
               "text" : " : "
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP",
               "text" : "GraphQLOperation"
@@ -600,6 +605,49 @@
   "title" : "GraphQLResultHandler",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlresulthandler"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLOperation"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SH",
+      "text" : "Hashable"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s8SendableP",
+      "text" : "Sendable"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "GraphQLOperation",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqloperation"
 }
 }
 }

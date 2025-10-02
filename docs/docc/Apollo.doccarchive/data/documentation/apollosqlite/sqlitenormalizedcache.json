@@ -52,6 +52,10 @@
         "text" : "SQLiteNormalizedCache"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "SQLiteNormalizedCache.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloSQLite\/SQLiteNormalizedCache.swift#L9"
+    },
     "role" : "symbol",
     "roleHeading" : "Class",
     "symbolKind" : "class",
@@ -97,8 +101,8 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/ApolloSQLite\/6Apollo15NormalizedCacheP",
-        "doc:\/\/ApolloSQLite\/6Apollo23ReadOnlyNormalizedCacheP",
+        "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache",
+        "doc:\/\/Apollo\/documentation\/Apollo\/ReadOnlyNormalizedCache",
         "doc:\/\/ApolloSQLite\/s8CopyableP"
       ],
       "kind" : "relationships",
@@ -159,15 +163,88 @@
   "type" : "link",
   "url" : "\/documentation\/apollo\/normalizedcache"
 },
-"doc://ApolloSQLite/6Apollo15NormalizedCacheP": {
-  "identifier" : "doc:\/\/ApolloSQLite\/6Apollo15NormalizedCacheP",
-  "title" : "Apollo.NormalizedCache",
-  "type" : "unresolvable"
+"doc://Apollo/documentation/Apollo/NormalizedCache": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "NormalizedCache"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo23ReadOnlyNormalizedCacheP",
+      "text" : "ReadOnlyNormalizedCache"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "NormalizedCache",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/normalizedcache"
 },
-"doc://ApolloSQLite/6Apollo23ReadOnlyNormalizedCacheP": {
-  "identifier" : "doc:\/\/ApolloSQLite\/6Apollo23ReadOnlyNormalizedCacheP",
-  "title" : "Apollo.ReadOnlyNormalizedCache",
-  "type" : "unresolvable"
+"doc://Apollo/documentation/Apollo/ReadOnlyNormalizedCache": {
+  "abstract" : [
+    {
+      "text" : "A read-only view of a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/NormalizedCache",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " for use within a ",
+      "type" : "text"
+    },
+    {
+      "code" : "ReadTransaction",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : ".",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "ReadOnlyNormalizedCache"
+    },
+    {
+      "kind" : "text",
+      "text" : " : AnyObject"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ReadOnlyNormalizedCache",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "ReadOnlyNormalizedCache",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/readonlynormalizedcache"
 },
 "doc://ApolloSQLite/documentation/ApolloSQLite": {
   "abstract" : [

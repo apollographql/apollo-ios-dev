@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.delay(for:tolerance:scheduler:options:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Delays delivery of all output to the downstream receiver by a specified amount of time on a particular scheduler.",
       "type" : "text"
     }
   ],
@@ -452,6 +444,190 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The amount of time to delay.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "interval"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The allowed tolerance in delivering delayed events. The ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "Delay",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " publisher may deliver elements this much sooner or later than the interval specifies.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "tolerance"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The scheduler to deliver the delayed events.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "scheduler"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Options relevant to the scheduler’s behavior.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "options"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that delays delivery of elements and completion to the downstream receiver.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/delay(for:tolerance:scheduler:options:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " when you need to delay the delivery of elements to a downstream by a specified amount of time.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In this example, a ",
+              "type" : "text"
+            },
+            {
+              "text" : "doc:\/\/com.apple.documentation\/documentation\/Foundation\/Timer",
+              "type" : "text"
+            },
+            {
+              "text" : " publishes an event every second. The ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/delay(for:tolerance:scheduler:options:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator holds the delivery of the initial element for 3 seconds (±0.5 seconds), after which each element is delivered to the downstream on the main run loop after the specified delay:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let df = DateFormatter()",
+            "df.dateStyle = .none",
+            "df.timeStyle = .long",
+            "cancellable = Timer.publish(every: 1.0, on: .main, in: .default)",
+            "    .autoconnect()",
+            "    .handleEvents(receiveOutput: { date in",
+            "        print (\"Sending Timestamp \\'\\(df.string(from: date))\\' to delay()\")",
+            "    })",
+            "    .delay(for: .seconds(3), scheduler: RunLoop.main, options: .none)",
+            "    .sink(",
+            "        receiveCompletion: { print (\"completion: \\($0)\", terminator: \"\\n\") },",
+            "        receiveValue: { value in",
+            "            let now = Date()",
+            "            print (\"At \\(df.string(from: now)) received  Timestamp \\'\\(df.string(from: value))\\' sent: \\(String(format: \"%.2f\", now.timeIntervalSince(value))) secs ago\", terminator: \"\\n\")",
+            "        }",
+            "    )",
+            "",
+            "\/\/ Prints:",
+            "\/\/    Sending Timestamp '5:02:33 PM PDT' to delay()",
+            "\/\/    Sending Timestamp '5:02:34 PM PDT' to delay()",
+            "\/\/    Sending Timestamp '5:02:35 PM PDT' to delay()",
+            "\/\/    Sending Timestamp '5:02:36 PM PDT' to delay()",
+            "\/\/    At 5:02:36 PM PDT received  Timestamp '5:02:33 PM PDT' sent: 3.00 secs ago",
+            "\/\/    Sending Timestamp '5:02:37 PM PDT' to delay()",
+            "\/\/    At 5:02:37 PM PDT received  Timestamp '5:02:34 PM PDT' sent: 3.00 secs ago",
+            "\/\/    Sending Timestamp '5:02:38 PM PDT' to delay()",
+            "\/\/    At 5:02:38 PM PDT received  Timestamp '5:02:35 PM PDT' sent: 3.00 secs ago"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The delay affects the delivery of elements and completion, but not of the original subscription.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -531,7 +707,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/delay(for:tolerance:scheduler:options:)": {
   "abstract" : [
-
+    {
+      "text" : "Delays delivery of all output to the downstream receiver by a specified amount of time on a particular scheduler.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

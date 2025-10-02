@@ -33,6 +33,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "JSONResponseParser.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/ResponseParsing\/JSONResponseParser.swift#L6"
+    },
     "role" : "symbol",
     "roleHeading" : "Case",
     "symbolKind" : "case",

@@ -57,6 +57,10 @@
         "name" : "ApolloAPI"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "InputData.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/InputData.swift#L66"
+    },
     "role" : "symbol",
     "roleHeading" : "Case",
     "symbolKind" : "case",

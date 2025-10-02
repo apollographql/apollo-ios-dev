@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.print(_:to:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Prints log messages for all publishing events.",
       "type" : "text"
     }
   ],
@@ -249,6 +241,112 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A string —- which defaults to empty -— with which to prefix all log messages.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "prefix"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A stream for text output that receives messages, and which directs output to the console by default.  A custom stream can be used to log messages to other destinations.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "stream"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that prints log messages for all publishing events.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/print(_:to:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to log messages the console.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, log messages are printed on the console:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let integers = (1...2)",
+            "cancellable = integers.publisher",
+            "   .print(\"Logged a message\", to: nil)",
+            "   .sink { _ in }",
+            "",
+            "\/\/ Prints:",
+            "\/\/  Logged a message: receive subscription: (1..<2)",
+            "\/\/  Logged a message: request unlimited",
+            "\/\/  Logged a message: receive value: (1)",
+            "\/\/  Logged a message: receive finished"
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -328,7 +426,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/print(_:to:)": {
   "abstract" : [
-
+    {
+      "text" : "Prints log messages for all publishing events.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
