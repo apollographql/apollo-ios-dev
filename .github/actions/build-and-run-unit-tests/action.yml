@@ -16,4 +16,4 @@ runs:
   - name: Build and Test
     shell: bash
     run: |
-      xcodebuild clean test -resultBundlePath TestResults/ResultBundle.xcresult -derivedDataPath DerivedData -workspace "ApolloDev.xcworkspace" -scheme "${{ inputs.scheme }}" -destination "${{ inputs.destination }}" -testPlan "${{ inputs.test-plan }}" | xcbeautify
+      xcodebuild clean test -resultBundlePath TestResults/ResultBundle.xcresult -derivedDataPath DerivedData -workspace "ApolloDev.xcworkspace" -scheme "${{ inputs.scheme }}" -destination "${{ inputs.destination }}" -testPlan "${{ inputs.test-plan }}" -verbose -parallel-testing-enabled NO
