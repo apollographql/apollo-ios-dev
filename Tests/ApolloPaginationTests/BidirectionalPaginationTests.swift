@@ -149,11 +149,6 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
         data.hero.friendsConnection.friends equal: \(first?.data?.hero.friendsConnection.friends == last?.data?.hero.friendsConnection.friends)
         data.hero.friendsConnection.pageInfo equal: \(first?.data?.hero.friendsConnection.pageInfo == last?.data?.hero.friendsConnection.pageInfo)
         """)
-      for index in 0..<first!.data!.hero.friendsConnection.totalCount {
-        print("""
-          friend[\(index)] equality: \(first?.data?.hero.friendsConnection.friends[index] == last?.data?.hero.friendsConnection.friends[index])
-          """)
-      }
       XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 
       XCTAssertFalse(output.nextPages.isEmpty)
@@ -292,11 +287,6 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
         data.hero.friendsConnection.friends equal: \(first?.data?.hero.friendsConnection.friends == last?.data?.hero.friendsConnection.friends)
         data.hero.friendsConnection.pageInfo equal: \(first?.data?.hero.friendsConnection.pageInfo == last?.data?.hero.friendsConnection.pageInfo)
         """)
-      for index in 0..<first!.data!.hero.friendsConnection.totalCount {
-        print("""
-          friend[\(index)] equality: \(first?.data?.hero.friendsConnection.friends[index] == last?.data?.hero.friendsConnection.friends[index])
-          """)
-      }
       XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 
       XCTAssertFalse(output.nextPages.isEmpty)
