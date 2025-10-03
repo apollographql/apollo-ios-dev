@@ -116,11 +116,11 @@ enum Mocks {
           class PageInfo: MockSelectionSet {
             override class var __selections: [Selection] {[
               .field("__typename", String.self),
-              .field("startCursor", Optional<String>.self),
+              .field("startCursor", String.self),
               .field("hasPreviousPage", Bool.self),
             ]}
 
-            var startCursor: String? { __data["startCursor"] }
+            var startCursor: String { __data["startCursor"] }
             var hasPreviousPage: Bool { __data["hasPreviousPage"] }
           }
         }
