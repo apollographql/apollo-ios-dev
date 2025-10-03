@@ -85,14 +85,14 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       let last = try? results.last?.get().initialPage
       print("""
         \(#function) - equality
-        first: \(first)
-        last: \(last)
         data equal: \(first?.data == last?.data)
         data.hero equal: \(first?.data?.hero == last?.data?.hero)
         data.hero.__typename equal: \(first?.data?.hero.__typename == last?.data?.hero.__typename)
         data.hero.id equal: \(first?.data?.hero.id == last?.data?.hero.id)
         data.hero.name equal: \(first?.data?.hero.name == last?.data?.hero.name)
         data.hero.friendsConnection equal: \(first?.data?.hero.friendsConnection == last?.data?.hero.friendsConnection)
+        first.data.hero.friendsConnection: \(first?.data?.hero.friendsConnection)
+        last.dat.hero.friendsConnection: \(last?.data?.hero.friendsConnection)
         data.hero.friendsConnection.__data equal: \(first?.data?.hero.friendsConnection.__data == last?.data?.hero.friendsConnection.__data)
         data.hero.friendsConnection.__data._data equal: \(first?.data?.hero.friendsConnection.__data._data == last?.data?.hero.friendsConnection.__data._data)
         data.hero.friendsConnection.__data._fulfilledFragments equal: \(first?.data?.hero.friendsConnection.__data._fulfilledFragments == last?.data?.hero.friendsConnection.__data._fulfilledFragments)
@@ -229,14 +229,14 @@ final class ForwardPaginationTests: XCTestCase, CacheDependentTesting {
       let last = try? newResult.get().initialPage
       print("""
         \(#function) - equality
-        first: \(first)
-        last: \(last)
         data equal: \(first?.data == last?.data)
         data.hero equal: \(first?.data?.hero == last?.data?.hero)
         data.hero.__typename equal: \(first?.data?.hero.__typename == last?.data?.hero.__typename)
         data.hero.id equal: \(first?.data?.hero.id == last?.data?.hero.id)
         data.hero.name equal: \(first?.data?.hero.name == last?.data?.hero.name)
         data.hero.friendsConnection equal: \(first?.data?.hero.friendsConnection == last?.data?.hero.friendsConnection)
+        first.data.hero.friendsConnection: \(first?.data?.hero.friendsConnection)
+        last.dat.hero.friendsConnection: \(last?.data?.hero.friendsConnection)
         data.hero.friendsConnection.__data equal: \(first?.data?.hero.friendsConnection.__data == last?.data?.hero.friendsConnection.__data)
         data.hero.friendsConnection.__data._data equal: \(first?.data?.hero.friendsConnection.__data._data == last?.data?.hero.friendsConnection.__data._data)
         data.hero.friendsConnection.__data._fulfilledFragments equal: \(first?.data?.hero.friendsConnection.__data._fulfilledFragments == last?.data?.hero.friendsConnection.__data._fulfilledFragments)
