@@ -131,6 +131,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
       let _ = first?.data?.hero.friendsConnection == last?.data?.hero.friendsConnection
       print("""
         \(#function) - equality
+        equal: \(first == last)
         data equal: \(first?.data == last?.data)
         data.hero equal: \(first?.data?.hero == last?.data?.hero)
         data.hero.__typename equal: \(first?.data?.hero.__typename == last?.data?.hero.__typename)
@@ -268,6 +269,7 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
       let last = try? results.last?.get().initialPage
       print("""
         \(#function) - equality
+        equal: \(first == last)
         data equal: \(first?.data == last?.data)
         data.hero equal: \(first?.data?.hero == last?.data?.hero)
         data.hero.__typename equal: \(first?.data?.hero.__typename == last?.data?.hero.__typename)
