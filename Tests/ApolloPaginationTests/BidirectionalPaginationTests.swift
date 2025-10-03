@@ -126,6 +126,28 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
 
     try XCTAssertSuccessResult(result) { output in
       // Assert first page is unchanged
+      let first = try? results.first?.get().initialPage
+      let last = try? results.last?.get().initialPage
+      let _ = first?.data?.hero.friendsConnection == last?.data?.hero.friendsConnection
+      print("""
+        \(#function) - equality
+        equal: \(first == last)
+        data equal: \(first?.data == last?.data)
+        data.hero equal: \(first?.data?.hero == last?.data?.hero)
+        data.hero.__typename equal: \(first?.data?.hero.__typename == last?.data?.hero.__typename)
+        data.hero.id equal: \(first?.data?.hero.id == last?.data?.hero.id)
+        data.hero.name equal: \(first?.data?.hero.name == last?.data?.hero.name)
+        data.hero.friendsConnection equal: \(first?.data?.hero.friendsConnection == last?.data?.hero.friendsConnection)
+        hashes - lhs:\(first?.data?.hero.friendsConnection.hashValue) rhs:\(last?.data?.hero.friendsConnection.hashValue)
+        data.hero.friendsConnection.__data equal: \(first?.data?.hero.friendsConnection.__data == last?.data?.hero.friendsConnection.__data)
+        data.hero.friendsConnection.__data._data equal: \(first?.data?.hero.friendsConnection.__data._data == last?.data?.hero.friendsConnection.__data._data)
+        data.hero.friendsConnection.__data._fulfilledFragments equal: \(first?.data?.hero.friendsConnection.__data._fulfilledFragments == last?.data?.hero.friendsConnection.__data._fulfilledFragments)
+        data.hero.friendsConnection.__data._deferredFragments equal: \(first?.data?.hero.friendsConnection.__data._deferredFragments == last?.data?.hero.friendsConnection.__data._deferredFragments)
+        data.hero.friendsConnection.__typename equal: \(first?.data?.hero.friendsConnection.__typename == last?.data?.hero.friendsConnection.__typename)
+        data.hero.friendsConnection.totalCount equal: \(first?.data?.hero.friendsConnection.totalCount == last?.data?.hero.friendsConnection.totalCount)
+        data.hero.friendsConnection.friends equal: \(first?.data?.hero.friendsConnection.friends == last?.data?.hero.friendsConnection.friends)
+        data.hero.friendsConnection.pageInfo equal: \(first?.data?.hero.friendsConnection.pageInfo == last?.data?.hero.friendsConnection.pageInfo)
+        """)
       XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 
       XCTAssertFalse(output.nextPages.isEmpty)
@@ -242,6 +264,27 @@ final class BidirectionalPaginationTests: XCTestCase, CacheDependentTesting {
 
     try XCTAssertSuccessResult(result) { output in
       // Assert first page is unchanged
+      let first = try? results.first?.get().initialPage
+      let last = try? results.last?.get().initialPage
+      print("""
+        \(#function) - equality
+        equal: \(first == last)
+        data equal: \(first?.data == last?.data)
+        data.hero equal: \(first?.data?.hero == last?.data?.hero)
+        data.hero.__typename equal: \(first?.data?.hero.__typename == last?.data?.hero.__typename)
+        data.hero.id equal: \(first?.data?.hero.id == last?.data?.hero.id)
+        data.hero.name equal: \(first?.data?.hero.name == last?.data?.hero.name)
+        data.hero.friendsConnection equal: \(first?.data?.hero.friendsConnection == last?.data?.hero.friendsConnection)
+        hashes - lhs:\(first?.data?.hero.friendsConnection.hashValue) rhs:\(last?.data?.hero.friendsConnection.hashValue)
+        data.hero.friendsConnection.__data equal: \(first?.data?.hero.friendsConnection.__data == last?.data?.hero.friendsConnection.__data)
+        data.hero.friendsConnection.__data._data equal: \(first?.data?.hero.friendsConnection.__data._data == last?.data?.hero.friendsConnection.__data._data)
+        data.hero.friendsConnection.__data._fulfilledFragments equal: \(first?.data?.hero.friendsConnection.__data._fulfilledFragments == last?.data?.hero.friendsConnection.__data._fulfilledFragments)
+        data.hero.friendsConnection.__data._deferredFragments equal: \(first?.data?.hero.friendsConnection.__data._deferredFragments == last?.data?.hero.friendsConnection.__data._deferredFragments)
+        data.hero.friendsConnection.__typename equal: \(first?.data?.hero.friendsConnection.__typename == last?.data?.hero.friendsConnection.__typename)
+        data.hero.friendsConnection.totalCount equal: \(first?.data?.hero.friendsConnection.totalCount == last?.data?.hero.friendsConnection.totalCount)
+        data.hero.friendsConnection.friends equal: \(first?.data?.hero.friendsConnection.friends == last?.data?.hero.friendsConnection.friends)
+        data.hero.friendsConnection.pageInfo equal: \(first?.data?.hero.friendsConnection.pageInfo == last?.data?.hero.friendsConnection.pageInfo)
+        """)
       XCTAssertEqual(try? results.first?.get().initialPage, try? results.last?.get().initialPage)
 
       XCTAssertFalse(output.nextPages.isEmpty)
