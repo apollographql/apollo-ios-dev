@@ -39,6 +39,10 @@
         "text" : "SchemaDownloadError"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloSchemaDownloader.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/ApolloSchemaDownloader.swift#L10"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

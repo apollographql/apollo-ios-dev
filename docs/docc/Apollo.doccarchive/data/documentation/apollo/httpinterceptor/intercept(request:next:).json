@@ -131,6 +131,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "HTTPInterceptor.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/RequestChain\/Interceptors\/HTTPInterceptor.swift#L46"
+    },
     "required" : true,
     "role" : "symbol",
     "roleHeading" : "Instance Method",
@@ -483,7 +487,7 @@
       "type" : "text"
     },
     {
-      "code" : "GraphQLOperation",
+      "code" : "\/ApolloAPI\/GraphQLOperation",
       "type" : "codeVoice"
     },
     {

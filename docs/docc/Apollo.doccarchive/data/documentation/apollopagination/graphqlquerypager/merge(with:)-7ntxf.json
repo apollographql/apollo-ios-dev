@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.merge(with:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Combines elements from this publisher with those from another publisher of the same type, delivering an interleaved sequence of elements.",
       "type" : "text"
     }
   ],
@@ -213,6 +205,45 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Another publisher of this publisher’s type.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "other"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that emits an event when either upstream publisher emits an event.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -292,7 +323,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/merge(with:)-7ntxf": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from this publisher with those from another publisher of the same type, delivering an interleaved sequence of elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

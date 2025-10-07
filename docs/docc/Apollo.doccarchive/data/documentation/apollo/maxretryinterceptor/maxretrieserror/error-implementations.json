@@ -40,6 +40,18 @@
       ],
       "title" : "Instance Properties"
     }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/maxretryinterceptor\/maxretrieserror\/error-implementations"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
   ]
 , 
 "references": {
@@ -198,7 +210,10 @@
 },
 "doc://Apollo/documentation/Apollo/MaxRetryInterceptor/MaxRetriesError/localizedDescription": {
   "abstract" : [
-
+    {
+      "text" : "Retrieve the localized description for this error.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

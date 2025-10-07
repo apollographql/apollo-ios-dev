@@ -58,6 +58,10 @@
         "name" : "ApolloSQLite"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloSQLiteDatabase.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloSQLite\/ApolloSQLiteDatabase.swift#L212"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",

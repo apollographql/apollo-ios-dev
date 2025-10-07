@@ -52,6 +52,10 @@
         "text" : "CursorBasedPagination"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "CursorBasedPagination.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/CursorBasedPagination\/CursorBasedPagination.swift#L3"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

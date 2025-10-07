@@ -75,6 +75,10 @@
         "unavailable" : false
       }
     ],
+    "remoteSource" : {
+      "fileName" : "RequestContext.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/RequestContext.swift#L24"
+    },
     "required" : true,
     "role" : "symbol",
     "roleHeading" : "Instance Property",

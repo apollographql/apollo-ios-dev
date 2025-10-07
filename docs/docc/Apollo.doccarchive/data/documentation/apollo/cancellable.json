@@ -51,6 +51,10 @@
         "unavailable" : false
       }
     ],
+    "remoteSource" : {
+      "fileName" : "Cancellable.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/Cancellable.swift#L5"
+    },
     "role" : "symbol",
     "roleHeading" : "Protocol",
     "symbolKind" : "protocol",

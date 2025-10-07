@@ -90,6 +90,10 @@
         "name" : "ApolloPagination"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLQueryPager.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/GraphQLQueryPager.swift#L137"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
@@ -131,6 +135,7 @@
               "text" : ": "
             },
             {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:6Apollo11CachePolicyO",
               "text" : "CachePolicy"
@@ -140,6 +145,7 @@
               "text" : "."
             },
             {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/Query",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO",
               "text" : "Query"
@@ -149,6 +155,7 @@
               "text" : "."
             },
             {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/Query\/SingleResponse",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:6Apollo11CachePolicyO5QueryO14SingleResponseO",
               "text" : "SingleResponse"
@@ -232,6 +239,112 @@
   ]
 , 
 "references": {
+"doc://Apollo/documentation/Apollo/CachePolicy": {
+  "abstract" : [
+    {
+      "text" : "A set of cache policies for requests to an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClient",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " that specify whether results should be fetched from the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "server or loaded from the local cache.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "CachePolicy"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "CachePolicy",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cachepolicy"
+},
+"doc://Apollo/documentation/Apollo/CachePolicy/Query": {
+  "abstract" : [
+    {
+      "text" : "Cache policies for use with ",
+      "type" : "text"
+    },
+    {
+      "code" : "GraphQLQuery",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " operations.",
+      "type" : "text"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Query"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/Query",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "CachePolicy.Query",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cachepolicy\/query"
+},
+"doc://Apollo/documentation/Apollo/CachePolicy/Query/SingleResponse": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "enum"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "SingleResponse"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/CachePolicy\/Query\/SingleResponse",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "CachePolicy.Query.SingleResponse",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/cachepolicy\/query\/singleresponse"
+},
 "doc://ApolloPagination/documentation/ApolloPagination": {
   "abstract" : [
 

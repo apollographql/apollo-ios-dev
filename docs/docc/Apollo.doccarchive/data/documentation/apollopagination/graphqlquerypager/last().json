@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.last()",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Publishes the last element of a stream, after the stream finishes.",
       "type" : "text"
     }
   ],
@@ -173,6 +165,83 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that only publishes the last element of a stream.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/last()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " when you need to emit only the last element from an upstream publisher.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, the range publisher only emits the last element from the sequence publisher, ",
+              "type" : "text"
+            },
+            {
+              "code" : "10",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", then finishes normally.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let numbers = (-10...10)",
+            "cancellable = numbers.publisher",
+            "    .last()",
+            "    .sink { print(\"\\($0)\") }",
+            "",
+            "\/\/ Prints: \"10\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -252,7 +321,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/last()": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the last element of a stream, after the stream finishes.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

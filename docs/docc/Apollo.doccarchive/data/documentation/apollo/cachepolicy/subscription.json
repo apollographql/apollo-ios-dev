@@ -53,6 +53,10 @@
         "text" : "Subscription"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "CachePolicy.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/Caching\/CachePolicy.swift#L35"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

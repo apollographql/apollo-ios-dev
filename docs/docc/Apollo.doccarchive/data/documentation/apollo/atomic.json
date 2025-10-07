@@ -48,6 +48,10 @@
         "text" : "Atomic"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "Atomic.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/Internal%20Utilities\/Atomic.swift#L5"
+    },
     "role" : "symbol",
     "roleHeading" : "Class",
     "symbolKind" : "class",

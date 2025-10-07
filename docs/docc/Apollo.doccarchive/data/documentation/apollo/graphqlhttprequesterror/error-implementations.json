@@ -39,6 +39,18 @@
       ],
       "title" : "Instance Properties"
     }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/graphqlhttprequesterror\/error-implementations"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
   ]
 , 
 "references": {
@@ -92,7 +104,10 @@
 },
 "doc://Apollo/documentation/Apollo/GraphQLHTTPRequestError/localizedDescription": {
   "abstract" : [
-
+    {
+      "text" : "Retrieve the localized description for this error.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

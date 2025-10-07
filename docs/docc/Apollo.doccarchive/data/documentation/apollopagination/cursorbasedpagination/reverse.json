@@ -46,6 +46,10 @@
         "text" : "Reverse"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ReversePagination.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/CursorBasedPagination\/ReversePagination.swift#L3"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

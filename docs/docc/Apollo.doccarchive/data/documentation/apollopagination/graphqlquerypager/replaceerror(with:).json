@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.replaceError(with:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Replaces any errors in the stream with the provided element.",
       "type" : "text"
     }
   ],
@@ -231,6 +223,139 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "An element to emit when the upstream publisher fails.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "output"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that replaces an error from the upstream publisher with the provided output element.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "If the upstream publisher fails with an error, this publisher emits the provided element, then finishes normally.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, a publisher of strings fails with a ",
+              "type" : "text"
+            },
+            {
+              "code" : "MyError",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " instance, which sends a failure completion downstream. The ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/replaceError(with:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator handles the failure by publishing the string ",
+              "type" : "text"
+            },
+            {
+              "code" : "(replacement element)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " and completing normally.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "struct MyError: Error {}",
+            "let fail = Fail<String, MyError>(error: MyError())",
+            "cancellable = fail",
+            "    .replaceError(with: \"(replacement element)\")",
+            "    .sink(",
+            "        receiveCompletion: { print (\"\\($0)\") },",
+            "        receiveValue: { print (\"\\($0)\", terminator: \" \") }",
+            "    )",
+            "",
+            "\/\/ Prints: \"(replacement element) finished\"."
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "This ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/replaceError(with:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " functionality is useful when you want to handle an error by sending a single replacement element and end the stream. Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/catch(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to recover from an error and provide a replacement publisher to continue providing elements to the downstream subscriber.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -310,7 +435,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/replaceError(with:)": {
   "abstract" : [
-
+    {
+      "text" : "Replaces any errors in the stream with the provided element.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

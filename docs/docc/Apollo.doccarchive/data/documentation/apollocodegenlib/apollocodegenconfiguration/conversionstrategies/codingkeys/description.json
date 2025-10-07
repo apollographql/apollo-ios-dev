@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "CodingKey.description",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "A textual representation of this key.",
       "type" : "text"
     }
   ],
@@ -267,7 +259,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ConversionStrategies/CodingKeys/description": {
   "abstract" : [
-
+    {
+      "text" : "A textual representation of this key.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

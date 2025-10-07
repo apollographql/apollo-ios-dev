@@ -78,6 +78,10 @@
         ]
       }
     ],
+    "remoteSource" : {
+      "fileName" : "URL+Apollo.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/URL+Apollo.swift#L51"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",

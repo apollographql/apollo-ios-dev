@@ -46,6 +46,10 @@
         "text" : "Bidirectional"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "BidirectionalPagination.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/CursorBasedPagination\/BidirectionalPagination.swift#L3"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

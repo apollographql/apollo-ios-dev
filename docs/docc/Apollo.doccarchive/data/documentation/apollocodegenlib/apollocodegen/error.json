@@ -54,6 +54,10 @@
         "text" : "Error"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloCodegen+Errors.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/ApolloCodegen+Errors.swift#L9"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

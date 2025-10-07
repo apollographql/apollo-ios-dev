@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.assertNoFailure(_:file:line:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Raises a fatal error when its upstream publisher fails, and otherwise republishes all received input.",
       "type" : "text"
     }
   ],
@@ -291,6 +283,203 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A string used at the beginning of the fatal error message.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "prefix"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A filename used in the error message. This defaults to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "#file",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "file"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A line number used in the error message. This defaults to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "#line",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "line"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that raises a fatal error when its upstream publisher fails.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "assertNoFailure()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " for internal integrity checks that are active during testing. However, it is important to note that, like its Swift counterpart ",
+              "type" : "text"
+            },
+            {
+              "code" : "fatalError(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", the ",
+              "type" : "text"
+            },
+            {
+              "code" : "assertNoFailure()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator asserts a fatal exception when triggered during development and testing, ",
+              "type" : "text"
+            },
+            {
+              "inlineContent" : [
+                {
+                  "text" : "and",
+                  "type" : "text"
+                }
+              ],
+              "type" : "emphasis"
+            },
+            {
+              "text" : " in shipping versions of code.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, a ",
+              "type" : "text"
+            },
+            {
+              "code" : "CurrentValueSubject",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " publishes the initial and second values successfully. The third value, containing a ",
+              "type" : "text"
+            },
+            {
+              "code" : "genericSubjectError",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", causes the ",
+              "type" : "text"
+            },
+            {
+              "code" : "assertNoFailure()",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator to assert a fatal exception stopping the process:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "public enum SubjectError: Error {",
+            "    case genericSubjectError",
+            "}",
+            "",
+            "let subject = CurrentValueSubject<String, Error>(\"initial value\")",
+            "subject",
+            "    .assertNoFailure()",
+            "    .sink(receiveCompletion: { print (\"completion: \\($0)\") },",
+            "          receiveValue: { print (\"value: \\($0).\") }",
+            "    )",
+            "",
+            "subject.send(\"second value\")",
+            "subject.send(completion: Subscribers.Completion<Error>.failure(SubjectError.genericSubjectError))",
+            "",
+            "\/\/ Prints:",
+            "\/\/  value: initial value.",
+            "\/\/  value: second value.",
+            "\/\/  The process then terminates in the debugger as the assertNoFailure operator catches the genericSubjectError."
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -370,7 +559,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/assertNoFailure(_:file:line:)": {
   "abstract" : [
-
+    {
+      "text" : "Raises a fatal error when its upstream publisher fails, and otherwise republishes all received input.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

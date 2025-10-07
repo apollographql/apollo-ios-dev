@@ -224,7 +224,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/allSatisfy(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes a single Boolean value that indicates whether all received elements pass a given predicate.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -305,7 +308,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/append(_:)-3qu99": {
   "abstract" : [
-
+    {
+      "text" : "Appends a publisher’s output with the specified sequence.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -419,7 +425,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/append(_:)-8aal7": {
   "abstract" : [
-
+    {
+      "text" : "Appends a publisher’s output with the specified elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -543,7 +552,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/append(_:)-wnv": {
   "abstract" : [
-
+    {
+      "text" : "Appends the output of this publisher with the elements emitted by the given publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -622,7 +634,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/assertNoFailure(_:file:line:)": {
   "abstract" : [
-
+    {
+      "text" : "Raises a fatal error when its upstream publisher fails, and otherwise republishes all received input.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -720,7 +735,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/assign(to:)": {
   "abstract" : [
-
+    {
+      "text" : "Republishes elements received from a publisher, by assigning them to a property marked as a publisher.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [
@@ -832,7 +850,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/assign(to:on:)": {
   "abstract" : [
-
+    {
+      "text" : "Assigns each element from a publisher to a property on an object.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [
@@ -964,7 +985,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/breakpoint(receiveSubscription:receiveOutput:receiveCompletion:)": {
   "abstract" : [
-
+    {
+      "text" : "Raises a debugger signal when a provided closure needs to stop the process in the debugger.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1131,7 +1155,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/breakpointOnError()": {
   "abstract" : [
-
+    {
+      "text" : "Raises a debugger signal upon receiving a failure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1186,7 +1213,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/buffer(size:prefetch:whenFull:)": {
   "abstract" : [
-
+    {
+      "text" : "Buffers elements received from an upstream publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1327,7 +1357,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/catch(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Handles errors from an upstream publisher by replacing it with another publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1423,7 +1456,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/collect()": {
   "abstract" : [
-
+    {
+      "text" : "Collects all received elements, and emits a single array of the collection when the upstream publisher finishes.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1478,7 +1514,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/collect(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Collects up to the specified number of elements, and then emits a single array of the collection.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1542,7 +1581,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/collect(_:options:)": {
   "abstract" : [
-
+    {
+      "text" : "Collects elements by a given time-grouping strategy, and emits a single array of the collection.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1664,7 +1706,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/combineLatest(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Subscribes to an additional publisher and publishes a tuple upon receiving output from either publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1743,7 +1788,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/combineLatest(_:_:)-32h5s": {
   "abstract" : [
-
+    {
+      "text" : "Subscribes to two additional publishers and publishes a tuple upon receiving output from any of the publishers.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1846,7 +1894,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/combineLatest(_:_:)-3m6fr": {
   "abstract" : [
-
+    {
+      "text" : "Subscribes to an additional publisher and invokes a closure upon receiving output from either publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -2001,7 +2052,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/combineLatest(_:_:_:)-4qg8v": {
   "abstract" : [
-
+    {
+      "text" : "Subscribes to three additional publishers and publishes a tuple upon receiving output from any of the publishers.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -2128,7 +2182,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/combineLatest(_:_:_:)-81x5u": {
   "abstract" : [
-
+    {
+      "text" : "Subscribes to two additional publishers and invokes a closure upon receiving output from any of the publishers.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -2324,7 +2381,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/combineLatest(_:_:_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Subscribes to three additional publishers and invokes a closure upon receiving output from any of the publishers.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -2561,7 +2621,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/compactMap(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Calls a closure with each received element and publishes any returned optional that has a value.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -2657,7 +2720,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/contains(where:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes a Boolean value upon receiving an element that satisfies the predicate closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -2746,7 +2812,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/count()": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the number of elements received from the upstream publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -2801,7 +2870,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/debounce(for:scheduler:options:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes elements only after a specified time interval elapses between events.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -2947,7 +3019,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/decode(type:decoder:)": {
   "abstract" : [
-
+    {
+      "text" : "Decodes the output from the upstream using a specified decoder.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -3066,7 +3141,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/delay(for:tolerance:scheduler:options:)": {
   "abstract" : [
-
+    {
+      "text" : "Delays delivery of all output to the downstream receiver by a specified amount of time on a particular scheduler.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -3246,7 +3324,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/drop(untilOutputFrom:)": {
   "abstract" : [
-
+    {
+      "text" : "Ignores elements from the upstream publisher until it receives an element from a second publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -3333,7 +3414,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/drop(while:)": {
   "abstract" : [
-
+    {
+      "text" : "Omits elements from the upstream publisher until a given closure returns false, before republishing all remaining elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -3422,7 +3506,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/dropFirst(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Omits the specified number of elements before republishing subsequent elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -3486,7 +3573,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/eraseToAnyPublisher()": {
   "abstract" : [
-
+    {
+      "text" : "Wraps this publisher with a type eraser.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -3558,7 +3648,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/filter(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Republishes all elements that match a provided closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -3639,7 +3732,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/first()": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the first element of a stream, then finishes.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -3694,7 +3790,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/first(where:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the first element of a stream to satisfy a predicate closure, then finishes normally.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -3783,7 +3882,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/flatMap(maxPublishers:_:)-5xn93": {
   "abstract" : [
-
+    {
+      "text" : "Transforms all elements from an upstream publisher into a new publisher up to a maximum number of publishers you specify.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [
@@ -3972,7 +4074,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/flatMap(maxPublishers:_:)-6ydp0": {
   "abstract" : [
-
+    {
+      "text" : "Transforms all elements from an upstream publisher into a new publisher up to a maximum number of publishers you specify.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -4129,7 +4234,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/flatMap(maxPublishers:_:)-7tjjf": {
   "abstract" : [
-
+    {
+      "text" : "Transforms all elements from an upstream publisher into a new publisher up to a maximum number of publishers you specify.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [
@@ -4283,7 +4391,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/flatMap(maxPublishers:_:)-v65z": {
   "abstract" : [
-
+    {
+      "text" : "Transforms all elements from an upstream publisher into a new publisher up to a maximum number of publishers you specify.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -4413,7 +4524,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/handleEvents(receiveSubscription:receiveOutput:receiveCompletion:receiveCancel:receiveRequest:)": {
   "abstract" : [
-
+    {
+      "text" : "Performs the specified closures when publisher events occur.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -4632,7 +4746,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/ignoreOutput()": {
   "abstract" : [
-
+    {
+      "text" : "Ignores all upstream elements, but passes along the upstream publisher’s completion state (finished or failed).",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -4687,7 +4804,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/last()": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the last element of a stream, after the stream finishes.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -4742,7 +4862,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/last(where:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the last element of a stream that satisfies a predicate closure, after upstream finishes.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -4831,7 +4954,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/makeConnectable()": {
   "abstract" : [
-
+    {
+      "text" : "Creates a connectable wrapper around the publisher.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [
@@ -4918,7 +5044,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/map(_:)-1n0d2": {
   "abstract" : [
-
+    {
+      "text" : "Transforms all elements from the upstream publisher with a provided closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -5014,7 +5143,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/map(_:)-5xco8": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the value of a key path.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -5119,7 +5251,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/map(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the values of two key paths as a tuple.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -5274,7 +5409,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/map(_:_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the values of three key paths as a tuple.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -5479,7 +5617,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/mapError(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Converts any failure from the upstream publisher into a new error.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -5575,7 +5716,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/max(by:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the maximum value received from the upstream publisher, using the provided ordering closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -5681,7 +5825,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/measureInterval(using:options:)": {
   "abstract" : [
-
+    {
+      "text" : "Measures and emits the time interval between events received from an upstream publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -5793,7 +5940,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/merge(with:)-7ko3g": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from this publisher with those from another publisher, delivering an interleaved sequence of elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -5880,7 +6030,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/merge(with:)-7ntxf": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from this publisher with those from another publisher of the same type, delivering an interleaved sequence of elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -5951,7 +6104,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/merge(with:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from this publisher with those from two other publishers, delivering an interleaved sequence of elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -6062,7 +6218,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/merge(with:_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from this publisher with those from three other publishers, delivering an interleaved sequence of elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -6197,7 +6356,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/merge(with:_:_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from this publisher with those from four other publishers, delivering an interleaved sequence of elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -6356,7 +6518,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/merge(with:_:_:_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from this publisher with those from five other publishers, delivering an interleaved sequence of elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -6539,7 +6704,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/merge(with:_:_:_:_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from this publisher with those from six other publishers, delivering an interleaved sequence of elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -6746,7 +6914,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/merge(with:_:_:_:_:_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from this publisher with those from seven other publishers, delivering an interleaved sequence of elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -6977,7 +7148,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/min(by:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the minimum value received from the upstream publisher, after it finishes.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -7083,7 +7257,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/multicast(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Applies a closure to create a subject that delivers elements to subscribers.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -7162,7 +7339,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/multicast(subject:)": {
   "abstract" : [
-
+    {
+      "text" : "Provides a subject to deliver elements to multiple subscribers.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -7249,7 +7429,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/output(at:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes a specific element, indicated by its index in the sequence of published elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -7321,7 +7504,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/output(in:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes elements specified by their range in the sequence of published elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -7400,7 +7586,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/prefix(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Republishes elements up to the specified maximum count.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -7464,7 +7653,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/prefix(untilOutputFrom:)": {
   "abstract" : [
-
+    {
+      "text" : "Republishes elements until another publisher emits an element.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -7551,7 +7743,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/prefix(while:)": {
   "abstract" : [
-
+    {
+      "text" : "Republishes elements while a predicate closure indicates publishing should continue.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -7640,7 +7835,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/prepend(_:)-1urj": {
   "abstract" : [
-
+    {
+      "text" : "Prefixes a publisher’s output with the specified sequence.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -7754,7 +7952,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/prepend(_:)-4j7e1": {
   "abstract" : [
-
+    {
+      "text" : "Prefixes the output of this publisher with the elements emitted by the given publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -7833,7 +8034,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/prepend(_:)-64d2f": {
   "abstract" : [
-
+    {
+      "text" : "Prefixes a publisher’s output with the specified values.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -7957,7 +8161,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/print(_:to:)": {
   "abstract" : [
-
+    {
+      "text" : "Prints log messages for all publishing events.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -8038,7 +8245,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/receive(on:options:)": {
   "abstract" : [
-
+    {
+      "text" : "Specifies the scheduler on which to receive elements from the publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -8150,7 +8360,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/reduce(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Applies a closure that collects each element of a stream and publishes a final result upon completion.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -8262,7 +8475,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/removeDuplicates(by:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes only elements that don’t match the previous element, as evaluated by a provided closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -8368,7 +8584,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/replaceEmpty(with:)": {
   "abstract" : [
-
+    {
+      "text" : "Replaces an empty stream with the provided element.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -8448,7 +8667,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/replaceError(with:)": {
   "abstract" : [
-
+    {
+      "text" : "Replaces any errors in the stream with the provided element.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -8528,7 +8750,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/replaceNil(with:)": {
   "abstract" : [
-
+    {
+      "text" : "Replaces nil elements in the stream with the provided element.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -8615,7 +8840,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/retry(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Attempts to recreate a failed subscription with the upstream publisher up to the number of times you specify.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -8679,7 +8907,18 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/scan(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Transforms elements from the upstream publisher by providing the current",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "element to a closure along with the last value returned by the closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -8791,7 +9030,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/setFailureType(to:)": {
   "abstract" : [
-
+    {
+      "text" : "Changes the failure type declared by the upstream publisher.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [
@@ -8910,7 +9152,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/share()": {
   "abstract" : [
-
+    {
+      "text" : "Shares the output of an upstream publisher with multiple subscribers.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -8965,7 +9210,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/sink(receiveCompletion:receiveValue:)": {
   "abstract" : [
-
+    {
+      "text" : "Attaches a subscriber with closure-based behavior.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -9085,7 +9333,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/sink(receiveValue:)": {
   "abstract" : [
-
+    {
+      "text" : "Attaches a subscriber with closure-based behavior to a publisher that never fails.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [
@@ -9185,7 +9436,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/subscribe(_:)-5vwe3": {
   "abstract" : [
-
+    {
+      "text" : "Attaches the specified subscriber to this publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -9230,7 +9484,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/subscribe(_:)-87xwh": {
   "abstract" : [
-
+    {
+      "text" : "Attaches the specified subject to this publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -9280,7 +9537,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/subscribe(on:options:)": {
   "abstract" : [
-
+    {
+      "text" : "Specifies the scheduler on which to perform subscribe, cancel, and request operations.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -9392,7 +9652,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/throttle(for:scheduler:latest:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes either the most-recent or first element published by the upstream publisher in the specified time interval.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -9530,7 +9793,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/timeout(_:scheduler:options:customError:)": {
   "abstract" : [
-
+    {
+      "text" : "Terminates publishing if the upstream publisher exceeds the specified time interval without producing an element.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -9693,7 +9959,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryAllSatisfy(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes a single Boolean value that indicates whether all received elements pass a given error-throwing predicate.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -9782,7 +10051,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryCatch(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Handles errors from an upstream publisher by either replacing it with another publisher or throwing a new error.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -9886,7 +10158,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryCompactMap(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Calls an error-throwing closure with each received element and publishes any returned optional that has a value.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -9990,7 +10265,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryContains(where:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes a Boolean value upon receiving an element that satisfies the throwing predicate closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -10087,7 +10365,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryDrop(while:)": {
   "abstract" : [
-
+    {
+      "text" : "Omits elements from the upstream publisher until an error-throwing closure returns false, before republishing all remaining elements.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -10184,7 +10465,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryFilter(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Republishes all elements that match a provided error-throwing closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -10273,7 +10557,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryFirst(where:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the first element of a stream to satisfy a throwing predicate closure, then finishes normally.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -10370,7 +10657,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryLast(where:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the last element of a stream that satisfies an error-throwing predicate closure, after the stream finishes.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -10467,7 +10757,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryMap(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Transforms all elements from the upstream publisher with a provided error-throwing closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -10571,7 +10864,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryMax(by:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the maximum value received from the upstream publisher, using the provided error-throwing closure to order the items.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -10685,7 +10981,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryMin(by:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the minimum value received from the upstream publisher, using the provided error-throwing closure to order the items.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -10799,7 +11098,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryPrefix(while:)": {
   "abstract" : [
-
+    {
+      "text" : "Republishes elements while an error-throwing predicate closure indicates publishing should continue.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -10896,7 +11198,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryReduce(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Applies an error-throwing closure that collects each element of a stream and publishes a final result upon completion.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -11016,7 +11321,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryRemoveDuplicates(by:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes only elements that don’t match the previous element, as evaluated by a provided error-throwing closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -11130,7 +11438,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryScan(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Transforms elements from the upstream publisher by providing the current element to an error-throwing closure along with the last value returned by the closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -11250,7 +11561,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/values-3l0lz": {
   "abstract" : [
-
+    {
+      "text" : "The elements produced by the publisher, as an asynchronous sequence.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [
@@ -11328,7 +11642,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/values-96ly3": {
   "abstract" : [
-
+    {
+      "text" : "The elements produced by the publisher, as a throwing asynchronous sequence.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -11374,7 +11691,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/zip(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from another publisher and deliver pairs of elements as tuples.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -11453,7 +11773,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/zip(_:_:)-3oklf": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from another publisher and delivers a transformed output.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -11608,7 +11931,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/zip(_:_:)-7ik1f": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from two other publishers and delivers groups of elements as tuples.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -11711,7 +12037,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/zip(_:_:_:)-1pr": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from two other publishers and delivers a transformed output.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -11907,7 +12236,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/zip(_:_:_:)-88gn6": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from three other publishers and delivers groups of elements as tuples.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -12034,7 +12366,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/zip(_:_:_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Combines elements from three other publishers and delivers a transformed output.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

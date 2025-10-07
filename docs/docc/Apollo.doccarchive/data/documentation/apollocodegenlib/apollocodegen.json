@@ -44,6 +44,10 @@
         "text" : "ApolloCodegen"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloCodegen.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/ApolloCodegen.swift#L11"
+    },
     "role" : "symbol",
     "roleHeading" : "Class",
     "symbolKind" : "class",

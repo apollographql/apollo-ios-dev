@@ -40,6 +40,18 @@
       ],
       "title" : "Instance Properties"
     }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/requestchain\/retry\/error-implementations"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
   ]
 , 
 "references": {
@@ -64,7 +76,7 @@
       "type" : "text"
     },
     {
-      "code" : "GraphQLOperation",
+      "code" : "\/ApolloAPI\/GraphQLOperation",
       "type" : "codeVoice"
     },
     {
@@ -256,7 +268,10 @@
 },
 "doc://Apollo/documentation/Apollo/RequestChain/Retry/localizedDescription": {
   "abstract" : [
-
+    {
+      "text" : "Retrieve the localized description for this error.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

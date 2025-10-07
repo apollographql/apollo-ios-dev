@@ -63,6 +63,10 @@
         "unavailable" : false
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloClient.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/ApolloClient.swift#L656"
+    },
     "role" : "symbol",
     "roleHeading" : "Type Property",
     "symbolKind" : "property",

@@ -53,6 +53,10 @@
         "text" : "JSONEncodable"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "JSON.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/JSON.swift#L49"
+    },
     "role" : "symbol",
     "roleHeading" : "Protocol",
     "symbolKind" : "protocol",

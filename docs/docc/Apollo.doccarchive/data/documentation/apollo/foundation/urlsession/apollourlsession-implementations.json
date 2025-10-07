@@ -40,6 +40,18 @@
       ],
       "title" : "Instance Methods"
     }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/foundation\/urlsession\/apollourlsession-implementations"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
   ]
 , 
 "references": {

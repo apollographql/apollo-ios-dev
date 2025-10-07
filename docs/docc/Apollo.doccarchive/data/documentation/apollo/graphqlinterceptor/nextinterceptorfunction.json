@@ -54,6 +54,10 @@
         "text" : "NextInterceptorFunction"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLInterceptor.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/RequestChain\/Interceptors\/GraphQLInterceptor.swift#L90"
+    },
     "role" : "symbol",
     "roleHeading" : "Type Alias",
     "symbolKind" : "typealias",
@@ -373,7 +377,7 @@
       "type" : "text"
     },
     {
-      "code" : "GraphQLOperation",
+      "code" : "\/ApolloAPI\/GraphQLOperation",
       "type" : "codeVoice"
     },
     {

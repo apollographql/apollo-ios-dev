@@ -88,6 +88,10 @@
         "text" : "QueryWrapper"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLQueryPagerOutput.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/GraphQLQueryPagerOutput.swift#L37"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

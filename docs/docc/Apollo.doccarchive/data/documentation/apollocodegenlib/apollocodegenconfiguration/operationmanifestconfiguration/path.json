@@ -49,6 +49,10 @@
         "name" : "ApolloCodegenLib"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloCodegenConfiguration+OperationManifestConfiguration.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/CodegenConfiguration\/ApolloCodegenConfiguration+OperationManifestConfiguration.swift#L10"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Property",
     "symbolKind" : "property",

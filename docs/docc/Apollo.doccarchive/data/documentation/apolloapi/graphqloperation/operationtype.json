@@ -3,9 +3,9 @@
     {
       "anchor" : "GraphQLOperation-Implementations",
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType-90ybj",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType-5e63x",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType-370r3",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType-5e63x"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType-90ybj"
       ],
       "title" : "GraphQLOperation Implementations"
     }
@@ -61,6 +61,10 @@
         "name" : "ApolloAPI"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLOperation.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/GraphQLOperation.swift#L75"
+    },
     "required" : true,
     "role" : "symbol",
     "roleHeading" : "Type Property",

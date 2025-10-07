@@ -103,7 +103,18 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/FileManagerActor/assertIsolated(_:file:line:)": {
   "abstract" : [
-
+    {
+      "text" : "Stops program execution if the current task is not executing on this",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "actor’s serial executor.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -183,7 +194,18 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/FileManagerActor/assumeIsolated(_:file:line:)": {
   "abstract" : [
-
+    {
+      "text" : "Assume that the current task is executing on this actor’s serial executor,",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "or stop program execution otherwise.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -298,7 +320,18 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/FileManagerActor/preconditionIsolated(_:file:line:)": {
   "abstract" : [
-
+    {
+      "text" : "Stops program execution if the current task is not executing on this",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "actor’s serial executor.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

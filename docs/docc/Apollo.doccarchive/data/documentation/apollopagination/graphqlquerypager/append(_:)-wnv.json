@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.append(_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Appends the output of this publisher with the elements emitted by the given publisher.",
       "type" : "text"
     }
   ],
@@ -326,6 +318,127 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The appending publisher.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "publisher"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that appends the appending publisher’s elements after this publisher’s elements.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/append(_:)-5yh02",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to append the output of one publisher to another. The ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/append(_:)-5yh02",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator produces no elements until this publisher finishes. It then produces this publisher’s elements, followed by the given publisher’s elements. If this publisher fails with an error, the given publishers elements aren’t published.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, the ",
+              "type" : "text"
+            },
+            {
+              "code" : "append",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " publisher republishes all elements from the ",
+              "type" : "text"
+            },
+            {
+              "code" : "numbers",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " publisher until it finishes, then publishes all elements from the ",
+              "type" : "text"
+            },
+            {
+              "code" : "otherNumbers",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " publisher:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let numbers = (0...10)",
+            "let otherNumbers = (25...35)",
+            "cancellable = numbers.publisher",
+            "    .append(otherNumbers.publisher)",
+            "    .sink { print(\"\\($0)\", terminator: \" \") }",
+            "",
+            "\/\/ Prints: \"0 1 2 3 4 5 6 7 8 9 10 25 26 27 28 29 30 31 32 33 34 35 \""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -405,7 +518,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/append(_:)-wnv": {
   "abstract" : [
-
+    {
+      "text" : "Appends the output of this publisher with the elements emitted by the given publisher.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

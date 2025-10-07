@@ -56,6 +56,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "Record.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/Caching\/Record.swift#L19"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Subscript",
     "symbolKind" : "subscript",

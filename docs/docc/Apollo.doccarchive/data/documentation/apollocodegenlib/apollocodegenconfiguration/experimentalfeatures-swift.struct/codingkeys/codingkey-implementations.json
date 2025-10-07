@@ -169,7 +169,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ExperimentalFeatures-swift.struct/CodingKeys/debugDescription": {
   "abstract" : [
-
+    {
+      "text" : "A textual representation of this key, suitable for debugging.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -203,7 +206,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/ExperimentalFeatures-swift.struct/CodingKeys/description": {
   "abstract" : [
-
+    {
+      "text" : "A textual representation of this key.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

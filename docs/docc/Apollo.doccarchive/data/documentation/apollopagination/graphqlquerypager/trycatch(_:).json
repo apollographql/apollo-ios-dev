@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.tryCatch(_:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Handles errors from an upstream publisher by either replacing it with another publisher or throwing a new error.",
       "type" : "text"
     }
   ],
@@ -350,6 +342,137 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A throwing closure that accepts the upstream failure as input. This closure can either replace the upstream publisher with a new one, or throw a new error to the downstream subscriber.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "handler"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that handles errors from an upstream publisher by replacing the failed publisher with another publisher, or an error.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryCatch(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to decide how to handle from an upstream publisher by either replacing the publisher with a new publisher, or throwing a new error.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, an array publisher emits values that a ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryMap(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " operator evaluates to ensure the values are greater than zero. If the values aren’t greater than zero, the operator throws an error to the downstream subscriber to let it know there was a problem. The subscriber, ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryCatch(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", replaces the error with a new publisher using ",
+              "type" : "text"
+            },
+            {
+              "code" : "Just",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to publish a final value before the stream ends normally.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "enum SimpleError: Error { case error }",
+            "var numbers = [5, 4, 3, 2, 1, -1, 7, 8, 9, 10]",
+            "",
+            "cancellable = numbers.publisher",
+            "   .tryMap { v in",
+            "        if v > 0 {",
+            "            return v",
+            "        } else {",
+            "            throw SimpleError.error",
+            "        }",
+            "}",
+            "  .tryCatch { error in",
+            "      Just(0) \/\/ Send a final value before completing normally.",
+            "              \/\/ Alternatively, throw a new error to terminate the stream.",
+            "}",
+            "  .sink(receiveCompletion: { print (\"Completion: \\($0).\") },",
+            "        receiveValue: { print (\"Received \\($0).\") }",
+            "  )",
+            "\/\/    Received 5.",
+            "\/\/    Received 4.",
+            "\/\/    Received 3.",
+            "\/\/    Received 2.",
+            "\/\/    Received 1.",
+            "\/\/    Received 0.",
+            "\/\/    Completion: finished."
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -429,7 +552,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryCatch(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Handles errors from an upstream publisher by either replacing it with another publisher or throwing a new error.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

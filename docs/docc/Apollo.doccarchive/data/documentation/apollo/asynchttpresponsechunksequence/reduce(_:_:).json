@@ -1,15 +1,15 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
+      "text" : "Returns the result of combining the elements of the asynchronous sequence",
       "type" : "text"
     },
     {
-      "code" : "AsyncSequence.reduce(_:_:)",
-      "type" : "codeVoice"
+      "text" : " ",
+      "type" : "text"
     },
     {
-      "text" : ".",
+      "text" : "using the given closure.",
       "type" : "text"
     }
   ],
@@ -323,6 +323,289 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The value to use as the initial accumulating value.",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "The ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "nextPartialResult",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " closure receives ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "initialResult",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " the first",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "time the closure runs.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "initialResult"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that combines an accumulating value and",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "an element of the asynchronous sequence into a new accumulating value,",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "for use in the next call of the ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "nextPartialResult",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " closure or",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "returned to the caller.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "nextPartialResult"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The final accumulated value. If the sequence has no elements,",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "the result is ",
+              "type" : "text"
+            },
+            {
+              "code" : "initialResult",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use the ",
+              "type" : "text"
+            },
+            {
+              "code" : "reduce(_:_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " method to produce a single value from the elements of",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "an entire sequence. For example, you can use this method on an sequence of",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "numbers to find their sum or product.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The ",
+              "type" : "text"
+            },
+            {
+              "code" : "nextPartialResult",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " closure executes sequentially with an accumulating",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "value initialized to ",
+              "type" : "text"
+            },
+            {
+              "code" : "initialResult",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " and each element of the sequence.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In this example, an asynchronous sequence called ",
+              "type" : "text"
+            },
+            {
+              "code" : "Counter",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " produces ",
+              "type" : "text"
+            },
+            {
+              "code" : "Int",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "values from ",
+              "type" : "text"
+            },
+            {
+              "code" : "1",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to ",
+              "type" : "text"
+            },
+            {
+              "code" : "4",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ". The ",
+              "type" : "text"
+            },
+            {
+              "code" : "reduce(_:_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " method sums the values",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "received from the asynchronous sequence.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let sum = await Counter(howHigh: 4)",
+            "    .reduce(0) {",
+            "        $0 + $1",
+            "    }",
+            "print(sum)",
+            "\/\/ Prints \"10\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -484,7 +767,18 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/reduce(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns the result of combining the elements of the asynchronous sequence",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "using the given closure.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

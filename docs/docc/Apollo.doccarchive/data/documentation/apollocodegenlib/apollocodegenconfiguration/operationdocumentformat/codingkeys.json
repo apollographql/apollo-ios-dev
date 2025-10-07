@@ -40,6 +40,10 @@
         "text" : "CodingKeys"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloCodegenConfiguration.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/CodegenConfiguration\/ApolloCodegenConfiguration.swift#L998"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

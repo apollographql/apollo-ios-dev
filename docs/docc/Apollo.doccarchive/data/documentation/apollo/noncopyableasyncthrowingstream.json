@@ -68,6 +68,10 @@
         "text" : "NonCopyableAsyncThrowingStream"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "NonCopyableAsyncThrowingStream.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/NonCopyableAsyncThrowingStream.swift#L19"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

@@ -55,6 +55,10 @@
         "name" : "ApolloPagination"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "GraphQLQueryPager.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/GraphQLQueryPager.swift#L13"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Property",
     "symbolKind" : "property",
@@ -76,6 +80,7 @@
               "text" : "@"
             },
             {
+              "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Atomic",
               "kind" : "attribute",
               "preciseIdentifier" : "s:6Apollo6AtomicC",
               "text" : "Atomic"
@@ -154,6 +159,66 @@
   ]
 , 
 "references": {
+"doc://Apollo/documentation/Apollo/Atomic": {
+  "abstract" : [
+    {
+      "text" : "Wrapper for a value protected by an ",
+      "type" : "text"
+    },
+    {
+      "code" : "NSLock",
+      "type" : "codeVoice"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "attribute",
+      "text" : "@propertyWrapper"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "final"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "keyword",
+      "text" : "class"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "Atomic"
+    },
+    {
+      "kind" : "text",
+      "text" : "<"
+    },
+    {
+      "kind" : "genericParameter",
+      "text" : "T"
+    },
+    {
+      "kind" : "text",
+      "text" : ">"
+    }
+  ],
+  "identifier" : "doc:\/\/Apollo\/documentation\/Apollo\/Atomic",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "Atomic",
+  "type" : "topic",
+  "url" : "\/documentation\/apollo\/atomic"
+},
 "doc://ApolloPagination/documentation/ApolloPagination": {
   "abstract" : [
 

@@ -44,6 +44,10 @@
         "text" : "ResponsePath"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ResponsePath.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/ResponsePath.swift#L9"
+    },
     "role" : "symbol",
     "roleHeading" : "Structure",
     "symbolKind" : "struct",

@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.breakpoint(receiveSubscription:receiveOutput:receiveCompletion:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Raises a debugger signal when a provided closure needs to stop the process in the debugger.",
       "type" : "text"
     }
   ],
@@ -397,6 +389,224 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that executes when the publisher receives a subscription. Return ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "true",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " from this closure to raise ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "SIGTRAP",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ", or false to continue.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "receiveSubscription"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that executes when the publisher receives a value. Return ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "true",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " from this closure to raise ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "SIGTRAP",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ", or false to continue.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "receiveOutput"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that executes when the publisher receives a completion. Return ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "true",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " from this closure to raise ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "SIGTRAP",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ", or false to continue.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "receiveCompletion"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that raises a debugger signal when one of the provided closures returns ",
+              "type" : "text"
+            },
+            {
+              "code" : "true",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/breakpoint(receiveSubscription:receiveOutput:receiveCompletion:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to examine one or more stages of the subscribe\/publish\/completion process and stop in the debugger, based on conditions you specify. When any of the provided closures returns ",
+              "type" : "text"
+            },
+            {
+              "code" : "true",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", this operator raises the ",
+              "type" : "text"
+            },
+            {
+              "code" : "SIGTRAP",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " signal to stop the process in the debugger. Otherwise, this publisher passes through values and completions as-is.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, a ",
+              "type" : "text"
+            },
+            {
+              "code" : "PassthroughSubject",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " publishes strings to a breakpoint republisher. When the breakpoint receives the string “",
+              "type" : "text"
+            },
+            {
+              "code" : "DEBUGGER",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : "”, it returns ",
+              "type" : "text"
+            },
+            {
+              "code" : "true",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", which stops the app in the debugger.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let publisher = PassthroughSubject<String?, Never>()",
+            "cancellable = publisher",
+            "    .breakpoint(",
+            "        receiveOutput: { value in return value == \"DEBUGGER\" }",
+            "    )",
+            "    .sink { print(\"\\(String(describing: $0))\" , terminator: \" \") }",
+            "",
+            "publisher.send(\"DEBUGGER\")",
+            "",
+            "\/\/ Prints: \"error: Execution was interrupted, reason: signal SIGTRAP.\"",
+            "\/\/ Depending on your specific environment, the console messages may",
+            "\/\/ also include stack trace information, which is not shown here."
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -476,7 +686,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/breakpoint(receiveSubscription:receiveOutput:receiveCompletion:)": {
   "abstract" : [
-
+    {
+      "text" : "Raises a debugger signal when a provided closure needs to stop the process in the debugger.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

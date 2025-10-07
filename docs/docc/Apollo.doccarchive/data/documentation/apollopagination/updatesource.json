@@ -38,6 +38,10 @@
         "text" : "UpdateSource"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "UpdateSource.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-pagination\/Sources\/ApolloPagination\/UpdateSource.swift#L1"
+    },
     "role" : "symbol",
     "roleHeading" : "Enumeration",
     "symbolKind" : "enum",

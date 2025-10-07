@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Publisher.tryFirst(where:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Publishes the first element of a stream to satisfy a throwing predicate closure, then finishes normally.",
       "type" : "text"
     }
   ],
@@ -273,6 +265,109 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A closure that takes an element as a parameter and returns a Boolean value that indicates whether to publish the element.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "predicate"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A publisher that only publishes the first element of a stream that satisfies the predicate.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use ",
+              "type" : "text"
+            },
+            {
+              "code" : "Publisher\/tryFirst(where:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " when you need to republish only the first element of a stream that satisfies an error-throwing closure you specify.",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "The publisher ignores all elements after the first. If this publisher doesn’t receive any elements, it finishes without publishing. If the predicate closure throws an error, the publisher fails.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In the example below, a range publisher emits the first element in the range then finishes normally:",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let numberRange: ClosedRange<Int> = (-1...50)",
+            "numberRange.publisher",
+            "    .tryFirst {",
+            "        guard $0 < 99 else {throw RangeError()}",
+            "        return true",
+            "    }",
+            "    .sink(",
+            "        receiveCompletion: { print (\"completion: \\($0)\", terminator: \" \") },",
+            "        receiveValue: { print (\"\\($0)\", terminator: \" \") }",
+            "     )",
+            "",
+            "\/\/ Prints: \"-1 completion: finished\"",
+            "\/\/ If instead the number range were ClosedRange<Int> = (100...200), the tryFirst operator would terminate publishing with a RangeError."
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -352,7 +447,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/GraphQLQueryPager/tryFirst(where:)": {
   "abstract" : [
-
+    {
+      "text" : "Publishes the first element of a stream to satisfy a throwing predicate closure, then finishes normally.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -1,15 +1,15 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
+      "text" : "Returns a new option set with only the elements contained in both this",
       "type" : "text"
     },
     {
-      "code" : "OptionSet.intersection(_:)",
-      "type" : "codeVoice"
+      "text" : " ",
+      "type" : "text"
     },
     {
-      "text" : ".",
+      "text" : "set and the given set.",
       "type" : "text"
     }
   ],
@@ -132,6 +132,113 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "An option set.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "other"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A new option set with only the elements contained in both this",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "set and ",
+              "type" : "text"
+            },
+            {
+              "code" : "other",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ".",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "This example uses the ",
+              "type" : "text"
+            },
+            {
+              "code" : "intersection(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " method to limit the available",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "shipping options to what can be used with a PO Box destination.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "\/\/ Can only ship standard or priority to PO Boxes",
+            "let poboxShipping: ShippingOptions = [.standard, .priority]",
+            "let memberShipping: ShippingOptions =",
+            "        [.standard, .priority, .secondDay]",
+            "",
+            "let availableOptions = memberShipping.intersection(poboxShipping)",
+            "print(availableOptions.contains(.priority))",
+            "\/\/ Prints \"true\"",
+            "print(availableOptions.contains(.secondDay))",
+            "\/\/ Prints \"false\""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -237,7 +344,18 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/ApolloCodegenConfiguration/OperationDocumentFormat/intersection(_:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a new option set with only the elements contained in both this",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "set and the given set.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

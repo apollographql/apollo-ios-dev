@@ -64,6 +64,10 @@
         "name" : "ApolloCodegenLib"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "ApolloCodegen+Errors.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios-codegen\/Sources\/ApolloCodegenLib\/ApolloCodegen+Errors.swift#L18"
+    },
     "role" : "symbol",
     "roleHeading" : "Case",
     "symbolKind" : "case",

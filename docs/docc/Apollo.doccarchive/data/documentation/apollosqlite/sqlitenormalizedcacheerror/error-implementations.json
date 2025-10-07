@@ -130,7 +130,10 @@
 },
 "doc://ApolloSQLite/documentation/ApolloSQLite/SQLiteNormalizedCacheError/localizedDescription": {
   "abstract" : [
-
+    {
+      "text" : "Retrieve the localized description for this error.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

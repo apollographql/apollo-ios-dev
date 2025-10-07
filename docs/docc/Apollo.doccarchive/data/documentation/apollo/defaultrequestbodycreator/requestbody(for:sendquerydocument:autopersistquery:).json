@@ -1,18 +1,4 @@
 {
-  "abstract" : [
-    {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "JSONRequestBodyCreator.requestBody(for:sendQueryDocument:autoPersistQuery:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
-    }
-  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -114,6 +100,10 @@
         "name" : "Apollo"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "RequestBodyCreator.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/Apollo\/RequestBodyCreator.swift#L26"
+    },
     "role" : "symbol",
     "roleHeading" : "Instance Method",
     "symbolKind" : "method",
@@ -213,6 +203,7 @@
               "text" : ") -> "
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONEncodableDictionary",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI23JSONEncodableDictionarya",
               "text" : "JSONEncodableDictionary"
@@ -238,6 +229,7 @@
               "text" : " : "
             },
             {
+              "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation",
               "kind" : "typeIdentifier",
               "preciseIdentifier" : "s:9ApolloAPI16GraphQLOperationP",
               "text" : "GraphQLOperation"
@@ -406,6 +398,104 @@
   "title" : "requestBody(for:sendQueryDocument:autoPersistQuery:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/defaultrequestbodycreator\/requestbody(for:sendquerydocument:autopersistquery:)"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/GraphQLOperation": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "protocol"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "GraphQLOperation"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SH",
+      "text" : "Hashable"
+    },
+    {
+      "kind" : "text",
+      "text" : ", "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:s8SendableP",
+      "text" : "Sendable"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "GraphQLOperation",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/graphqloperation"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/JSONEncodableDictionary": {
+  "abstract" : [
+    {
+      "text" : "Represents a Dictionary that can be converted into a ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONObject",
+      "isActive" : true,
+      "type" : "reference"
+    }
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "typealias"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "JSONEncodableDictionary"
+    },
+    {
+      "kind" : "text",
+      "text" : " = ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : " : any "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI13JSONEncodableP",
+      "text" : "JSONEncodable"
+    },
+    {
+      "kind" : "text",
+      "text" : "]"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONEncodableDictionary",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "JSONEncodableDictionary",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/jsonencodabledictionary"
 }
 }
 }

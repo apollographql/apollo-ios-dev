@@ -1,15 +1,23 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
+      "text" : "Creates an asynchronous sequence that maps the given closure over the",
       "type" : "text"
     },
     {
-      "code" : "AsyncSequence.compactMap(_:)",
-      "type" : "codeVoice"
+      "text" : " ",
+      "type" : "text"
     },
     {
-      "text" : ".",
+      "text" : "asynchronous sequence’s elements, omitting results that don’t return a",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "value.",
       "type" : "text"
     }
   ],
@@ -285,6 +293,293 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "A mapping closure. ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "transform",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " accepts an element",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "of this sequence as its parameter and returns a transformed value of the",
+                  "type" : "text"
+                },
+                {
+                  "text" : " ",
+                  "type" : "text"
+                },
+                {
+                  "text" : "same or of a different type.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "transform"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "An asynchronous sequence that contains, in order, the",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "non-",
+              "type" : "text"
+            },
+            {
+              "code" : "nil",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " elements produced by the ",
+              "type" : "text"
+            },
+            {
+              "code" : "transform",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " closure.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "Use the ",
+              "type" : "text"
+            },
+            {
+              "code" : "compactMap(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " method to transform every element received from",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "a base asynchronous sequence, while also discarding any ",
+              "type" : "text"
+            },
+            {
+              "code" : "nil",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " results",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "from the closure. Typically, you use this to transform from one type of",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "element to another.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "In this example, an asynchronous sequence called ",
+              "type" : "text"
+            },
+            {
+              "code" : "Counter",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " produces ",
+              "type" : "text"
+            },
+            {
+              "code" : "Int",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "values from ",
+              "type" : "text"
+            },
+            {
+              "code" : "1",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " to ",
+              "type" : "text"
+            },
+            {
+              "code" : "5",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ". The closure provided to the ",
+              "type" : "text"
+            },
+            {
+              "code" : "compactMap(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "method takes each ",
+              "type" : "text"
+            },
+            {
+              "code" : "Int",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " and looks up a corresponding ",
+              "type" : "text"
+            },
+            {
+              "code" : "String",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " from a",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "code" : "romanNumeralDict",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " dictionary. Because there is no key for ",
+              "type" : "text"
+            },
+            {
+              "code" : "4",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : ", the closure",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "returns ",
+              "type" : "text"
+            },
+            {
+              "code" : "nil",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " in this case, which ",
+              "type" : "text"
+            },
+            {
+              "code" : "compactMap(_:)",
+              "type" : "codeVoice"
+            },
+            {
+              "text" : " omits from the",
+              "type" : "text"
+            },
+            {
+              "text" : " ",
+              "type" : "text"
+            },
+            {
+              "text" : "transformed asynchronous sequence.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        },
+        {
+          "code" : [
+            "let romanNumeralDict: [Int: String] =",
+            "    [1: \"I\", 2: \"II\", 3: \"III\", 5: \"V\"]",
+            "    ",
+            "let stream = Counter(howHigh: 5)",
+            "    .compactMap { romanNumeralDict[$0] }",
+            "for await numeral in stream {",
+            "    print(numeral, terminator: \" \")",
+            "}",
+            "\/\/ Prints \"I II III V \""
+          ],
+          "syntax" : null,
+          "type" : "codeListing"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -446,7 +741,26 @@
 },
 "doc://Apollo/documentation/Apollo/AsyncHTTPResponseChunkSequence/compactMap(_:)-3fbud": {
   "abstract" : [
-
+    {
+      "text" : "Creates an asynchronous sequence that maps the given closure over the",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "asynchronous sequence’s elements, omitting results that don’t return a",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "value.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -181,7 +181,10 @@
 },
 "doc://ApolloPagination/documentation/ApolloPagination/PaginationOutput/QueryWrapper/!=(_:_:)": {
   "abstract" : [
-
+    {
+      "text" : "Returns a Boolean value indicating whether two values are not equal.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

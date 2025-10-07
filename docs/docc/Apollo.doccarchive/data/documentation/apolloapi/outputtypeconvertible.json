@@ -38,6 +38,10 @@
         "text" : "OutputTypeConvertible"
       }
     ],
+    "remoteSource" : {
+      "fileName" : "OutputTypeConvertible.swift",
+      "url" : "https:\/\/github.com\/apollographql\/apollo-ios-dev\/blob\/main\/apollo-ios\/Sources\/ApolloAPI\/OutputTypeConvertible.swift#L1"
+    },
     "role" : "symbol",
     "roleHeading" : "Protocol",
     "symbolKind" : "protocol",
