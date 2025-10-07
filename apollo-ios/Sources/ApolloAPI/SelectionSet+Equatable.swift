@@ -22,9 +22,9 @@ public extension SelectionSet {
   }
 
   @inlinable
-  internal static func equatableCheck<T: Hashable>(
-    _ lhs: [T: any Hashable],
-    _ rhs: [T: any Hashable]
+  internal static func equatableCheck(
+    _ lhs: [String: any Hashable],
+    _ rhs: [String: any Hashable]
   ) -> Bool {
     guard lhs.keys == rhs.keys else { return false }
 
@@ -37,12 +37,21 @@ public extension SelectionSet {
     }
   }
 
+  @_disfavoredOverload
   @inlinable
   internal static func equatableCheck<T: Hashable>(
     _ lhs: T,
     _ rhs: any Hashable
   ) -> Bool {
-    lhs == rhs as? T
+    if let lhs = lhs as? [any Hashable],
+       let rhs = rhs as? [any Hashable]  {
+
+      return lhs.elementsEqual(rhs) { l, r in
+        equatableCheck(l, r)
+      }
+    }
+
+    return lhs == rhs as? T
   }
 
   private func fieldsForEquality() -> [String: FieldValue] {
@@ -52,7 +61,6 @@ public extension SelectionSet {
 
     } else {
       self.addFulfilledSelections(of: type(of: self), to: &fields)
-
     }
 
     return fields
