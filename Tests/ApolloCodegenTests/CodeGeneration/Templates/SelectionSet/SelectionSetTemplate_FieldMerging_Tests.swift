@@ -67,7 +67,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       generateInitializers: selectionSetInitializers,
       config: config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
+      accessControlRenderer: mockTemplateRenderer.accessControlRenderer(for: .member)
     )
   }
 

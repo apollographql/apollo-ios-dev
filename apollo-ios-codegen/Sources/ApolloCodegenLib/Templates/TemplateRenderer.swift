@@ -1,5 +1,5 @@
-import TemplateString
 import OrderedCollections
+import TemplateString
 
 // MARK: TemplateRenderer
 
@@ -103,10 +103,10 @@ extension TemplateRenderer {
 
     let body = {
       switch target {
-      case let .schemaFile(type): 
+      case .schemaFile(let type):
         return renderSchemaFile(type, errorRecorder)
 
-      case let .operationFile(moduleImports):
+      case .operationFile(let moduleImports):
         return renderOperationFile(moduleImports, errorRecorder)
 
       case .moduleFile:
@@ -135,20 +135,20 @@ extension TemplateRenderer {
         return nil
       case (true, nil):
         return config.schemaNamespace.firstUppercased
-      case let (false, .some(schemaTypeNamespace)):
+      case (false, .some(let schemaTypeNamespace)):
         return schemaTypeNamespace
-      case let (true, .some(schemaTypeNamespace)):
+      case (true, .some(let schemaTypeNamespace)):
         return "\(config.schemaNamespace.firstUppercased).\(schemaTypeNamespace)"
       }
     }()
 
     return TemplateString(
-    """
-    \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
-    \(ImportStatementTemplate.SchemaType.template(for: config, type: type))
+      """
+      \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
+      \(ImportStatementTemplate.SchemaType.template(for: config, type: type))
 
-    \(ifLet: renderDetachedTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
-    \(ifLet: namespace, {
+      \(ifLet: renderDetachedTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
+      \(ifLet: namespace, {
       renderBodyTemplate(nonFatalErrorRecorder: errorRecorder)
         .wrappedInNamespace(
           $0,
@@ -156,7 +156,7 @@ extension TemplateRenderer {
         )
       },
       else: renderBodyTemplate(nonFatalErrorRecorder: errorRecorder))
-    """
+      """
     ).description
   }
 
@@ -165,19 +165,19 @@ extension TemplateRenderer {
     _ errorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> String {
     TemplateString(
-    """
-    \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
-    \(ImportStatementTemplate.Operation.template(for: config))
-    \(ifLet: moduleImports, { "\(ModuleImportStatementTemplate.template(moduleImports: $0))" })
+      """
+      \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
+      \(ImportStatementTemplate.Operation.template(for: config))
+      \(ifLet: moduleImports, { "\(ModuleImportStatementTemplate.template(moduleImports: $0))" })
 
-    \(if: config.output.operations.isInModule && !config.output.schemaTypes.isInModule,
+      \(if: config.output.operations.isInModule && !config.output.schemaTypes.isInModule,
       renderBodyTemplate(nonFatalErrorRecorder: errorRecorder)
         .wrappedInNamespace(
           config.schemaNamespace.firstUppercased,
           accessModifier: accessControlModifier(for: .namespace)
       ),
       else: renderBodyTemplate(nonFatalErrorRecorder: errorRecorder))
-    """
+      """
     ).description
   }
 
@@ -185,10 +185,10 @@ extension TemplateRenderer {
     _ errorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> String {
     TemplateString(
-    """
-    \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
-    \(renderBodyTemplate(nonFatalErrorRecorder: errorRecorder))
-    """
+      """
+      \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
+      \(renderBodyTemplate(nonFatalErrorRecorder: errorRecorder))
+      """
     ).description
   }
 
@@ -196,93 +196,29 @@ extension TemplateRenderer {
     _ errorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> String {
     TemplateString(
-    """
-    \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
-    \(ImportStatementTemplate.TestMock.template(for: config))
+      """
+      \(ifLet: renderHeaderTemplate(nonFatalErrorRecorder: errorRecorder), { "\($0)\n" })
+      \(ImportStatementTemplate.TestMock.template(for: config))
 
-    \(renderBodyTemplate(nonFatalErrorRecorder: errorRecorder))
-    """
+      \(renderBodyTemplate(nonFatalErrorRecorder: errorRecorder))
+      """
     ).description
   }
 }
 
-// MARK: Extension - Access modifier
-
-fileprivate extension ApolloCodegenConfiguration.AccessModifier {
-  var swiftString: String {
-    switch self {
-    case .public: return "public " // there should be no spaces in these strings
-    case .internal: return ""
-    }
-  }
-}
-
-enum AccessControlScope {
-  case namespace
-  case parent
-  case member
-}
+// MARK: Extension - Access modifier & SPI
 
 extension TemplateRenderer {
-  func accessControlModifier(for scope: AccessControlScope) -> String {
-    switch target {
-    case .moduleFile, .schemaFile: return schemaAccessControlModifier(scope: scope)
-    case .operationFile: return operationAccessControlModifier(scope: scope)
-    case .testMockFile: return testMockAccessControlModifier(scope: scope)
-    }
+  func accessControlModifier(for scope: AccessControlRenderer.Scope) -> String {
+    self.accessControlRenderer(for: scope).accessControl()
   }
 
-  private func schemaAccessControlModifier(
-    scope: AccessControlScope
-  ) -> String {
-    switch (config.output.schemaTypes.moduleType, scope) {
-    case (.embeddedInTarget, .parent):
-      return ""
-    case
-      (.embeddedInTarget(_, .public), .namespace),
-      (.embeddedInTarget(_, .public), .member):
-        return ApolloCodegenConfiguration.AccessModifier.public.swiftString
-    case
-      (.embeddedInTarget(_, .internal), .namespace),
-      (.embeddedInTarget(_, .internal), .member):
-        return ApolloCodegenConfiguration.AccessModifier.internal.swiftString
-    case
-      (.swiftPackage, _),
-      (.other, _):
-        return ApolloCodegenConfiguration.AccessModifier.public.swiftString
-    }
-  }
-
-  private func operationAccessControlModifier(
-    scope: AccessControlScope
-  ) -> String {
-    switch (config.output.operations, scope) {
-    case (.inSchemaModule, _):
-        return schemaAccessControlModifier(scope: scope)
-    case
-      (.absolute(_, .public), _),
-      (.relative(_, .public), _):
-        return ApolloCodegenConfiguration.AccessModifier.public.swiftString
-    case
-      (.absolute(_, .internal), _),
-      (.relative(_, .internal), _):
-        return ApolloCodegenConfiguration.AccessModifier.internal.swiftString
-    }
-  }
-
-  private func testMockAccessControlModifier(
-    scope: AccessControlScope
-  ) -> String {
-    switch (config.config.output.testMocks, scope) {
-    case (.none, _):
-      return ""
-    case (.absolute(_, .internal), _):
-        return ApolloCodegenConfiguration.AccessModifier.internal.swiftString
-    case
-      (.swiftPackage, _),
-      (.absolute(_, .public), _):
-        return ApolloCodegenConfiguration.AccessModifier.public.swiftString
-    }
+  func accessControlRenderer(for scope: AccessControlRenderer.Scope) -> AccessControlRenderer {
+    return AccessControlRenderer(
+      target: self.target,
+      config: self.config.config,
+      scope: scope
+    )
   }
 }
 
@@ -292,11 +228,11 @@ extension TemplateString {
   /// Wraps `self` in an extension on `namespace`.
   fileprivate func wrappedInNamespace(_ namespace: String, accessModifier: String) -> Self {
     TemplateString(
-    """
-    \(accessModifier)extension \(namespace) {
-      \(self)
-    }
-    """
+      """
+      \(accessModifier)extension \(namespace) {
+        \(self)
+      }
+      """
     )
   }
 }
@@ -350,21 +286,21 @@ struct ImportStatementTemplate {
   enum Operation {
     static func template(
       for config: ApolloCodegen.ConfigurationContext
-    ) -> TemplateString {      
+    ) -> TemplateString {
       return """
-      @_exported import \(TemplateConstants.ApolloAPITargetName)
-      @_spi(Execution) @_spi(Unsafe) import \(TemplateConstants.ApolloAPITargetName)
-      \(if: config.output.operations != .inSchemaModule, "import \(config.schemaModuleName)")
-      """
+        @_exported import \(TemplateConstants.ApolloAPITargetName)
+        @_spi(Execution) @_spi(Unsafe) import \(TemplateConstants.ApolloAPITargetName)
+        \(if: config.output.operations != .inSchemaModule, "import \(config.schemaModuleName)")
+        """
     }
   }
 
   enum TestMock {
     static func template(for config: ApolloCodegen.ConfigurationContext) -> TemplateString {
       return """
-      import ApolloTestSupport
-      @testable import \(config.schemaModuleName)
-      """
+        import ApolloTestSupport
+        @testable import \(config.schemaModuleName)
+        """
     }
   }
 }
@@ -377,16 +313,16 @@ struct ModuleImportStatementTemplate {
     moduleImports: OrderedSet<String>
   ) -> TemplateString {
     return """
-    \(moduleImports.map { "import \($0)" }.joined(separator: "\n"))
-    """
+      \(moduleImports.map { "import \($0)" }.joined(separator: "\n"))
+      """
   }
-    
+
 }
 
 fileprivate extension ApolloCodegenConfiguration {
   var schemaModuleName: String {
     switch output.schemaTypes.moduleType {
-    case let .embeddedInTarget(targetName, _): return targetName
+    case .embeddedInTarget(let targetName, _): return targetName
     case .swiftPackage, .other: return schemaNamespace.firstUppercased
     }
   }

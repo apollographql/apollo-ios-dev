@@ -53,7 +53,7 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
       generateInitializers: false,
       config: config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
+      accessControlRenderer: mockTemplateRenderer.accessControlRenderer(for: .member)
     )
   }
 

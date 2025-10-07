@@ -38,7 +38,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
             generateInitializers: config.config.shouldGenerateSelectionSetInitializers(for: operation),
             config: config,
             nonFatalErrorRecorder: nonFatalErrorRecorder,
-            renderAccessControl: { accessControlModifier(for: .member) }()
+            accessControlRenderer: self.accessControlRenderer(for: .member)
         ).renderBody())
       }
     
