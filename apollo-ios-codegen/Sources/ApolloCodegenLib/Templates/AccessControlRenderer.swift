@@ -30,7 +30,7 @@ struct AccessControlRenderer {
 
     guard shouldIncludeSPI else { return string }
 
-    for spi in spis {
+    for spi in spis.reversed() {
       string = "@_spi(\(spi)) " + string
     }
     return string
