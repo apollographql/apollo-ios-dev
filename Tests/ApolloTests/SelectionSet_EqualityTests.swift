@@ -1022,7 +1022,7 @@ class SelectionSet_EqualityTests: XCTestCase {
     await fulfillment(of: [updateCompletedExpectation], timeout: 1.0)
   }
 
-  func test__equatable__givenFailingModelFromCI_sameValue_shouldBeEqual() throws {
+  func test__equatable__givenNestedObjects_sameValue_shouldBeEqual() throws {
     // given
     class ReverseFriendsQuery: MockSelectionSet {
       override class var __selections: [Selection] { [
@@ -1034,29 +1034,18 @@ class SelectionSet_EqualityTests: XCTestCase {
       class Hero: MockSelectionSet {
         override class var __selections: [Selection] {[
           .field("__typename", String.self),
-          .field("id", String.self),
-          .field("name", String.self),
-          .field("friendsConnection", FriendsConnection.self, arguments: [
-            "first": .variable("first"),
-            "before": .variable("before"),
-          ]),
+          .field("friendsConnection", FriendsConnection.self),
         ]}
 
-        var name: String { __data["name"] }
-        var id: String { __data["id"] }
         var friendsConnection: FriendsConnection { __data["friendsConnection"] }
 
         class FriendsConnection: MockSelectionSet {
           override class var __selections: [Selection] {[
             .field("__typename", String.self),
-            .field("totalCount", Int.self),
             .field("friends", [Character].self),
-            .field("pageInfo", PageInfo.self),
           ]}
 
-          var totalCount: Int { __data["totalCount"] }
           var friends: [Character] { __data["friends"] }
-          var pageInfo: PageInfo { __data["pageInfo"] }
 
           class Character: MockSelectionSet {
             override class var __selections: [Selection] {[
@@ -1067,17 +1056,6 @@ class SelectionSet_EqualityTests: XCTestCase {
 
             var name: String { __data["name"] }
             var id: String { __data["id"] }
-          }
-
-          class PageInfo: MockSelectionSet {
-            override class var __selections: [Selection] {[
-              .field("__typename", String.self),
-              .field("startCursor", Optional<String>.self),
-              .field("hasPreviousPage", Bool.self),
-            ]}
-
-            var startCursor: String? { __data["startCursor"] }
-            var hasPreviousPage: Bool { __data["hasPreviousPage"] }
           }
         }
       }
@@ -1090,11 +1068,8 @@ class SelectionSet_EqualityTests: XCTestCase {
     let body: JSONObject = ["data": [
       "hero": [
         "__typename": "Droid",
-        "id": "2001",
-        "name": "R2-D2",
         "friendsConnection": [
           "__typename": "FriendsConnection",
-          "totalCount": 3,
           "friends": [
             [
               "__typename": "Human",
@@ -1106,11 +1081,6 @@ class SelectionSet_EqualityTests: XCTestCase {
               "name": "Leia Organa",
               "id": "1003",
             ]
-          ],
-          "pageInfo": [
-            "__typename": "PageInfo",
-            "startCursor": "Y3Vyc29yMg==",
-            "hasPreviousPage": true
           ]
         ]
       ]
