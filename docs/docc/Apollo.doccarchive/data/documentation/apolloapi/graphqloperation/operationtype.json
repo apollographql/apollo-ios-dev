@@ -3,9 +3,9 @@
     {
       "anchor" : "GraphQLOperation-Implementations",
       "identifiers" : [
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType-370r3",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType-5e63x",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType-90ybj",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType-370r3"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/GraphQLOperation\/operationType-90ybj"
       ],
       "title" : "GraphQLOperation Implementations"
     }

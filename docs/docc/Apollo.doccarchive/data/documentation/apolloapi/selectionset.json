@@ -144,12 +144,18 @@
       "title" : "Instance Properties"
     },
     {
+      "anchor" : "Type-Aliases",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/FieldValue"
+      ],
+      "title" : "Type Aliases"
+    },
+    {
       "anchor" : "Default-Implementations",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/CustomDebugStringConvertible-Implementations",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Equatable-Implementations",
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Hashable-Implementations"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/CustomDebugStringConvertible-Implementations"
       ],
       "title" : "Default Implementations"
     }
@@ -592,16 +598,36 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionset\/customdebugstringconvertible-implementations"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/Equatable-Implementations": {
+"doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/FieldValue": {
   "abstract" : [
 
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Equatable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Equatable Implementations",
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "typealias"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "FieldValue"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/FieldValue",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "FieldValue"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "SelectionSet.FieldValue",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selectionset\/equatable-implementations"
+  "url" : "\/documentation\/apolloapi\/selectionset\/fieldvalue"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/Fragments-swift.associatedtype": {
   "abstract" : [
@@ -676,17 +702,6 @@
   "title" : "Fragments",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionset\/fragments-swift.associatedtype"
-},
-"doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/Hashable-Implementations": {
-  "abstract" : [
-
-  ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Hashable-Implementations",
-  "kind" : "article",
-  "role" : "collectionGroup",
-  "title" : "Hashable Implementations",
-  "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selectionset\/hashable-implementations"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/Schema": {
   "abstract" : [

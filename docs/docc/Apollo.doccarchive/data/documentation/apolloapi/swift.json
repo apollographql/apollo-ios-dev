@@ -36,7 +36,8 @@
       "anchor" : "Extended-Structures",
       "generated" : true,
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary"
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Dictionary",
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Hasher"
       ],
       "title" : "Extended Structures"
     },
@@ -157,6 +158,38 @@
   "title" : "Dictionary",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/swift\/dictionary"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/Swift/Hasher": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "extension"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "preciseIdentifier" : "s:s6HasherV",
+      "text" : "Hasher"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Swift\/Hasher",
+  "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "Hasher"
+    }
+  ],
+  "role" : "symbol",
+  "title" : "Hasher",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/swift\/hasher"
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Swift/Optional": {
   "abstract" : [
