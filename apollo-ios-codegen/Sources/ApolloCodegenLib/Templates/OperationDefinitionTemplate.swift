@@ -18,6 +18,22 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
     .operationFile(moduleImports: operation.definition.moduleImports)
   }
 
+  private var accessControl: (member: AccessControlRenderer, parent: AccessControlRenderer)!
+
+  init(
+    operation: IR.Operation,
+    operationIdentifier: String?,
+    config: ApolloCodegen.ConfigurationContext,
+  ) {
+    self.operation = operation
+    self.operationIdentifier = operationIdentifier
+    self.config = config
+    self.accessControl = (
+      member: accessControlRenderer(for: .member),
+      parent: accessControlRenderer(for: .parent)
+    )
+  }
+
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
@@ -32,20 +48,20 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
 
       \(section: VariableAccessors(operation.definition.variables))
 
-      \(accessControlModifier(for: .member))struct Data: \(operation.renderedSelectionSetType(config)) {
+      \(accessControl.member.render())struct Data: \(operation.renderedSelectionSetType(config)) {
         \(SelectionSetTemplate(
             definition: operation,
             generateInitializers: config.config.shouldGenerateSelectionSetInitializers(for: operation),
             config: config,
             nonFatalErrorRecorder: nonFatalErrorRecorder,
-            accessControlRenderer: self.accessControlRenderer(for: .member)
+            accessControlRenderer: accessControl.member
         ).renderBody())
       }
     
       \(section: DeferredFragmentsMetadataTemplate(
         operation: operation,
         config: config,
-        renderAccessControl: { accessControlModifier(for: .parent) }()
+        renderAccessControl: { accessControl.parent.render() }()
       ).render())
     }
 
@@ -54,10 +70,10 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
     
   private func OperationDeclaration() -> TemplateString {
     return """
-    \(accessControlModifier(for: .parent))\
+    \(accessControl.parent.render())\
     struct \(operation.generatedDefinitionName): \
     \(operation.definition.operationType.renderedProtocolName) {
-      \(accessControlModifier(for: .member))\
+      \(accessControl.member.render())\
     static let operationName: String = "\(operation.definition.name)"
     """
   }
@@ -67,7 +83,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
     let includeDefinition = config.options.operationDocumentFormat.contains(.definition)
 
     return TemplateString("""
-      \(accessControlModifier(for: .member))\
+      \(accessControl.member.render())\
       static let operationDocument: \(TemplateConstants.ApolloAPITargetName).OperationDocument = .init(
       \(if: config.options.operationDocumentFormat.contains(.operationId), {
         precondition(operationIdentifier != nil, "operationIdentifier is missing.")

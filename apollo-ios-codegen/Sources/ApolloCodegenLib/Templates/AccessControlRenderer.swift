@@ -25,7 +25,7 @@ struct AccessControlRenderer {
     self.accessModifier = Self.accessControlModifier(target: target, config: config, scope: scope)
   }
 
-  func accessControl(withSPIs spis: [SPI] = []) -> String {
+  func render(withSPIs spis: [SPI] = []) -> String {
     var string = accessModifier?.swiftString ?? ""
 
     guard shouldIncludeSPI else { return string }

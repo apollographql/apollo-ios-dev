@@ -312,10 +312,10 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
     let expected = """
         struct Data: TestSchema.SelectionSet {
-          @_spi(Unsafe) let __data: DataDict
-          @_spi(Unsafe) init(_dataDict: DataDict) { __data = _dataDict }
+          let __data: DataDict
+          init(_dataDict: DataDict) { __data = _dataDict }
 
-          @_spi(Execution) static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
+          static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
       """
 
     // when

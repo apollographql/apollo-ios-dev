@@ -21,13 +21,13 @@ struct FragmentTemplate: TemplateRenderer {
     let memberAccessControlRenderer = accessControlRenderer(for: .member)
     return TemplateString(
     """
-    \(accessControlModifier(for: .parent))\
+    \(accessControlRenderer(for: .parent).render())\
     struct \(fragment.generatedDefinitionName.asFragmentName): \
     \(fragment.renderedSelectionSetType(config)), Fragment\
     \(if: fragment.isIdentifiable, ", Identifiable")\
      {
     \(if: includeDefinition, """
-      \(memberAccessControlRenderer.accessControl())\
+      \(memberAccessControlRenderer.render())\
     static var fragmentDefinition: StaticString {
         #"\(fragment.definition.source.convertedToSingleLine())"#
       }

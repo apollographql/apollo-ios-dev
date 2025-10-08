@@ -152,7 +152,7 @@ extension TemplateRenderer {
       renderBodyTemplate(nonFatalErrorRecorder: errorRecorder)
         .wrappedInNamespace(
           $0,
-          accessModifier: accessControlModifier(for: .namespace)
+          accessModifier: accessControlRenderer(for: .namespace).render()
         )
       },
       else: renderBodyTemplate(nonFatalErrorRecorder: errorRecorder))
@@ -174,7 +174,7 @@ extension TemplateRenderer {
       renderBodyTemplate(nonFatalErrorRecorder: errorRecorder)
         .wrappedInNamespace(
           config.schemaNamespace.firstUppercased,
-          accessModifier: accessControlModifier(for: .namespace)
+          accessModifier: accessControlRenderer(for: .namespace).render()
       ),
       else: renderBodyTemplate(nonFatalErrorRecorder: errorRecorder))
       """
@@ -209,10 +209,6 @@ extension TemplateRenderer {
 // MARK: Extension - Access modifier & SPI
 
 extension TemplateRenderer {
-  func accessControlModifier(for scope: AccessControlRenderer.Scope) -> String {
-    self.accessControlRenderer(for: scope).accessControl()
-  }
-
   func accessControlRenderer(for scope: AccessControlRenderer.Scope) -> AccessControlRenderer {
     return AccessControlRenderer(
       target: self.target,

@@ -27,7 +27,7 @@ struct CustomScalarTemplate: TemplateRenderer {
     """
     \(documentation: documentationTemplate, config: config)
     \(graphqlScalar.name.typeNameDocumentation)
-    \(accessControlModifier(for: .parent))\
+    \(accessControlRenderer(for: .parent).render())\
     typealias \(graphqlScalar.render(as: .typename())) = String
     
     """

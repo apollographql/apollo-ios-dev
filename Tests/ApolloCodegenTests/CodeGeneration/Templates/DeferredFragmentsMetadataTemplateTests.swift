@@ -45,7 +45,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     subject = DeferredFragmentsMetadataTemplate(
       operation: operation,
       config: configContext,
-      renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .parent)
+      renderAccessControl: mockTemplateRenderer.accessControlRenderer(for: .parent).render()
     )
   }
   

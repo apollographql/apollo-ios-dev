@@ -35,7 +35,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -51,7 +51,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal(""))
@@ -67,7 +67,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl(withSPIs: [.Internal])
+    let actual = subject.render(withSPIs: [.Internal])
 
     // then
     expect(actual).to(equal("@_spi(Internal) public "))
@@ -83,7 +83,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl(withSPIs: [.Unsafe, .Internal])
+    let actual = subject.render(withSPIs: [.Unsafe, .Internal])
 
     // then
     expect(actual).to(equal("@_spi(Unsafe) @_spi(Internal) public "))
@@ -99,7 +99,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl(withSPIs: [.Internal, .Execution])
+    let actual = subject.render(withSPIs: [.Internal, .Execution])
 
     // then
     expect(actual).to(equal(""))
@@ -115,7 +115,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl(withSPIs: [])
+    let actual = subject.render(withSPIs: [])
 
     // then
     expect(actual).to(equal("public "))
@@ -133,7 +133,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -149,7 +149,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -165,7 +165,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -181,7 +181,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -197,7 +197,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -213,7 +213,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -229,7 +229,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -245,7 +245,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -261,7 +261,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal(""))
@@ -277,7 +277,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal(""))
@@ -293,7 +293,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal(""))
@@ -309,7 +309,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal(""))
@@ -330,7 +330,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -349,7 +349,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -368,7 +368,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal(""))
@@ -387,7 +387,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -406,7 +406,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal(""))
@@ -425,7 +425,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -444,7 +444,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal(""))
@@ -465,7 +465,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal(""))
@@ -484,7 +484,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -503,7 +503,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -522,7 +522,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal(""))
@@ -540,7 +540,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -556,7 +556,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -572,7 +572,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal(""))
@@ -590,7 +590,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -606,7 +606,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -622,7 +622,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -638,7 +638,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -654,7 +654,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -670,7 +670,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -686,7 +686,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))
@@ -702,7 +702,7 @@ class AccessControlRendererTests: XCTestCase {
     )
 
     // when
-    let actual = subject.accessControl()
+    let actual = subject.render()
 
     // then
     expect(actual).to(equal("public "))

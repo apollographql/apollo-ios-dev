@@ -22,9 +22,9 @@ struct SchemaConfigurationTemplate: TemplateRenderer {
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
     return """
-    \(accessControlModifier(for: .parent))enum SchemaConfiguration: \
+    \(accessControlRenderer(for: .parent).render())enum SchemaConfiguration: \
     \(TemplateConstants.ApolloAPITargetName).SchemaConfiguration {
-      \(accessControlModifier(for: .member))\
+      \(accessControlRenderer(for: .member).render())\
     static func cacheKeyInfo(for type: \(TemplateConstants.ApolloAPITargetName).Object, object: \(TemplateConstants.ApolloAPITargetName).ObjectData) -> CacheKeyInfo? {
         // Implement this function to configure cache key resolution for your schema types.
         return nil
