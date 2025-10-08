@@ -37,7 +37,6 @@ public extension SelectionSet {
     }
   }
 
-  @_disfavoredOverload
   @inlinable
   internal static func equatableCheck<T: Hashable>(
     _ lhs: T,
