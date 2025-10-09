@@ -108,7 +108,7 @@ struct AccessControlRenderer {
 fileprivate extension ApolloCodegenConfiguration.AccessModifier {
   var swiftString: String {
     switch self {
-    case .public: return "public "  // there should be no spaces in these strings
+    case .public: return "public "
     case .internal: return ""
     }
   }
