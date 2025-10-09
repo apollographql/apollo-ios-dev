@@ -449,7 +449,7 @@
         "type" : "text"
       },
       {
-        "code" : "AnyScalarType",
+        "code" : "JSONEncodable",
         "type" : "codeVoice"
       },
       {

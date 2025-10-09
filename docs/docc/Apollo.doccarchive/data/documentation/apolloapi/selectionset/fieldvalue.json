@@ -9,19 +9,80 @@
   },
   "identifier" : {
     "interfaceLanguage" : "swift",
-    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/Hashable-Implementations"
+    "url" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/FieldValue"
   },
-  "kind" : "article",
+  "kind" : "symbol",
   "metadata" : {
+    "extendedModule" : "ApolloAPI",
+    "externalID" : "s:9ApolloAPI12SelectionSetPAAE10FieldValuea",
+    "fragments" : [
+      {
+        "kind" : "keyword",
+        "text" : "typealias"
+      },
+      {
+        "kind" : "text",
+        "text" : " "
+      },
+      {
+        "kind" : "identifier",
+        "text" : "FieldValue"
+      }
+    ],
     "modules" : [
       {
         "name" : "ApolloAPI"
       }
     ],
-    "role" : "collectionGroup",
-    "roleHeading" : "API Collection",
-    "title" : "Hashable Implementations"
+    "navigatorTitle" : [
+      {
+        "kind" : "identifier",
+        "text" : "FieldValue"
+      }
+    ],
+    "role" : "symbol",
+    "roleHeading" : "Type Alias",
+    "symbolKind" : "typealias",
+    "title" : "SelectionSet.FieldValue"
   },
+  "primaryContentSections" : [
+    {
+      "declarations" : [
+        {
+          "languages" : [
+            "swift"
+          ],
+          "platforms" : [
+            "macOS"
+          ],
+          "tokens" : [
+            {
+              "kind" : "keyword",
+              "text" : "typealias"
+            },
+            {
+              "kind" : "text",
+              "text" : " "
+            },
+            {
+              "kind" : "identifier",
+              "text" : "FieldValue"
+            },
+            {
+              "kind" : "text",
+              "text" : " = any "
+            },
+            {
+              "kind" : "typeIdentifier",
+              "preciseIdentifier" : "s:SH",
+              "text" : "Hashable"
+            }
+          ]
+        }
+      ],
+      "kind" : "declarations"
+    }
+  ],
   "schemaVersion" : {
     "major" : 0,
     "minor" : 3,
@@ -30,20 +91,10 @@
   "sections" : [
 
   ],
-  "topicSections" : [
-    {
-      "anchor" : "Instance-Methods",
-      "generated" : true,
-      "identifiers" : [
-        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/hash(into:)"
-      ],
-      "title" : "Instance Methods"
-    }
-  ],
   "variants" : [
     {
       "paths" : [
-        "\/documentation\/apolloapi\/selectionset\/hashable-implementations"
+        "\/documentation\/apolloapi\/selectionset\/fieldvalue"
       ],
       "traits" : [
         {
@@ -137,14 +188,14 @@
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionset"
 },
-"doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/hash(into:)": {
+"doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/FieldValue": {
   "abstract" : [
 
   ],
   "fragments" : [
     {
       "kind" : "keyword",
-      "text" : "func"
+      "text" : "typealias"
     },
     {
       "kind" : "text",
@@ -152,44 +203,21 @@
     },
     {
       "kind" : "identifier",
-      "text" : "hash"
-    },
-    {
-      "kind" : "text",
-      "text" : "("
-    },
-    {
-      "kind" : "externalParam",
-      "text" : "into"
-    },
-    {
-      "kind" : "text",
-      "text" : ": "
-    },
-    {
-      "kind" : "keyword",
-      "text" : "inout"
-    },
-    {
-      "kind" : "text",
-      "text" : " "
-    },
-    {
-      "kind" : "typeIdentifier",
-      "preciseIdentifier" : "s:s6HasherV",
-      "text" : "Hasher"
-    },
-    {
-      "kind" : "text",
-      "text" : ")"
+      "text" : "FieldValue"
     }
   ],
-  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/hash(into:)",
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/FieldValue",
   "kind" : "symbol",
+  "navigatorTitle" : [
+    {
+      "kind" : "identifier",
+      "text" : "FieldValue"
+    }
+  ],
   "role" : "symbol",
-  "title" : "hash(into:)",
+  "title" : "SelectionSet.FieldValue",
   "type" : "topic",
-  "url" : "\/documentation\/apolloapi\/selectionset\/hash(into:)"
+  "url" : "\/documentation\/apolloapi\/selectionset\/fieldvalue"
 }
 }
 }
