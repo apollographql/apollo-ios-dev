@@ -13,7 +13,7 @@ struct SchemaModuleNamespaceTemplate: TemplateRenderer {
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
     TemplateString("""
-    \(accessControlModifier(for: .namespace))\
+    \(accessControlRenderer(for: .namespace).render())\
     enum \(config.schemaNamespace.firstUppercased) { }
 
     """)

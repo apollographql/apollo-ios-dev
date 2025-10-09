@@ -18,16 +18,16 @@ struct FragmentTemplate: TemplateRenderer {
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
     let includeDefinition = config.options.operationDocumentFormat.contains(.definition)
-    
+    let memberAccessControlRenderer = accessControlRenderer(for: .member)
     return TemplateString(
     """
-    \(accessControlModifier(for: .parent))\
+    \(accessControlRenderer(for: .parent).render())\
     struct \(fragment.generatedDefinitionName.asFragmentName): \
     \(fragment.renderedSelectionSetType(config)), Fragment\
     \(if: fragment.isIdentifiable, ", Identifiable")\
      {
     \(if: includeDefinition, """
-      \(accessControlModifier(for: .member))\
+      \(memberAccessControlRenderer.render())\
     static var fragmentDefinition: StaticString {
         #"\(fragment.definition.source.convertedToSingleLine())"#
       }
@@ -38,7 +38,7 @@ struct FragmentTemplate: TemplateRenderer {
         generateInitializers: config.config.shouldGenerateSelectionSetInitializers(for: fragment),
         config: config,
         nonFatalErrorRecorder: nonFatalErrorRecorder,
-        renderAccessControl: { accessControlModifier(for: .member) }()
+        accessControlRenderer: memberAccessControlRenderer
       ).renderBody())
     }
 

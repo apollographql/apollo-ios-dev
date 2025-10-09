@@ -15,7 +15,7 @@ struct MockInterfacesTemplate: TemplateRenderer {
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
     TemplateString("""
-    \(accessControlModifier(for: .parent))extension MockObject {
+    \(accessControlRenderer(for: .parent).render())extension MockObject {
       \(graphqlInterfaces.map {
       "typealias \($0.render(as: .typename())) = Interface"
       }, separator: "\n")

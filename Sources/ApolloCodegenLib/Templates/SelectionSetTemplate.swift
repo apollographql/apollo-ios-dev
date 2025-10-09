@@ -11,7 +11,7 @@ struct SelectionSetTemplate {
   let generateInitializers: Bool
   let config: ApolloCodegen.ConfigurationContext
   let nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
-  let renderAccessControl: () -> String
+  let accessControlRenderer: AccessControlRenderer
 
   private let nameCache: SelectionSetNameCache
 
@@ -22,13 +22,13 @@ struct SelectionSetTemplate {
     generateInitializers: Bool,
     config: ApolloCodegen.ConfigurationContext,
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder,
-    renderAccessControl: @autoclosure @escaping () -> String
+    accessControlRenderer: AccessControlRenderer
   ) {
     self.definition = definition
     self.generateInitializers = generateInitializers
     self.config = config
     self.nonFatalErrorRecorder = nonFatalErrorRecorder
-    self.renderAccessControl = renderAccessControl
+    self.accessControlRenderer = accessControlRenderer
 
     self.nameCache = SelectionSetNameCache(config: config)
   }
@@ -95,13 +95,13 @@ struct SelectionSetTemplate {
     if let referencedSelectionSetName = selectionSet.nameForReferencedSelectionSet(config: config) {
       guard referencedSelectionSetName != fieldSelectionSetName else { return nil }
       return
-        "\(renderAccessControl())typealias \(fieldSelectionSetName) = \(referencedSelectionSetName)"
+        "\(accessControlRenderer.render())typealias \(fieldSelectionSetName) = \(referencedSelectionSetName)"
     }
 
     return TemplateString(
       """
       \(SelectionSetNameDocumentation(selectionSet))
-      \(renderAccessControl())\
+      \(accessControlRenderer.render())\
       struct \(fieldSelectionSetName): \(SelectionSetType())\
       \(if: selectionSet.isIdentifiable, ", Identifiable")\
        {
@@ -117,7 +117,7 @@ struct SelectionSetTemplate {
     return TemplateString(
       """
       \(SelectionSetNameDocumentation(inlineFragment))
-      \(renderAccessControl())\
+      \(accessControlRenderer.render())\
       struct \(inlineFragment.renderedTypeName): \(SelectionSetType(asInlineFragment: true))\
       \(if: inlineFragment.isCompositeInlineFragment, ", \(TemplateConstants.ApolloAPITargetName).CompositeInlineFragment")\
       \(if: inlineFragment.isIdentifiable, ", Identifiable")\
@@ -200,7 +200,7 @@ struct SelectionSetTemplate {
 
     return TemplateString(
       """
-      @_spi(Unsafe) \(renderAccessControl())init(_dataDict: DataDict) {\
+      \(accessControlRenderer.render(withSPIs: [.Unsafe]))init(_dataDict: DataDict) {\
       \(ifLet: propertiesTemplate(), where: { !$0.isEmpty }, {
         """
 
@@ -216,7 +216,7 @@ struct SelectionSetTemplate {
   }
 
   private func DataPropertyTemplate() -> TemplateString {
-    "@_spi(Unsafe) \(renderAccessControl())\(isMutable ? "var" : "let") __data: DataDict"
+    "\(accessControlRenderer.render(withSPIs: [.Unsafe]))\(isMutable ? "var" : "let") __data: DataDict"
   }
 
   private func RootEntityTypealias(_ selectionSet: IR.ComputedSelectionSet) -> TemplateString {
@@ -229,13 +229,13 @@ struct SelectionSetTemplate {
     )
 
     return """
-      \(renderAccessControl())typealias RootEntityType = \(rootEntityName)
+      \(accessControlRenderer.render())typealias RootEntityType = \(rootEntityName)
       """
   }
 
   private func ParentTypeTemplate(_ type: GraphQLCompositeType) -> String {
     """
-    @_spi(Execution) \(renderAccessControl())\
+    \(accessControlRenderer.render(withSPIs: [.Execution]))\
     static var __parentType: any \(TemplateConstants.ApolloAPITargetName).ParentType { \
     \(GeneratedSchemaTypeReference(type)) }
     """
@@ -245,7 +245,7 @@ struct SelectionSetTemplate {
     _ mergedSources: OrderedSet<IR.MergedSelections.MergedSource>
   ) -> TemplateString {
     return """
-      @_spi(Execution) \(renderAccessControl())\
+      \(accessControlRenderer.render(withSPIs: [.Execution]))\
       static var __mergedSources: [any \(TemplateConstants.ApolloAPITargetName).SelectionSet.Type] { [
         \(mergedSources.map {
         let selectionSetName = SelectionSetNameGenerator.generatedSelectionSetName(
@@ -280,7 +280,7 @@ struct SelectionSetTemplate {
 
     if !groupedSelections.isEmpty || shouldIncludeTypenameSelection {
       selectionsTemplate = TemplateString("""
-        @_spi(Execution) \(renderAccessControl())\
+        \(accessControlRenderer.render(withSPIs: [.Execution]))\
         static var __selections: [\(TemplateConstants.ApolloAPITargetName).Selection] { [
           \(if: shouldIncludeTypenameSelection, ".field(\"__typename\", String.self),")
           \(renderedSelections(groupedSelections.unconditionalSelections, &deprecatedArguments), terminator: ",")
@@ -471,7 +471,7 @@ struct SelectionSetTemplate {
     }
 
     return """
-      @_spi(Execution) \(renderAccessControl())static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      \(accessControlRenderer.render(withSPIs: [.Execution]))static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         \(fulfilledFragments.map { "\($0).self" })
       ] }
       """
@@ -504,7 +504,7 @@ struct SelectionSetTemplate {
     if deferredFragments.isEmpty { return nil }
 
     return """
-      @_spi(Execution) \(renderAccessControl())static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
+      \(accessControlRenderer.render(withSPIs: [.Execution]))static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
         \(deferredFragments.map { "\($0).self" })
       ] }
       """
@@ -530,7 +530,7 @@ struct SelectionSetTemplate {
     return """
       \(documentation: field.underlyingField.documentation, config: config)
       \(deprecationReason: field.underlyingField.deprecationReason, config: config)
-      \(renderAccessControl())var \(field.responseKey.renderAsFieldPropertyName(config: config.config)): \
+      \(accessControlRenderer.render())var \(field.responseKey.renderAsFieldPropertyName(config: config.config)): \
       \(typeName(for: field, forceOptional: field.isConditionallyIncluded(in: scope))) {\
       \(if: isMutable,
       """
@@ -558,7 +558,7 @@ struct SelectionSetTemplate {
 
     let typeName = inlineFragment.renderedTypeName
     return """
-      \(renderAccessControl())var \(typeName.firstLowercased): \(typeName)? { _asInlineFragment() }
+      \(accessControlRenderer.render())var \(typeName.firstLowercased): \(typeName)? { _asInlineFragment() }
       """
   }
 
@@ -576,7 +576,7 @@ struct SelectionSetTemplate {
     let scope = selectionSet.typeInfo.scope
 
     return """
-      \(renderAccessControl())struct Fragments: FragmentContainer {
+      \(accessControlRenderer.render())struct Fragments: FragmentContainer {
         \(DataPropertyTemplate())
         \(FragmentInitializerTemplate(selectionSet))
 
@@ -665,7 +665,7 @@ struct SelectionSetTemplate {
           )
       , else:
           """
-          \(renderAccessControl())var \(propertyName): \(typeName)\(if: isOptional, "?") {\
+          \(accessControlRenderer.render())var \(propertyName): \(typeName)\(if: isOptional, "?") {\
           \(if: !isMutable && !isDeferred, " _toFragment() }")
           """
       )
@@ -695,7 +695,7 @@ struct SelectionSetTemplate {
     _ selectionSet: ComputedSelectionSet
   ) -> TemplateString {
     return """
-      \(renderAccessControl())init(
+      \(accessControlRenderer.render())init(
         \(InitializerSelectionParametersTemplate(selectionSet))
       ) {
         self.init(unsafelyWithData: [

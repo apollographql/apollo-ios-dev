@@ -13,17 +13,17 @@ struct OneOfInputObjectTemplate: TemplateRenderer {
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
-    let memberAccessControl = accessControlModifier(for: .member)
+    let memberAccessControl = accessControlRenderer(for: .member)
     
     return TemplateString(
     """
     \(documentation: graphqlInputObject.documentation, config: config)
     \(graphqlInputObject.name.typeNameDocumentation)
-    \(accessControlModifier(for: .parent))\
+    \(accessControlRenderer(for: .parent).render())\
     enum \(graphqlInputObject.render(as: .typename())): OneOfInputObject {
       \(graphqlInputObject.fields.map({ "\(FieldCaseTemplate($1))" }), separator: "\n")
     
-      @_spi(Unsafe) \(memberAccessControl)var __data: InputDict {
+      \(memberAccessControl.render(withSPIs: [.Unsafe]))var __data: InputDict {
         switch self {
         \(graphqlInputObject.fields.map({ "\(FieldCaseDataTemplate($1))" }), separator: "\n")
         }
