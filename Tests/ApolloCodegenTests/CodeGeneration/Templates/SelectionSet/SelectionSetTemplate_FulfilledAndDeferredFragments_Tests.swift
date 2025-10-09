@@ -52,7 +52,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
       generateInitializers: true,
       config: ApolloCodegen.ConfigurationContext(config: config),
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
+      accessControlRenderer: mockTemplateRenderer.accessControlRenderer(for: .member)
     )
   }
 
@@ -80,7 +80,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
       generateInitializers: true,
       config: ApolloCodegen.ConfigurationContext(config: config),
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
+      accessControlRenderer: mockTemplateRenderer.accessControlRenderer(for: .member)
     )
     return fragment
   }

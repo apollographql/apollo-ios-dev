@@ -273,7 +273,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     )
 
     let expected = """
-      @_spi(Execution) static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
+      static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
         switch typename {
         case "objA": return ObjectSchema.Objects.ObjA
         case "objB": return ObjectSchema.Objects.ObjB
@@ -307,7 +307,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     )
 
     let expected = """
-      @_spi(Execution) static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
+      static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
         switch typename {
         case "ObjectA": return ObjectSchema.Objects.ObjectA
         default: return nil
@@ -322,6 +322,37 @@ class SchemaMetadataTemplateTests: XCTestCase {
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render_objectTypeFunction_givenWithPublicAccessModifier_includesSPI() {
+    // given
+    buildSubject(
+      referencedTypes: .init([
+        GraphQLObjectType.mock("objA"),
+        GraphQLObjectType.mock("objB"),
+        GraphQLObjectType.mock("objC"),
+      ], schemaRootTypes: .mock()),
+      config: .mock(.swiftPackage(), schemaNamespace: "objectSchema")
+    )
+
+    let expected = """
+      @_spi(Execution) public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
+        switch typename {
+        case "objA": return ObjectSchema.Objects.ObjA
+        case "objB": return ObjectSchema.Objects.ObjB
+        case "objC": return ObjectSchema.Objects.ObjC
+        default: return nil
+        }
+      }
+    }
+    
+    """
+
+    // when
+    let actual = renderTemplate()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
   func test__render__givenModuleEmbeddedInTarget_withInternalAccessModifier_rendersTypeNamespaceEnums_withInternalAccess() {

@@ -51,10 +51,11 @@ struct MockObjectTemplate: TemplateRenderer {
          )
       }
 
-    let memberAccessControl = accessControlModifier(for: .member)
+    let memberAccessControl = accessControlRenderer(for: .member).render()
+    let parentAccessControl = accessControlRenderer(for: .parent).render()
 
     return """
-    \(accessControlModifier(for: .parent))final class \(objectName): MockObject {
+    \(parentAccessControl)final class \(objectName): MockObject {
       \(memberAccessControl)static let objectType: \(TemplateConstants.ApolloAPITargetName).Object = \(config.schemaNamespace.firstUppercased).Objects.\(objectName)
       \(memberAccessControl)static let _mockFields = MockFields()
       \(memberAccessControl)typealias MockValueCollectionType = Array<Mock<\(objectName)>>
@@ -71,7 +72,7 @@ struct MockObjectTemplate: TemplateRenderer {
     \(!fields.isEmpty ?
       TemplateString("""
       
-      \(accessControlModifier(for: .parent))\
+      \(parentAccessControl)\
       extension Mock where O == \(objectName) {
         \(conflictingFieldNameProperties(fields))
         convenience init(

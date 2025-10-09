@@ -87,7 +87,7 @@ Tests/TestCodeGenConfigurations/**/Podfile.lock
 Tests/TestCodeGenConfigurations/**/TestMocks
 Tests/TestCodeGenConfigurations/EmbeddedInTarget-RelativeAbsolute/PackageOne/**/*.graphql.swift
 Tests/TestCodeGenConfigurations/EmbeddedInTarget-RelativeAbsolute/PackageTwo/Sources/PackageTwo
-Tests/TestCodeGenConfigurations/CodegenXCFramework/CodegenXCFramework/MyAPI/**
+Tests/TestCodeGenConfigurations/CodegenXCFramework/CodegenXCFramework/MyAPI
 !Tests/TestCodeGenConfigurations/**/SchemaConfiguration.swift
 !Tests/TestCodeGenConfigurations/Other-CustomTarget/AnimalKingdomAPI/AnimalKingdomAPI.h
 !Tests/TestCodeGenConfigurations/EmbeddedInTarget-RelativeAbsolute/PackageTwo/Sources/PackageTwo/PackageTwo.swift

@@ -57,7 +57,7 @@
       "moduleType" : {
         "embeddedInTarget" : {
           "name": "TestApp",
-          "accessModifier": "public"
+          "accessModifier": "internal"
         }
       }
     },

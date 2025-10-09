@@ -58,7 +58,7 @@ class SelectionSetTemplateTests: XCTestCase {
       generateInitializers: false,
       config: config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
+      accessControlRenderer: mockTemplateRenderer.accessControlRenderer(for: .member)
     )
   }
   
@@ -3266,7 +3266,7 @@ class SelectionSetTemplateTests: XCTestCase {
       generateInitializers: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: self.subject.renderAccessControl()
+      accessControlRenderer: self.subject.accessControlRenderer
     )
     let rendered_allAnimals_animalFragment = fragmentSubject.test_render(
       childEntity: try XCTUnwrap(allAnimals_animalFragment.rootField.selectionSet?.computed)
@@ -3344,7 +3344,7 @@ class SelectionSetTemplateTests: XCTestCase {
       generateInitializers: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: self.subject.renderAccessControl()
+      accessControlRenderer: self.subject.accessControlRenderer
     )
     let rendered_allAnimals_asDog_animalFragment = fragmentSubject.test_render(
       childEntity: try XCTUnwrap(allAnimals_asDog_animalFragment.rootField.selectionSet?.computed)
@@ -3432,7 +3432,7 @@ class SelectionSetTemplateTests: XCTestCase {
       generateInitializers: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: self.subject.renderAccessControl()
+      accessControlRenderer: self.subject.accessControlRenderer
     )
     let rendered_allAnimals_asDog_animalFragment = fragmentSubject.test_render(
       childEntity: try XCTUnwrap(allAnimals_asDog_animalFragment.rootField.selectionSet?.computed)
@@ -3520,7 +3520,7 @@ class SelectionSetTemplateTests: XCTestCase {
       generateInitializers: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: self.subject.renderAccessControl()
+      accessControlRenderer: self.subject.accessControlRenderer
     )
     let rendered_allAnimals_asDog_animalFragment = fragmentSubject.test_render(
       childEntity: try XCTUnwrap(allAnimals_asDog_animalFragment.rootField.selectionSet?.computed)
@@ -3608,7 +3608,7 @@ class SelectionSetTemplateTests: XCTestCase {
       generateInitializers: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: self.subject.renderAccessControl()
+      accessControlRenderer: self.subject.accessControlRenderer
     )
     let rendered_allAnimals_asDog_animalFragment = fragmentSubject.test_render(
       childEntity: try XCTUnwrap(allAnimals_asDog_animalFragment.rootField.selectionSet?.computed)
@@ -3701,7 +3701,7 @@ class SelectionSetTemplateTests: XCTestCase {
       generateInitializers: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: self.subject.renderAccessControl()
+      accessControlRenderer: self.subject.accessControlRenderer
     )
     let rendered_allAnimals_asDog_animalFragment = fragmentSubject.test_render(
       childEntity: try XCTUnwrap(allAnimals_asDog_animalFragment.rootField.selectionSet?.computed)
@@ -3800,7 +3800,7 @@ class SelectionSetTemplateTests: XCTestCase {
       generateInitializers: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: self.subject.renderAccessControl()
+      accessControlRenderer: self.subject.accessControlRenderer
     )
     let rendered_allAnimals_basicFragment = basicFragmentSubject.test_render(
       childEntity: try XCTUnwrap(allAnimals_basicFragment.rootField.selectionSet?.computed)
@@ -3892,7 +3892,7 @@ class SelectionSetTemplateTests: XCTestCase {
       generateInitializers: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: self.subject.renderAccessControl()
+      accessControlRenderer: self.subject.accessControlRenderer
     )
     let rendered_allAnimals_animalFragment_asDog = fragmentSubject.test_render(
       childEntity: try XCTUnwrap(allAnimals_animalFragment_asDog.computed)
@@ -3984,7 +3984,7 @@ class SelectionSetTemplateTests: XCTestCase {
       generateInitializers: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: self.subject.renderAccessControl()
+      accessControlRenderer: self.subject.accessControlRenderer
     )
     let rendered_allAnimals_animalFragment = fragmentSubject.test_render(
       childEntity: try XCTUnwrap(allAnimals_animalFragment.rootField.selectionSet?.computed)
@@ -9532,7 +9532,7 @@ class SelectionSetTemplateTests: XCTestCase {
       generateInitializers: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: self.subject.renderAccessControl()
+      accessControlRenderer: self.subject.accessControlRenderer
     )
     let rendered_allAnimals_asDog_animalFragment = fragmentSubject.test_render(
       childEntity: try XCTUnwrap(allAnimals_asDog_animalFragment.rootField.selectionSet?.computed)
@@ -9615,7 +9615,7 @@ class SelectionSetTemplateTests: XCTestCase {
       generateInitializers: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: self.subject.renderAccessControl()
+      accessControlRenderer: self.subject.accessControlRenderer
     )
     let rendered_allAnimals_animalFragment_asDog = fragmentSubject.test_render(
       childEntity: try XCTUnwrap(allAnimals_animalFragment_asDog.computed)
@@ -11824,7 +11824,7 @@ class SelectionSetTemplateTests: XCTestCase {
       generateInitializers: false,
       config: self.subject.config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: self.subject.renderAccessControl()
+      accessControlRenderer: self.subject.accessControlRenderer
     )
 
     let actual = fragmentTemplate.test_render(

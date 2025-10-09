@@ -222,7 +222,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       case fieldOne(String)
       case fieldTwo(String)
     
-      @_spi(Unsafe) var __data: InputDict {
+      var __data: InputDict {
         switch self {
         case .fieldOne(let value):
           return InputDict(["fieldOne": value])

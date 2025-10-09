@@ -58,7 +58,7 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
       generateInitializers: true,
       config: ApolloCodegen.ConfigurationContext(config: config),
       nonFatalErrorRecorder: errorRecorder,
-      renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
+      accessControlRenderer: mockTemplateRenderer.accessControlRenderer(for: .member)
     )
   }
 
@@ -81,7 +81,7 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
       generateInitializers: true,
       config: ApolloCodegen.ConfigurationContext(config: config),
       nonFatalErrorRecorder: errorRecorder,
-      renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
+      accessControlRenderer: mockTemplateRenderer.accessControlRenderer(for: .member)
     )
   }
 

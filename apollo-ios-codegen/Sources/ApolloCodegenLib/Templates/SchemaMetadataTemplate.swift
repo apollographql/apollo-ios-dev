@@ -18,7 +18,7 @@ struct SchemaMetadataTemplate: TemplateRenderer {
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
-    let parentAccessLevel = accessControlModifier(for: .parent)
+    let parentAccessLevel = accessControlRenderer(for: .parent).render()
 
     return TemplateString(
     """
@@ -36,7 +36,7 @@ struct SchemaMetadataTemplate: TemplateRenderer {
 
     \(documentation: schema.documentation, config: config)
     \(parentAccessLevel)enum SchemaMetadata: \(TemplateConstants.ApolloAPITargetName).SchemaMetadata {
-      \(accessControlModifier(for: .member))\
+      \(accessControlRenderer(for: .member).render())\
     static let configuration: any \(TemplateConstants.ApolloAPITargetName).SchemaConfiguration.Type = SchemaConfiguration.self
 
       \(objectTypeFunction)
@@ -52,7 +52,7 @@ struct SchemaMetadataTemplate: TemplateRenderer {
 
   var objectTypeFunction: TemplateString {
     return """
-    @_spi(Execution) \(accessControlModifier(for: .member))\
+    \(accessControlRenderer(for: .member).render(withSPIs: [.Execution]))\
     static func objectType(forTypename typename: String) -> \(TemplateConstants.ApolloAPITargetName).Object? {
       switch typename {
       \(schema.referencedTypes.objects.map {
@@ -79,7 +79,7 @@ struct SchemaMetadataTemplate: TemplateRenderer {
   }
 
   private func protocolDefinition(prefix: String?, schemaNamespace: String) -> TemplateString {
-    let accessLevel = accessControlModifier(for: .member)
+    let accessLevel = accessControlRenderer(for: .member).render()
 
     return TemplateString("""
       \(accessLevel)protocol \(prefix ?? "")SelectionSet: \(TemplateConstants.ApolloAPITargetName).SelectionSet & \(TemplateConstants.ApolloAPITargetName).RootSelectionSet

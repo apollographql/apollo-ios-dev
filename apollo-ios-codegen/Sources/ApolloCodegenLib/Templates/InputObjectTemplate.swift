@@ -16,22 +16,22 @@ struct InputObjectTemplate: TemplateRenderer {
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
     let (validFields, deprecatedFields) = graphqlInputObject.fields.filterFields()
-    let memberAccessControl = accessControlModifier(for: .member)
+    let memberAccessControl = accessControlRenderer(for: .member)
 
     return TemplateString(
     """
     \(documentation: graphqlInputObject.documentation, config: config)
     \(graphqlInputObject.name.typeNameDocumentation)
-    \(accessControlModifier(for: .parent))\
+    \(accessControlRenderer(for: .parent).render())\
     struct \(graphqlInputObject.render(as: .typename())): InputObject {
-      @_spi(Unsafe) \(memberAccessControl)private(set) var __data: InputDict
+      \(memberAccessControl.render(withSPIs: [.Unsafe]))private(set) var __data: InputDict
     
-      @_spi(Unsafe) \(memberAccessControl)init(_ data: InputDict) {
+      \(memberAccessControl.render(withSPIs: [.Unsafe]))init(_ data: InputDict) {
         __data = data
       }
 
       \(if: !deprecatedFields.isEmpty && !validFields.isEmpty && shouldIncludeDeprecatedWarnings, """
-      \(memberAccessControl)init(
+      \(memberAccessControl.render())init(
         \(InitializerParametersTemplate(validFields))
       ) {
         __data = InputDict([
@@ -44,7 +44,7 @@ struct InputObjectTemplate: TemplateRenderer {
       \(if: !deprecatedFields.isEmpty && shouldIncludeDeprecatedWarnings, """
       @available(*, deprecated, message: "\(deprecatedMessage(for: deprecatedFields))")
       """)
-      \(memberAccessControl)init(
+      \(memberAccessControl.render())init(
         \(InitializerParametersTemplate(graphqlInputObject.fields))
       ) {
         __data = InputDict([
@@ -104,7 +104,7 @@ struct InputObjectTemplate: TemplateRenderer {
     \(documentation: field.documentation, config: config)
     \(deprecationReason: field.deprecationReason, config: config)
     \(field.name.typeNameDocumentation)
-    \(accessControlModifier(for: .member))\
+    \(accessControlRenderer(for: .member).render())\
     var \(field.render(config: config)): \(field.renderInputValueType(config: config.config)) {
       get { __data["\(field.name.schemaName)"] }
       set { __data["\(field.name.schemaName)"] = newValue }

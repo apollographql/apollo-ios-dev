@@ -15,7 +15,7 @@ struct MockUnionsTemplate: TemplateRenderer {
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
     TemplateString("""
-    \(accessControlModifier(for: .parent))extension MockObject {
+    \(accessControlRenderer(for: .parent).render())extension MockObject {
       \(graphqlUnions.map {
       "typealias \($0.render(as: .typename())) = Union"
       }, separator: "\n")

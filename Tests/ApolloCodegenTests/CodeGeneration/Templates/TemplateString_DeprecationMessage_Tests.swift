@@ -275,7 +275,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       generateInitializers: true,
       config: config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: { "does not matter" }()
+      accessControlRenderer: AccessControlRenderer(target: .moduleFile, config: .mock(), scope: .member) // Does not affect this test
     )
 
     let expected = #"""
@@ -405,7 +405,7 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
       generateInitializers: true,
       config: config,
       nonFatalErrorRecorder: .init(),
-      renderAccessControl: { "does not matter" }()
+      accessControlRenderer: AccessControlRenderer(target: .moduleFile, config: .mock(), scope: .member) // Does not affect this test
     )
 
     let expected = #"""

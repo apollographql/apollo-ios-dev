@@ -284,9 +284,9 @@ class InputObjectTemplateTests: XCTestCase {
 
     let expected = """
     struct MockInput: InputObject {
-      @_spi(Unsafe) private(set) var __data: InputDict
+      private(set) var __data: InputDict
 
-      @_spi(Unsafe) init(_ data: InputDict) {
+      init(_ data: InputDict) {
         __data = data
       }
 

@@ -15,11 +15,12 @@ struct LocalCacheMutationDefinitionTemplate: OperationTemplateRenderer {
   func renderBodyTemplate(
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   ) -> TemplateString {
-    let memberAccessControl = accessControlModifier(for: .member)
+    let memberAccessControlRenderer = accessControlRenderer(for: .member)
+    let memberAccessControl = memberAccessControlRenderer.render()
 
     return TemplateString(
     """
-    \(accessControlModifier(for: .parent))\
+    \(accessControlRenderer(for: .parent).render())\
     struct \(operation.generatedDefinitionName): LocalCacheMutation {
       \(memberAccessControl)static let operationType: GraphQLOperationType = .\(operation.definition.operationType.rawValue)
 
@@ -35,7 +36,7 @@ struct LocalCacheMutationDefinitionTemplate: OperationTemplateRenderer {
             generateInitializers: config.config.shouldGenerateSelectionSetInitializers(for: operation),
             config: config,
             nonFatalErrorRecorder: nonFatalErrorRecorder,
-            renderAccessControl: { accessControlModifier(for: .member) }()
+            accessControlRenderer: memberAccessControlRenderer
         ).renderBody())
       }
     }
