@@ -461,6 +461,88 @@ class SelectionSet_EquatableTests: XCTestCase {
     expect(selectionSet1.hashValue).toNot(equal(selectionSet2.hashValue))
   }
 
+  func test__equatable__includeCondition__singleField_sameValues_returns_true() {
+    // given
+    final class HeroFragment: MockFragment, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __parentType: any ParentType { Types.Hero }
+      override class var __selections: [Selection] {[
+        .field("name", String?.self),
+        .include(if: "includeAge", .field("age", Int?.self))
+      ]}
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HeroFragment.self]
+      }
+    }
+
+    // when
+    let selectionSet1 = HeroFragment(_dataDict: DataDict(
+      data: [
+        "name": "Name 1",
+        "age": 25
+      ],
+      fulfilledFragments: [
+        ObjectIdentifier(HeroFragment.self)
+      ]
+    ))
+
+    let selectionSet2 = HeroFragment(_dataDict: DataDict(
+      data: [
+        "name": "Name 1",
+        "age": 25
+      ],
+      fulfilledFragments: [
+        ObjectIdentifier(HeroFragment.self)
+      ]
+    ))
+
+    // then
+    expect(selectionSet1).to(equal(selectionSet2))
+    expect(selectionSet1.hashValue).to(equal(selectionSet2.hashValue))
+  }
+
+  func test__equatable__includeCondition__singleField_differentValues_returns_false() {
+    // given
+    final class HeroFragment: MockFragment, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __parentType: any ParentType { Types.Hero }
+      override class var __selections: [Selection] {[
+        .field("name", String?.self),
+        .include(if: "includeAge", .field("age", Int?.self))
+      ]}
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HeroFragment.self]
+      }
+    }
+
+    // when
+    let selectionSet1 = HeroFragment(_dataDict: DataDict(
+      data: [
+        "name": "Name 1",
+        "age": 25
+      ],
+      fulfilledFragments: [
+        ObjectIdentifier(HeroFragment.self)
+      ]
+    ))
+
+    let selectionSet2 = HeroFragment(_dataDict: DataDict(
+      data: [
+        "name": "Name 1",
+        "age": 30
+      ],
+      fulfilledFragments: [
+        ObjectIdentifier(HeroFragment.self)
+      ]
+    ))
+
+    // then
+    expect(selectionSet1).toNot(equal(selectionSet2))
+    expect(selectionSet1.hashValue).toNot(equal(selectionSet2.hashValue))
+  }
+
   // MARK: Named Fragment
 
   func test__equatable__namedFragment_differentValue_forFieldInChildNamedFragment_returns_false() {
