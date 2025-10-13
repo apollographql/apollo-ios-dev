@@ -77,6 +77,7 @@ jobs:
       with:
         access-token: ${{ secrets.APOLLO_IOS_PAT }}
         repo: "apollographql/apollo-ios-dev"
+        base-branch: ${{ github.ref_name }}
         head-branch: "${{ env.BRANCH_NAME }}"
         reviewers: AnthonyMDev,calvincestari,bobafetters
         title: Release ${{ env.VERSION_NUMBER }}
