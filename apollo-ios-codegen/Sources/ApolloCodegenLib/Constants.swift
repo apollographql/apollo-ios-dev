@@ -1,5 +1,5 @@
 import Foundation
 
 public enum Constants {
-  public static let CodegenVersion: String = "1.25.1"
+  public static let CodegenVersion: String = "1.25.2"
 }
