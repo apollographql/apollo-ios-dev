@@ -1,8 +1,12 @@
 name: "Test Extract Release Notes"
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to extract release notes for (e.g., 1.2.3)'
+        required: true
+        type: string
 
 jobs:
   test-extract:
@@ -21,9 +25,11 @@ jobs:
 
       - name: Print Release Notes
         shell: bash
+        env:
+          RELEASE_NOTES: ${{ steps.extract.outputs.release-notes }}
         run: |
           echo "========================================="
           echo "Release Notes for v${{ github.event.inputs.version }}"
           echo "========================================="
-          echo "${{ steps.extract.outputs.release-notes }}"
+          printf '%s\n' "$RELEASE_NOTES"
           echo "========================================="
