@@ -67,7 +67,7 @@ jobs:
         uses: ./.github/actions/extract-release-notes
         with:
           changelog-path: apollo-ios/CHANGELOG.md
-          version: ${{ env.RELEASE_VERSION }}
+          versionNumber: ${{ env.RELEASE_VERSION }}
 
       # Create Draft Release on GitHub with tag of version
       - name: Create Draft Release (`apollo-ios`)

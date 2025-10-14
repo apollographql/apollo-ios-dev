@@ -4,7 +4,7 @@ inputs:
   changelog-path:
     description: "Path to the CHANGELOG.md file"
     required: true
-  version:
+  versionNumber:
     description: "Version number to extract release notes for"
     required: true
 outputs:
@@ -19,7 +19,7 @@ runs:
       shell: bash
       run: |
         changelog_file="${{ inputs.changelog-path }}"
-        version_header="## v${{ inputs.version }}"
+        version_header="## v${{ inputs.versionNumber }}"
 
         # Find the section for this version between the version header and the next version header
         release_notes=$(awk "
