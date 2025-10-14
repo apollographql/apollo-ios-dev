@@ -18,7 +18,7 @@ jobs:
         with:
           repository: apollographql/apollo-ios
           path: "checkout//apollo-ios"
-          ref: main
+          ref: ${{ github.ref_name }}
 
       # Checkout apollo-ios-codegen repo
       - name: Checkout apollo-ios-codegen Repo
@@ -26,7 +26,7 @@ jobs:
         with:
           repository: apollographql/apollo-ios-codegen
           path: "checkout/apollo-ios-codegen"
-          ref: main
+          ref: ${{ github.ref_name }}
 
       # Setup SSH Keys
       - name: Setup SSH Keys
@@ -68,7 +68,7 @@ jobs:
           gh release create ${{ env.RELEASE_VERSION }} 'apollo-ios/CLI/apollo-ios-cli.tar.gz#apollo-ios-cli.tar.gz' -d --repo "apollographql/apollo-ios" -t "${{ env.RELEASE_VERSION }}"
         env:
           GH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
-      
+
       - name: Create Draft Release (`apollo-ios-codegen`)
         shell: bash
         run: |
