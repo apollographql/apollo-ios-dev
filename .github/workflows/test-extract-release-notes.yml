@@ -1,0 +1,32 @@
+name: "Test Extract Release Notes"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number to extract (e.g., 2.0.1)'
+        required: true
+
+jobs:
+  test-extract:
+    runs-on: macos-latest
+    name: Test Extract Release Notes
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Extract Release Notes
+        id: extract
+        uses: ./.github/actions/extract-release-notes
+        with:
+          changelog-path: apollo-ios/CHANGELOG.md
+          version: ${{ github.event.inputs.version }}
+
+      - name: Print Release Notes
+        shell: bash
+        run: |
+          echo "========================================="
+          echo "Release Notes for v${{ github.event.inputs.version }}"
+          echo "========================================="
+          echo "${{ steps.extract.outputs.release-notes }}"
+          echo "========================================="

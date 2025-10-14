@@ -1,0 +1,36 @@
+name: "Extract Release Notes"
+description: "Extracts release notes from CHANGELOG.md for a specific version"
+inputs:
+  changelog-path:
+    description: "Path to the CHANGELOG.md file"
+    required: true
+  version:
+    description: "Version number to extract release notes for"
+    required: true
+outputs:
+  release-notes:
+    description: "The extracted release notes for the specified version"
+    value: ${{ steps.extract.outputs.release-notes }}
+runs:
+  using: "composite"
+  steps:
+    - name: Extract Release Notes
+      id: extract
+      shell: bash
+      run: |
+        changelog_file="${{ inputs.changelog-path }}"
+        version_header="## v${{ inputs.version }}"
+
+        # Find the section for this version between the version header and the next version header
+        release_notes=$(awk "
+          /^${version_header}/ { found=1; next }
+          found && /^## v/ { exit }
+          found { print }
+        " "$changelog_file" | sed -e :a -e '/^\s*$/d;N;/\n$/ba')
+
+        # Save to output using heredoc
+        {
+          echo "release-notes<<EOF"
+          echo "$release_notes"
+          echo "EOF"
+        } >> $GITHUB_OUTPUT
