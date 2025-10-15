@@ -9,6 +9,7 @@ struct SelectionSetTemplate {
 
   let definition: any IR.Definition
   let generateInitializers: Bool
+  let generateDecodableTypes: Bool
   let config: ApolloCodegen.ConfigurationContext
   let nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder
   let renderAccessControl: () -> String
@@ -20,12 +21,14 @@ struct SelectionSetTemplate {
   init(
     definition: any IR.Definition,
     generateInitializers: Bool,
+    generateDecodableTypes: Bool,
     config: ApolloCodegen.ConfigurationContext,
     nonFatalErrorRecorder: ApolloCodegen.NonFatalError.Recorder,
     renderAccessControl: @autoclosure @escaping () -> String
   ) {
     self.definition = definition
     self.generateInitializers = generateInitializers
+    self.generateDecodableTypes = generateDecodableTypes
     self.config = config
     self.nonFatalErrorRecorder = nonFatalErrorRecorder
     self.renderAccessControl = renderAccessControl
@@ -104,6 +107,7 @@ struct SelectionSetTemplate {
       \(renderAccessControl())\
       struct \(fieldSelectionSetName): \(SelectionSetType())\
       \(if: selectionSet.isIdentifiable, ", Identifiable")\
+      \(if: config.output.generateDecodableTypes, ", Encodable")\
        {
         \(BodyTemplate(context))
       }
@@ -121,6 +125,7 @@ struct SelectionSetTemplate {
       struct \(inlineFragment.renderedTypeName): \(SelectionSetType(asInlineFragment: true))\
       \(if: inlineFragment.isCompositeInlineFragment, ", \(config.ApolloAPITargetName).CompositeInlineFragment")\
       \(if: inlineFragment.isIdentifiable, ", Identifiable")\
+      \(if: config.output.generateDecodableTypes, ", Encodable")\
        {
         \(BodyTemplate(context))
       }

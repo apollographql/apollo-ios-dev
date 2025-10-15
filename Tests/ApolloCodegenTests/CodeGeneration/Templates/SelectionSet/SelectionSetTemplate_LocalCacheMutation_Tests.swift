@@ -50,6 +50,7 @@ class SelectionSetTemplate_LocalCacheMutationTests: XCTestCase {
     subject = SelectionSetTemplate(
       definition: self.operation.irObject,
       generateInitializers: false,
+      generateDecodableTypes: false,
       config: config,
       nonFatalErrorRecorder: .init(),
       renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
