@@ -120,9 +120,13 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
     let allReadsCompletedExpectation = XCTestExpectation(description: "All reads completed")
     allReadsCompletedExpectation.expectedFulfillmentCount = numberOfReads
 
-    for _ in 0..<numberOfReads {
+    for index in 0..<numberOfReads {
       Task(priority: .background) { [store = store!] in
-        defer { allReadsCompletedExpectation.fulfill() }
+        defer {
+          print("Completed \(index)")
+          allReadsCompletedExpectation.fulfill()
+        }
+
         try await store.withinReadTransaction { transaction in
           let data = try await transaction.read(query: query)
 
