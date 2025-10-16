@@ -280,3 +280,11 @@ You may see `Type 'MyCustomScalar' does not conform to protocol ...` errors whil
 ```swift
 @_spi(Execution) @_spi(Internal) import ApolloAPI
 ```
+
+### GraphQL Int32 input values
+
+In Apollo iOS 1.x, input values with a GraphQL `Int` type were mapped to Swift's `Int` type. Starting in Apollo iOS 2.0, these are now mapped to Swift's `Int32` type to align with the [GraphQL specification](http://spec.graphql.org/October2021/#sec-Int), which defines the `Int` type as a signed 32-bit integer. **This change only effects input values (ie. query parameters & fields on input objects).** `Int` fields on response models will still use the Swift `Int` type.
+
+This change ensures proper type safety and prevents potential overflow issues when working with GraphQL APIs that rely on the spec-compliant 32-bit integer.
+
+While migrating, you will need to convert your `Int` values to `Int32` when passing them as input parameters to a GraphQL operation or input object.
