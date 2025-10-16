@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: apollographql/apollo-ios
-          path: "checkout//apollo-ios"
+          path: "checkout/apollo-ios"
           ref: ${{ github.ref_name }}
 
       # Checkout apollo-ios-codegen repo
@@ -63,30 +63,20 @@ jobs:
 
       # Extract release notes from CHANGELOG.md
       - name: Extract Release Notes
-        shell: bash
-        run: |
-          changelog_file="apollo-ios/CHANGELOG.md"
-          version_header="## v${{ env.RELEASE_VERSION }}"
-
-          # Find the section for this version between the version header and the next version header
-          release_notes=$(awk "
-            /^${version_header}/ { found=1; next }
-            found && /^## v/ { exit }
-            found { print }
-          " "$changelog_file" | sed -e :a -e '/^\s*$/d;N;/\n$/ba')
-
-          # Save to environment variable for use in subsequent steps
-          echo "RELEASE_NOTES<<EOF" >> ${GITHUB_ENV}
-          echo "$release_notes" >> ${GITHUB_ENV}
-          echo "EOF" >> ${GITHUB_ENV}
+        id: release-notes
+        uses: ./.github/actions/extract-release-notes
+        with:
+          changelog-path: checkout/apollo-ios/CHANGELOG.md
+          versionNumber: ${{ env.RELEASE_VERSION }}
 
       # Create Draft Release on GitHub with tag of version
       - name: Create Draft Release (`apollo-ios`)
         shell: bash
-        run: |
-          gh release create ${{ env.RELEASE_VERSION }} 'apollo-ios/CLI/apollo-ios-cli.tar.gz#apollo-ios-cli.tar.gz' -d --repo "apollographql/apollo-ios" -t "${{ env.RELEASE_VERSION }}" --notes "${{ env.RELEASE_NOTES }}"
         env:
           GH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
+          RELEASE_NOTES: ${{ steps.release-notes.outputs.release-notes }}
+        run: |
+          gh release create ${{ env.RELEASE_VERSION }} 'apollo-ios/CLI/apollo-ios-cli.tar.gz#apollo-ios-cli.tar.gz' -d --repo "apollographql/apollo-ios" -t "${{ env.RELEASE_VERSION }}" --notes "$RELEASE_NOTES"
 
       - name: Create Draft Release (`apollo-ios-codegen`)
         shell: bash
