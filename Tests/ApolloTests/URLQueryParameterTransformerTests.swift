@@ -215,6 +215,27 @@ class URLQueryParameterTransformerTests: XCTestCase {
     expect(url?.absoluteString).to(equal(expected))
   }
 
+  func test__createGetURL__queryWithParameter_withSemicolon_encodesSemicolon() throws {
+    let extensions: JSONEncodableDictionary = [
+      "testParam": ";Test;Test"
+    ]
+
+    let body: JSONEncodableDictionary = [
+      "query": MockQuery<MockSelectionSet>.definition?.queryDocument,
+      "extensions": extensions,
+    ]
+
+    let transformer = URLQueryParameterTransformer(body: body, url: Self.url)
+
+    let url = transformer.createGetURL()
+
+    let expected =
+      "http://localhost:8080/graphql?extensions=%7B%22testParam%22:%22%3BTest%3BTest%22%7D&query=Mock%20Operation%20Definition"
+
+    expect(url?.absoluteString).to(equal(expected))
+  }
+
+
   func test__createGetURL__queryWithPersistedQueryID_withoutQueryParameter_encodesURL() throws {
     class GivenMockOperation: MockQuery<MockSelectionSet>, @unchecked Sendable {
       override class var operationName: String { "TestOpName" }
