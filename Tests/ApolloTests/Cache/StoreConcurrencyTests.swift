@@ -120,6 +120,8 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
     let allReadsCompletedExpectation = XCTestExpectation(description: "All reads completed")
     allReadsCompletedExpectation.expectedFulfillmentCount = numberOfReads
 
+    print("Starting concurrent reads...")
+
     for index in 0..<numberOfReads {
       Task(priority: .background) { [store = store!] in
         defer {
@@ -136,6 +138,8 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
         }
       }
     }
+
+    print("Concurrent read tasks created...")
 
     await fulfillment(of: [allReadsCompletedExpectation], timeout: defaultWaitTimeout)
   }
