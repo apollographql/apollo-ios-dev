@@ -10,11 +10,16 @@ Before you can book a trip, you need to be able to pass your authentication toke
 
 The `ApolloClient` uses something called a `NetworkTransport` under the hood. By default, the client creates a `RequestChainNetworkTransport` instance to handle talking over HTTP to your server.
 
-A `RequestChain` runs your request through an array of `ApolloInterceptor` objects which can mutate the request and/or check the cache before it hits the network, and then do additional work after a response is received from the network.
+A `RequestChain` processes your request through a series of specialized interceptor types that handle different aspects of request execution. The `RequestChain` separates interceptor responsibilities into four discrete types:
 
-The `RequestChainNetworkTransport` uses an object that conforms to the `InterceptorProvider` protocol in order to create that array of interceptors for each operation it executes. There are a couple of providers that are set up by default, which return a fairly standard array of interceptors.
+- **`GraphQLInterceptor`** - Handles pre-flight and post-flight work on the `GraphQLRequest` and `GraphQLResponse`
+- **`CacheInterceptor`** - Handles cache read and write operations
+- **`HTTPInterceptor`** - Handles pre-flight and post-flight work on HTTP requests and responses
+- **`ResponseParsingInterceptor`** - Handles parsing of HTTP response data into `GraphQLResponse` objects
 
-The nice thing is that you can also add your own interceptors to the chain anywhere you need to perform custom actions. In this case, you want to have an interceptor that will add your token.
+The `RequestChainNetworkTransport` uses an object that conforms to the `InterceptorProvider` protocol to provide these interceptors for each operation it executes. The `DefaultInterceptorProvider` provides a standard set of interceptors, but you can create your own `InterceptorProvider` to customize this behavior.
+
+The nice thing is that you can add your own interceptors to perform custom actions. In this case, you want to add an `HTTPInterceptor` that will add your authentication token to each request.
 
 First, create the new interceptor. Go to **File > New > File...** and create a new **Swift File**. Name it **AuthorizationInterceptor.swift**, and make sure it's added to the **RocketReserver** target. Open that file, and add the following code:
 
@@ -23,18 +28,15 @@ import Foundation
 import Apollo
 import ApolloAPI
 
-class AuthorizationInterceptor: ApolloInterceptor {
+struct AuthorizationInterceptor: HTTPInterceptor {
     public var id: String = UUID().uuidString
     
-    func interceptAsync<Operation>(
-        chain: RequestChain,
-        request: HTTPRequest<Operation>,
-        response: HTTPResponse<Operation>?,
-        completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void
-    ) where Operation : GraphQLOperation {
+    func intercept(
+      request: URLRequest,
+      next: NextHTTPInterceptorFunction
+    ) async throws -> HTTPResponse {
         // TODO
     }
-    
 }
 ```
 
@@ -47,63 +49,60 @@ import KeychainSwift
 Then, replace the `TODO` within the `interceptAsync` method with code to get the token from the keychain, and add it to your headers if it exists:
 
 ```swift title="AuthorizationInterceptor.swift"
+var request = request
 let keychain = KeychainSwift()
-if let token = keychain.get(LoginView.loginKeychainKey) {
-    request.addHeader(name: "Authorization", value: token)
+if let token = await keychain.get(LoginView.loginKeychainKey) {
+    request.addValue(token, forHTTPHeaderField: "Authorization")
 }
 
-chain.proceedAsync(
-    request: request,
-    response: response,
-    interceptor: self,
-    completion: completion)
+return try await next(request)
 ```
 
-An array of `ApolloInterceptor`s which are handed off to each request to perform in order is set up by an object conforming to the `InterceptorProvider` protocol. There's a `DefaultInterceptorProvider` which has an array with most of the Interceptors you'd want to use.
+## Create a Custom Interceptor Provider
 
-You can also make your own object conforming to `InterceptorProvider` - or, in this case, since the interceptor only needs to be added to the beginning of the list to run before all the other interceptors, you can subclass the existing `DefaultInterceptorProvider`.
+The `InterceptorProvider` protocol defines four separate methods that provide different types of interceptors for each operation:
 
-Go to **File > New > File...** and create a new **Swift File**. Name it **NetworkInterceptorProvider.swift**, and make sure it's added to the **RocketReserver** target. Add code which inserts your `AuthorizationInterceptor` before the other interceptors provided by the `DefaultInterceptorProvider`:
+- **`graphQLInterceptors(for:)`** - Returns an array of `GraphQLInterceptors` for pre-flight and post-flight work
+- **`cacheInterceptor(for:)`** - Returns a single `CacheInterceptor` for cache operations
+- **`httpInterceptors(for:)`** - Returns an array of `HTTPInterceptors` for HTTP request/response handling
+- **`responseParser(for:)`** - Returns a `ResponseParsingInterceptor` for parsing responses
+
+The `DefaultInterceptorProvider` uses the protocol's default implementations to provide a standard set of interceptors. To add your custom `AuthorizationInterceptor`, you can implement `InterceptorProvider` and override the `httpInterceptors(for:)` method to insert your interceptor at the beginning of the GraphQL interceptor array. 
+
+Go to **File > New > File...** and create a new Swift File. Name it **NetworkInterceptorProvider.swift**, and make sure it's added to the **RocketReserver** target. Add code which inserts your `AuthorizationInterceptor` before the other HTTP interceptors provided by the default implementation:
 
 ```swift title="NetworkInterceptorProvider.swift"
 import Foundation
 import Apollo
 import ApolloAPI
 
-class NetworkInterceptorProvider: DefaultInterceptorProvider {
+struct NetworkInterceptorProvider: InterceptorProvider {
     
-    override func interceptors<Operation>(for operation: Operation) -> [ApolloInterceptor] where Operation : GraphQLOperation {
-        var interceptors = super.interceptors(for: operation)
-        interceptors.insert(AuthorizationInterceptor(), at: 0)
-        return interceptors
+    func httpInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any HTTPInterceptor] {
+        return [AuthorizationInterceptor()] + DefaultInterceptorProvider.shared.httpInterceptors(for: operation)
     }
     
 }
 ```
 
-> Another way to do this would be to copy and paste the list interceptors provided by the `DefaultInterceptorProvider` (which are all public), and then place your interceptors in the points in the array where you want them. However, since in this case we can run this interceptor first, it's simpler to subclass.
-
 ## Use the interceptor
 
-Next, go back to your `Network` class. Replace the `ApolloClient` with an updated `lazy var` which creates the `RequestChainNetworkTransport` manually, using your custom interceptor provider:
+Next, go back to your `ApolloClient+Setup.swift` class. Replace the implementation of the static `ApolloClient` var with the following code which creates and uses your new `InterceptorProvider`:
 
-```swift title="Network.swift"
-class Network {
+```swift title="ApolloClient+Setup.swift"
+static let shared: ApolloClient = {
+    let cache = InMemoryNormalizedCache()
+    let store = ApolloStore(cache: cache)
+    let url = URL(string: "https://apollo-fullstack-tutorial.herokuapp.com/graphql")!
     
-    static let shared = Network()
-    
-    private(set) lazy var apollo: ApolloClient = {
-        let client = URLSessionClient()
-        let cache = InMemoryNormalizedCache()
-        let store = ApolloStore(cache: cache)
-        let provider = NetworkInterceptorProvider(client: client, store: store)
-        let url = URL(string: "https://apollo-fullstack-tutorial.herokuapp.com/graphql")!
-        let transport = RequestChainNetworkTransport(interceptorProvider: provider, endpointURL: url)
-
-        return ApolloClient(networkTransport: transport, store: store)
-    }()
-    
-}
+    let networkTransport = RequestChainNetworkTransport(
+        urlSession: URLSession.shared,
+        interceptorProvider: NetworkInterceptorProvider(),
+        store: store,
+        endpointURL: url
+    )
+    return ApolloClient(networkTransport: networkTransport, store: store)
+}()
 ```
 
 Now, go back to **AuthorizationInterceptor.swift**.

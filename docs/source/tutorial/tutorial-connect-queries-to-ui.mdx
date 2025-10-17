@@ -17,23 +17,18 @@ In `LaunchListViewModel` add a new variable to hold the launches returned by the
 Next, replace the `TODO` in the `loadMoreLaunches()` method with the code to run the `LaunchListQuery`:
 
 ```swift title="LaunchListViewModel.swift"
-Network.shared.apollo.fetch(query: LaunchListQuery()) { [weak self] result in
-    guard let self = self else {
-        return
+do {
+    let response = try await ApolloClient.shared.fetch(query: LaunchListQuery())
+    
+    if let errors = response.errors {
+        appAlert = .errors(errors: errors)
     }
-
-    switch result {
-    case .success(let graphQLResult):
-        if let launchConnection = graphQLResult.data?.launches {
-            self.launches.append(contentsOf: launchConnection.launches.compactMap({ $0 }))
-        }
-
-        if let errors = graphQLResult.errors {
-            self.appAlert = .errors(errors: errors)
-        }
-    case .failure(let error):
-        self.appAlert = .errors(errors: [error])
+    
+    if let launchConnection = response.data?.launches {
+        launches.append(contentsOf: launchConnection.launches.compactMap({ $0 }))
     }
+} catch {
+    appAlert = .errors(errors: [error])
 }
 ```
 
@@ -78,7 +73,7 @@ The last step is to call the `loadMoreLaunches` method we updated earlier to act
 
 ```swift title="LaunchListView.swift"
 .task {
-    viewModel.loadMoreLaunches() // highlight-line
+    await viewModel.loadMoreLaunchesIfTheyExist() // highlight-line
 }
 ```
 
