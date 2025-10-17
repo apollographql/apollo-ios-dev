@@ -87,23 +87,19 @@ Run the operation again, and you'll now see that in addition to the information 
 
 Now that your query is fetching the right data, it's time to add the query to Xcode.
 
-1. Right-click on the `graphql` folder in the project hierarchy and select **New File...**
+1. Right-click on the `graphql` folder in the project hierarchy and select **New Empty File**
 
 <img src="images/add_new_query_file.png" class="screenshot" alt="Updated query JSON in Sandbox Explorer" height="400" />
 
-2. Select the **Empty** file template, and click **Next**
-
-<img src="images/empty_file_template.png" class="screenshot" alt="Empty file template" height="450"/>
-
-3. Name the file `LaunchList.graphql`, ensure the file is being added to the `graphql` folder where your `schema.graphqls` file is. Finally, make sure the file is **not** being added to the app target, then click **Create**
+2. Name the file `LaunchList.graphql`, ensure the file is added to the `graphql` folder where your `schema.graphqls` file is. Then check to see if the file is included in the target, and if so remove it.
 
 <img src="images/dont_add_query_file_to_target.png" class="screenshot" alt="Don't add file to target" height="450"/>
 
-4. Copy your final operation from Sandbox Explorer by selecting the three dot (aka "meatball") menu to the right of your operation name and selecting "Copy Operation":
+3. Copy your final operation from Sandbox Explorer by selecting the three dot (aka "meatball") menu to the right of your operation name and selecting "Copy Operation":
 
 <img src="images/explorer_meatball_copy.png" class="screenshot" alt="Copy operation from Explorer Sandbox"/>
 
-5. Paste the copied operation into the `LaunchList.graphql` file. Your query file should now look like this:
+4. Paste the copied operation into the `LaunchList.graphql` file. Your query file should now look like this:
 
 ```graphql title="/graphql/LaunchList.graphql"
 query LaunchList {

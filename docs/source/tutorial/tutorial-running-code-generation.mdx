@@ -30,14 +30,6 @@ With the code generated, next we need to add the generated SPM package to the pr
 
 <img src="images/package_in_project_hierarchy.png" class="screenshot" alt="Package in project hierarchy" height="300"/>
 
-4. Next, in Xcode select the project, then the `RocketReserver` target, and go to **Build Phases**. Under the **Link Binary With Libraries** section click the **+** sign
-
-<img src="images/link_binary_with_libraries.png" class="screenshot" alt="Link binary with libraries"/>
-
-5. In the dialog that pops up, select the `RocketReserverAPI` library and click **Add**
-
-<img src="images/link_binary_with_libraries_dialog.png" class="screenshot" alt="Link binary with libraries dialog" height="400"/>
-
 ## Examine the generated code
 
 In the Xcode project hierarchy, navigate to `RocketReserver/Packages/RocketReseverAPI/Sources/Operations/Queries/LaunchListQuery.graphql.swift`. It defines a root class, `LaunchListQuery`, with many nested structs below it. If you compare the structs to the JSON data returned in Sandbox Explorer, you see that the structure matches. These structs include properties only for the fields that your query requests.

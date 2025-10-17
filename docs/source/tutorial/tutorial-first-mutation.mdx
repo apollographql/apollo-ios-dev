@@ -76,24 +76,19 @@ import RocketReserverAPI
 Next, replace the `TODO` in the `login(with email: String?)` method with the following code:
 
 ```swift title="LoginViewModel.swift"
-Network.shared.apollo.perform(mutation: LoginMutation(email: email)) { [weak self] result in
-    defer {
-        self?.isSubmitEnabled = true
+do {
+    let response = try await ApolloClient.shared.perform(mutation: LoginMutation(email: email))
+    
+    if let errors = response.errors {
+        appAlert = .errors(errors: errors)
     }
-
-    switch result {
-    case .success(let graphQLResult):
-        if let token = graphQLResult.data?.login?.token {
-            // TODO - store token securely
-            self?.isPresented = false
-        }
-
-        if let errors = graphQLResult.errors {
-            self?.appAlert = .errors(errors: errors)
-        }
-    case .failure(let error):
-        self?.appAlert = .errors(errors: [error])
+    
+    if let token = response.data?.login?.token {
+        // TODO - store token securely
+        isPresented = false
     }
+} catch {
+    appAlert = .errors(errors: [error])
 }
 ```
 

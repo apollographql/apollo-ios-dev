@@ -113,9 +113,10 @@ Now that you've confirmed it worked, copy the query (either by selecting all the
 
 Now let's add the code to run this query to retrieve our data.
 
-Go to `DetailViewModel.swift` and add this `import`
+Go to `DetailViewModel.swift` and add these `import`'s
 
 ```swift title="DetailViewModel.swift"
+import Apollo
 import RocketReserverAPI
 ```
 
@@ -136,28 +137,25 @@ init(launchID: RocketReserverAPI.ID) {// highlight-line
 Next we need to run the query, so replace the `TODO` in the `loadLaunchDetails` method with this code:
 
 ```swift title="DetailViewModel.swift"
-func loadLaunchDetails() {
+func loadLaunchDetails() async {
     guard launchID != launch?.id else {
         return
     }
-
-    Network.shared.apollo.fetch(query: LaunchDetailsQuery(launchId: launchID)) { [weak self] result in
-        guard let self = self else {
-            return
+    
+    do {
+        let response = try await ApolloClient.shared.fetch(
+            query: LaunchDetailsQuery(launchId: launchID)
+        )
+        
+        if let errors = response.errors {
+            appAlert = .errors(errors: errors)
         }
-
-        switch result {
-        case .success(let graphQLResult):
-            if let launch = graphQLResult.data?.launch {
-                self.launch = launch
-            }
-
-            if let errors = graphQLResult.errors {
-                self.appAlert = .errors(errors: errors)
-            }
-        case .failure(let error):
-            self.appAlert = .errors(errors: [error])
+        
+        if let launch = response.data?.launch {
+            self.launch = launch
         }
+    } catch {
+        appAlert = .errors(errors: [error])
     }
 }
 ```
@@ -188,40 +186,42 @@ var body: some View {
     VStack {
         if let launch = viewModel.launch { // highlight-line
             HStack(spacing: 10) {
-                if let missionPatch = launch.mission?.missionPatch { // highlight-line 
-                    WebImage(url: URL(string: missionPatch)) // highlight-line
-                        .resizable() // highlight-line
-                        .placeholder(placeholderImg) // highlight-line
-                        .indicator(.activity) // highlight-line
-                        .scaledToFit() // highlight-line
-                        .frame(width: 165, height: 165) // highlight-line
+                if let missionPatch = launch.mission?.missionPatch { // highlight-line
+                    WebImage(url: URL(string: missionPatch)) { image in // highlight-line
+                        image.resizable() // highlight-line
+                    } placeholder: { // highlight-line
+                        placeholderImg.resizable() // highlight-line
+                    } // highlight-line
+                    .indicator(.activity) // highlight-line
+                    .scaledToFit() // highlight-line
+                    .frame(width: 165, height: 165) // highlight-line
                 } else { // highlight-line
                     placeholderImg
                         .resizable()
                         .scaledToFit()
                         .frame(width: 165, height: 165)
                 } // highlight-line
-
+                
                 VStack(alignment: .leading, spacing: 4) {
                     if let missionName = launch.mission?.name { // highlight-line
                         Text(missionName)
                             .font(.system(size: 24, weight: .bold))
                     }
-
+                    
                     if let rocketName = launch.rocket?.name { // highlight-line
                         Text("🚀 \(rocketName)")
                             .font(.system(size: 18))
                     }
-
+                    
                     if let launchSite = launch.site { // highlight-line
                         Text(launchSite)
                             .font(.system(size: 14))
                     }
                 }
-
+                
                 Spacer()
             }
-
+            
             if launch.isBooked { // highlight-line
                 cancelTripButton()
             } else {
@@ -234,7 +234,7 @@ var body: some View {
     .navigationTitle(viewModel.launch?.mission?.name ?? "") // highlight-line
     .navigationBarTitleDisplayMode(.inline)
     .task {
-        viewModel.loadLaunchDetails() // highlight-line
+        await viewModel.loadLaunchDetails() // highlight-line
     }
     .sheet(isPresented: $viewModel.isShowingLogin) {
         LoginView(isPresented: $viewModel.isShowingLogin)
