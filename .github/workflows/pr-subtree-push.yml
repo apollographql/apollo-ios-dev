@@ -7,6 +7,7 @@ on:
   pull_request_target:
     branches:
         - main
+        - v1
     types: [closed]
 
 jobs:
@@ -20,7 +21,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v4
       with:
-        ref: main
+        ref: ${{ github.event.pull_request.base.ref }}
         fetch-depth: 0
     - name: Setup SSH Keys
       uses: webfactory/ssh-agent@v0.7.0
@@ -44,7 +45,7 @@ jobs:
       with:
         subtree: apollo-ios
         remote: git@github.com:apollographql/apollo-ios.git
-        target-branch: main
+        target-branch: ${{ github.event.pull_request.base.ref }}
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Subtree - Apollo iOS Codegen
@@ -53,7 +54,7 @@ jobs:
       with:
         subtree: apollo-ios-codegen
         remote: git@github.com:apollographql/apollo-ios-codegen.git
-        target-branch: main
+        target-branch: ${{ github.event.pull_request.base.ref }}
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Subtree - Apollo iOS Pagination
@@ -62,7 +63,7 @@ jobs:
       with:
         subtree: apollo-ios-pagination
         remote: git@github.com:apollographql/apollo-ios-pagination.git
-        target-branch: main
+        target-branch: ${{ github.event.pull_request.base.ref }}
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Push Updated History

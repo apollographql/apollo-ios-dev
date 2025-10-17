@@ -17,8 +17,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: apollographql/apollo-ios
-          path: "checkout//apollo-ios"
-          ref: main
+          path: "checkout/apollo-ios"
+          ref: ${{ github.ref_name }}
 
       # Checkout apollo-ios-codegen repo
       - name: Checkout apollo-ios-codegen Repo
@@ -61,18 +61,28 @@ jobs:
           git tag ${{ env.RELEASE_VERSION }}
           git push --tags
 
+      # Extract release notes from CHANGELOG.md
+      - name: Extract Release Notes
+        id: release-notes
+        uses: ./.github/actions/extract-release-notes
+        with:
+          changelog-path: checkout/apollo-ios/CHANGELOG.md
+          versionNumber: ${{ env.RELEASE_VERSION }}
+
       # Create Draft Release on GitHub with tag of version
       - name: Create Draft Release (`apollo-ios`)
         shell: bash
-        run: |
-          gh release create ${{ env.RELEASE_VERSION }} 'apollo-ios/CLI/apollo-ios-cli.tar.gz#apollo-ios-cli.tar.gz' -d --repo "apollographql/apollo-ios" -t "${{ env.RELEASE_VERSION }}"
         env:
           GH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
-      
+          RELEASE_NOTES: ${{ steps.release-notes.outputs.release-notes }}
+        run: |
+          gh release create ${{ env.RELEASE_VERSION }} 'apollo-ios/CLI/apollo-ios-cli.tar.gz#apollo-ios-cli.tar.gz' -d --repo "apollographql/apollo-ios" -t "${{ env.RELEASE_VERSION }}" --notes "$RELEASE_NOTES"
+
       - name: Create Draft Release (`apollo-ios-codegen`)
         shell: bash
         run: |
-          gh release create ${{ env.RELEASE_VERSION }} -d --repo "apollographql/apollo-ios-codegen" -t "${{ env.RELEASE_VERSION }}"
+          release_note="This release is tied to the ${{ env.RELEASE_VERSION }} release of the apollo-ios repo, release notes can be found [here](https://github.com/apollographql/apollo-ios/releases/tag/${{ env.RELEASE_VERSION }})."
+          gh release create ${{ env.RELEASE_VERSION }} -d --repo "apollographql/apollo-ios-codegen" -t "${{ env.RELEASE_VERSION }}" --notes "$release_note"
         env:
           GH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
 
