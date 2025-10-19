@@ -165,6 +165,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public let operations: OperationsFileOutput
     /// The local path structure for the test mock operation object files.
     public let testMocks: TestMockFileOutput
+    /// Whether to generate type validation for the generated code.
+    public let generateDecodableTypes: Bool
     
     /// This var helps maintain backwards compatibility with legacy operation manifest generation
     /// with the new `OperationManifestConfiguration` and will be fully removed in v2.0
@@ -174,6 +176,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     public struct Default {
       public static let operations: OperationsFileOutput = .inSchemaModule
       public static let testMocks: TestMockFileOutput = .none
+      public static let generateDecodableTypes: Bool = false
     }
 
     /// Designated initializer.
@@ -188,15 +191,18 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
     ///  with persisted queries or
     ///  [Automatic Persisted Queries (APQs)](https://www.apollographql.com/docs/apollo-server/performance/apq).
     /// Defaults to `nil`.
+    ///  - generateDecodableTypes: Whether to generate type validation for the generated code.
     public init(
       schemaTypes: SchemaTypesFileOutput,
       operations: OperationsFileOutput = Default.operations,
-      testMocks: TestMockFileOutput = Default.testMocks
+      testMocks: TestMockFileOutput = Default.testMocks,
+      generateDecodableTypes: Bool = Default.generateDecodableTypes
     ) {
       self.schemaTypes = schemaTypes
       self.operations = operations
       self.testMocks = testMocks
       self.operationIDsPath = nil
+      self.generateDecodableTypes = generateDecodableTypes
     }
 
     // MARK: Codable
@@ -206,6 +212,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       case operations
       case testMocks
       case operationIdentifiersPath
+      case generateDecodableTypes
     }
 
     /// `Decodable` implementation to allow for properties to be optional in the encoded JSON with
@@ -230,6 +237,10 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
         String.self,
         forKey: .operationIdentifiersPath
       )
+      generateDecodableTypes = try values.decodeIfPresent(
+        Bool.self,
+        forKey: .generateDecodableTypes
+      ) ?? Default.generateDecodableTypes
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -238,6 +249,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable {
       try container.encode(self.schemaTypes, forKey: .schemaTypes)
       try container.encode(self.operations, forKey: .operations)
       try container.encode(self.testMocks, forKey: .testMocks)
+      try container.encode(self.generateDecodableTypes, forKey: .generateDecodableTypes)
     }
   }
 
@@ -1698,18 +1710,21 @@ extension ApolloCodegenConfiguration.FileOutput {
   ///  If `.none`, test mocks will not be generated. Defaults to `.none`.
   ///  - operationIdentifiersPath: An absolute location to an operation id JSON map file
   ///  for use with APQ registration. Defaults to `nil`.
+  ///  - generateDecodableTypes: Whether to generate type validation for the generated code.
   @available(*, deprecated, renamed: "init(schemaTypes:operations:testMocks:)")
   @_disfavoredOverload
   public init(
     schemaTypes: ApolloCodegenConfiguration.SchemaTypesFileOutput,
     operations: ApolloCodegenConfiguration.OperationsFileOutput = Default.operations,
     testMocks: ApolloCodegenConfiguration.TestMockFileOutput = Default.testMocks,
+    generateDecodableTypes: Bool = Default.generateDecodableTypes,
     operationIdentifiersPath: String?
   ) {
     self.schemaTypes = schemaTypes
     self.operations = operations
     self.testMocks = testMocks
     self.operationIDsPath = operationIdentifiersPath
+    self.generateDecodableTypes = generateDecodableTypes
   }
 
   /// An absolute location to an operation id JSON map file.

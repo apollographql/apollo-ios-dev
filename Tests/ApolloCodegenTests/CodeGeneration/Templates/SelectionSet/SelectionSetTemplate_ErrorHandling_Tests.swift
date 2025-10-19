@@ -56,6 +56,7 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
     subject = SelectionSetTemplate(
       definition: self.operation.irObject,
       generateInitializers: true,
+      generateDecodableTypes: false,
       config: ApolloCodegen.ConfigurationContext(config: config),
       nonFatalErrorRecorder: errorRecorder,
       renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
@@ -79,6 +80,7 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
     subject = SelectionSetTemplate(
       definition: fragment.irObject,
       generateInitializers: true,
+      generateDecodableTypes: false,
       config: ApolloCodegen.ConfigurationContext(config: config),
       nonFatalErrorRecorder: errorRecorder,
       renderAccessControl: mockTemplateRenderer.accessControlModifier(for: .member)
