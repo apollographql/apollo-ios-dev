@@ -13,7 +13,7 @@ env:
 
 jobs:
   create-release-pr:
-    runs-on: macos-15
+    runs-on: macos-latest
     timeout-minutes: 5
     name: "Create Release PR"
     steps:

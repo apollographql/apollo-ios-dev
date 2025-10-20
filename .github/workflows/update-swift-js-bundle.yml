@@ -13,7 +13,7 @@ env:
 
 jobs:
   update-swift-js-bundle:
-    runs-on: macos-latest
+    runs-on: macos-26
     timeout-minutes: 5
     name: "Update Swift JS Bundle"
     steps:
