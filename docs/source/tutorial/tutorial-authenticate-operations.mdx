@@ -19,7 +19,7 @@ A `RequestChain` processes your request through a series of specialized intercep
 
 The `RequestChainNetworkTransport` uses an object that conforms to the `InterceptorProvider` protocol to provide these interceptors for each operation it executes. The `DefaultInterceptorProvider` provides a standard set of interceptors, but you can create your own `InterceptorProvider` to customize this behavior.
 
-The nice thing is that you can add your own interceptors to perform custom actions. In this case, you want to add an `HTTPInterceptor` that will add your authentication token to each request.
+You can also add your own interceptors to perform custom actions. In this case, you'll add an `HTTPInterceptor` that adds your authentication token to each request.
 
 First, create the new interceptor. Go to **File > New > File...** and create a new **Swift File**. Name it **AuthorizationInterceptor.swift**, and make sure it's added to the **RocketReserver** target. Open that file, and add the following code:
 
@@ -28,9 +28,7 @@ import Foundation
 import Apollo
 import ApolloAPI
 
-struct AuthorizationInterceptor: HTTPInterceptor {
-    public var id: String = UUID().uuidString
-    
+struct AuthorizationInterceptor: HTTPInterceptor {    
     func intercept(
       request: URLRequest,
       next: NextHTTPInterceptorFunction
@@ -65,11 +63,11 @@ The `InterceptorProvider` protocol defines four separate methods that provide di
 - **`graphQLInterceptors(for:)`** - Returns an array of `GraphQLInterceptors` for pre-flight and post-flight work
 - **`cacheInterceptor(for:)`** - Returns a single `CacheInterceptor` for cache operations
 - **`httpInterceptors(for:)`** - Returns an array of `HTTPInterceptors` for HTTP request/response handling
-- **`responseParser(for:)`** - Returns a `ResponseParsingInterceptor` for parsing responses
+- **`responseParser(for:)`** - Returns a single `ResponseParsingInterceptor` for parsing responses
 
-The `DefaultInterceptorProvider` uses the protocol's default implementations to provide a standard set of interceptors. To add your custom `AuthorizationInterceptor`, you can implement `InterceptorProvider` and override the `httpInterceptors(for:)` method to insert your interceptor at the beginning of the GraphQL interceptor array. 
+The `DefaultInterceptorProvider` uses the protocol's default implementations to provide a standard set of interceptors. To add your custom `AuthorizationInterceptor`, implement `InterceptorProvider` and override the `httpInterceptors(for:)` method to insert your interceptor at the beginning of the interceptor array. 
 
-Go to **File > New > File...** and create a new Swift File. Name it **NetworkInterceptorProvider.swift**, and make sure it's added to the **RocketReserver** target. Add code which inserts your `AuthorizationInterceptor` before the other HTTP interceptors provided by the default implementation:
+Go to `File > New > File...` and create a new Swift File. Name it `NetworkInterceptorProvider.swift`, and make sure it's added to the `RocketReserver` target. Add code that inserts your `AuthorizationInterceptor` before the other HTTP interceptors provided by the default implementation:
 
 ```swift title="NetworkInterceptorProvider.swift"
 import Foundation
@@ -87,7 +85,7 @@ struct NetworkInterceptorProvider: InterceptorProvider {
 
 ## Use the interceptor
 
-Next, go back to your `ApolloClient+Setup.swift` class. Replace the implementation of the static `ApolloClient` var with the following code which creates and uses your new `InterceptorProvider`:
+Next, go back to your `ApolloClient+Setup.swift` class. Replace the implementation of the static `ApolloClient` `var` with the following code that creates and uses your new `InterceptorProvider`:
 
 ```swift title="ApolloClient+Setup.swift"
 static let shared: ApolloClient = {

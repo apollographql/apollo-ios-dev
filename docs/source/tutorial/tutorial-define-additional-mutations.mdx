@@ -175,12 +175,16 @@ private func cancelTrip(with id: RocketReserverAPI.ID) async {
         
         if let cancelResult = response.data?.cancelTrip {
             if cancelResult.success {
-                appAlert = .basic(title: "Trip cancelled",
-                                    message: cancelResult.message ?? "Your trip has been officially cancelled")
+                appAlert = .basic(
+                    title: "Trip cancelled",
+                    message: cancelResult.message ?? "Your trip has been officially cancelled"
+                )
                 await loadLaunchDetails()
             } else {
-                appAlert = .basic(title: "Could not cancel trip",
-                                    message: cancelResult.message ?? "Something went wrong")
+                appAlert = .basic(
+                    title: "Could not cancel trip",
+                    message: cancelResult.message ?? "Something went wrong"
+                )
             }
         }
     } catch {
@@ -209,11 +213,11 @@ There are a number of ways to change this, but for now we'll focus on the one th
 
 The `fetch` method of `ApolloClient` provides defaults for most of its parameters, so if you're using the default configuration, the only value you need to provide yourself is the `Query`.
 
-However, an important parameter to be aware of is the `cachePolicy`. By default, this has the value of `cacheFirst`, which does essentially what it says on the label: it looks in the current cache (by default an in-memory cache) for data, and fetches it from the network if it's not present.
+An important parameter to be aware of is `cachePolicy`. By default, its value is `cacheFirst`, which first attempts to fulfill the request from the cache. If the data isn't in the cache, it fetches from the network.
 
 If the data *is* present, the default behavior is to return the local copy to prevent an unnecessary network fetch. However, this is sometimes not the desired behavior (especially after executing a mutation).
 
-There are [several different cache policies available to you](/ios/fetching/fetching-data#fetching-locally-cached-data), but the easiest way to absolutely force a refresh from the network that still updates the cache is to use `networkOnly`. This policy bypasses the cache when going to the network, but it also stores the results of the fetch in the cache for future use.
+Multiple [cache policies are available](/ios/fetching/fetching-data#fetching-locally-cached-data). To force a refresh from the network that also updates the cache, use the `networkOnly` policy. This policy bypasses the cache for the request but stores the fetched results in the cache for future use.
 
 Update the `loadLaunchDetails` method to take a parameter to determine if it should force reload. If it should force reload, update the cache policy from the default `.returnCacheDataElseFetch`, which will return data from the cache if it exists, to `.fetchIgnoringCacheData`:
 
@@ -264,9 +268,9 @@ Run the application. When you book or cancel a trip, the application will fetch 
 
 ## More resources
 
-> **Note:** The subscriptions section of this tutorial has been temporarily removed while the web socket functionality of Apollo iOS is being rewritten for an upcoming 2.x release.
+> **Note:** The subscriptions section of this tutorial is temporarily removed while Apollo rewrites the WebSocket functionality for an upcoming v2.x release.
 
-There are way more things you can do with the Apollo iOS SDK, and the rest of this documentation includes info on more advanced topics like:
+You can do much more with the Apollo iOS SDK. The rest of this documentation covers advanced topics, including:
 
 - Using [fragments](/ios/fetching/fragments/)
 - Working with [custom scalars](/ios/custom-scalars)

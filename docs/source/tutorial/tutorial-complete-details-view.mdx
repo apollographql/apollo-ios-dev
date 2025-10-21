@@ -113,7 +113,7 @@ Now that you've confirmed it worked, copy the query (either by selecting all the
 
 Now let's add the code to run this query to retrieve our data.
 
-Go to `DetailViewModel.swift` and add these `import`'s
+Go to `DetailViewModel.swift` and add the following `import` statements:
 
 ```swift title="DetailViewModel.swift"
 import Apollo
@@ -201,7 +201,7 @@ var body: some View {
                         .scaledToFit()
                         .frame(width: 165, height: 165)
                 } // highlight-line
-                
+
                 VStack(alignment: .leading, spacing: 4) {
                     if let missionName = launch.mission?.name { // highlight-line
                         Text(missionName)
