@@ -83,31 +83,27 @@ Now that you have the `BookTrip` mutation, it's time to implement the logic to b
 Replacing the existing function with this code:
 
 ```swift title="DetailViewModel.swift"
-private func bookTrip(with id: RocketReserverAPI.ID) {
-    Network.shared.apollo.perform(mutation: BookTripMutation(id: id)) { [weak self] result in
-        guard let self = self else {
-            return
+private func bookTrip(with id: RocketReserverAPI.ID) async {
+    do {
+        let response = try await ApolloClient.shared.perform(mutation: BookTripMutation(id: id))
+        
+        if let errors = response.errors {
+            appAlert = .errors(errors: errors)
         }
-
-        switch result {
-        case .success(let graphQLResult):
-            if let bookingResult = graphQLResult.data?.bookTrips {
-                if bookingResult.success {
-                    self.appAlert = .basic(title: "Success!",
-                                           message: bookingResult.message ?? "Trip booked successfully")
-                    self.loadLaunchDetails()
-                } else {
-                    self.appAlert = .basic(title: "Could not book trip",
-                                           message: bookingResult.message ?? "Unknown failure")
-                }
+        
+        if let bookingResult = response.data?.bookTrips {
+            if bookingResult.success {
+                appAlert = .basic(title: "Success!",
+                                    message: bookingResult.message ?? "Trip booked successfully")
+                await loadLaunchDetails()
+            } else {
+                appAlert = .basic(title: "Could not book trip",
+                                    message: bookingResult.message ??
+                                    "Something went wrong while booking the trip")
             }
-
-            if let errors = graphQLResult.errors {
-                self.appAlert = .errors(errors: errors)
-            }
-        case .failure(let error):
-            self.appAlert = .errors(errors: [error])
         }
+    } catch {
+        appAlert = .errors(errors: [error])
     }
 }
 ```
@@ -169,31 +165,30 @@ Now run code generation in Terminal to generate the new mutation code.
 Now let's implement the logic to cancel a trip in the app, go back to `DetailViewModel.swift`, find the `cancelTrip()` method and replace it with the following code:
 
 ```swift title="DetailViewModel.swift"
-private func cancelTrip(with id: RocketReserverAPI.ID) {
-    Network.shared.apollo.perform(mutation: CancelTripMutation(launchId: id)) { [weak self] result in
-        guard let self = self else {
-            return
+private func cancelTrip(with id: RocketReserverAPI.ID) async {
+    do {
+        let response = try await ApolloClient.shared.perform(mutation: CancelTripMutation(launchId: id))
+        
+        if let errors = response.errors {
+            appAlert = .errors(errors: errors)
         }
-
-        switch result {
-        case .success(let graphQLResult):
-            if let cancelResult = graphQLResult.data?.cancelTrip {
-                if cancelResult.success {
-                    self.appAlert = .basic(title: "Trip cancelled",
-                                           message: cancelResult.message ?? "Your trip has been officially cancelled")
-                    self.loadLaunchDetails()
-                } else {
-                    self.appAlert = .basic(title: "Could not cancel trip",
-                                           message: cancelResult.message ?? "Unknown failure.")
-                }
+        
+        if let cancelResult = response.data?.cancelTrip {
+            if cancelResult.success {
+                appAlert = .basic(
+                    title: "Trip cancelled",
+                    message: cancelResult.message ?? "Your trip has been officially cancelled"
+                )
+                await loadLaunchDetails()
+            } else {
+                appAlert = .basic(
+                    title: "Could not cancel trip",
+                    message: cancelResult.message ?? "Something went wrong"
+                )
             }
-
-            if let errors = graphQLResult.errors {
-                self.appAlert = .errors(errors: errors)
-            }
-        case .failure(let error):
-            self.appAlert = .errors(errors: [error])
         }
+    } catch {
+        appAlert = .errors(errors: [error])
     }
 }
 ```
@@ -218,30 +213,37 @@ There are a number of ways to change this, but for now we'll focus on the one th
 
 The `fetch` method of `ApolloClient` provides defaults for most of its parameters, so if you're using the default configuration, the only value you need to provide yourself is the `Query`.
 
-However, an important parameter to be aware of is the `cachePolicy`. By default, this has the value of `returnCacheDataElseFetch`, which does essentially what it says on the label: it looks in the current cache (by default an in-memory cache) for data, and fetches it from the network if it's not present.
+An important parameter to be aware of is `cachePolicy`. By default, its value is `cacheFirst`, which first attempts to fulfill the request from the cache. If the data isn't in the cache, it fetches from the network.
 
 If the data *is* present, the default behavior is to return the local copy to prevent an unnecessary network fetch. However, this is sometimes not the desired behavior (especially after executing a mutation).
 
-There are [several different cache policies available to you](/ios/fetching/fetching-data#fetching-locally-cached-data), but the easiest way to absolutely force a refresh from the network that still updates the cache is to use `fetchIgnoringCacheData`. This policy bypasses the cache when going to the network, but it also stores the results of the fetch in the cache for future use.
-
-First, we need to add the following `import` to `DetailViewModel`:
-
-```swift title="DetailViewModel.swift"
-import Apollo
-```
+Multiple [cache policies are available](/ios/fetching/fetching-data#fetching-locally-cached-data). To force a refresh from the network that also updates the cache, use the `networkOnly` policy. This policy bypasses the cache for the request but stores the fetched results in the cache for future use.
 
 Update the `loadLaunchDetails` method to take a parameter to determine if it should force reload. If it should force reload, update the cache policy from the default `.returnCacheDataElseFetch`, which will return data from the cache if it exists, to `.fetchIgnoringCacheData`:
 
 ```swift title="DetailViewModel.swift"
-func loadLaunchDetails(forceReload: Bool = false) { // highlight-line
+func loadLaunchDetails(forceReload: Bool = false) async { // highlight-line
     guard forceReload || launchID != launch?.id else { // highlight-line
         return
     }
-
-    let cachePolicy: CachePolicy = forceReload ? .fetchIgnoringCacheData : .returnCacheDataElseFetch // highlight-line
-
-    Network.shared.apollo.fetch(query: LaunchDetailsQuery(launchId: launchID), cachePolicy: cachePolicy) { [weak self] result in // highlight-line
-        // Network handling remains the same
+    
+    let cachePolicy: CachePolicy.Query.SingleResponse = forceReload ? .networkOnly : .cacheFirst // highlight-line
+    
+    do {
+        let response = try await ApolloClient.shared.fetch( // highlight-line
+            query: LaunchDetailsQuery(launchId: launchID), // highlight-line
+            cachePolicy: cachePolicy // highlight-line
+        ) // highlight-line
+        
+        if let errors = response.errors {
+            appAlert = .errors(errors: errors)
+        }
+        
+        if let launch = response.data?.launch {
+            self.launch = launch
+        }
+    } catch {
+        appAlert = .errors(errors: [error])
     }
 }
 ```
@@ -250,18 +252,28 @@ Next, update both the `bookTrip(...)` and `cancelTrip(...)` methods to use the u
 
 ```swift title="DetailViewModel.swift"
 // bookTrip()
-self.appAlert = .basic(title: "Success!",
-                       message: bookingResult.message ?? "Trip booked successfully")
-self.loadLaunchDetails(forceReload: true) // highlight-line
+appAlert = .basic(title: "Success!",
+                message: bookingResult.message ?? "Trip booked successfully")
+await loadLaunchDetails(forceReload: true) // highlight-line
 
 // cancelTrip()
-self.appAlert = .basic(title: "Trip cancelled",
-                       message: cancelResult.message ?? "Your trip has been officially cancelled")
-self.loadLaunchDetails(forceReload: true) // highlight-line
+appAlert = .basic(title: "Trip cancelled",
+                message: cancelResult.message ?? "Your trip has been officially cancelled")
+await loadLaunchDetails(forceReload: true) // hightlight-line
 ```
 
 ## Test the mutations
 
 Run the application. When you book or cancel a trip, the application will fetch the updated state and update the UI with the correct state. When you go out and back in, the cache will be updated with the most recent state, and the most recent state will display.
 
-In the next section, you'll learn how to use [subscriptions](tutorial-subscriptions) with the Apollo client.
+## More resources
+
+> **Note:** The subscriptions section of this tutorial is temporarily removed while Apollo rewrites the WebSocket functionality for an upcoming v2.x release.
+
+You can do much more with the Apollo iOS SDK. The rest of this documentation covers advanced topics, including:
+
+- Using [fragments](/ios/fetching/fragments/)
+- Working with [custom scalars](/ios/custom-scalars)
+- [Managing the cache](/ios/caching/introduction)
+
+Feel free to ask questions in [Apollo's Community Forum](https://community.apollographql.com/new-topic?category=Help&tags=mobile,client).

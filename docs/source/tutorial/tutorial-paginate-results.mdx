@@ -44,7 +44,7 @@ Add a variable to hold on to this object, as well as a variable for the most rec
 ```swift title="LaunchListViewModel.swift"
 @Published var launches = [LaunchListQuery.Data.Launches.Launch]()
 @Published var lastConnection: LaunchListQuery.Data.Launches? // highlight-line
-@Published var activeRequest: Cancellable? // highlight-line
+@Published var activeRequest: Bool = false // highlight-line
 @Published var appAlert: AppAlert?
 @Published var notificationMessage: String?
 ```
@@ -52,45 +52,45 @@ Add a variable to hold on to this object, as well as a variable for the most rec
 Next, let's update our `loadMoreLaunches()` method to use the `cursor` property as well as manage the `lastConnection` and `activeRequest` properties:
 
 ```swift title="LaunchListViewModel.swift"
-private func loadMoreLaunches(from cursor: String?) { // highlight-line
-    self.activeRequest = Network.shared.apollo.fetch(query: LaunchListQuery(cursor: cursor ?? .null)) { [weak self] result in // highlight-line
-        guard let self = self else {
-            return
-        }
-
-        self.activeRequest = nil // highlight-line
-
-        switch result {
-        case .success(let graphQLResult):
-            if let launchConnection = graphQLResult.data?.launches {
-                self.lastConnection = launchConnection// highlight-line
-                self.launches.append(contentsOf: launchConnection.launches.compactMap({ $0 }))
+private func loadMoreLaunches(from cursor: String?) async { // highlight-line
+        defer { // highlight-line
+            activeRequest = false // highlight-line
+        } // highlight-line
+        
+        do {
+            activeRequest = true // highlight-line
+            let response = try await ApolloClient.shared.fetch(query: LaunchListQuery(cursor: cursor ?? .null))
+            
+            if let errors = response.errors {
+                appAlert = .errors(errors: errors)
             }
-
-            if let errors = graphQLResult.errors {
-                self.appAlert = .errors(errors: errors)
+            
+            if let launchConnection = response.data?.launches {
+                lastConnection = launchConnection // highlight-line
+                launches.append(contentsOf: launchConnection.launches.compactMap({ $0 }))
             }
-        case .failure(let error):
-            self.appAlert = .errors(errors: [error])
+        } catch {
+            appAlert = .errors(errors: [error])
         }
     }
-}
 ```
 
 Now implement the `loadMoreLaunchesIfTheyExist()` method to check if there are any launches to load before attempting to load them. Replace the `TODO` with the following code:
 
 ```swift title="LaunchListViewModel.swift"
-func loadMoreLaunchesIfTheyExist() {
+func loadMoreLaunchesIfTheyExist() async {
+    guard !activeRequest else { return }
+    
     guard let connection = self.lastConnection else {
-        self.loadMoreLaunches(from: nil)
+        await self.loadMoreLaunches(from: nil)
         return
     }
-
+    
     guard connection.hasMore else {
         return
     }
-
-    self.loadMoreLaunches(from: connection.cursor)
+    
+    await self.loadMoreLaunches(from: connection.cursor)
 }
 ```
 
@@ -112,14 +112,18 @@ List {
         LaunchRow(launch: viewModel.launches[index])
     }
     if viewModel.lastConnection?.hasMore != false { // highlight-line
-        if viewModel.activeRequest == nil { // highlight-line
-            Button(action: viewModel.loadMoreLaunchesIfTheyExist) { // highlight-line
+        if !viewModel.activeRequest { // highlight-line
+            Button(action: { // highlight-line
+                Task { // highlight-line
+                    await viewModel.loadMoreLaunchesIfTheyExist() // highlight-line
+                } // highlight-line
+            }, label: { // highlight-line
                 Text("Tap to load more") // highlight-line
-            } // highlight-line
-        } else { // highlight-line 
+            }) // highlight-line
+        } else { // highlight-line
             Text("Loading...") // highlight-line
         } // highlight-line
-    } // highlight-line
+    }
 }
 ```
 
