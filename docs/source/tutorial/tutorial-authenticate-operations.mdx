@@ -56,7 +56,7 @@ if let token = await keychain.get(LoginView.loginKeychainKey) {
 return try await next(request)
 ```
 
-## Create a Custom Interceptor Provider
+## Create a custom interceptor provider
 
 The `InterceptorProvider` protocol defines four separate methods that provide different types of interceptors for each operation:
 
@@ -65,7 +65,7 @@ The `InterceptorProvider` protocol defines four separate methods that provide di
 - **`httpInterceptors(for:)`** - Returns an array of `HTTPInterceptors` for HTTP request/response handling
 - **`responseParser(for:)`** - Returns a single `ResponseParsingInterceptor` for parsing responses
 
-The `DefaultInterceptorProvider` uses the protocol's default implementations to provide a standard set of interceptors. To add your custom `AuthorizationInterceptor`, implement `InterceptorProvider` and override the `httpInterceptors(for:)` method to insert your interceptor at the beginning of the interceptor array. 
+The `DefaultInterceptorProvider` uses the protocol's default implementations to provide a standard set of interceptors. To add your custom `AuthorizationInterceptor`, implement `InterceptorProvider` and override the `httpInterceptors(for:)` method to insert your interceptor at the beginning of the interceptor array.
 
 Go to `File > New > File...` and create a new Swift File. Name it `NetworkInterceptorProvider.swift`, and make sure it's added to the `RocketReserver` target. Add code that inserts your `AuthorizationInterceptor` before the other HTTP interceptors provided by the default implementation:
 
