@@ -1,4 +1,4 @@
-name: "Main Branch Health"
+name: "Nightly Health Check"
 
 on:
   workflow_dispatch:
@@ -6,11 +6,11 @@ on:
     - cron: "0 7 * * *"
 
 env:
-  XCODE_VERSION: "26.0"
+  XCODE_VERSION: "16.4"
 
 jobs:
   tuist-generation:
-    runs-on: macos-26
+    runs-on: macos-15
     timeout-minutes: 8
     name: Run Tuist Generation
     steps:
@@ -31,7 +31,7 @@ jobs:
         key: ${{ github.run_id }}-dependencies
 
   run-swift-builds:
-    runs-on: macos-26
+    runs-on: macos-15
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -53,7 +53,7 @@ jobs:
         cd ${{ matrix.package }} && swift build
 
   build-and-unit-test:
-    runs-on: macos-26
+    runs-on: macos-15
     needs: tuist-generation
     timeout-minutes: 20
     strategy:
@@ -67,13 +67,13 @@ jobs:
             name: Apollo Unit Tests - macOS
             run-js-tests: false
           # iOS_current
-          - destination: platform=iOS Simulator,OS=26.0,name=iPhone 17
+          - destination: platform=iOS Simulator,OS=18.5,name=iPhone 16
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
             name: Apollo Unit Tests - iOS
             run-js-tests: false
           # tvOS_current
-          - destination: platform=tvOS Simulator,OS=26.0,name=Apple TV
+          - destination: platform=tvOS Simulator,OS=18.5,name=Apple TV
             scheme: ApolloTests
             test-plan: Apollo-CITestPlan
             name: Apollo Unit Tests - tvOS
@@ -153,7 +153,7 @@ jobs:
           TestResults/ResultBundle.zip
 
   run-codegen-test-configurations:
-    runs-on: macos-26
+    runs-on: macos-15
     timeout-minutes: 20
     name: Codegen Test Configurations - macOS
     steps:
@@ -168,7 +168,7 @@ jobs:
         ./scripts/run-test-codegen-configurations.sh -t
   
   send-slack-status-notification:
-    runs-on: macos-26
+    runs-on: macos-15
     if: ${{ always() }}
     timeout-minutes: 5
     needs: [tuist-generation, run-swift-builds, build-and-unit-test, run-codegen-test-configurations]
