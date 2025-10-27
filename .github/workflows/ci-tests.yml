@@ -38,6 +38,7 @@ jobs:
               - 'apollo-ios/**'
             tuist:
               - '.tuist-version'
+              - '.mise.toml'
 
   tuist-generation:
     runs-on: macos-26
