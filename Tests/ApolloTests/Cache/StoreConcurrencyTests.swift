@@ -97,6 +97,10 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
   }
   
   func testConcurrentReadsInitiatedFromBackgroundTasks() async throws {
+  #if !os(macOS)
+    throw XCTSkip("Skipping \(#function) on non-macOS platform.")
+
+  #else
     try await store.publish(records: [
       "QUERY_ROOT": ["hero": CacheReference("2001")],
       "2001": [
@@ -134,6 +138,7 @@ class StoreConcurrencyTests: XCTestCase, CacheDependentTesting {
     }
 
     await fulfillment(of: [allReadsCompletedExpectation], timeout: defaultWaitTimeout)
+  #endif
   }
 
   func testMultipleUpdatesInitiatedFromMainThread() async throws {
