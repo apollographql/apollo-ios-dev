@@ -18,6 +18,9 @@ public struct HeroDetails: StarWarsAPI.SelectionSet, Fragment {
     .inlineFragment(AsHuman.self),
     .inlineFragment(AsDroid.self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    HeroDetails.self
+  ] }
 
   /// The name of the character
   public var name: String { __data["name"] }
@@ -29,15 +32,10 @@ public struct HeroDetails: StarWarsAPI.SelectionSet, Fragment {
     __typename: String,
     name: String
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": __typename,
-        "name": name,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(HeroDetails.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": __typename,
+      "name": name,
+    ])
   }
 
   /// AsHuman
@@ -52,6 +50,10 @@ public struct HeroDetails: StarWarsAPI.SelectionSet, Fragment {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("height", Double?.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroDetails.self,
+      HeroDetails.AsHuman.self
+    ] }
 
     /// Height in the preferred unit, default is meters
     public var height: Double? { __data["height"] }
@@ -62,17 +64,11 @@ public struct HeroDetails: StarWarsAPI.SelectionSet, Fragment {
       height: Double? = nil,
       name: String
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Human.typename,
-          "height": height,
-          "name": name,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroDetails.self),
-          ObjectIdentifier(HeroDetails.AsHuman.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Human.typename,
+        "height": height,
+        "name": name,
+      ])
     }
   }
 
@@ -88,6 +84,10 @@ public struct HeroDetails: StarWarsAPI.SelectionSet, Fragment {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("primaryFunction", String?.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroDetails.self,
+      HeroDetails.AsDroid.self
+    ] }
 
     /// This droid's primary function
     public var primaryFunction: String? { __data["primaryFunction"] }
@@ -98,17 +98,11 @@ public struct HeroDetails: StarWarsAPI.SelectionSet, Fragment {
       primaryFunction: String? = nil,
       name: String
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Droid.typename,
-          "primaryFunction": primaryFunction,
-          "name": name,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroDetails.self),
-          ObjectIdentifier(HeroDetails.AsDroid.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Droid.typename,
+        "primaryFunction": primaryFunction,
+        "name": name,
+      ])
     }
   }
 }

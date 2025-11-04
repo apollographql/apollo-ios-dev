@@ -23,6 +23,9 @@ public class RepoURLQuery: GraphQLQuery {
         "name": "apollo-ios"
       ]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      RepoURLQuery.Data.self
+    ] }
 
     /// Lookup a given repository by the owner and repository name.
     public var repository: Repository? { __data["repository"] }
@@ -38,6 +41,9 @@ public class RepoURLQuery: GraphQLQuery {
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("url", GitHubAPI.URI.self),
+      ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        RepoURLQuery.Data.Repository.self
       ] }
 
       /// The HTTP URL for this repository

@@ -27,21 +27,19 @@ public class HeroDetailsQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroDetailsQuery.Data.self
+    ] }
 
     public var hero: Hero? { __data["hero"] }
 
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroDetailsQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
@@ -58,6 +56,9 @@ public class HeroDetailsQuery: GraphQLQuery {
         .inlineFragment(AsHuman.self),
         .inlineFragment(AsDroid.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroDetailsQuery.Data.Hero.self
+      ] }
 
       /// The name of the character
       public var name: String { __data["name"] }
@@ -69,15 +70,10 @@ public class HeroDetailsQuery: GraphQLQuery {
         __typename: String,
         name: String
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "name": name,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroDetailsQuery.Data.Hero.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "name": name,
+        ])
       }
 
       /// Hero.AsHuman
@@ -92,6 +88,10 @@ public class HeroDetailsQuery: GraphQLQuery {
         public static var __selections: [ApolloAPI.Selection] { [
           .field("height", Double?.self),
         ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          HeroDetailsQuery.Data.Hero.self,
+          HeroDetailsQuery.Data.Hero.AsHuman.self
+        ] }
 
         /// Height in the preferred unit, default is meters
         public var height: Double? { __data["height"] }
@@ -102,17 +102,11 @@ public class HeroDetailsQuery: GraphQLQuery {
           height: Double? = nil,
           name: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": StarWarsAPI.Objects.Human.typename,
-              "height": height,
-              "name": name,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(HeroDetailsQuery.Data.Hero.self),
-              ObjectIdentifier(HeroDetailsQuery.Data.Hero.AsHuman.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": StarWarsAPI.Objects.Human.typename,
+            "height": height,
+            "name": name,
+          ])
         }
       }
 
@@ -128,6 +122,10 @@ public class HeroDetailsQuery: GraphQLQuery {
         public static var __selections: [ApolloAPI.Selection] { [
           .field("primaryFunction", String?.self),
         ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          HeroDetailsQuery.Data.Hero.self,
+          HeroDetailsQuery.Data.Hero.AsDroid.self
+        ] }
 
         /// This droid's primary function
         public var primaryFunction: String? { __data["primaryFunction"] }
@@ -138,17 +136,11 @@ public class HeroDetailsQuery: GraphQLQuery {
           primaryFunction: String? = nil,
           name: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": StarWarsAPI.Objects.Droid.typename,
-              "primaryFunction": primaryFunction,
-              "name": name,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(HeroDetailsQuery.Data.Hero.self),
-              ObjectIdentifier(HeroDetailsQuery.Data.Hero.AsDroid.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": StarWarsAPI.Objects.Droid.typename,
+            "primaryFunction": primaryFunction,
+            "name": name,
+          ])
         }
       }
     }

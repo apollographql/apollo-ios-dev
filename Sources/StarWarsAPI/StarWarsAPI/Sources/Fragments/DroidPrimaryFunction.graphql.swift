@@ -16,6 +16,9 @@ public struct DroidPrimaryFunction: StarWarsAPI.SelectionSet, Fragment {
     .field("__typename", String.self),
     .field("primaryFunction", String?.self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    DroidPrimaryFunction.self
+  ] }
 
   /// This droid's primary function
   public var primaryFunction: String? { __data["primaryFunction"] }
@@ -23,14 +26,9 @@ public struct DroidPrimaryFunction: StarWarsAPI.SelectionSet, Fragment {
   public init(
     primaryFunction: String? = nil
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": StarWarsAPI.Objects.Droid.typename,
-        "primaryFunction": primaryFunction,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(DroidPrimaryFunction.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": StarWarsAPI.Objects.Droid.typename,
+      "primaryFunction": primaryFunction,
+    ])
   }
 }

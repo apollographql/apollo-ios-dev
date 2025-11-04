@@ -23,6 +23,9 @@ public class RepositoryQuery: GraphQLQuery {
         "name": "apollo-ios"
       ]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      RepositoryQuery.Data.self
+    ] }
 
     /// Lookup a given repository by the owner and repository name.
     public var repository: Repository? { __data["repository"] }
@@ -38,6 +41,9 @@ public class RepositoryQuery: GraphQLQuery {
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .field("issueOrPullRequest", IssueOrPullRequest?.self, arguments: ["number": 13]),
+      ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        RepositoryQuery.Data.Repository.self
       ] }
 
       /// Returns a single issue-like object from the current repository by number.
@@ -56,6 +62,9 @@ public class RepositoryQuery: GraphQLQuery {
           .inlineFragment(AsIssue.self),
           .inlineFragment(AsReactable.self),
         ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          RepositoryQuery.Data.Repository.IssueOrPullRequest.self
+        ] }
 
         public var asIssue: AsIssue? { _asInlineFragment() }
         public var asReactable: AsReactable? { _asInlineFragment() }
@@ -73,6 +82,11 @@ public class RepositoryQuery: GraphQLQuery {
             .field("body", String.self),
             .field("url", GitHubAPI.URI.self),
             .field("author", Author?.self),
+          ] }
+          public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+            RepositoryQuery.Data.Repository.IssueOrPullRequest.self,
+            RepositoryQuery.Data.Repository.IssueOrPullRequest.AsIssue.self,
+            RepositoryQuery.Data.Repository.IssueOrPullRequest.AsReactable.self
           ] }
 
           /// Identifies the body of the issue.
@@ -96,6 +110,10 @@ public class RepositoryQuery: GraphQLQuery {
               .field("__typename", String.self),
               .field("avatarUrl", GitHubAPI.URI.self),
             ] }
+            public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+              RepositoryQuery.Data.Repository.IssueOrPullRequest.AsIssue.Author.self,
+              RepositoryQuery.Data.Repository.IssueOrPullRequest.AsReactable.AsComment.Author.self
+            ] }
 
             /// A URL pointing to the actor's public avatar.
             public var avatarUrl: GitHubAPI.URI { __data["avatarUrl"] }
@@ -117,6 +135,10 @@ public class RepositoryQuery: GraphQLQuery {
             .field("viewerCanReact", Bool.self),
             .inlineFragment(AsComment.self),
           ] }
+          public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+            RepositoryQuery.Data.Repository.IssueOrPullRequest.self,
+            RepositoryQuery.Data.Repository.IssueOrPullRequest.AsReactable.self
+          ] }
 
           /// Can user react to this subject
           public var viewerCanReact: Bool { __data["viewerCanReact"] }
@@ -135,6 +157,11 @@ public class RepositoryQuery: GraphQLQuery {
             public static var __selections: [ApolloAPI.Selection] { [
               .field("author", Author?.self),
             ] }
+            public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+              RepositoryQuery.Data.Repository.IssueOrPullRequest.self,
+              RepositoryQuery.Data.Repository.IssueOrPullRequest.AsReactable.self,
+              RepositoryQuery.Data.Repository.IssueOrPullRequest.AsReactable.AsComment.self
+            ] }
 
             /// The actor who authored the comment.
             public var author: Author? { __data["author"] }
@@ -152,6 +179,9 @@ public class RepositoryQuery: GraphQLQuery {
               public static var __selections: [ApolloAPI.Selection] { [
                 .field("__typename", String.self),
                 .field("login", String.self),
+              ] }
+              public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+                RepositoryQuery.Data.Repository.IssueOrPullRequest.AsReactable.AsComment.Author.self
               ] }
 
               /// The username of the actor.

@@ -28,21 +28,19 @@ public class HeroNameAndAppearsInWithFragmentQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroNameAndAppearsInWithFragmentQuery.Data.self
+    ] }
 
     public var hero: Hero? { __data["hero"] }
 
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroNameAndAppearsInWithFragmentQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
@@ -56,6 +54,10 @@ public class HeroNameAndAppearsInWithFragmentQuery: GraphQLQuery {
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .fragment(CharacterNameAndAppearsIn.self),
+      ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroNameAndAppearsInWithFragmentQuery.Data.Hero.self,
+        CharacterNameAndAppearsIn.self
       ] }
 
       /// The name of the character
@@ -75,17 +77,11 @@ public class HeroNameAndAppearsInWithFragmentQuery: GraphQLQuery {
         name: String,
         appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?]
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "name": name,
-            "appearsIn": appearsIn,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroNameAndAppearsInWithFragmentQuery.Data.Hero.self),
-            ObjectIdentifier(CharacterNameAndAppearsIn.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "name": name,
+          "appearsIn": appearsIn,
+        ])
       }
     }
   }

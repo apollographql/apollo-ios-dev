@@ -27,21 +27,19 @@ public class CreateAwesomeReviewMutation: GraphQLMutation {
         ]
       ]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      CreateAwesomeReviewMutation.Data.self
+    ] }
 
     public var createReview: CreateReview? { __data["createReview"] }
 
     public init(
       createReview: CreateReview? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Mutation.typename,
-          "createReview": createReview._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(CreateAwesomeReviewMutation.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Mutation.typename,
+        "createReview": createReview._fieldData,
+      ])
     }
 
     /// CreateReview
@@ -57,6 +55,9 @@ public class CreateAwesomeReviewMutation: GraphQLMutation {
         .field("stars", Int.self),
         .field("commentary", String?.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        CreateAwesomeReviewMutation.Data.CreateReview.self
+      ] }
 
       /// The number of stars this review gave, 1-5
       public var stars: Int { __data["stars"] }
@@ -67,16 +68,11 @@ public class CreateAwesomeReviewMutation: GraphQLMutation {
         stars: Int,
         commentary: String? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": StarWarsAPI.Objects.Review.typename,
-            "stars": stars,
-            "commentary": commentary,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(CreateAwesomeReviewMutation.Data.CreateReview.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": StarWarsAPI.Objects.Review.typename,
+          "stars": stars,
+          "commentary": commentary,
+        ])
       }
     }
   }

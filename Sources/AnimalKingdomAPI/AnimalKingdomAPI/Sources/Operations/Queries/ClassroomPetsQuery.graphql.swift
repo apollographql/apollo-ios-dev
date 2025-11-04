@@ -21,21 +21,19 @@ public class ClassroomPetsQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("classroomPets", [ClassroomPet?]?.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      ClassroomPetsQuery.Data.self
+    ] }
 
     public var classroomPets: [ClassroomPet?]? { __data["classroomPets"] }
 
     public init(
       classroomPets: [ClassroomPet?]? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": AnimalKingdomAPI.Objects.Query.typename,
-          "classroomPets": classroomPets._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(ClassroomPetsQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": AnimalKingdomAPI.Objects.Query.typename,
+        "classroomPets": classroomPets._fieldData,
+      ])
     }
 
     /// ClassroomPet
@@ -49,6 +47,9 @@ public class ClassroomPetsQuery: GraphQLQuery {
       public static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
         .fragment(ClassroomPetDetails.self),
+      ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        ClassroomPetsQuery.Data.ClassroomPet.self
       ] }
 
       public var asAnimal: AsAnimal? { _asInlineFragment() }
@@ -68,14 +69,9 @@ public class ClassroomPetsQuery: GraphQLQuery {
       public init(
         __typename: String
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+        ])
       }
 
       /// ClassroomPet.AsAnimal
@@ -89,6 +85,12 @@ public class ClassroomPetsQuery: GraphQLQuery {
         public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.Animal }
         public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
           ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetDetails.AsAnimal.self
+        ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetsQuery.Data.ClassroomPet.AsAnimal.self,
+          ClassroomPetDetails.self,
           ClassroomPetDetails.AsAnimal.self
         ] }
 
@@ -105,18 +107,10 @@ public class ClassroomPetsQuery: GraphQLQuery {
           __typename: String,
           species: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": __typename,
-              "species": species,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.self),
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.AsAnimal.self),
-              ObjectIdentifier(ClassroomPetDetails.self),
-              ObjectIdentifier(ClassroomPetDetails.AsAnimal.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": __typename,
+            "species": species,
+          ])
         }
       }
 
@@ -133,6 +127,12 @@ public class ClassroomPetsQuery: GraphQLQuery {
           ClassroomPetsQuery.Data.ClassroomPet.self,
           ClassroomPetDetails.AsPet.self
         ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetsQuery.Data.ClassroomPet.AsPet.self,
+          ClassroomPetDetails.self,
+          ClassroomPetDetails.AsPet.self
+        ] }
 
         public var humanName: String? { __data["humanName"] }
 
@@ -147,18 +147,10 @@ public class ClassroomPetsQuery: GraphQLQuery {
           __typename: String,
           humanName: String? = nil
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": __typename,
-              "humanName": humanName,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.self),
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.AsPet.self),
-              ObjectIdentifier(ClassroomPetDetails.self),
-              ObjectIdentifier(ClassroomPetDetails.AsPet.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": __typename,
+            "humanName": humanName,
+          ])
         }
       }
 
@@ -173,6 +165,13 @@ public class ClassroomPetsQuery: GraphQLQuery {
         public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Interfaces.WarmBlooded }
         public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
           ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetDetails.AsAnimal.self,
+          ClassroomPetDetails.AsWarmBlooded.self
+        ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetsQuery.Data.ClassroomPet.AsWarmBlooded.self,
+          ClassroomPetDetails.self,
           ClassroomPetDetails.AsAnimal.self,
           ClassroomPetDetails.AsWarmBlooded.self
         ] }
@@ -192,20 +191,11 @@ public class ClassroomPetsQuery: GraphQLQuery {
           species: String,
           laysEggs: Bool
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": __typename,
-              "species": species,
-              "laysEggs": laysEggs,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.self),
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.AsWarmBlooded.self),
-              ObjectIdentifier(ClassroomPetDetails.self),
-              ObjectIdentifier(ClassroomPetDetails.AsAnimal.self),
-              ObjectIdentifier(ClassroomPetDetails.AsWarmBlooded.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": __typename,
+            "species": species,
+            "laysEggs": laysEggs,
+          ])
         }
       }
 
@@ -220,6 +210,15 @@ public class ClassroomPetsQuery: GraphQLQuery {
         public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Cat }
         public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
           ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetDetails.AsAnimal.self,
+          ClassroomPetDetails.AsPet.self,
+          ClassroomPetDetails.AsWarmBlooded.self,
+          ClassroomPetDetails.AsCat.self
+        ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetsQuery.Data.ClassroomPet.AsCat.self,
+          ClassroomPetDetails.self,
           ClassroomPetDetails.AsAnimal.self,
           ClassroomPetDetails.AsPet.self,
           ClassroomPetDetails.AsWarmBlooded.self,
@@ -246,25 +245,14 @@ public class ClassroomPetsQuery: GraphQLQuery {
           bodyTemperature: Int,
           isJellicle: Bool
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": AnimalKingdomAPI.Objects.Cat.typename,
-              "species": species,
-              "humanName": humanName,
-              "laysEggs": laysEggs,
-              "bodyTemperature": bodyTemperature,
-              "isJellicle": isJellicle,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.self),
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.AsCat.self),
-              ObjectIdentifier(ClassroomPetDetails.self),
-              ObjectIdentifier(ClassroomPetDetails.AsAnimal.self),
-              ObjectIdentifier(ClassroomPetDetails.AsPet.self),
-              ObjectIdentifier(ClassroomPetDetails.AsWarmBlooded.self),
-              ObjectIdentifier(ClassroomPetDetails.AsCat.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": AnimalKingdomAPI.Objects.Cat.typename,
+            "species": species,
+            "humanName": humanName,
+            "laysEggs": laysEggs,
+            "bodyTemperature": bodyTemperature,
+            "isJellicle": isJellicle,
+          ])
         }
       }
 
@@ -279,6 +267,15 @@ public class ClassroomPetsQuery: GraphQLQuery {
         public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Bird }
         public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
           ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetDetails.AsAnimal.self,
+          ClassroomPetDetails.AsPet.self,
+          ClassroomPetDetails.AsWarmBlooded.self,
+          ClassroomPetDetails.AsBird.self
+        ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetsQuery.Data.ClassroomPet.AsBird.self,
+          ClassroomPetDetails.self,
           ClassroomPetDetails.AsAnimal.self,
           ClassroomPetDetails.AsPet.self,
           ClassroomPetDetails.AsWarmBlooded.self,
@@ -303,24 +300,13 @@ public class ClassroomPetsQuery: GraphQLQuery {
           laysEggs: Bool,
           wingspan: Double
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": AnimalKingdomAPI.Objects.Bird.typename,
-              "species": species,
-              "humanName": humanName,
-              "laysEggs": laysEggs,
-              "wingspan": wingspan,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.self),
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.AsBird.self),
-              ObjectIdentifier(ClassroomPetDetails.self),
-              ObjectIdentifier(ClassroomPetDetails.AsAnimal.self),
-              ObjectIdentifier(ClassroomPetDetails.AsPet.self),
-              ObjectIdentifier(ClassroomPetDetails.AsWarmBlooded.self),
-              ObjectIdentifier(ClassroomPetDetails.AsBird.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": AnimalKingdomAPI.Objects.Bird.typename,
+            "species": species,
+            "humanName": humanName,
+            "laysEggs": laysEggs,
+            "wingspan": wingspan,
+          ])
         }
       }
 
@@ -335,6 +321,13 @@ public class ClassroomPetsQuery: GraphQLQuery {
         public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.PetRock }
         public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
           ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetDetails.AsPet.self,
+          ClassroomPetDetails.AsPetRock.self
+        ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          ClassroomPetsQuery.Data.ClassroomPet.self,
+          ClassroomPetsQuery.Data.ClassroomPet.AsPetRock.self,
+          ClassroomPetDetails.self,
           ClassroomPetDetails.AsPet.self,
           ClassroomPetDetails.AsPetRock.self
         ] }
@@ -353,20 +346,11 @@ public class ClassroomPetsQuery: GraphQLQuery {
           humanName: String? = nil,
           favoriteToy: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": AnimalKingdomAPI.Objects.PetRock.typename,
-              "humanName": humanName,
-              "favoriteToy": favoriteToy,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.self),
-              ObjectIdentifier(ClassroomPetsQuery.Data.ClassroomPet.AsPetRock.self),
-              ObjectIdentifier(ClassroomPetDetails.self),
-              ObjectIdentifier(ClassroomPetDetails.AsPet.self),
-              ObjectIdentifier(ClassroomPetDetails.AsPetRock.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": AnimalKingdomAPI.Objects.PetRock.typename,
+            "humanName": humanName,
+            "favoriteToy": favoriteToy,
+          ])
         }
       }
     }

@@ -24,6 +24,9 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
         "owner": "apollographql"
       ]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      IssuesAndCommentsForRepositoryQuery.Data.self
+    ] }
 
     /// Lookup a given repository by the owner and repository name.
     public var repository: Repository? { __data["repository"] }
@@ -40,6 +43,9 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
         .field("__typename", String.self),
         .field("name", String.self),
         .field("issues", Issues.self, arguments: ["last": 100]),
+      ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        IssuesAndCommentsForRepositoryQuery.Data.Repository.self
       ] }
 
       /// The name of the repository.
@@ -59,6 +65,9 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
           .field("__typename", String.self),
           .field("nodes", [Node?]?.self),
         ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.self
+        ] }
 
         /// A list of nodes.
         public var nodes: [Node?]? { __data["nodes"] }
@@ -77,6 +86,9 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
             .field("author", Author?.self),
             .field("body", String.self),
             .field("comments", Comments.self, arguments: ["last": 100]),
+          ] }
+          public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+            IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.self
           ] }
 
           /// Identifies the issue title.
@@ -99,6 +111,10 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
             public static var __selections: [ApolloAPI.Selection] { [
               .field("__typename", String.self),
               .fragment(AuthorDetails.self),
+            ] }
+            public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+              IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Author.self,
+              AuthorDetails.self
             ] }
 
             /// The username of the actor.
@@ -124,6 +140,12 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
               public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.User }
               public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
                 IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Author.self,
+                AuthorDetails.self,
+                AuthorDetails.AsUser.self
+              ] }
+              public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+                IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Author.self,
+                IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Author.AsUser.self,
                 AuthorDetails.self,
                 AuthorDetails.AsUser.self
               ] }
@@ -155,6 +177,9 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
               .field("__typename", String.self),
               .field("nodes", [Node?]?.self),
             ] }
+            public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+              IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Comments.self
+            ] }
 
             /// A list of nodes.
             public var nodes: [Node?]? { __data["nodes"] }
@@ -171,6 +196,9 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
                 .field("__typename", String.self),
                 .field("body", String.self),
                 .field("author", Author?.self),
+              ] }
+              public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+                IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Comments.Node.self
               ] }
 
               /// The body as Markdown.
@@ -189,6 +217,10 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
                 public static var __selections: [ApolloAPI.Selection] { [
                   .field("__typename", String.self),
                   .fragment(AuthorDetails.self),
+                ] }
+                public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+                  IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Comments.Node.Author.self,
+                  AuthorDetails.self
                 ] }
 
                 /// The username of the actor.
@@ -214,6 +246,12 @@ public class IssuesAndCommentsForRepositoryQuery: GraphQLQuery {
                   public static var __parentType: any ApolloAPI.ParentType { GitHubAPI.Objects.User }
                   public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
                     IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Comments.Node.Author.self,
+                    AuthorDetails.self,
+                    AuthorDetails.AsUser.self
+                  ] }
+                  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+                    IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Comments.Node.Author.self,
+                    IssuesAndCommentsForRepositoryQuery.Data.Repository.Issues.Node.Comments.Node.Author.AsUser.self,
                     AuthorDetails.self,
                     AuthorDetails.AsUser.self
                   ] }

@@ -16,6 +16,9 @@ public struct FriendsNames: StarWarsAPI.SelectionSet, Fragment {
     .field("__typename", String.self),
     .field("friends", [Friend?]?.self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    FriendsNames.self
+  ] }
 
   /// The friends of the character, or an empty list if they have none
   public var friends: [Friend?]? { __data["friends"] }
@@ -24,15 +27,10 @@ public struct FriendsNames: StarWarsAPI.SelectionSet, Fragment {
     __typename: String,
     friends: [Friend?]? = nil
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": __typename,
-        "friends": friends._fieldData,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(FriendsNames.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": __typename,
+      "friends": friends._fieldData,
+    ])
   }
 
   /// Friend
@@ -47,6 +45,9 @@ public struct FriendsNames: StarWarsAPI.SelectionSet, Fragment {
       .field("__typename", String.self),
       .field("name", String.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      FriendsNames.Friend.self
+    ] }
 
     /// The name of the character
     public var name: String { __data["name"] }
@@ -55,15 +56,10 @@ public struct FriendsNames: StarWarsAPI.SelectionSet, Fragment {
       __typename: String,
       name: String
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": __typename,
-          "name": name,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(FriendsNames.Friend.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": __typename,
+        "name": name,
+      ])
     }
   }
 }

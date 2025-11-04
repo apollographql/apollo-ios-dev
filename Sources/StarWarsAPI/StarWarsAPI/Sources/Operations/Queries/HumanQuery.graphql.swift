@@ -27,21 +27,19 @@ public class HumanQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("human", Human?.self, arguments: ["id": .variable("id")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HumanQuery.Data.self
+    ] }
 
     public var human: Human? { __data["human"] }
 
     public init(
       human: Human? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "human": human._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HumanQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "human": human._fieldData,
+      ])
     }
 
     /// Human
@@ -57,6 +55,9 @@ public class HumanQuery: GraphQLQuery {
         .field("name", String.self),
         .field("mass", Double?.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HumanQuery.Data.Human.self
+      ] }
 
       /// What this human calls themselves
       public var name: String { __data["name"] }
@@ -67,16 +68,11 @@ public class HumanQuery: GraphQLQuery {
         name: String,
         mass: Double? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": StarWarsAPI.Objects.Human.typename,
-            "name": name,
-            "mass": mass,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HumanQuery.Data.Human.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": StarWarsAPI.Objects.Human.typename,
+          "name": name,
+          "mass": mass,
+        ])
       }
     }
   }

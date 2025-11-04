@@ -17,6 +17,10 @@ public struct WarmBloodedDetails: AnimalKingdomAPI.SelectionSet, Fragment {
     .field("bodyTemperature", Int.self),
     .fragment(HeightInMeters.self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    WarmBloodedDetails.self,
+    HeightInMeters.self
+  ] }
 
   public var bodyTemperature: Int { __data["bodyTemperature"] }
   public var height: Height { __data["height"] }
@@ -33,17 +37,11 @@ public struct WarmBloodedDetails: AnimalKingdomAPI.SelectionSet, Fragment {
     bodyTemperature: Int,
     height: Height
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": __typename,
-        "bodyTemperature": bodyTemperature,
-        "height": height._fieldData,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(WarmBloodedDetails.self),
-        ObjectIdentifier(HeightInMeters.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": __typename,
+      "bodyTemperature": bodyTemperature,
+      "height": height._fieldData,
+    ])
   }
 
   public typealias Height = HeightInMeters.Height

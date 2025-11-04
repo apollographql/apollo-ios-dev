@@ -21,6 +21,9 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
     .inlineFragment(AsBird.self),
     .inlineFragment(AsPetRock.self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    ClassroomPetDetails.self
+  ] }
 
   public var asAnimal: AsAnimal? { _asInlineFragment() }
   public var asPet: AsPet? { _asInlineFragment() }
@@ -32,14 +35,9 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   public init(
     __typename: String
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": __typename,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(ClassroomPetDetails.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": __typename,
+    ])
   }
 
   /// AsAnimal
@@ -54,6 +52,10 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("species", String.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      ClassroomPetDetails.self,
+      ClassroomPetDetails.AsAnimal.self
+    ] }
 
     public var species: String { __data["species"] }
 
@@ -61,16 +63,10 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
       __typename: String,
       species: String
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": __typename,
-          "species": species,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(ClassroomPetDetails.self),
-          ObjectIdentifier(ClassroomPetDetails.AsAnimal.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": __typename,
+        "species": species,
+      ])
     }
   }
 
@@ -86,6 +82,10 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("humanName", String?.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      ClassroomPetDetails.self,
+      ClassroomPetDetails.AsPet.self
+    ] }
 
     public var humanName: String? { __data["humanName"] }
 
@@ -93,16 +93,10 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
       __typename: String,
       humanName: String? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": __typename,
-          "humanName": humanName,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(ClassroomPetDetails.self),
-          ObjectIdentifier(ClassroomPetDetails.AsPet.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": __typename,
+        "humanName": humanName,
+      ])
     }
   }
 
@@ -118,6 +112,11 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("laysEggs", Bool.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      ClassroomPetDetails.self,
+      ClassroomPetDetails.AsWarmBlooded.self,
+      ClassroomPetDetails.AsAnimal.self
+    ] }
 
     public var laysEggs: Bool { __data["laysEggs"] }
     public var species: String { __data["species"] }
@@ -127,18 +126,11 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
       laysEggs: Bool,
       species: String
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": __typename,
-          "laysEggs": laysEggs,
-          "species": species,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(ClassroomPetDetails.self),
-          ObjectIdentifier(ClassroomPetDetails.AsWarmBlooded.self),
-          ObjectIdentifier(ClassroomPetDetails.AsAnimal.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": __typename,
+        "laysEggs": laysEggs,
+        "species": species,
+      ])
     }
   }
 
@@ -155,6 +147,13 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
       .field("bodyTemperature", Int.self),
       .field("isJellicle", Bool.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      ClassroomPetDetails.self,
+      ClassroomPetDetails.AsCat.self,
+      ClassroomPetDetails.AsAnimal.self,
+      ClassroomPetDetails.AsPet.self,
+      ClassroomPetDetails.AsWarmBlooded.self
+    ] }
 
     public var bodyTemperature: Int { __data["bodyTemperature"] }
     public var isJellicle: Bool { __data["isJellicle"] }
@@ -169,23 +168,14 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
       humanName: String? = nil,
       laysEggs: Bool
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": AnimalKingdomAPI.Objects.Cat.typename,
-          "bodyTemperature": bodyTemperature,
-          "isJellicle": isJellicle,
-          "species": species,
-          "humanName": humanName,
-          "laysEggs": laysEggs,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(ClassroomPetDetails.self),
-          ObjectIdentifier(ClassroomPetDetails.AsCat.self),
-          ObjectIdentifier(ClassroomPetDetails.AsAnimal.self),
-          ObjectIdentifier(ClassroomPetDetails.AsPet.self),
-          ObjectIdentifier(ClassroomPetDetails.AsWarmBlooded.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": AnimalKingdomAPI.Objects.Cat.typename,
+        "bodyTemperature": bodyTemperature,
+        "isJellicle": isJellicle,
+        "species": species,
+        "humanName": humanName,
+        "laysEggs": laysEggs,
+      ])
     }
   }
 
@@ -201,6 +191,13 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("wingspan", Double.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      ClassroomPetDetails.self,
+      ClassroomPetDetails.AsBird.self,
+      ClassroomPetDetails.AsAnimal.self,
+      ClassroomPetDetails.AsPet.self,
+      ClassroomPetDetails.AsWarmBlooded.self
+    ] }
 
     public var wingspan: Double { __data["wingspan"] }
     public var species: String { __data["species"] }
@@ -213,22 +210,13 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
       humanName: String? = nil,
       laysEggs: Bool
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": AnimalKingdomAPI.Objects.Bird.typename,
-          "wingspan": wingspan,
-          "species": species,
-          "humanName": humanName,
-          "laysEggs": laysEggs,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(ClassroomPetDetails.self),
-          ObjectIdentifier(ClassroomPetDetails.AsBird.self),
-          ObjectIdentifier(ClassroomPetDetails.AsAnimal.self),
-          ObjectIdentifier(ClassroomPetDetails.AsPet.self),
-          ObjectIdentifier(ClassroomPetDetails.AsWarmBlooded.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": AnimalKingdomAPI.Objects.Bird.typename,
+        "wingspan": wingspan,
+        "species": species,
+        "humanName": humanName,
+        "laysEggs": laysEggs,
+      ])
     }
   }
 
@@ -244,6 +232,11 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("favoriteToy", String.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      ClassroomPetDetails.self,
+      ClassroomPetDetails.AsPetRock.self,
+      ClassroomPetDetails.AsPet.self
+    ] }
 
     public var favoriteToy: String { __data["favoriteToy"] }
     public var humanName: String? { __data["humanName"] }
@@ -252,18 +245,11 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
       favoriteToy: String,
       humanName: String? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": AnimalKingdomAPI.Objects.PetRock.typename,
-          "favoriteToy": favoriteToy,
-          "humanName": humanName,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(ClassroomPetDetails.self),
-          ObjectIdentifier(ClassroomPetDetails.AsPetRock.self),
-          ObjectIdentifier(ClassroomPetDetails.AsPet.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": AnimalKingdomAPI.Objects.PetRock.typename,
+        "favoriteToy": favoriteToy,
+        "humanName": humanName,
+      ])
     }
   }
 }

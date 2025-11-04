@@ -27,21 +27,19 @@ public class HeroAndFriendsNamesWithIDForParentOnlyQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroAndFriendsNamesWithIDForParentOnlyQuery.Data.self
+    ] }
 
     public var hero: Hero? { __data["hero"] }
 
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroAndFriendsNamesWithIDForParentOnlyQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
@@ -58,6 +56,9 @@ public class HeroAndFriendsNamesWithIDForParentOnlyQuery: GraphQLQuery {
         .field("name", String.self),
         .field("friends", [Friend?]?.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroAndFriendsNamesWithIDForParentOnlyQuery.Data.Hero.self
+      ] }
 
       /// The ID of the character
       public var id: StarWarsAPI.ID { __data["id"] }
@@ -72,17 +73,12 @@ public class HeroAndFriendsNamesWithIDForParentOnlyQuery: GraphQLQuery {
         name: String,
         friends: [Friend?]? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "id": id,
-            "name": name,
-            "friends": friends._fieldData,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroAndFriendsNamesWithIDForParentOnlyQuery.Data.Hero.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "id": id,
+          "name": name,
+          "friends": friends._fieldData,
+        ])
       }
 
       /// Hero.Friend
@@ -97,6 +93,9 @@ public class HeroAndFriendsNamesWithIDForParentOnlyQuery: GraphQLQuery {
           .field("__typename", String.self),
           .field("name", String.self),
         ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          HeroAndFriendsNamesWithIDForParentOnlyQuery.Data.Hero.Friend.self
+        ] }
 
         /// The name of the character
         public var name: String { __data["name"] }
@@ -105,15 +104,10 @@ public class HeroAndFriendsNamesWithIDForParentOnlyQuery: GraphQLQuery {
           __typename: String,
           name: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": __typename,
-              "name": name,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(HeroAndFriendsNamesWithIDForParentOnlyQuery.Data.Hero.Friend.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": __typename,
+            "name": name,
+          ])
         }
       }
     }

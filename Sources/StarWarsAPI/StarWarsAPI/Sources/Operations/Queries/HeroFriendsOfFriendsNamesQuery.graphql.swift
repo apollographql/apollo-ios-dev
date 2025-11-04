@@ -27,21 +27,19 @@ public class HeroFriendsOfFriendsNamesQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroFriendsOfFriendsNamesQuery.Data.self
+    ] }
 
     public var hero: Hero? { __data["hero"] }
 
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroFriendsOfFriendsNamesQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
@@ -56,6 +54,9 @@ public class HeroFriendsOfFriendsNamesQuery: GraphQLQuery {
         .field("__typename", String.self),
         .field("friends", [Friend?]?.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroFriendsOfFriendsNamesQuery.Data.Hero.self
+      ] }
 
       /// The friends of the character, or an empty list if they have none
       public var friends: [Friend?]? { __data["friends"] }
@@ -64,15 +65,10 @@ public class HeroFriendsOfFriendsNamesQuery: GraphQLQuery {
         __typename: String,
         friends: [Friend?]? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "friends": friends._fieldData,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroFriendsOfFriendsNamesQuery.Data.Hero.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "friends": friends._fieldData,
+        ])
       }
 
       /// Hero.Friend
@@ -88,6 +84,9 @@ public class HeroFriendsOfFriendsNamesQuery: GraphQLQuery {
           .field("id", StarWarsAPI.ID.self),
           .field("friends", [Friend?]?.self),
         ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          HeroFriendsOfFriendsNamesQuery.Data.Hero.Friend.self
+        ] }
 
         /// The ID of the character
         public var id: StarWarsAPI.ID { __data["id"] }
@@ -99,16 +98,11 @@ public class HeroFriendsOfFriendsNamesQuery: GraphQLQuery {
           id: StarWarsAPI.ID,
           friends: [Friend?]? = nil
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": __typename,
-              "id": id,
-              "friends": friends._fieldData,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(HeroFriendsOfFriendsNamesQuery.Data.Hero.Friend.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": __typename,
+            "id": id,
+            "friends": friends._fieldData,
+          ])
         }
 
         /// Hero.Friend.Friend
@@ -123,6 +117,9 @@ public class HeroFriendsOfFriendsNamesQuery: GraphQLQuery {
             .field("__typename", String.self),
             .field("name", String.self),
           ] }
+          public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+            HeroFriendsOfFriendsNamesQuery.Data.Hero.Friend.Friend.self
+          ] }
 
           /// The name of the character
           public var name: String { __data["name"] }
@@ -131,15 +128,10 @@ public class HeroFriendsOfFriendsNamesQuery: GraphQLQuery {
             __typename: String,
             name: String
           ) {
-            self.init(_dataDict: DataDict(
-              data: [
-                "__typename": __typename,
-                "name": name,
-              ],
-              fulfilledFragments: [
-                ObjectIdentifier(HeroFriendsOfFriendsNamesQuery.Data.Hero.Friend.Friend.self)
-              ]
-            ))
+            self.init(unsafelyWithData: [
+              "__typename": __typename,
+              "name": name,
+            ])
           }
         }
       }

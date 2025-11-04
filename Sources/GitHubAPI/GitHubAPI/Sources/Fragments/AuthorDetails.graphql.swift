@@ -17,6 +17,9 @@ public struct AuthorDetails: GitHubAPI.SelectionSet, Fragment {
     .field("login", String.self),
     .inlineFragment(AsUser.self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    AuthorDetails.self
+  ] }
 
   /// The username of the actor.
   public var login: String { __data["login"] }
@@ -35,6 +38,10 @@ public struct AuthorDetails: GitHubAPI.SelectionSet, Fragment {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("id", GitHubAPI.ID.self),
       .field("name", String?.self),
+    ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      AuthorDetails.self,
+      AuthorDetails.AsUser.self
     ] }
 
     public var id: GitHubAPI.ID { __data["id"] }

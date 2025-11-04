@@ -26,21 +26,19 @@ public class FindPetQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("findPet", [FindPet].self, arguments: ["input": .variable("input")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      FindPetQuery.Data.self
+    ] }
 
     public var findPet: [FindPet] { __data["findPet"] }
 
     public init(
       findPet: [FindPet]
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": AnimalKingdomAPI.Objects.Query.typename,
-          "findPet": findPet._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(FindPetQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": AnimalKingdomAPI.Objects.Query.typename,
+        "findPet": findPet._fieldData,
+      ])
     }
 
     /// FindPet
@@ -56,6 +54,9 @@ public class FindPetQuery: GraphQLQuery {
         .field("id", AnimalKingdomAPI.ID.self),
         .field("humanName", String?.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        FindPetQuery.Data.FindPet.self
+      ] }
 
       public var id: AnimalKingdomAPI.ID { __data["id"] }
       public var humanName: String? { __data["humanName"] }
@@ -65,16 +66,11 @@ public class FindPetQuery: GraphQLQuery {
         id: AnimalKingdomAPI.ID,
         humanName: String? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "id": id,
-            "humanName": humanName,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(FindPetQuery.Data.FindPet.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "id": id,
+          "humanName": humanName,
+        ])
       }
     }
   }

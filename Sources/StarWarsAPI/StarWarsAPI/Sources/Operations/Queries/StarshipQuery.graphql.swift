@@ -21,21 +21,19 @@ public class StarshipQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("starship", Starship?.self, arguments: ["id": 3000]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      StarshipQuery.Data.self
+    ] }
 
     public var starship: Starship? { __data["starship"] }
 
     public init(
       starship: Starship? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "starship": starship._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(StarshipQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "starship": starship._fieldData,
+      ])
     }
 
     /// Starship
@@ -51,6 +49,9 @@ public class StarshipQuery: GraphQLQuery {
         .field("name", String.self),
         .field("coordinates", [[Double]]?.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        StarshipQuery.Data.Starship.self
+      ] }
 
       /// The name of the starship
       public var name: String { __data["name"] }
@@ -60,16 +61,11 @@ public class StarshipQuery: GraphQLQuery {
         name: String,
         coordinates: [[Double]]? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": StarWarsAPI.Objects.Starship.typename,
-            "name": name,
-            "coordinates": coordinates,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(StarshipQuery.Data.Starship.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": StarWarsAPI.Objects.Starship.typename,
+          "name": name,
+          "coordinates": coordinates,
+        ])
       }
     }
   }
