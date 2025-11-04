@@ -21,6 +21,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("stringValue", String?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var stringValue: String? { __data["stringValue"] }
 
@@ -67,6 +70,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("stringValue", String?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var stringValue: String? { __data["stringValue"] }
 
@@ -112,6 +118,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("stringValue", String?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var stringValue: String? { __data["stringValue"] }
 
@@ -156,6 +165,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("__typename", String.self),
           .field("stringValue", [String?]?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var stringValue: [String?]? { __data["stringValue"] }
@@ -204,6 +216,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("__typename", String.self),
           .field("fieldValue", [[[String?]]].self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var fieldValue: [[[String?]]] { __data["fieldValue"] }
@@ -254,6 +269,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("fieldValue", [[[String?]]].self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var fieldValue: [[[String?]]] { __data["fieldValue"] }
 
@@ -300,6 +318,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("stringValue", [String?]?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var stringValue: [String?]? { __data["stringValue"] }
 
@@ -345,6 +366,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("stringValue", [String?]?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var stringValue: [String?]? { __data["stringValue"] }
 
@@ -389,6 +413,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("__typename", String.self),
           .field("intValue", Int?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var intValue: Int? { __data["intValue"] }
@@ -436,6 +463,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("intValue", Int?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var intValue: Int? { __data["intValue"] }
 
@@ -481,6 +511,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("intValue", Int?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var intValue: Int? { __data["intValue"] }
 
@@ -525,6 +558,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("__typename", String.self),
           .field("boolValue", Bool?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var boolValue: Bool? { __data["boolValue"] }
@@ -572,6 +608,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("boolValue", Bool?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var boolValue: Bool? { __data["boolValue"] }
 
@@ -616,6 +655,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("__typename", String.self),
           .field("boolValue", Bool?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var boolValue: Bool? { __data["boolValue"] }
@@ -663,6 +705,10 @@ class SelectionSet_EquatableTests: XCTestCase {
         ]
       }
 
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
+
       public var floatValue: Float? { __data["floatValue"] }
 
       convenience init(
@@ -707,6 +753,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("__typename", String.self),
           .field("floatValue", Float?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var floatValue: Float? { __data["floatValue"] }
@@ -753,6 +802,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("floatValue", Float?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var floatValue: Float? { __data["floatValue"] }
 
@@ -797,6 +849,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("__typename", String.self),
           .field("doubleValue", Double?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var doubleValue: Double? { __data["doubleValue"] }
@@ -844,6 +899,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("doubleValue", Double?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var doubleValue: Double? { __data["doubleValue"] }
 
@@ -889,6 +947,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("doubleValue", Double?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var doubleValue: Double? { __data["doubleValue"] }
 
@@ -933,6 +994,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("__typename", String.self),
           .field("fieldValue", String?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var fieldValue: String? { __data["fieldValue"] }
@@ -980,6 +1044,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("__typename", String.self),
           .field("fieldValue", GivenCustomScalar?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var fieldValue: GivenCustomScalar? { __data["fieldValue"] }
@@ -1029,6 +1096,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("fieldValue", GivenCustomScalar?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var fieldValue: GivenCustomScalar? { __data["fieldValue"] }
 
@@ -1076,6 +1146,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("fieldValue", GivenCustomScalar?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var fieldValue: GivenCustomScalar? { __data["fieldValue"] }
 
@@ -1121,6 +1194,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .include(if: "a", .inlineFragment(IfA.self)),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HeroFragment.self]
+      }
 
       final class IfA: ConcreteMockTypeCase<HeroFragment>, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
@@ -1128,6 +1204,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           [
             .field("age", Int.self)
           ]
+        }
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [HeroFragment.self, HeroFragment.IfA.self]
         }
       }
     }
@@ -1170,6 +1249,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .include(if: "a", .inlineFragment(IfA.self)),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HeroFragment.self]
+      }
 
       final class IfA: ConcreteMockTypeCase<HeroFragment>, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
@@ -1178,6 +1260,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           [
             .field("age", Int.self)
           ]
+        }
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [HeroFragment.self, HeroFragment.IfA.self]
         }
 
       }
@@ -1219,6 +1304,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .include(if: "a", .inlineFragment(IfA.self)),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HeroFragment.self]
+      }
 
       final class IfA: ConcreteMockTypeCase<HeroFragment>, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
@@ -1226,6 +1314,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           [
             .field("age", Int.self)
           ]
+        }
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [HeroFragment.self, HeroFragment.IfA.self]
         }
       }
     }
@@ -1267,6 +1358,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("name", String?.self),
           .include(if: "includeAge", .field("age", Int?.self)),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HeroFragment.self]
       }
     }
 
@@ -1310,6 +1404,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("name", String?.self),
           .include(if: "includeAge", .field("age", Int?.self)),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HeroFragment.self]
       }
     }
 
@@ -1446,6 +1543,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("name", String?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
     }
 
     // when
@@ -1483,6 +1583,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("__typename", String.self),
           .field("name", String?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
     }
 
@@ -1522,6 +1625,10 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("hero", Hero.self)
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [GivenSelectionSet.self]
+      }
+
       var hero: Hero { __data["hero"] }
 
       class Hero: MockSelectionSet {
@@ -1532,6 +1639,10 @@ class SelectionSet_EquatableTests: XCTestCase {
             .field("friend", Friend.self),
           ]
         }
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [Hero.self]
+        }
+
         var friend: Friend { __data["friend"] }
 
         class Friend: MockSelectionSet {
@@ -1540,6 +1651,9 @@ class SelectionSet_EquatableTests: XCTestCase {
               .field("__typename", String.self),
               .field("name", String.self),
             ]
+          }
+          override class var __fulfilledFragments: [any SelectionSet.Type] {
+            [Friend.self]
           }
           var name: String { __data["name"] }
         }
@@ -1588,6 +1702,9 @@ class SelectionSet_EquatableTests: XCTestCase {
           .field("hero", Hero?.self, arguments: ["id": .variable("id")])
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [ReverseFriendsQuery.self]
+      }
 
       var hero: Hero { __data["hero"] }
 
@@ -1597,6 +1714,9 @@ class SelectionSet_EquatableTests: XCTestCase {
             .field("__typename", String.self),
             .field("friendsConnection", FriendsConnection.self),
           ]
+        }
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [Hero.self]
         }
 
         var friendsConnection: FriendsConnection { __data["friendsConnection"] }
@@ -1608,6 +1728,9 @@ class SelectionSet_EquatableTests: XCTestCase {
               .field("friends", [Character].self),
             ]
           }
+          override class var __fulfilledFragments: [any SelectionSet.Type] {
+            [FriendsConnection.self]
+          }
 
           var friends: [Character] { __data["friends"] }
 
@@ -1618,6 +1741,9 @@ class SelectionSet_EquatableTests: XCTestCase {
                 .field("name", String.self),
                 .field("id", String.self),
               ]
+            }
+            override class var __fulfilledFragments: [any SelectionSet.Type] {
+              [Character.self]
             }
 
             var name: String { __data["name"] }
