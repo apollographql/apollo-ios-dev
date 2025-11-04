@@ -294,24 +294,18 @@ class FragmentTemplateTests: XCTestCase {
     try await buildSubjectAndFragment()
 
     let expected = """
-      struct TestFragment: TestSchema.SelectionSet, Fragment {
-        static var fragmentDefinition: StaticString {
-          #"fragment TestFragment on Query { __typename }"#
-        }
-
-        let __data: DataDict
-        init(_dataDict: DataDict) { __data = _dataDict }
-
-        static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
-        static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-          TestFragment.self
-        ] }
+    struct TestFragment: TestSchema.SelectionSet, Fragment {
+      static var fragmentDefinition: StaticString {
+        #"fragment TestFragment on Query { __typename }"#
       }
 
       let __data: DataDict
       init(_dataDict: DataDict) { __data = _dataDict }
 
       static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
+      static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        TestFragment.self
+      ] }
     }
 
     """
@@ -334,21 +328,9 @@ class FragmentTemplateTests: XCTestCase {
     try await buildSubjectAndFragment()
 
     let expected = """
-      struct TestFragment: TestSchema.SelectionSet, Fragment {
-        static var fragmentDefinition: StaticString {
-          #"fragment TestFragment on Animal { __typename }"#
-        }
-
-        let __data: DataDict
-        init(_dataDict: DataDict) { __data = _dataDict }
-
-        static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
-        static var __selections: [ApolloAPI.Selection] { [
-          .field("__typename", String.self),
-        ] }
-        static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-          TestFragment.self
-        ] }
+    struct TestFragment: TestSchema.SelectionSet, Fragment {
+      static var fragmentDefinition: StaticString {
+        #"fragment TestFragment on Animal { __typename }"#
       }
 
       let __data: DataDict
@@ -357,6 +339,9 @@ class FragmentTemplateTests: XCTestCase {
       static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
       static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
+      ] }
+      static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        TestFragment.self
       ] }
     }
 

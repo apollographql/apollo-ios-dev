@@ -1136,12 +1136,12 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(
       """
         }
-        
+      
         // MARK: - Deferred Fragment Metadata
       
         enum DeferredFragmentIdentifiers {
       """,
-      atLine: 64,
+      atLine: 77,
       ignoringExtraLines: true
     ))
     
@@ -1151,7 +1151,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
       }
 
       """,
-      atLine: 74,
+      atLine: 87,
       ignoringExtraLines: false
     ))
   }
@@ -1201,11 +1201,11 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(
       equalLineByLine(
       """
-      // MARK: - Deferred Fragment Metadata
+        // MARK: - Deferred Fragment Metadata
       
-      enum DeferredFragmentIdentifiers {
+        enum DeferredFragmentIdentifiers {
       """,
-      atLine: 64,
+      atLine: 79,
       ignoringExtraLines: true
     ))
 
@@ -1215,7 +1215,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
       }
 
       """,
-      atLine: 74,
+      atLine: 87,
       ignoringExtraLines: false
     ))
   }
@@ -1264,11 +1264,11 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(
       equalLineByLine(
       """
-      // MARK: - Deferred Fragment Metadata
+        // MARK: - Deferred Fragment Metadata
       
-      enum DeferredFragmentIdentifiers {
+        enum DeferredFragmentIdentifiers {
       """,
-      atLine: 64,
+      atLine: 79,
       ignoringExtraLines: true
     ))
 
@@ -1278,7 +1278,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
       }
 
       """,
-      atLine: 74,
+      atLine: 87,
       ignoringExtraLines: false
     ))
   }
