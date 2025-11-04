@@ -49,8 +49,8 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     )
   }
   
-  private func renderSubject() -> String? {
-    subject.render()?.description
+  private func renderSubject() -> String {
+    subject.render().description
   }
   
   // MARK: - Deferred Inline Fragments
@@ -97,7 +97,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         DeferredFragmentIdentifiers.root: Data.AllAnimal.Root.self,
       ]}
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -144,7 +143,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         DeferredFragmentIdentifiers.root: Data.AllAnimal.Root.self,
       ]}
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -196,7 +194,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         DeferredFragmentIdentifiers.root: Data.AllAnimal.AsDog.Root.self,
       ]}
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -255,7 +252,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         DeferredFragmentIdentifiers.two: Data.AllAnimal.AsDog.Two.self,
       ]}
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -320,7 +316,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         DeferredFragmentIdentifiers.two: Data.AllAnimal.AsCat.Two.self,
       ]}
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -388,7 +383,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         DeferredFragmentIdentifiers.inner: Data.AllAnimal.AsDog.Outer.Friend.AsCat.Inner.self,
       ]}
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -439,7 +433,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         DeferredFragmentIdentifiers.root: AnimalFragment.self,
       ]}
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -492,7 +485,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         DeferredFragmentIdentifiers.root: DogFragment.self,
       ]}
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -548,7 +540,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         DeferredFragmentIdentifiers.root: Data.Root.self,
       ]}
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -604,7 +595,6 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         DeferredFragmentIdentifiers.root: Data.AsDog.Root.self,
       ]}
       """,
-      atLine: 2,
       ignoringExtraLines: false)
     )
   }
@@ -658,7 +648,7 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
         DeferredFragmentIdentifiers.deferredDog: DogFragment.self,
       ]}
       """,
-      atLine: 4,
+      atLine: 3,
       ignoringExtraLines: false)
     )
   }

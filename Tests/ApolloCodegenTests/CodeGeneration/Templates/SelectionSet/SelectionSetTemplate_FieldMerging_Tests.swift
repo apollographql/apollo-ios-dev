@@ -122,7 +122,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
   }
 
   func test__render_fieldAccessors__givenFieldMerging_siblings_rendersSiblingField_notAncestorField() async throws {
@@ -181,7 +181,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asPet.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 11, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
   func test__render_fieldAccessors__givenFieldMerging_ancestors_rendersAncestorField_notSiblingField() async throws {
@@ -240,7 +240,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asPet.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 11, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
   }
 
   // MARK: - Fragment Accessors
@@ -312,7 +312,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asPet.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 18, ignoringExtraLines: true))
   }
 
   func test__render_fragmentAccessors__givenFieldMerging_siblings_rendersSiblingFragment_notAncestorFragment() async throws {
@@ -382,7 +382,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asPet.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 19, ignoringExtraLines: true))
   }
 
   // MARK: - Composite Inline Fragments
@@ -450,7 +450,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asDog_predator.selectionSet!.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 14, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
   func test__render_compositeInlineFragment__givenFieldMerging_ancestors_doesNotRenderSiblingCompositeInlineFragment() async throws {
@@ -514,7 +514,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asDog_predator.selectionSet!.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 15, ignoringExtraLines: true))
   }
 
   // MARK: - Child Entity Selection Sets
@@ -569,7 +569,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
   func test__render_childEntitySelectionSet__givenFieldMerging_ancestors__givenEntityFieldMergedFromAncestor_doesNotRenderMergedChildSelectionSet() async throws {
@@ -623,7 +623,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
   func test__render_childEntitySelectionSet__givenFieldMerging_ancestors__givenEntityFieldMergedFromAncestorAndSibling_doesNotRenderMergedChildSelectionSet() async throws {
@@ -687,7 +687,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
   func test__render_childEntitySelectionSet__givenFieldMerging_siblings__givenEntityFieldMergedFromAncestorAndSibling_rendersTypealiasToEntityInSibling() async throws {
@@ -752,7 +752,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
   func test__render_childEntitySelectionSet__givenFieldMerging_ancestorsAndSiblings__givenEntityFieldMergedFromAncestorAndSibling_rendersMergedChildSelectionSet() async throws {
@@ -818,7 +818,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
   // MARK: - Child Entity Selection Sets - In Union
@@ -886,7 +886,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: housePets_asDog.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
   // MARK: - Child Entity Selection Sets - From Named Fragments
@@ -957,7 +957,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
   func test__render_childEntitySelectionSet__givenFieldMerging_ancestorsAndNamedFragments__givenEntityFieldMergedFromNamedFragmentInAncestor_rendersTypealiasToEntityInFragment() async throws {
@@ -1029,7 +1029,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
   func test__render_childEntitySelectionSet__givenFieldMerging_siblingsAndNamedFragments__givenEntityFieldMergedFromNamedFragmentInAncestor_doesNotIncludeFieldAccessorOrChildSelectionSet() async throws {
@@ -1091,7 +1091,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
   func test__render_childEntitySelectionSet__givenFieldMerging__givenEntityFieldWithAdditionalFieldMergedFromNamedFragmentInAncestor_mergesFieldCorrectly() async throws {
@@ -1165,7 +1165,10 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       )
 
       // then
-      expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: false))
+      expect(actual).to(equalLineByLine(
+        expected,
+        atLine: test.shouldMergeField ? 16 : 15,
+        ignoringExtraLines: false))
     }
   }
 
@@ -1286,6 +1289,11 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        TestOperationQuery.Data.AllAnimal.Predator.self,
+        PredatorDetails.Predator.self,
+        PredatorName.Predator.self
+      ] }
 
       public var species: String? { __data["species"] }
       public var predator: Predator? { __data["predator"] }
@@ -1297,7 +1305,12 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
         public init(_dataDict: DataDict) { __data = _dataDict }
 
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
-
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          TestOperationQuery.Data.AllAnimal.Predator.Predator.self,
+          PredatorDetails.Predator.Predator.self,
+          PredatorName.Predator.Predator.self
+        ] }
+    
         public var species: String? { __data["species"] }
         public var name: String? { __data["name"] }
       }
@@ -1379,6 +1392,11 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        TestOperationQuery.Data.AllAnimal.Predator.self,
+        PredatorDetails.Predator.self,
+        PredatorName.Predator.self
+      ] }
 
       public var species: String? { __data["species"] }
       public var name: String? { __data["name"] }
@@ -1460,6 +1478,11 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
       public init(_dataDict: DataDict) { __data = _dataDict }
 
       public static var __parentType: any ApolloAPI.ParentType { TestSchema.Interfaces.Animal }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        TestOperationQuery.Data.AllAnimal.Predator.self,
+        PredatorDetails.Predator.self,
+        PredatorName.Predator.self
+      ] }
 
       public var species: String? { __data["species"] }
       public var name: String? { __data["name"] }
@@ -1474,6 +1497,14 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
         public typealias RootEntityType = TestOperationQuery.Data.AllAnimal.Predator
         public static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Dog }
         public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
+          PredatorDetails.Predator.self,
+          PredatorDetails.Predator.AsDog.self,
+          PredatorName.Predator.self,
+          PredatorName.Predator.AsDog.self
+        ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          TestOperationQuery.Data.AllAnimal.Predator.self,
+          TestOperationQuery.Data.AllAnimal.Predator.AsDog.self,
           PredatorDetails.Predator.self,
           PredatorDetails.Predator.AsDog.self,
           PredatorName.Predator.self,
@@ -1630,7 +1661,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
   func test__render_fragmentAccessors__givenFieldMerging_siblings__givenEntityFieldMergedFromNamedFragmentInAncestor_doesNotRenderFragmentAccessor() async throws {
@@ -1690,7 +1721,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
   func test__render_fragmentAccessors__givenFieldMerging_siblings__givenEntityFieldMergedFromNamedFragmentInSibling_rendersFragmentAccessor() async throws {
@@ -1759,7 +1790,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
   }
 
   func test__render_fragmentAccessors__givenFieldMerging_ancestors__givenEntityFieldMergedFromNamedFragmentInSibling_doesNotRenderFragmentAccessor() async throws {
@@ -1821,7 +1852,7 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
     let actual = subject.test_render(childEntity: allAnimals_asDog.computed)
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 16, ignoringExtraLines: true))
   }
 
 }
