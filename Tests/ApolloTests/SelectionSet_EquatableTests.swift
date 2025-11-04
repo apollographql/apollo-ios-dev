@@ -6,7 +6,7 @@ import XCTest
 @testable import Apollo
 
 @MainActor
-class SelectionSet_EqualityTests: XCTestCase {
+class SelectionSet_EquatableTests: XCTestCase {
 
   // MARK: Scalar tests
 
