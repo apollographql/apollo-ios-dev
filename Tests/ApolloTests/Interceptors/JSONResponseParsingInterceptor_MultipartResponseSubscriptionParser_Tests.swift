@@ -328,7 +328,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
             "ticker": 1
           }
         }
-      }                    
+      }
       """.crlfFormattedData()
     )
 
@@ -336,7 +336,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
       """
       content-type: application/json
 
-      {}         
+      {}
       """.crlfFormattedData()
     )
 
@@ -351,7 +351,7 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
             "ticker": 2
           }
         }
-      }          
+      }
       """.crlfFormattedData()
     )
 
@@ -362,6 +362,53 @@ final class JSONResponseParsingInterceptor_MultipartResponseSubscriptionParser_T
     expect(results.count).to(equal(2))
     expect(results[0].result.data?.ticker).to(equal(1))
     expect(results[1].result.data?.ticker).to(equal(2))
+  }
+
+  // Test for issue https://github.com/apollographql/apollo-ios/issues/3608
+  func test__parsing__givenHeartbeatMissingEndDataLineSeparator_shouldIgnore() async throws {
+    let operation = MockSubscription<Time>()
+    let streamMocker = AsyncStreamMocker<Data>()
+
+    let urlResponse = HTTPURLResponse.mock(
+      headerFields: ["Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"]
+    )
+
+    let resultStream = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: false
+    )
+    .getStream()
+
+    streamMocker.emit(
+      "content-type: application/json\r\n\r\n{}".data(using: .utf8)!
+    )
+
+    streamMocker.emit(
+      """
+      content-type: application/json
+
+      {
+        "payload": {
+          "data": {
+            "__typename": "Time",
+            "ticker": 1
+          }
+        }
+      }
+      """.crlfFormattedData()
+    )
+
+    streamMocker.finish()
+
+    let results = try await resultStream.getAllValues()
+
+    expect(results.count).to(equal(1))
+    expect(results[0].result.data?.ticker).to(equal(1))
+    
   }
 
   func test__parsing__givenCapitalizedContentType_shouldReturnSuccess() async throws {
