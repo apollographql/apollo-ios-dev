@@ -27,6 +27,7 @@ input PetAdoptionInput {
   favoriteToy: String!
   isSpayedOrNeutered: Boolean! = false
   measurements: MeasurementsInput
+  adoptionDate: CustomDate
 }
 
 input MeasurementsInput {
@@ -54,6 +55,7 @@ interface Pet @typePolicy(keyFields: "id") {
   humanName: String
   favoriteToy: String!
   owner: Human
+  adoptionDate: CustomDate
 }
 
 interface HousePet implements Animal & Pet {
@@ -68,6 +70,7 @@ interface HousePet implements Animal & Pet {
   bestFriend: Pet
   rival: Pet
   livesWith: ClassroomPet
+  adoptionDate: CustomDate
   birthdate: CustomDate
 }
 
@@ -110,6 +113,7 @@ type Cat implements Animal & Pet & WarmBlooded {
   humanName: String
   favoriteToy: String!
   owner: Human
+  adoptionDate: CustomDate
   bodyTemperature: Int!
   laysEggs: Boolean!
   isJellicle: Boolean!
@@ -124,6 +128,7 @@ type Dog implements Animal & Pet & HousePet & WarmBlooded {
   humanName: String
   favoriteToy: String!
   owner: Human
+  adoptionDate: CustomDate
   bodyTemperature: Int!
   laysEggs: Boolean!
   bestFriend: HousePet
@@ -142,6 +147,7 @@ type Bird implements Animal & Pet & WarmBlooded {
   humanName: String
   favoriteToy: String!
   owner: Human
+  adoptionDate: CustomDate
   bodyTemperature: Int!
   laysEggs: Boolean!
   wingspan: Float!
@@ -156,6 +162,7 @@ type Fish implements Animal & Pet {
   humanName: String
   favoriteToy: String!
   owner: Human
+  adoptionDate: CustomDate
 }
 
 type Rat implements Animal & Pet {
@@ -167,6 +174,7 @@ type Rat implements Animal & Pet {
   humanName: String
   favoriteToy: String!
   owner: Human
+  adoptionDate: CustomDate
 }
 
 type Crocodile implements Animal {
@@ -184,6 +192,7 @@ type PetRock implements Pet {
   humanName: String
   favoriteToy: String!
   owner: Human
+  adoptionDate: CustomDate
 }
 
 union ClassroomPet = Cat | Bird | Rat | PetRock
