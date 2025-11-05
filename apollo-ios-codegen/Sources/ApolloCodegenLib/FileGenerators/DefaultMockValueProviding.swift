@@ -38,7 +38,7 @@ extension GraphQLScalarType: DefaultMockValueProviding {
     case "Boolean":
       return "false"
     default:
-      return "try! .init(_jsonValue: \"\")"
+      return ".defaultMockValue"
     }
   }
 }

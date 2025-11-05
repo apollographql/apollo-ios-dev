@@ -101,7 +101,7 @@ items:
         href: ./custom-scalars
       - label: Persisted Queries
         href: ./fetching/persisted-queries
-      - label: "@defer support (experimental)"
+      - label: "@defer support"
         href: ./fetching/defer
   - label: Caching
     children:

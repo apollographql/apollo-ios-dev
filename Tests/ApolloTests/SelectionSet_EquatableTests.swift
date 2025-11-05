@@ -543,6 +543,97 @@ class SelectionSet_EquatableTests: XCTestCase {
     expect(selectionSet1.hashValue).toNot(equal(selectionSet2.hashValue))
   }
 
+  // MARK: Fragment Merging
+
+  // Unit test to reproduce https://github.com/apollographql/apollo-ios/issues/3602
+  func test__equatable__childObject_inBothSelfAndNamedFragment_withNestedInlineFragment_differentValues_returns_false() {
+    // given
+    final class Hero: MockSelectionSet, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __parentType: any ParentType { Types.Hero }
+      override class var __selections: [Selection] {[
+        .field("friends", [Friend].self),        
+        .fragment(HeroFriendFragment.self)
+      ]}
+
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self, HeroFriendFragment.self]
+      }
+
+      class Friend: MockSelectionSet, @unchecked Sendable {
+        override class var __selections: [Selection] {[
+          .inlineFragment(AsCharacter.self)
+        ]}
+
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [Friend.self, HeroFriendFragment.Friend.self]
+        }
+
+        final class AsCharacter: ConcreteMockTypeCase<Friend>, @unchecked Sendable {
+          typealias Schema = MockSchemaMetadata
+
+          override class var __parentType: any ParentType { Types.Character }
+          override class var __selections: [Selection] {[
+            .field("age", Int?.self),
+          ]}
+          override class var __fulfilledFragments: [any SelectionSet.Type] {
+            [Friend.self, Friend.AsCharacter.self, HeroFriendFragment.Friend.self]
+          }
+        }
+      }
+    }
+
+    final class HeroFriendFragment: MockFragment, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __parentType: any ParentType { Types.Hero }
+      override class var __selections: [Selection] {[
+        .field("friends", [Friend].self)
+      ]}
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HeroFriendFragment.self]
+      }
+
+      class Friend: MockSelectionSet, @unchecked Sendable {
+        override class var __selections: [Selection] {[
+          .field("name", String?.self),
+        ]}
+
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [Friend.self]
+        }
+      }
+    }
+
+    // when
+    let selectionSet1 = Hero.Friend.AsCharacter.init(_dataDict: DataDict(
+      data: [
+        "name": "Name 1"
+      ],
+      fulfilledFragments: [
+        ObjectIdentifier(Hero.Friend.self),
+        ObjectIdentifier(Hero.Friend.AsCharacter.self),
+        ObjectIdentifier(HeroFriendFragment.Friend.self)
+      ]
+    ))
+
+    let selectionSet2 = Hero.Friend.AsCharacter.init(_dataDict: DataDict(
+      data: [
+        "name": "Name 2"
+      ],
+      fulfilledFragments: [
+        ObjectIdentifier(Hero.Friend.self),
+        ObjectIdentifier(Hero.Friend.AsCharacter.self),
+        ObjectIdentifier(HeroFriendFragment.Friend.self)
+      ]
+    ))
+
+    // then
+    expect(selectionSet1).toNot(equal(selectionSet2))
+    expect(selectionSet1.hashValue).toNot(equal(selectionSet2.hashValue))
+  }
+
   // MARK: Named Fragment
 
   func test__equatable__namedFragment_differentValue_forFieldInChildNamedFragment_returns_false() {

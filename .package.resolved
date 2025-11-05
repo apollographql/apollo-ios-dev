@@ -1,4 +1,5 @@
 {
+  "originHash" : "50edd0e2dbb26f1cb3132d77b60af378a095dcdf6eaae1fa5795d80bcb5e753b",
   "pins" : [
     {
       "identity" : "cwlcatchexception",
@@ -32,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Quick/Nimble.git",
       "state" : {
-        "revision" : "7795df4fff1a9cd231fe4867ae54f4dc5f5734f9",
-        "version" : "13.7.1"
+        "revision" : "cc945f7bdf3b485adedc315e18685c065059b4ca",
+        "version" : "13.8.0"
       }
     },
     {
@@ -46,15 +47,6 @@
       }
     },
     {
-      "identity" : "swift-atomics",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-atomics",
-      "state" : {
-        "revision" : "cd142fd2f64be2100422d658e7411e39489da985",
-        "version" : "1.2.0"
-      }
-    },
-    {
       "identity" : "swift-collections",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-collections",
@@ -64,5 +56,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
