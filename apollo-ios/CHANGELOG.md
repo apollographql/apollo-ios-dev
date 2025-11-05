@@ -1,5 +1,8 @@
 # Change Log
 
+## v1.25.3
+
+
 ## v1.25.2
 
 This version has no new changes since v1.25.1 and is being created to fix an issue where the previous version was tagged incorrectly.

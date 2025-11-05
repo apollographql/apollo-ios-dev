@@ -1,7 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "A type representing all of the fragments the ",
+      "text" : "A type representing all of the named fragments the ",
       "type" : "text"
     },
     {
@@ -370,7 +370,7 @@
 "doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/Fragments-swift.associatedtype": {
   "abstract" : [
     {
-      "text" : "A type representing all of the fragments the ",
+      "text" : "A type representing all of the named fragments the ",
       "type" : "text"
     },
     {

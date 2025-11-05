@@ -136,6 +136,14 @@
       "title" : "Associated Types"
     },
     {
+      "anchor" : "Initializers",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/init(unsafelyWithData:)"
+      ],
+      "title" : "Initializers"
+    },
+    {
       "anchor" : "Instance-Properties",
       "generated" : true,
       "identifiers" : [
@@ -632,7 +640,7 @@
 "doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/Fragments-swift.associatedtype": {
   "abstract" : [
     {
-      "text" : "A type representing all of the fragments the ",
+      "text" : "A type representing all of the named fragments the ",
       "type" : "text"
     },
     {
@@ -822,6 +830,53 @@
   "title" : "fragments",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/selectionset\/fragments-swift.property"
+},
+"doc://ApolloAPI/documentation/ApolloAPI/SelectionSet/init(unsafelyWithData:)": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "identifier",
+      "text" : "init"
+    },
+    {
+      "kind" : "text",
+      "text" : "("
+    },
+    {
+      "kind" : "externalParam",
+      "text" : "unsafelyWithData"
+    },
+    {
+      "kind" : "text",
+      "text" : ": ["
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    },
+    {
+      "kind" : "text",
+      "text" : " : "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:9ApolloAPI9JSONValuea",
+      "text" : "JSONValue"
+    },
+    {
+      "kind" : "text",
+      "text" : "])"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSet\/init(unsafelyWithData:)",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "init(unsafelyWithData:)",
+  "type" : "topic",
+  "url" : "\/documentation\/apolloapi\/selectionset\/init(unsafelywithdata:)"
 },
 "doc://ApolloAPI/s28CustomDebugStringConvertibleP": {
   "identifier" : "doc:\/\/ApolloAPI\/s28CustomDebugStringConvertibleP",
