@@ -102,7 +102,7 @@ private func PrettyPrintedFailureResult(
 ///   - after: A ``TemplateTestRegexMatcher`` that should be matched in the actual string before starting the comparison.
 func equalLineByLine(
   _ expectedValue: String,
-  forSection sectionTemplateRegex: any TemplateTestRegexMatcher,
+  forSection sectionTemplateRegex: any TemplateTestRegexMatcher
 ) -> Nimble.Matcher<String> {
   equalLineByLine(
     expectedValue,

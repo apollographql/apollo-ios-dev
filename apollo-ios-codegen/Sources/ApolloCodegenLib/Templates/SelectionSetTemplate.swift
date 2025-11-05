@@ -470,7 +470,7 @@ struct SelectionSetTemplate {
     }
 
     return """
-      \(renderAccessControl())static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      \(renderAccessControl())static var __fulfilledFragments: [any \(config.ApolloAPITargetName).SelectionSet.Type] { [
         \(fulfilledFragments.map { "\($0).self" })
       ] }
       """
