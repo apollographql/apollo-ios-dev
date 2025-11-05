@@ -5,7 +5,7 @@
 ### Fixed
 
 - **Percent encode semicolons when using GET ([#812](https://github.com/apollographql/apollo-ios-dev/pull/812)):** Semicolons were not being correctly encoded into the query string when `useGETForQueries` was enabled. _Thank you to [@nevil](https://github.com/nevil) for the contribution_.
-- **Include merged fields in selection set equality check ([#3602](https://github.com/apollographql/apollo-ios-dev/issues/3602)):** When a field merged from a child object in a named fragment was merged, it was not being used for equality checks. Equality checks now use the types `__fulfilledFragments` and collects selections from all of them, instead of just traversing downward from `self.__selections`. This ensures all expected data is collected from merged fragments. See PR [#832](https://github.com/apollographql/apollo-ios-dev/pull/832). _Thank you to [@JOyo246](https://github.com/JOyo246) for raising the issue_.
+- **Include merged fields in selection set equality check ([#3602](https://github.com/apollographql/apollo-ios/issues/3602)):** When a field merged from a child object in a named fragment was merged, it was not being used for equality checks. Equality checks now use the types `__fulfilledFragments` and collects selections from all of them, instead of just traversing downward from `self.__selections`. This ensures all expected data is collected from merged fragments. See PR [#832](https://github.com/apollographql/apollo-ios-dev/pull/832). _Thank you to [@JOyo246](https://github.com/JOyo246) for raising the issue_.
 
 ## v2.0.2
 
