@@ -71,7 +71,7 @@ interface HousePet implements Animal & Pet {
   rival: Pet
   livesWith: ClassroomPet
   adoptionDate: CustomDate
-  birthdate: CustomDate
+  birthdate: CustomDate!
 }
 
 interface WarmBlooded implements Animal {
@@ -134,7 +134,7 @@ type Dog implements Animal & Pet & HousePet & WarmBlooded {
   bestFriend: HousePet
   rival: Cat
   livesWith: Bird
-  birthdate: CustomDate
+  birthdate: CustomDate!
   houseDetails: Object
 }
 
