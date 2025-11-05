@@ -1,3 +1,4 @@
 #!/bin/bash
+set -eo pipefail
 
-set -o pipefail && xcodebuild test -scheme CustomTargetProject -destination platform=macOS -quiet | xcbeautify --is-ci
+xcodebuild test -scheme CustomTargetProject -destination platform=macOS -quiet | xcbeautify --is-ci
