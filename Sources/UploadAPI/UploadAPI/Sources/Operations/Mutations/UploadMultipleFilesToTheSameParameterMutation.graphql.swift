@@ -26,6 +26,9 @@ public class UploadMultipleFilesToTheSameParameterMutation: GraphQLMutation {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("multipleUpload", [MultipleUpload].self, arguments: ["files": .variable("files")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      UploadMultipleFilesToTheSameParameterMutation.Data.self
+    ] }
 
     public var multipleUpload: [MultipleUpload] { __data["multipleUpload"] }
 
@@ -43,6 +46,9 @@ public class UploadMultipleFilesToTheSameParameterMutation: GraphQLMutation {
         .field("path", String.self),
         .field("filename", String.self),
         .field("mimetype", String.self),
+      ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        UploadMultipleFilesToTheSameParameterMutation.Data.MultipleUpload.self
       ] }
 
       public var id: UploadAPI.ID { __data["id"] }

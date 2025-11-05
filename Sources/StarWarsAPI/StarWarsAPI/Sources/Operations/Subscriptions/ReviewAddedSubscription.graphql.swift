@@ -27,21 +27,19 @@ public class ReviewAddedSubscription: GraphQLSubscription {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("reviewAdded", ReviewAdded?.self, arguments: ["episode": .variable("episode")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      ReviewAddedSubscription.Data.self
+    ] }
 
     public var reviewAdded: ReviewAdded? { __data["reviewAdded"] }
 
     public init(
       reviewAdded: ReviewAdded? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Subscription.typename,
-          "reviewAdded": reviewAdded._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(ReviewAddedSubscription.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Subscription.typename,
+        "reviewAdded": reviewAdded._fieldData,
+      ])
     }
 
     /// ReviewAdded
@@ -58,6 +56,9 @@ public class ReviewAddedSubscription: GraphQLSubscription {
         .field("stars", Int.self),
         .field("commentary", String?.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        ReviewAddedSubscription.Data.ReviewAdded.self
+      ] }
 
       /// The movie
       public var episode: GraphQLEnum<StarWarsAPI.Episode>? { __data["episode"] }
@@ -71,17 +72,12 @@ public class ReviewAddedSubscription: GraphQLSubscription {
         stars: Int,
         commentary: String? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": StarWarsAPI.Objects.Review.typename,
-            "episode": episode,
-            "stars": stars,
-            "commentary": commentary,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(ReviewAddedSubscription.Data.ReviewAdded.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": StarWarsAPI.Objects.Review.typename,
+          "episode": episode,
+          "stars": stars,
+          "commentary": commentary,
+        ])
       }
     }
   }

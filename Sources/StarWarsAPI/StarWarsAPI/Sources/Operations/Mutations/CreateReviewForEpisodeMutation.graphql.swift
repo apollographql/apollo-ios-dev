@@ -38,21 +38,19 @@ public class CreateReviewForEpisodeMutation: GraphQLMutation {
         "review": .variable("review")
       ]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      CreateReviewForEpisodeMutation.Data.self
+    ] }
 
     public var createReview: CreateReview? { __data["createReview"] }
 
     public init(
       createReview: CreateReview? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Mutation.typename,
-          "createReview": createReview._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(CreateReviewForEpisodeMutation.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Mutation.typename,
+        "createReview": createReview._fieldData,
+      ])
     }
 
     /// CreateReview
@@ -68,6 +66,9 @@ public class CreateReviewForEpisodeMutation: GraphQLMutation {
         .field("stars", Int.self),
         .field("commentary", String?.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        CreateReviewForEpisodeMutation.Data.CreateReview.self
+      ] }
 
       /// The number of stars this review gave, 1-5
       public var stars: Int { __data["stars"] }
@@ -78,16 +79,11 @@ public class CreateReviewForEpisodeMutation: GraphQLMutation {
         stars: Int,
         commentary: String? = nil
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": StarWarsAPI.Objects.Review.typename,
-            "stars": stars,
-            "commentary": commentary,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(CreateReviewForEpisodeMutation.Data.CreateReview.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": StarWarsAPI.Objects.Review.typename,
+          "stars": stars,
+          "commentary": commentary,
+        ])
       }
     }
   }

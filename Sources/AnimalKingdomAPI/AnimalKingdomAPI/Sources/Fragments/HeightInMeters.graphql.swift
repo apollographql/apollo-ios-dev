@@ -16,6 +16,9 @@ public struct HeightInMeters: AnimalKingdomAPI.SelectionSet, Fragment {
     .field("__typename", String.self),
     .field("height", Height.self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    HeightInMeters.self
+  ] }
 
   public var height: Height { __data["height"] }
 
@@ -23,15 +26,10 @@ public struct HeightInMeters: AnimalKingdomAPI.SelectionSet, Fragment {
     __typename: String,
     height: Height
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": __typename,
-        "height": height._fieldData,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(HeightInMeters.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": __typename,
+      "height": height._fieldData,
+    ])
   }
 
   /// Height
@@ -46,21 +44,19 @@ public struct HeightInMeters: AnimalKingdomAPI.SelectionSet, Fragment {
       .field("__typename", String.self),
       .field("meters", Int.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeightInMeters.Height.self
+    ] }
 
     public var meters: Int { __data["meters"] }
 
     public init(
       meters: Int
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": AnimalKingdomAPI.Objects.Height.typename,
-          "meters": meters,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeightInMeters.Height.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": AnimalKingdomAPI.Objects.Height.typename,
+        "meters": meters,
+      ])
     }
   }
 }

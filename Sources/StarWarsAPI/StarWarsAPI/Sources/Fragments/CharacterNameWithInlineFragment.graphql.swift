@@ -17,6 +17,9 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
     .inlineFragment(AsHuman.self),
     .inlineFragment(AsDroid.self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    CharacterNameWithInlineFragment.self
+  ] }
 
   public var asHuman: AsHuman? { _asInlineFragment() }
   public var asDroid: AsDroid? { _asInlineFragment() }
@@ -24,14 +27,9 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
   public init(
     __typename: String
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": __typename,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(CharacterNameWithInlineFragment.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": __typename,
+    ])
   }
 
   /// AsHuman
@@ -46,6 +44,10 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
     public static var __selections: [ApolloAPI.Selection] { [
       .field("friends", [Friend?]?.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      CharacterNameWithInlineFragment.self,
+      CharacterNameWithInlineFragment.AsHuman.self
+    ] }
 
     /// This human's friends, or an empty list if they have none
     public var friends: [Friend?]? { __data["friends"] }
@@ -53,16 +55,10 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
     public init(
       friends: [Friend?]? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Human.typename,
-          "friends": friends._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(CharacterNameWithInlineFragment.self),
-          ObjectIdentifier(CharacterNameWithInlineFragment.AsHuman.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Human.typename,
+        "friends": friends._fieldData,
+      ])
     }
 
     /// AsHuman.Friend
@@ -77,6 +73,9 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
         .field("__typename", String.self),
         .field("appearsIn", [GraphQLEnum<StarWarsAPI.Episode>?].self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        CharacterNameWithInlineFragment.AsHuman.Friend.self
+      ] }
 
       /// The movies this character appears in
       public var appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?] { __data["appearsIn"] }
@@ -85,15 +84,10 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
         __typename: String,
         appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?]
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "appearsIn": appearsIn,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(CharacterNameWithInlineFragment.AsHuman.Friend.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "appearsIn": appearsIn,
+        ])
       }
     }
   }
@@ -110,6 +104,12 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
     public static var __selections: [ApolloAPI.Selection] { [
       .fragment(CharacterName.self),
       .fragment(FriendsNames.self),
+    ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      CharacterNameWithInlineFragment.self,
+      CharacterNameWithInlineFragment.AsDroid.self,
+      CharacterName.self,
+      FriendsNames.self
     ] }
 
     /// The name of the character
@@ -129,19 +129,11 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
       name: String,
       friends: [Friend?]? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Droid.typename,
-          "name": name,
-          "friends": friends._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(CharacterNameWithInlineFragment.self),
-          ObjectIdentifier(CharacterNameWithInlineFragment.AsDroid.self),
-          ObjectIdentifier(CharacterName.self),
-          ObjectIdentifier(FriendsNames.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Droid.typename,
+        "name": name,
+        "friends": friends._fieldData,
+      ])
     }
 
     public typealias Friend = FriendsNames.Friend

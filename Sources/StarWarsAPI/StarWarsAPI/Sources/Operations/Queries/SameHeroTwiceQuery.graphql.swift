@@ -22,6 +22,9 @@ public class SameHeroTwiceQuery: GraphQLQuery {
       .field("hero", Hero?.self),
       .field("hero", alias: "r2", R2?.self),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      SameHeroTwiceQuery.Data.self
+    ] }
 
     public var hero: Hero? { __data["hero"] }
     public var r2: R2? { __data["r2"] }
@@ -30,16 +33,11 @@ public class SameHeroTwiceQuery: GraphQLQuery {
       hero: Hero? = nil,
       r2: R2? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-          "r2": r2._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(SameHeroTwiceQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+        "r2": r2._fieldData,
+      ])
     }
 
     /// Hero
@@ -54,6 +52,9 @@ public class SameHeroTwiceQuery: GraphQLQuery {
         .field("__typename", String.self),
         .field("name", String.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        SameHeroTwiceQuery.Data.Hero.self
+      ] }
 
       /// The name of the character
       public var name: String { __data["name"] }
@@ -62,15 +63,10 @@ public class SameHeroTwiceQuery: GraphQLQuery {
         __typename: String,
         name: String
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "name": name,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(SameHeroTwiceQuery.Data.Hero.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "name": name,
+        ])
       }
     }
 
@@ -86,6 +82,9 @@ public class SameHeroTwiceQuery: GraphQLQuery {
         .field("__typename", String.self),
         .field("appearsIn", [GraphQLEnum<StarWarsAPI.Episode>?].self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        SameHeroTwiceQuery.Data.R2.self
+      ] }
 
       /// The movies this character appears in
       public var appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?] { __data["appearsIn"] }
@@ -94,15 +93,10 @@ public class SameHeroTwiceQuery: GraphQLQuery {
         __typename: String,
         appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?]
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-            "appearsIn": appearsIn,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(SameHeroTwiceQuery.Data.R2.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+          "appearsIn": appearsIn,
+        ])
       }
     }
   }

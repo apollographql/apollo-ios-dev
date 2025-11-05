@@ -78,7 +78,8 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       let jsonBody = try? JSONSerializationFormat.deserialize(data: httpBody) as? JSONObject else {
       fail(
         "httpBody invalid",
-        location: SourceLocation(file: file, line: line)
+        file: file,
+        line: line
       )
       return
     }
@@ -102,7 +103,8 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       } else {
         fail(
           "variables should not be nil",
-          location: SourceLocation(file: file, line: line)
+          file: file,
+          line: line
         )
       }
     }
@@ -112,7 +114,8 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       guard let ext = ext else {
         fail(
           "extensions json data should not be nil",
-          location: SourceLocation(file: file, line: line)
+          file: file,
+          line: line
         )
         return
       }
@@ -120,7 +123,8 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       guard let persistedQuery = ext["persistedQuery"] as? JSONObject else {
         fail(
           "persistedQuery is missing",
-          location: SourceLocation(file: file, line: line)
+          file: file,
+          line: line
         )
         return
       }
@@ -128,7 +132,8 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       guard let version = persistedQuery["version"] as? Int else {
         fail(
           "version is missing",
-          location: SourceLocation(file: file, line: line)
+          file: file,
+          line: line
         )
         return
       }
@@ -136,7 +141,8 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       guard let sha256Hash = persistedQuery["sha256Hash"] as? String else {
         fail(
           "sha256Hash is missing",
-          location: SourceLocation(file: file, line: line)
+          file: file,
+          line: line
         )
         return
       }
@@ -159,7 +165,8 @@ class AutomaticPersistedQueriesTests: XCTestCase {
     guard let url = request.url else {
       fail(
         "URL not valid",
-        location: SourceLocation(file: file, line: line)
+        file: file,
+        line: line
       )
       return
     }
@@ -190,7 +197,8 @@ class AutomaticPersistedQueriesTests: XCTestCase {
     } else {
       fail(
         "variables should not be nil",
-        location: SourceLocation(file: file, line: line)
+        file: file,
+        line: line
       )
     }
     
@@ -203,7 +211,8 @@ class AutomaticPersistedQueriesTests: XCTestCase {
         else {
         fail(
           "extensions json data should not be nil",
-          location: SourceLocation(file: file, line: line)
+          file: file,
+          line: line
         )
         return
       }
@@ -211,7 +220,8 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       guard let persistedQuery = jsonBody["persistedQuery"] as? JSONObject else {
         fail(
           "persistedQuery is missing",
-          location: SourceLocation(file: file, line: line)
+          file: file,
+          line: line
         )
         return
       }
@@ -219,7 +229,8 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       guard let sha256Hash = persistedQuery["sha256Hash"] as? String else {
         fail(
           "sha256Hash is missing",
-          location: SourceLocation(file: file, line: line)
+          file: file,
+          line: line
         )
         return
       }
@@ -227,7 +238,8 @@ class AutomaticPersistedQueriesTests: XCTestCase {
       guard let version = persistedQuery["version"] as? Int else {
         fail(
           "version is missing",
-          location: SourceLocation(file: file, line: line)
+          file: file,
+          line: line
         )
         return
       }

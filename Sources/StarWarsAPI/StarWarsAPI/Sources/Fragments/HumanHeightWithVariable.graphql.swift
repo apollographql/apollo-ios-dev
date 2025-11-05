@@ -16,6 +16,9 @@ public struct HumanHeightWithVariable: StarWarsAPI.SelectionSet, Fragment {
     .field("__typename", String.self),
     .field("height", Double?.self, arguments: ["unit": .variable("heightUnit")]),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    HumanHeightWithVariable.self
+  ] }
 
   /// Height in the preferred unit, default is meters
   public var height: Double? { __data["height"] }
@@ -23,14 +26,9 @@ public struct HumanHeightWithVariable: StarWarsAPI.SelectionSet, Fragment {
   public init(
     height: Double? = nil
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": StarWarsAPI.Objects.Human.typename,
-        "height": height,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(HumanHeightWithVariable.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": StarWarsAPI.Objects.Human.typename,
+      "height": height,
+    ])
   }
 }

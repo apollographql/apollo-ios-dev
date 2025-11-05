@@ -9,6 +9,9 @@ enum Mocks {
       override class var __selections: [Selection] { [
         .field("hero", Hero?.self, arguments: ["id": .variable("id")])
       ]}
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [BidirectionalFriendsQuery.self]
+      }
 
       var hero: Hero { __data["hero"] }
 
@@ -23,6 +26,9 @@ enum Mocks {
             "after": .variable("after"),
           ]),
         ]}
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [Hero.self]
+        }
 
         var name: String { __data["name"] }
         var id: String { __data["id"] }
@@ -35,6 +41,9 @@ enum Mocks {
             .field("friends", [Character].self),
             .field("pageInfo", PageInfo.self),
           ]}
+          override class var __fulfilledFragments: [any SelectionSet.Type] {
+            [FriendsConnection.self]
+          }
 
           var totalCount: Int { __data["totalCount"] }
           var friends: [Character] { __data["friends"] }
@@ -46,6 +55,9 @@ enum Mocks {
               .field("name", String.self),
               .field("id", String.self),
             ]}
+            override class var __fulfilledFragments: [any SelectionSet.Type] {
+              [Character.self]
+            }
 
             var name: String { __data["name"] }
             var id: String { __data["id"] }
@@ -59,6 +71,9 @@ enum Mocks {
               .field("endCursor", Optional<String>.self),
               .field("hasNextPage", Bool.self),
             ]}
+            override class var __fulfilledFragments: [any SelectionSet.Type] {
+              [PageInfo.self]
+            }
 
             var endCursor: String? { __data["endCursor"] }
             var hasNextPage: Bool { __data["hasNextPage"] }
@@ -72,6 +87,9 @@ enum Mocks {
       override class var __selections: [Selection] { [
         .field("hero", Hero?.self, arguments: ["id": .variable("id")])
       ]}
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [ReverseFriendsQuery.self]
+      }
 
       var hero: Hero { __data["hero"] }
 
@@ -85,6 +103,9 @@ enum Mocks {
             "before": .variable("before"),
           ]),
         ]}
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [Hero.self]
+        }
 
         var name: String { __data["name"] }
         var id: String { __data["id"] }
@@ -97,6 +118,9 @@ enum Mocks {
             .field("friends", [Character].self),
             .field("pageInfo", PageInfo.self),
           ]}
+          override class var __fulfilledFragments: [any SelectionSet.Type] {
+            [FriendsConnection.self]
+          }
 
           var totalCount: Int { __data["totalCount"] }
           var friends: [Character] { __data["friends"] }
@@ -108,6 +132,9 @@ enum Mocks {
               .field("name", String.self),
               .field("id", String.self),
             ]}
+            override class var __fulfilledFragments: [any SelectionSet.Type] {
+              [Character.self]
+            }
 
             var name: String { __data["name"] }
             var id: String { __data["id"] }
@@ -119,6 +146,9 @@ enum Mocks {
               .field("startCursor", Optional<String>.self),
               .field("hasPreviousPage", Bool.self),
             ]}
+            override class var __fulfilledFragments: [any SelectionSet.Type] {
+              [PageInfo.self]
+            }
 
             var startCursor: String? { __data["startCursor"] }
             var hasPreviousPage: Bool { __data["hasPreviousPage"] }
@@ -130,6 +160,9 @@ enum Mocks {
       override class var __selections: [Selection] { [
         .field("hero", Hero?.self, arguments: ["id": .variable("id")])
       ]}
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [FriendsQuery.self]
+      }
 
       var hero: Hero { __data["hero"] }
 
@@ -143,6 +176,9 @@ enum Mocks {
             "after": .variable("after"),
           ]),
         ]}
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [Hero.self]
+        }
 
         var name: String { __data["name"] }
         var id: String { __data["id"] }
@@ -155,6 +191,9 @@ enum Mocks {
             .field("friends", [Character].self),
             .field("pageInfo", PageInfo.self),
           ]}
+          override class var __fulfilledFragments: [any SelectionSet.Type] {
+            [FriendsConnection.self]
+          }
 
           var totalCount: Int { __data["totalCount"] }
           var friends: [Character] { __data["friends"] }
@@ -166,6 +205,9 @@ enum Mocks {
               .field("name", String.self),
               .field("id", String.self),
             ]}
+            override class var __fulfilledFragments: [any SelectionSet.Type] {
+              [Character.self]
+            }
 
             var name: String { __data["name"] }
             var id: String { __data["id"] }
@@ -177,6 +219,9 @@ enum Mocks {
               .field("endCursor", Optional<String>.self),
               .field("hasNextPage", Bool.self),
             ]}
+            override class var __fulfilledFragments: [any SelectionSet.Type] {
+              [PageInfo.self]
+            }
 
             var endCursor: String? { __data["endCursor"] }
             var hasNextPage: Bool { __data["hasNextPage"] }
@@ -189,6 +234,9 @@ enum Mocks {
       override class var __selections: [Selection] { [
         .field("hero", Hero?.self, arguments: ["id": .variable("id")])
       ]}
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [OffsetFriendsQuery.self]
+      }
 
       var hero: Hero { __data["hero"] }
 
@@ -202,6 +250,9 @@ enum Mocks {
             "limit": .variable("limit"),
           ]),
         ]}
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [Hero.self]
+        }
 
         var name: String { __data["name"] }
         var id: String { __data["id"] }
@@ -213,6 +264,9 @@ enum Mocks {
             .field("name", String.self),
             .field("id", String.self),
           ]}
+          override class var __fulfilledFragments: [any SelectionSet.Type] {
+            [Character.self]
+          }
 
           var name: String { __data["name"] }
           var id: String { __data["id"] }
@@ -226,6 +280,9 @@ enum Mocks {
       static var __selections: [Selection] { [
         .field("hero", Hero?.self, arguments: ["id": .variable("id")])
       ]}
+      static var __fulfilledFragments: [any SelectionSet.Type] {
+        [NameCacheMutation.self]
+      }
 
       var hero: Hero? {
         get { __data["hero"] }
@@ -240,6 +297,9 @@ enum Mocks {
           .field("id", String.self),
           .field("name", String.self),
         ]}
+        static var __fulfilledFragments: [any SelectionSet.Type] {
+          [Hero.self]
+        }
 
         var id: String {
           get { __data["id"] }

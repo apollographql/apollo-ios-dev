@@ -1,7 +1,8 @@
+import ApolloCodegenInternalTestHelpers
+import ApolloInternalTestHelpers
 import Foundation
 import Nimble
-import ApolloInternalTestHelpers
-import ApolloCodegenInternalTestHelpers
+
 @testable import ApolloCodegenLib
 
 /// A Nimble matcher that compares two strings line-by-line.
@@ -17,7 +18,7 @@ public func equalLineByLine(
   atLine startLine: Int = 1,
   ignoringExtraLines: Bool = false
 ) -> Nimble.Matcher<String> {
-  return Matcher.define() { actual in
+  return Matcher.define { actual in
     let actualString = try actual.evaluate()
 
     guard let actualLines = actualString?.lines(startingAt: startLine) else {
@@ -27,54 +28,63 @@ public func equalLineByLine(
       )
     }
 
-    let expectedLines = expectedValue.components(separatedBy: "\n")
+    return match(actualLines: actualLines, in: actualString, to: expectedValue, ignoringExtraLines: ignoringExtraLines)
+  }
+}
 
-    var expectedLinesBuffer: [String] = expectedLines.reversed()
+private func match<S: Collection>(
+  actualLines: S,
+  in actualString: String?,
+  to expectedValue: String,
+  ignoringExtraLines: Bool = false
+) -> MatcherResult where S.Element == String, S.Index == Int {
+  let expectedLines = expectedValue.components(separatedBy: "\n")
 
-    for index in actualLines.indices {
-      let actualLine = actualLines[index]
-      guard let expectedLine = expectedLinesBuffer.popLast() else {
-        if ignoringExtraLines {
-          return MatcherResult(
-            status: .matches,
-            message: .expectedTo("be equal")
-          )
-        } else {
-          return PrettyPrintedFailureResult(
-            actual: actualString,
-            message: .fail("Expected \(expectedLines.count + startLine - 1) lines, actual ended at line \(actualLines.count + startLine - 1)")
-          )
-        }
-      }
+  var expectedLinesBuffer: [String] = expectedLines.reversed()
 
-      if actualLine != expectedLine {
+  for index in actualLines.indices {
+    let actualLine = actualLines[index]
+    guard let expectedLine = expectedLinesBuffer.popLast() else {
+      if ignoringExtraLines {
+        return MatcherResult(
+          status: .matches,
+          message: .expectedTo("be equal")
+        )
+      } else {
         return PrettyPrintedFailureResult(
           actual: actualString,
-          message: .fail("Line \(index + 1) did not match. Expected \"\(expectedLine)\", got \"\(actualLine)\".")
+          message: .fail("Expected actual to end at end of expected string.")
         )
       }
     }
 
-    guard expectedLinesBuffer.isEmpty else {
-      return MatcherResult(
-        status: .fail,
-        message: .fail("Expected \(expectedLines.count), actual ended at line \(actualLines.count).")
+    if actualLine != expectedLine {
+      return PrettyPrintedFailureResult(
+        actual: actualString,
+        message: .fail("Line \(index + 1) did not match. Expected \"\(expectedLine)\", got \"\(actualLine)\".")
       )
     }
+  }
 
+  guard expectedLinesBuffer.isEmpty else {
     return MatcherResult(
-      status: .matches,
-      message: .expectedTo("be equal")
+      status: .fail,
+      message: .fail("Expected \(expectedLines.count) lines, actual ended at line \(actualLines.count).")
     )
   }
+
+  return MatcherResult(
+    status: .matches,
+    message: .expectedTo("be equal")
+  )
 }
 
-fileprivate func PrettyPrintedFailureResult(
+private func PrettyPrintedFailureResult(
   actual: String?,
   message: ExpectationMessage
 ) -> MatcherResult {
   if let actual = actual {
-    print ("Actual Document:")
+    print("Actual Document:")
     print(actual)
   }
   return MatcherResult(
@@ -83,7 +93,120 @@ fileprivate func PrettyPrintedFailureResult(
   )
 }
 
-extension String {
+// MARK: - Regex Template Matchers
+
+/// A Nimble matcher that compares two strings line-by-line after matching a ``TemplateTestRegexMatcher``
+///
+/// - Parameters:
+///   - expectedValue: The expected string to match against
+///   - after: A ``TemplateTestRegexMatcher`` that should be matched in the actual string before starting the comparison.
+func equalLineByLine(
+  _ expectedValue: String,
+  forSection sectionTemplateRegex: any TemplateTestRegexMatcher
+) -> Nimble.Matcher<String> {
+  equalLineByLine(
+    expectedValue,
+    atLine: 1,
+    inSection: sectionTemplateRegex,
+    ignoringExtraLines: false
+  )
+}
+
+func equalLineByLine(
+  _ expectedValue: String,
+  atLine startLine: Int,
+  inSection sectionTemplateRegex: any TemplateTestRegexMatcher,
+  ignoringExtraLines: Bool = false
+) -> Nimble.Matcher<String> {
+  return Matcher.define { actual in
+    guard let actualString = try actual.evaluate() else {
+      return MatcherResult(
+        status: .fail,
+        message: .expectedActualValueTo("include expected")
+      )
+    }
+
+    guard
+      let regexMatch = try? sectionTemplateRegex.regex
+        .firstMatch(in: actualString)?[RegexMatcher.match] as? (any StringProtocol),
+      let matchedLines = regexMatch.lines(startingAt: startLine)
+    else {
+      return PrettyPrintedFailureResult(
+        actual: actualString,
+        message: .expectedActualValueTo("have match for regex")
+      )
+    }
+
+    return match(
+      actualLines: matchedLines,
+      in: actualString,
+      to: expectedValue,
+      ignoringExtraLines: ignoringExtraLines
+    )
+  }
+}
+
+/// A Nimble matcher that compares two strings line-by-line after matching a ``TemplateTestRegexMatcher``
+///
+/// - Parameters:
+///   - expectedValue: The expected string to match against
+///   - after: A ``TemplateTestRegexMatcher`` that should be matched in the actual string before starting the comparison.
+func equalLineByLine(
+  _ expectedValue: String,
+  atLine startLine: Int = 1,
+  after afterTemplateRegex: any TemplateTestRegexMatcher,
+  ignoringExtraLines: Bool = false
+) -> Nimble.Matcher<String> {
+  return equalLineByLine(
+    expectedValue,
+    atLine: startLine,
+    after: afterTemplateRegex.regex,
+    ignoringExtraLines: ignoringExtraLines
+  )
+}
+
+private func equalLineByLine(
+  _ expectedValue: String,
+  atLine startLine: Int = 1,
+  after afterRegex: Regex<AnyRegexOutput>,
+  ignoringExtraLines: Bool = false
+) -> Nimble.Matcher<String> {
+  return Matcher.define { actual in
+    guard let actualString = try actual.evaluate() else {
+      return MatcherResult(
+        status: .fail,
+        message: .expectedActualValueTo("match expected")
+      )
+    }
+
+    guard
+      let regexMatch = try? afterRegex
+        .firstMatch(in: actualString)?[0].value as? any StringProtocol
+    else {
+      return PrettyPrintedFailureResult(
+        actual: actualString,
+        message: .expectedActualValueTo("have match for regex")
+      )
+    }
+
+    let actualStringAfterRegex = actualString[regexMatch.endIndex..<actualString.endIndex]
+    guard let actualLines = actualStringAfterRegex.lines(startingAt: startLine) else {
+      return PrettyPrintedFailureResult(
+        actual: actualString,
+        message: .fail("Insufficient Lines. Check `atLine` value.")
+      )
+    }
+
+    return match(
+      actualLines: actualLines,
+      in: actualString,
+      to: expectedValue,
+      ignoringExtraLines: ignoringExtraLines
+    )
+  }
+}
+
+extension StringProtocol {
   fileprivate func lines(startingAt startLine: Int) -> ArraySlice<String>? {
     let allLines = self.components(separatedBy: "\n")
     guard allLines.count >= startLine else { return nil }
@@ -113,7 +236,8 @@ public func equalLineByLine(
 
     var fileContents = try String(contentsOf: expectedFileURL)
     if trimImports {
-      fileContents = fileContents
+      fileContents =
+        fileContents
         .components(separatedBy: "\n")
         .filter { !$0.hasPrefix("import ") }
         .joined(separator: "\n")

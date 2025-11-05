@@ -303,6 +303,9 @@ class FragmentTemplateTests: XCTestCase {
       init(_dataDict: DataDict) { __data = _dataDict }
 
       static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
+      static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        TestFragment.self
+      ] }
     }
 
     """
@@ -336,6 +339,9 @@ class FragmentTemplateTests: XCTestCase {
       static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Animal }
       static var __selections: [ApolloAPI.Selection] { [
         .field("__typename", String.self),
+      ] }
+      static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        TestFragment.self
       ] }
     }
 
@@ -443,15 +449,10 @@ class FragmentTemplateTests: XCTestCase {
         init(
           species: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": TestSchema.Objects.Animal.typename,
-              "species": species,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(TestFragment.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": TestSchema.Objects.Animal.typename,
+            "species": species,
+          ])
         }
       """
 
@@ -464,7 +465,7 @@ class FragmentTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, forSection: .selectionSet.initializer))
   }
 
   func test__render_givenNamedFragment_configIncludesSpecificFragment_rendersInitializer() async throws {
@@ -490,15 +491,10 @@ class FragmentTemplateTests: XCTestCase {
         init(
           species: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": TestSchema.Objects.Animal.typename,
-              "species": species,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(TestFragment.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": TestSchema.Objects.Animal.typename,
+            "species": species,
+          ])
         }
       """
 
@@ -511,7 +507,7 @@ class FragmentTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 17, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, forSection: .selectionSet.initializer))
   }
 
   func test__render_givenNamedFragment_configDoesNotIncludeNamedFragments_doesNotRenderInitializer() async throws {
@@ -541,7 +537,13 @@ class FragmentTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine("}", atLine: 16, ignoringExtraLines: true))
+    expect(actual).to(
+      equalLineByLine(
+        "\n",
+        after: .selectionSet.propertyAccessors(),
+        ignoringExtraLines: false
+      )
+    )
   }
 
   func test__render_givenNamedFragments_configIncludeSpecificFragmentWithOtherName_doesNotRenderInitializer() async throws {
@@ -571,7 +573,13 @@ class FragmentTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine("}", atLine: 16, ignoringExtraLines: true))
+    expect(actual).to(
+      equalLineByLine(
+        "\n",
+        after: .selectionSet.propertyAccessors(),
+        ignoringExtraLines: false
+      )
+    )
   }
 
   func test__render_givenNamedFragments_asLocalCacheMutation_rendersInitializer() async throws {
@@ -597,15 +605,10 @@ class FragmentTemplateTests: XCTestCase {
         init(
           species: String
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": TestSchema.Objects.Animal.typename,
-              "species": species,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(TestFragment.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": TestSchema.Objects.Animal.typename,
+            "species": species,
+          ])
         }
       """
 
@@ -618,7 +621,7 @@ class FragmentTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 20, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, forSection: .selectionSet.initializer))
   }
 
   func test__render_givenOperationSelectionSet_initializerConfig_all_fieldMergingConfig_notAll_doesNotRenderInitializer() async throws {
@@ -661,7 +664,13 @@ class FragmentTemplateTests: XCTestCase {
       let actual = renderSubject()
 
       // then
-      expect(actual).to(equalLineByLine("}", atLine: 16, ignoringExtraLines: true))
+      expect(actual).to(
+        equalLineByLine(
+          "\n",
+          after: .selectionSet.propertyAccessors(),
+          ignoringExtraLines: false
+        )
+      )
     }
   }
 
@@ -731,14 +740,6 @@ class FragmentTemplateTests: XCTestCase {
 
     let expected =
     """
-      var __data: DataDict
-      init(_dataDict: DataDict) { __data = _dataDict }
-
-      static var __parentType: any ApolloAPI.ParentType { TestSchema.Objects.Query }
-      static var __selections: [ApolloAPI.Selection] { [
-        .field("allAnimals", [AllAnimal]?.self),
-      ] }
-
       var allAnimals: [AllAnimal]? {
         get { __data["allAnimals"] }
         set { __data["allAnimals"] = newValue }
@@ -751,7 +752,12 @@ class FragmentTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
+    expect(actual).to(
+      equalLineByLine(
+        expected,
+        forSection: .selectionSet.propertyAccessors(mutable: true)
+      )
+    )
   }
 
   // MARK: Casing

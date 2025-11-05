@@ -6,7 +6,7 @@ import XCTest
 @testable import Apollo
 
 @MainActor
-class SelectionSet_EqualityTests: XCTestCase {
+class SelectionSet_EquatableTests: XCTestCase {
 
   // MARK: Scalar tests
 
@@ -20,6 +20,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("__typename", String.self),
           .field("stringValue", String?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var stringValue: String? { __data["stringValue"] }
@@ -67,6 +70,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("stringValue", String?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var stringValue: String? { __data["stringValue"] }
 
@@ -111,6 +117,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("__typename", String.self),
           .field("stringValue", String?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var stringValue: String? { __data["stringValue"] }
@@ -157,6 +166,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("stringValue", [String?]?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var stringValue: [String?]? { __data["stringValue"] }
 
@@ -193,7 +205,7 @@ class SelectionSet_EqualityTests: XCTestCase {
   }
 
   func test__equatable__scalarStringMultidimensionalList_givenOptionalityOpposedDataDictValue_sameValue_shouldBeEqual()
-    throws
+  throws
   {
     // given
     class Hero: MockSelectionSet {
@@ -204,6 +216,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("__typename", String.self),
           .field("fieldValue", [[[String?]]].self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var fieldValue: [[[String?]]] { __data["fieldValue"] }
@@ -241,8 +256,8 @@ class SelectionSet_EqualityTests: XCTestCase {
   }
 
   func
-    test__equatable__scalarStringMultidimensionalList_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual()
-    throws
+  test__equatable__scalarStringMultidimensionalList_givenOptionalityOpposedDataDictValue_differentValue_shouldNotBeEqual()
+  throws
   {
     // given
     class Hero: MockSelectionSet {
@@ -253,6 +268,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("__typename", String.self),
           .field("fieldValue", [[[String?]]].self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var fieldValue: [[[String?]]] { __data["fieldValue"] }
@@ -300,6 +318,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("stringValue", [String?]?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var stringValue: [String?]? { __data["stringValue"] }
 
@@ -345,6 +366,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("stringValue", [String?]?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var stringValue: [String?]? { __data["stringValue"] }
 
@@ -389,6 +413,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("__typename", String.self),
           .field("intValue", Int?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var intValue: Int? { __data["intValue"] }
@@ -436,6 +463,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("intValue", Int?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var intValue: Int? { __data["intValue"] }
 
@@ -481,6 +511,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("intValue", Int?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var intValue: Int? { __data["intValue"] }
 
@@ -525,6 +558,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("__typename", String.self),
           .field("boolValue", Bool?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var boolValue: Bool? { __data["boolValue"] }
@@ -572,6 +608,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("boolValue", Bool?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var boolValue: Bool? { __data["boolValue"] }
 
@@ -616,6 +655,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("__typename", String.self),
           .field("boolValue", Bool?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var boolValue: Bool? { __data["boolValue"] }
@@ -663,6 +705,10 @@ class SelectionSet_EqualityTests: XCTestCase {
         ]
       }
 
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
+
       public var floatValue: Float? { __data["floatValue"] }
 
       convenience init(
@@ -707,6 +753,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("__typename", String.self),
           .field("floatValue", Float?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var floatValue: Float? { __data["floatValue"] }
@@ -753,6 +802,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("floatValue", Float?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var floatValue: Float? { __data["floatValue"] }
 
@@ -797,6 +849,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("__typename", String.self),
           .field("doubleValue", Double?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var doubleValue: Double? { __data["doubleValue"] }
@@ -844,6 +899,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("doubleValue", Double?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var doubleValue: Double? { __data["doubleValue"] }
 
@@ -889,6 +947,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("doubleValue", Double?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var doubleValue: Double? { __data["doubleValue"] }
 
@@ -933,6 +994,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("__typename", String.self),
           .field("fieldValue", String?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var fieldValue: String? { __data["fieldValue"] }
@@ -980,6 +1044,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("__typename", String.self),
           .field("fieldValue", GivenCustomScalar?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
 
       public var fieldValue: GivenCustomScalar? { __data["fieldValue"] }
@@ -1029,6 +1096,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("fieldValue", GivenCustomScalar?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var fieldValue: GivenCustomScalar? { __data["fieldValue"] }
 
@@ -1076,6 +1146,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("fieldValue", GivenCustomScalar?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
 
       public var fieldValue: GivenCustomScalar? { __data["fieldValue"] }
 
@@ -1121,6 +1194,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .include(if: "a", .inlineFragment(IfA.self)),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HeroFragment.self]
+      }
 
       final class IfA: ConcreteMockTypeCase<HeroFragment>, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
@@ -1128,6 +1204,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           [
             .field("age", Int.self)
           ]
+        }
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [HeroFragment.self, HeroFragment.IfA.self]
         }
       }
     }
@@ -1170,6 +1249,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .include(if: "a", .inlineFragment(IfA.self)),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HeroFragment.self]
+      }
 
       final class IfA: ConcreteMockTypeCase<HeroFragment>, @unchecked Sendable {
         typealias Schema = MockSchemaMetadata
@@ -1178,6 +1260,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           [
             .field("age", Int.self)
           ]
+        }
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [HeroFragment.self, HeroFragment.IfA.self]
         }
 
       }
@@ -1219,13 +1304,19 @@ class SelectionSet_EqualityTests: XCTestCase {
           .include(if: "a", .inlineFragment(IfA.self)),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HeroFragment.self]
+      }
 
       final class IfA: ConcreteMockTypeCase<HeroFragment>, @unchecked Sendable {
-        typealias Schema = MockSchemaMetadata        
+        typealias Schema = MockSchemaMetadata
         override class var __selections: [Selection] {
           [
             .field("age", Int.self)
           ]
+        }
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [HeroFragment.self, HeroFragment.IfA.self]
         }
       }
     }
@@ -1267,6 +1358,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("name", String?.self),
           .include(if: "includeAge", .field("age", Int?.self)),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HeroFragment.self]
       }
     }
 
@@ -1311,6 +1405,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .include(if: "includeAge", .field("age", Int?.self)),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HeroFragment.self]
+      }
     }
 
     // when
@@ -1343,6 +1440,97 @@ class SelectionSet_EqualityTests: XCTestCase {
     expect(selectionSet1.hashValue).toNot(equal(selectionSet2.hashValue))
   }
 
+  // MARK: Fragment Merging
+
+  // Unit test to reproduce https://github.com/apollographql/apollo-ios/issues/3602
+  func test__equatable__childObject_inBothSelfAndNamedFragment_withNestedInlineFragment_differentValues_returns_false() {
+    // given
+    final class Hero: MockSelectionSet, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __parentType: any ParentType { Object(typename: "Hero", implementedInterfaces: []) }
+      override class var __selections: [Selection] {[
+        .field("friends", [Friend].self),
+        .fragment(HeroFriendFragment.self)
+      ]}
+
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self, HeroFriendFragment.self]
+      }
+
+      class Friend: MockSelectionSet, @unchecked Sendable {
+        override class var __selections: [Selection] {[
+          .inlineFragment(AsCharacter.self)
+        ]}
+
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [Friend.self, HeroFriendFragment.Friend.self]
+        }
+
+        final class AsCharacter: ConcreteMockTypeCase<Friend>, @unchecked Sendable {
+          typealias Schema = MockSchemaMetadata
+
+          override class var __parentType: any ParentType { Object(typename: "Character", implementedInterfaces: []) }
+          override class var __selections: [Selection] {[
+            .field("age", Int?.self),
+          ]}
+          override class var __fulfilledFragments: [any SelectionSet.Type] {
+            [Friend.self, Friend.AsCharacter.self, HeroFriendFragment.Friend.self]
+          }
+        }
+      }
+    }
+
+    final class HeroFriendFragment: MockFragment, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __parentType: any ParentType { Object(typename: "Hero", implementedInterfaces: []) }
+      override class var __selections: [Selection] {[
+        .field("friends", [Friend].self)
+      ]}
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [HeroFriendFragment.self]
+      }
+
+      class Friend: MockSelectionSet, @unchecked Sendable {
+        override class var __selections: [Selection] {[
+          .field("name", String?.self),
+        ]}
+
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [Friend.self]
+        }
+      }
+    }
+
+    // when
+    let selectionSet1 = Hero.Friend.AsCharacter.init(_dataDict: DataDict(
+      data: [
+        "name": "Name 1"
+      ],
+      fulfilledFragments: [
+        ObjectIdentifier(Hero.Friend.self),
+        ObjectIdentifier(Hero.Friend.AsCharacter.self),
+        ObjectIdentifier(HeroFriendFragment.Friend.self)
+      ]
+    ))
+
+    let selectionSet2 = Hero.Friend.AsCharacter.init(_dataDict: DataDict(
+      data: [
+        "name": "Name 2"
+      ],
+      fulfilledFragments: [
+        ObjectIdentifier(Hero.Friend.self),
+        ObjectIdentifier(Hero.Friend.AsCharacter.self),
+        ObjectIdentifier(HeroFriendFragment.Friend.self)
+      ]
+    ))
+
+    // then
+    expect(selectionSet1).toNot(equal(selectionSet2))
+    expect(selectionSet1.hashValue).toNot(equal(selectionSet2.hashValue))
+  }
+
   // MARK: - Null/nil tests
 
   func test__equatable__optionalChildObject__isNullOnBoth_returns_true() {
@@ -1354,6 +1542,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("__typename", String.self),
           .field("name", String?.self),
         ]
+      }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
       }
     }
 
@@ -1393,6 +1584,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("name", String?.self),
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [Hero.self]
+      }
     }
 
     // when
@@ -1431,6 +1625,10 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("hero", Hero.self)
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [GivenSelectionSet.self]
+      }
+
       var hero: Hero { __data["hero"] }
 
       class Hero: MockSelectionSet {
@@ -1441,6 +1639,10 @@ class SelectionSet_EqualityTests: XCTestCase {
             .field("friend", Friend.self),
           ]
         }
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [Hero.self]
+        }
+
         var friend: Friend { __data["friend"] }
 
         class Friend: MockSelectionSet {
@@ -1449,6 +1651,9 @@ class SelectionSet_EqualityTests: XCTestCase {
               .field("__typename", String.self),
               .field("name", String.self),
             ]
+          }
+          override class var __fulfilledFragments: [any SelectionSet.Type] {
+            [Friend.self]
           }
           var name: String { __data["name"] }
         }
@@ -1497,6 +1702,9 @@ class SelectionSet_EqualityTests: XCTestCase {
           .field("hero", Hero?.self, arguments: ["id": .variable("id")])
         ]
       }
+      override class var __fulfilledFragments: [any SelectionSet.Type] {
+        [ReverseFriendsQuery.self]
+      }
 
       var hero: Hero { __data["hero"] }
 
@@ -1506,6 +1714,9 @@ class SelectionSet_EqualityTests: XCTestCase {
             .field("__typename", String.self),
             .field("friendsConnection", FriendsConnection.self),
           ]
+        }
+        override class var __fulfilledFragments: [any SelectionSet.Type] {
+          [Hero.self]
         }
 
         var friendsConnection: FriendsConnection { __data["friendsConnection"] }
@@ -1517,6 +1728,9 @@ class SelectionSet_EqualityTests: XCTestCase {
               .field("friends", [Character].self),
             ]
           }
+          override class var __fulfilledFragments: [any SelectionSet.Type] {
+            [FriendsConnection.self]
+          }
 
           var friends: [Character] { __data["friends"] }
 
@@ -1527,6 +1741,9 @@ class SelectionSet_EqualityTests: XCTestCase {
                 .field("name", String.self),
                 .field("id", String.self),
               ]
+            }
+            override class var __fulfilledFragments: [any SelectionSet.Type] {
+              [Character.self]
             }
 
             var name: String { __data["name"] }

@@ -16,6 +16,9 @@ public struct CharacterName: StarWarsAPI.SelectionSet, Fragment {
     .field("__typename", String.self),
     .field("name", String.self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    CharacterName.self
+  ] }
 
   /// The name of the character
   public var name: String { __data["name"] }
@@ -24,14 +27,9 @@ public struct CharacterName: StarWarsAPI.SelectionSet, Fragment {
     __typename: String,
     name: String
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": __typename,
-        "name": name,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(CharacterName.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": __typename,
+      "name": name,
+    ])
   }
 }

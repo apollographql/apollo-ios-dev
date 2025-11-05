@@ -17,6 +17,10 @@ public struct CharacterNameWithNestedAppearsInFragment: StarWarsAPI.SelectionSet
     .field("name", String.self),
     .fragment(CharacterAppearsIn.self),
   ] }
+  public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+    CharacterNameWithNestedAppearsInFragment.self,
+    CharacterAppearsIn.self
+  ] }
 
   /// The name of the character
   public var name: String { __data["name"] }
@@ -35,16 +39,10 @@ public struct CharacterNameWithNestedAppearsInFragment: StarWarsAPI.SelectionSet
     name: String,
     appearsIn: [GraphQLEnum<StarWarsAPI.Episode>?]
   ) {
-    self.init(_dataDict: DataDict(
-      data: [
-        "__typename": __typename,
-        "name": name,
-        "appearsIn": appearsIn,
-      ],
-      fulfilledFragments: [
-        ObjectIdentifier(CharacterNameWithNestedAppearsInFragment.self),
-        ObjectIdentifier(CharacterAppearsIn.self)
-      ]
-    ))
+    self.init(unsafelyWithData: [
+      "__typename": __typename,
+      "name": name,
+      "appearsIn": appearsIn,
+    ])
   }
 }

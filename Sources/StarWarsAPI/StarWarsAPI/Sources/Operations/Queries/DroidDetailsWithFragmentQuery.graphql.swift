@@ -28,21 +28,19 @@ public class DroidDetailsWithFragmentQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      DroidDetailsWithFragmentQuery.Data.self
+    ] }
 
     public var hero: Hero? { __data["hero"] }
 
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(DroidDetailsWithFragmentQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
@@ -57,20 +55,18 @@ public class DroidDetailsWithFragmentQuery: GraphQLQuery {
         .field("__typename", String.self),
         .inlineFragment(AsDroid.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        DroidDetailsWithFragmentQuery.Data.Hero.self
+      ] }
 
       public var asDroid: AsDroid? { _asInlineFragment() }
 
       public init(
         __typename: String
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(DroidDetailsWithFragmentQuery.Data.Hero.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+        ])
       }
 
       /// Hero.AsDroid
@@ -84,6 +80,11 @@ public class DroidDetailsWithFragmentQuery: GraphQLQuery {
         public static var __parentType: any ApolloAPI.ParentType { StarWarsAPI.Objects.Droid }
         public static var __selections: [ApolloAPI.Selection] { [
           .fragment(DroidDetails.self),
+        ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          DroidDetailsWithFragmentQuery.Data.Hero.self,
+          DroidDetailsWithFragmentQuery.Data.Hero.AsDroid.self,
+          DroidDetails.self
         ] }
 
         /// What others call this droid
@@ -102,18 +103,11 @@ public class DroidDetailsWithFragmentQuery: GraphQLQuery {
           name: String,
           primaryFunction: String? = nil
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": StarWarsAPI.Objects.Droid.typename,
-              "name": name,
-              "primaryFunction": primaryFunction,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(DroidDetailsWithFragmentQuery.Data.Hero.self),
-              ObjectIdentifier(DroidDetailsWithFragmentQuery.Data.Hero.AsDroid.self),
-              ObjectIdentifier(DroidDetails.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": StarWarsAPI.Objects.Droid.typename,
+            "name": name,
+            "primaryFunction": primaryFunction,
+          ])
         }
       }
     }

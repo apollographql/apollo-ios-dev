@@ -27,21 +27,19 @@ public class HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
     public static var __selections: [ApolloAPI.Selection] { [
       .field("hero", Hero?.self, arguments: ["episode": .variable("episode")]),
     ] }
+    public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+      HeroTypeDependentAliasedFieldQuery.Data.self
+    ] }
 
     public var hero: Hero? { __data["hero"] }
 
     public init(
       hero: Hero? = nil
     ) {
-      self.init(_dataDict: DataDict(
-        data: [
-          "__typename": StarWarsAPI.Objects.Query.typename,
-          "hero": hero._fieldData,
-        ],
-        fulfilledFragments: [
-          ObjectIdentifier(HeroTypeDependentAliasedFieldQuery.Data.self)
-        ]
-      ))
+      self.init(unsafelyWithData: [
+        "__typename": StarWarsAPI.Objects.Query.typename,
+        "hero": hero._fieldData,
+      ])
     }
 
     /// Hero
@@ -57,6 +55,9 @@ public class HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
         .inlineFragment(AsHuman.self),
         .inlineFragment(AsDroid.self),
       ] }
+      public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+        HeroTypeDependentAliasedFieldQuery.Data.Hero.self
+      ] }
 
       public var asHuman: AsHuman? { _asInlineFragment() }
       public var asDroid: AsDroid? { _asInlineFragment() }
@@ -64,14 +65,9 @@ public class HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
       public init(
         __typename: String
       ) {
-        self.init(_dataDict: DataDict(
-          data: [
-            "__typename": __typename,
-          ],
-          fulfilledFragments: [
-            ObjectIdentifier(HeroTypeDependentAliasedFieldQuery.Data.Hero.self)
-          ]
-        ))
+        self.init(unsafelyWithData: [
+          "__typename": __typename,
+        ])
       }
 
       /// Hero.AsHuman
@@ -86,6 +82,10 @@ public class HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
         public static var __selections: [ApolloAPI.Selection] { [
           .field("homePlanet", alias: "property", String?.self),
         ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          HeroTypeDependentAliasedFieldQuery.Data.Hero.self,
+          HeroTypeDependentAliasedFieldQuery.Data.Hero.AsHuman.self
+        ] }
 
         /// The home planet of the human, or null if unknown
         public var property: String? { __data["property"] }
@@ -93,16 +93,10 @@ public class HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
         public init(
           property: String? = nil
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": StarWarsAPI.Objects.Human.typename,
-              "property": property,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(HeroTypeDependentAliasedFieldQuery.Data.Hero.self),
-              ObjectIdentifier(HeroTypeDependentAliasedFieldQuery.Data.Hero.AsHuman.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": StarWarsAPI.Objects.Human.typename,
+            "property": property,
+          ])
         }
       }
 
@@ -118,6 +112,10 @@ public class HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
         public static var __selections: [ApolloAPI.Selection] { [
           .field("primaryFunction", alias: "property", String?.self),
         ] }
+        public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          HeroTypeDependentAliasedFieldQuery.Data.Hero.self,
+          HeroTypeDependentAliasedFieldQuery.Data.Hero.AsDroid.self
+        ] }
 
         /// This droid's primary function
         public var property: String? { __data["property"] }
@@ -125,16 +123,10 @@ public class HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
         public init(
           property: String? = nil
         ) {
-          self.init(_dataDict: DataDict(
-            data: [
-              "__typename": StarWarsAPI.Objects.Droid.typename,
-              "property": property,
-            ],
-            fulfilledFragments: [
-              ObjectIdentifier(HeroTypeDependentAliasedFieldQuery.Data.Hero.self),
-              ObjectIdentifier(HeroTypeDependentAliasedFieldQuery.Data.Hero.AsDroid.self)
-            ]
-          ))
+          self.init(unsafelyWithData: [
+            "__typename": StarWarsAPI.Objects.Droid.typename,
+            "property": property,
+          ])
         }
       }
     }
