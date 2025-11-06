@@ -26,7 +26,7 @@ jobs:
         with:
           repository: apollographql/apollo-ios-codegen
           path: "checkout/apollo-ios-codegen"
-          ref: main
+          ref: ${{ github.ref_name }}
 
       # Setup SSH Keys
       - name: Setup SSH Keys
@@ -90,6 +90,6 @@ jobs:
       - name: Dispatch apollo-ios-xcframework
         shell: bash
         run: |
-          gh workflow run release-new-version.yml -f remoteRef=${{ env.RELEASE_VERSION }} --repo "apollographql/apollo-ios-xcframework"
+          gh workflow run release-new-version.yml -f localRef=${{ github.ref_name }} remoteRef=${{ env.RELEASE_VERSION }} --repo "apollographql/apollo-ios-xcframework"
         env:
           GH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
