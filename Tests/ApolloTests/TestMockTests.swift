@@ -1,4 +1,3 @@
-
 import XCTest
 import Nimble
 @testable import Apollo
