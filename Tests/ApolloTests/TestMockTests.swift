@@ -517,7 +517,7 @@ class TestMockTests: XCTestCase {
       final class CatData: TestMockSchema.MockSelectionSet, @unchecked Sendable {
         override class var __parentType: any ParentType { TestMockSchema.Types.Cat }
         override class var __selections: [Selection] {[
-          .field("species", String.self),
+          .field("species", String?.self),
         ]}
       }
     }
@@ -534,6 +534,27 @@ class TestMockTests: XCTestCase {
     // then
     expect(selectionSet.nestedListOfObjects.count).to(equal(1))
     expect(selectionSet.nestedListOfObjects[0].count).to(equal(3))
+  }
+
+  func test__convertToSelectionSet__setListOfScalarsField__canAccessField() async throws {
+    // given
+    final class Animal: TestMockSchema.MockSelectionSet, @unchecked Sendable {
+      override class var __parentType: any ParentType { TestMockSchema.Interfaces.Animal }
+      override class var __selections: [Selection] {[
+        .field("listOfStrings", [String].self),
+      ]}
+
+      var listOfStrings: [String] { __data["listOfStrings"] }
+    }
+
+    let mock = Mock<Dog>()
+    mock.listOfStrings = ["1", "2", "3"]
+
+    // when
+    let selectionSet = await Animal.from(mock)
+
+    // then
+    expect(selectionSet.listOfStrings.count).to(equal(3))
   }
 }
 
