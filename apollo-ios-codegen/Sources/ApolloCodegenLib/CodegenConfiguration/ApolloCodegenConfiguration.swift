@@ -690,6 +690,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     /// `true` will add a filename suffix matching the schema type, the default is `false`. This can be used to
     /// avoid filename conflicts when operation type names match schema type names.
     public let appendSchemaTypeFilenameSuffix: Bool
+    
+    public let modelGenerationType: ModelGenerationType
 
     /// Default property values
     public struct Default {
@@ -705,6 +707,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       public static let conversionStrategies: ConversionStrategies = .init()
       public static let pruneGeneratedFiles: Bool = true
       public static let appendSchemaTypeFilenameSuffix: Bool = false
+      public static let modelGenerationType: ModelGenerationType = .response
     }
 
     /// Designated initializer.
@@ -728,6 +731,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     ///   - appendSchemaTypeFilenameSuffix: `true` will add a filename suffix matching the schema type, the
     ///     default is `false`. This can be used to avoid filename conflicts when operation type names match
     ///     schema type names.
+    ///   - modelGenerationType: How to generate models for your schema types, defaults to `.response` which is full
+    ///     model generation as it has worked prior to this option.
     public init(
       additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
       deprecatedEnumCases: Composition = Default.deprecatedEnumCases,
@@ -739,7 +744,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       warningsOnDeprecatedUsage: Composition = Default.warningsOnDeprecatedUsage,
       conversionStrategies: ConversionStrategies = Default.conversionStrategies,
       pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-      appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix
+      appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix,
+      modelGenerationType: ModelGenerationType = Default.modelGenerationType
     ) {
       self.additionalInflectionRules = additionalInflectionRules
       self.deprecatedEnumCases = deprecatedEnumCases
@@ -752,6 +758,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       self.conversionStrategies = conversionStrategies
       self.pruneGeneratedFiles = pruneGeneratedFiles
       self.appendSchemaTypeFilenameSuffix = appendSchemaTypeFilenameSuffix
+      self.modelGenerationType = modelGenerationType
     }
 
     // MARK: Codable
@@ -769,6 +776,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       case conversionStrategies
       case pruneGeneratedFiles
       case appendSchemaTypeFilenameSuffix
+      case modelGenerationType
     }
 
     public init(from decoder: any Decoder) throws {
@@ -840,6 +848,12 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
           Bool.self,
           forKey: .appendSchemaTypeFilenameSuffix
         ) ?? Default.appendSchemaTypeFilenameSuffix
+      
+      modelGenerationType =
+        try values.decodeIfPresent(
+          ModelGenerationType.self,
+          forKey: .modelGenerationType
+        ) ?? Default.modelGenerationType
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -856,6 +870,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       try container.encode(self.conversionStrategies, forKey: .conversionStrategies)
       try container.encode(self.pruneGeneratedFiles, forKey: .pruneGeneratedFiles)
       try container.encode(self.appendSchemaTypeFilenameSuffix, forKey: .appendSchemaTypeFilenameSuffix)
+      try container.encode(self.modelGenerationType, forKey: .modelGenerationType)
     }
   }
 
@@ -977,6 +992,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
           forKey: .inputObjects
         ) ?? Default.inputObjects
     }
+  }
+  
+  public enum ModelGenerationType: String, Codable, Equatable, Sendable {
+    case json
+    case response
   }
 
   // MARK: - OperationDocumentFormat

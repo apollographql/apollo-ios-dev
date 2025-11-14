@@ -1,4 +1,4 @@
-public enum Selection {
+public enum Selection: Sendable {
   /// A single field selection.
   case field(Field)
   /// A fragment spread of a named fragment definition.
@@ -10,7 +10,7 @@ public enum Selection {
   /// A group of selections that have `@include/@skip` directives.
   case conditional(Conditions, [Selection])
 
-  public struct Field {
+  public struct Field: Sendable {
     public let name: String
     public let alias: String?
     public let arguments: [String: InputValue]?
@@ -38,7 +38,7 @@ public enum Selection {
     public indirect enum OutputType: Sendable {
       case scalar(any ScalarType.Type)
       case customScalar(any CustomScalarType.Type)
-      case object(any RootSelectionSet.Type)
+      case object(ChildSelections)
       case nonNull(OutputType)
       case list(OutputType)
 
@@ -58,7 +58,32 @@ public enum Selection {
     }
   }
   
-  public struct FieldPolicyDirective: Hashable {
+  public enum ChildSelections: Sendable, Equatable, Hashable {
+    case inline([Selection])
+    case model(any RootSelectionSet.Type)
+    
+    public static func == (lhs: ChildSelections, rhs: ChildSelections) -> Bool {
+      switch (lhs, rhs) {
+      case let (.inline(lhsSelections), .inline(rhsSelections)):
+        return lhsSelections == rhsSelections
+      case let (.model(lhsType), .model(rhsType)):
+        return lhsType == rhsType
+      default:
+        return false
+      }
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+      switch self {
+      case let .inline(selections):
+        hasher.combine(selections)
+      case let .model(modelType):
+        hasher.combine(ObjectIdentifier(modelType))
+      }
+    }
+  }
+  
+  public struct FieldPolicyDirective: Hashable, Sendable {
     public let keyArgs: [String]
     
     public init(
@@ -221,8 +246,8 @@ extension Selection.Field.OutputType: Hashable {
       hasher.combine(ObjectIdentifier(valueType))
     case let .customScalar(valueType):
       hasher.combine(ObjectIdentifier(valueType))
-    case let .object(objectType):
-      hasher.combine(ObjectIdentifier(objectType))
+    case let .object(childSelections):
+      hasher.combine(childSelections)
     case
       let .nonNull(nested),
       let .list(nested):

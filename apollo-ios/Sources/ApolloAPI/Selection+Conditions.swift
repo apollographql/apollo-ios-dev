@@ -4,7 +4,7 @@ public extension Selection {
   /// The conditions are a two-dimensional array of `Selection.Condition`s.
   /// The outer array represents groups of conditions joined together with a logical "or".
   /// Conditions in the same inner array are joined together with a logical "and".
-  struct Conditions: Hashable {
+  struct Conditions: Hashable, Sendable {
     public let value: [[Condition]]
 
     public init(_ value: [[Condition]]) {
@@ -30,7 +30,7 @@ public extension Selection {
     }
   }
 
-  enum Condition: ExpressibleByStringLiteral, ExpressibleByBooleanLiteral, Hashable {
+  enum Condition: ExpressibleByStringLiteral, ExpressibleByBooleanLiteral, Hashable, Sendable {
     case value(Bool)
     case variable(name: String, inverted: Bool)
 

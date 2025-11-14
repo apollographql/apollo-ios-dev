@@ -3,7 +3,7 @@ public protocol Deferrable: SelectionSet { }
 /// Wraps a deferred selection set (either an inline fragment or fragment spread) to expose the
 /// fulfilled value as well as the fulfilled state through the projected value.
 @propertyWrapper
-public struct Deferred<Fragment: Deferrable> {
+public struct Deferred<Fragment: Deferrable & ResponseModel> {
   public enum State: Equatable {
     /// The deferred selection set has not been received yet.
     case pending

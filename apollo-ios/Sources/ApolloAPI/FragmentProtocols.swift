@@ -76,12 +76,12 @@ extension FragmentContainer {
   ///
   /// - Returns: The ``Fragment`` the ``SelectionSet`` has been converted to
   @_spi(Unsafe)
-  @inlinable public func _toFragment<T: Fragment>() -> T {
+  @inlinable public func _toFragment<T: Fragment & ResponseModel>() -> T {
     _convertToFragment()
   }
 
   @_spi(Unsafe)
-  @usableFromInline func _convertToFragment<T: Fragment>()-> T {
+  @usableFromInline func _convertToFragment<T: Fragment & ResponseModel>()-> T {
     return T.init(_dataDict: __data)
   }
 
@@ -98,7 +98,7 @@ extension FragmentContainer {
   /// - Returns: The ``Fragment`` the ``SelectionSet`` has been converted to, or `nil` if the
   /// fragment was not fulfilled.
   @_spi(Unsafe)
-  @inlinable public func _toFragment<T: Fragment>() -> T? {
+  @inlinable public func _toFragment<T: Fragment & ResponseModel>() -> T? {
     guard __data.fragmentIsFulfilled(T.self) else { return nil }
     return T.init(_dataDict: __data)
   }

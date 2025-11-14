@@ -175,7 +175,7 @@ public protocol SelectionSetEntityValue: Sendable, Hashable {
   var _fieldData: DataDict.FieldValue { get }
 }
 
-extension RootSelectionSet {
+extension RootSelectionSet where Self: ResponseModel {
   /// - Warning: This function is not supported for external use.
   /// Unsupported usage may result in unintended consequences including crashes.
   @_spi(Unsafe)

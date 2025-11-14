@@ -41,10 +41,10 @@ extension Array: OutputTypeConvertible where Element: OutputTypeConvertible {
   }
 }
 
-extension RootSelectionSet {
+extension RootSelectionSet where Self: ResponseModel {
   @_spi(Execution)
   @inlinable public static var _asOutputType: Selection.Field.OutputType {
-    .nonNull(.object(self))
+    .nonNull(.object(.model(self)))
   }
 }
 

@@ -71,7 +71,21 @@ public protocol SelectionSet: Sendable, Hashable, CustomDebugStringConvertible {
   /// The deferred fragments that may be fulfilled on a valid instance of the `SelectionSet`.
   @_spi(Execution)
   static var __deferredFragments: [any Deferrable.Type] { get }
+}
 
+extension SelectionSet {
+
+  @_spi(Execution)
+  public static var __selections: [Selection] { [] }
+
+  @_spi(Execution)
+  @inlinable public static var __deferredFragments: [any Deferrable.Type] { [] }
+
+}
+
+// MARK: - Response Model
+
+public protocol ResponseModel: SelectionSet {
   /// The data of the underlying GraphQL object represented by the generated selection set.
   @_spi(Unsafe)
   var __data: DataDict { get }
@@ -95,22 +109,15 @@ public protocol SelectionSet: Sendable, Hashable, CustomDebugStringConvertible {
   init(_dataDict: DataDict)
 }
 
-extension SelectionSet {
-
+extension ResponseModel {
   public var __typename: String? { __data["__typename"] }
-
-  @_spi(Execution)
-  public static var __selections: [Selection] { [] }
-
-  @_spi(Execution)
-  @inlinable public static var __deferredFragments: [any Deferrable.Type] { [] }
-
+  
   @_spi(Execution)
   @inlinable public var __objectType: Object? {
     guard let __typename else { return nil }
     return Schema.objectType(forTypename: __typename)
   }
-
+  
   /// Verifies if a `SelectionSet` may be converted to an `InlineFragment` and performs
   /// the conversion.
   ///
@@ -118,13 +125,13 @@ extension SelectionSet {
   /// Generated call sites are guaranteed by the GraphQL compiler to be safe.
   /// Unsupported usage may result in unintended consequences including crashes.
   @_disfavoredOverload @_spi(Unsafe)
-  @inlinable public func _asInlineFragment<T: SelectionSet>() -> T? {
+  @inlinable public func _asInlineFragment<T: ResponseModel>() -> T? {
     guard __data.fragmentIsFulfilled(T.self) else { return nil }
     return T.init(_dataDict: __data)
   }
 
   @_spi(Unsafe)
-  public func _asInlineFragment<T: CompositeInlineFragment>() -> T? {
+  public func _asInlineFragment<T: CompositeInlineFragment & ResponseModel>() -> T? {
     guard __data.fragmentsAreFulfilled(T.__mergedSources) else { return nil }
     return T.init(_dataDict: __data)
   }
@@ -132,9 +139,7 @@ extension SelectionSet {
   public var debugDescription: String {
     return "\(self.__data._data as AnyObject)"
   }
-
-  // MARK: - Internal
-
+  
   static var __fulfilledFragmentIds: Set<ObjectIdentifier> {
     Set(Self.__fulfilledFragments.map(ObjectIdentifier.init))
   }
@@ -153,24 +158,30 @@ extension SelectionSet {
       )
     )
   }
-
 }
 
-extension SelectionSet where Fragments: FragmentContainer {
+extension ResponseModel where Fragments: FragmentContainer {
   /// Contains accessors for all of the fragments the `SelectionSet` can be converted to.
   public var fragments: Fragments { Fragments(_dataDict: __data) }
 }
 
 // MARK: - Root Entity Type Conversion Helpers
 
-extension InlineFragment {
+extension InlineFragment where Self: ResponseModel, RootEntityType: ResponseModel {
   public var asRootEntityType: RootEntityType {
-    RootEntityType.init(_dataDict: __data)
+    RootEntityType.init(_fieldData: __data)
   }
 }
 
-extension RootSelectionSet {
-  public init<T: InlineFragment>(_ inlineFragment: T) where T.RootEntityType == Self {
+extension RootSelectionSet where Self: ResponseModel {
+  public init<T: InlineFragment>(_ inlineFragment: T) where T.RootEntityType == Self, T: ResponseModel {
     self = inlineFragment.asRootEntityType
   }
+}
+
+
+// MARK: - JSON Model
+
+public protocol JSONModel: SelectionSet {
+  var rawJSON: String { get set }
 }

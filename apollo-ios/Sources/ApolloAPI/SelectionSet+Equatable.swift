@@ -1,7 +1,7 @@
 import Foundation
 
-// MARK: - Equatable & Hashable
-public extension SelectionSet {
+// MARK: - Equatable & Hashable for ResponseModel
+public extension SelectionSet where Self: ResponseModel {
 
   /// Creates a hash using a narrowly scoped algorithm that only combines fields in the underlying data
   /// that are relevant to the `SelectionSet`. This ensures that hashes for a fragment do not
@@ -22,14 +22,25 @@ public extension SelectionSet {
 
   private func fieldsForEquality() -> [String: DataDict.FieldValue] {
     var fields: [String: DataDict.FieldValue] = [:]
-    if let asTypeCase = self as? any InlineFragment {
-      self.addFulfilledSelections(of: type(of: asTypeCase.asRootEntityType), to: &fields)
-
-    } else {
-      self.addFulfilledSelections(of: type(of: self), to: &fields)
-      
-    }
+    
+    let selectionSetType = determineSelectionSetTypeForEquality()
+    addFulfilledSelections(of: selectionSetType, to: &fields)
+    
     return fields
+  }
+  
+  private func determineSelectionSetTypeForEquality() -> any SelectionSet.Type {
+    // For inline fragments, try to use their root entity type for more accurate equality checks
+    if let inlineFragment = self as? (any InlineFragment & ResponseModel) {
+      // Check if we can safely access the root entity type
+      let rootEntity = inlineFragment.asRootEntityType
+      if rootEntity is any ResponseModel {
+        return type(of: rootEntity)
+      }
+    }
+    
+    // Default to using the current type
+    return type(of: self)
   }
 
   private func addFulfilledSelections(
@@ -91,14 +102,19 @@ public extension SelectionSet {
           guard let objectData = fieldData as? DataDict else {
             preconditionFailure("Expected object data for object field: \(field)")
           }
-          fields[field.responseKey] = selectionSetType.init(_dataDict: objectData)
+          // Create a ResponseModel instance using the proper initializer
+          if let responseModelType = selectionSetType as? any ResponseModel.Type {
+            fields[field.responseKey] = responseModelType.init(_dataDict: objectData)
+          }
 
         case true:
           guard let listData = fieldData as? [DataDict.FieldValue] else {
             preconditionFailure("Expected list data for field: \(field)")
           }
-
-          fields[field.responseKey] = convertElements(of: listData, to: selectionSetType) as DataDict.FieldValue
+          
+          if let rootSelectionSetType = selectionSetType as? any RootSelectionSet.Type {
+            fields[field.responseKey] = convertElements(of: listData, to: rootSelectionSetType) as DataDict.FieldValue
+          }
         }
       }
     }
@@ -108,8 +124,9 @@ public extension SelectionSet {
     of list: [DataDict.FieldValue],
     to selectionSetType: any RootSelectionSet.Type
   ) -> [DataDict.FieldValue] {
-    if let dataDictList = list as? [DataDict] {
-      return dataDictList.map { selectionSetType.init(_dataDict: $0) }
+    if let dataDictList = list as? [DataDict],
+       let responseModelType = selectionSetType as? any ResponseModel.Type {
+      return dataDictList.map { responseModelType.init(_dataDict: $0) }
     }
 
     if let nestedList = list as? [[DataDict.FieldValue]] {
