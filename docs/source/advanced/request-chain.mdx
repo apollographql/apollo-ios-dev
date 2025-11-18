@@ -175,7 +175,7 @@ struct AuthHeaderInterceptor: GraphQLInterceptor {
 
 [`HTTPInterceptor`](https://www.apollographql.com/docs/ios/docc/documentation/apollo/httpinterceptor) requires you to implement the `intercept(request: next:)` function to perform pre-flight work on the `URLRequest` and post-flight work on the `HTTPResponse`, including the raw response `Data` stream.
 
-After the `RequestChain` proceeds through the `GraphQLInterceptor`s provided by it's `InterceptorProvider`, it will call `GraphQLRequest/toURLRequest()` on the final `GraphQLRequest`. Each `HTTPInterceptor` provided by the `InterceptorProvider` will then have it's `intercept(request:next:)` function called in sequential order prior to fetching the request.
+After the `RequestChain` proceeds through each `GraphQLInterceptor` provided by it's `InterceptorProvider`, it will call `GraphQLRequest/toURLRequest()` on the final `GraphQLRequest`. Each `HTTPInterceptor` provided by the `InterceptorProvider` will then have it's `intercept(request:next:)` function called in sequential order prior to fetching the request.
 
 The `intercept` function works as follows:
 
@@ -192,6 +192,12 @@ The `intercept` function works as follows:
   - The `mapChunks` closure can return the original data stream or a modified version.
 - Return the `HTTPResponse`
   - When finished, your interceptor must return the `HTTPResponse`, which will be passed back up the chain to the previous `HTTPInterceptor`.
+
+<Note>
+
+Because an `HTTPInterceptor` does not have access to the `GraphQLRequest`, it cannot trigger a `RequestChain.Retry`. We recommend throwing a custom error from a failing `HTTPInterceptor` and implementing a `GraphQLInterceptor` responsible for error handling to catch the error and trigger a retry with the appropriate `GraphQLRequest`.
+
+</Note>
 
 ### CacheInterceptor
 
@@ -258,7 +264,7 @@ If you are using a response format other than JSON or that differs from the Grap
 
 ## Request retries
 
-Any interceptor can trigger a request retry by throwing a `RequestChain.Retry` error. When a `RequestChain` receives a thrown `Retry` error, it will restart from the beginning of the [request chain flow](#request-chain-flow) using the `request` provided by the error. This allows the request to be modified to correct errors that may be causing the failure prior to beginning again.
+Any `GraphQLInterceptor` can trigger a request retry by throwing a `RequestChain.Retry` error. When a `RequestChain` receives a thrown `Retry` error, it will restart from the beginning of the [request chain flow](#request-chain-flow) using the `request` provided by the error. This allows the request to be modified to correct errors that may be causing the failure prior to beginning again.
 
 ### Preventing infinite retry loops
 
