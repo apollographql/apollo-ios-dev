@@ -195,7 +195,7 @@ The `intercept` function works as follows:
 
 <Note>
 
-Because an `HTTPInterceptor` do not have access to the `GraphQLRequest`, it cannot trigger a `RequestChain.Retry`. We recommend throwing a custom error from a failing `HTTPInterceptor` and implementing a `GraphQLInterceptor` responsible for error handling to catch the error and trigger a retry with the appropriate `GraphQLRequest`.
+Because an `HTTPInterceptor` does not have access to the `GraphQLRequest`, it cannot trigger a `RequestChain.Retry`. We recommend throwing a custom error from a failing `HTTPInterceptor` and implementing a `GraphQLInterceptor` responsible for error handling to catch the error and trigger a retry with the appropriate `GraphQLRequest`.
 
 </Note>
 
