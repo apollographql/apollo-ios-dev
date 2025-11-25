@@ -10,6 +10,12 @@ public final class WebSocketTransport: SubscriptionNetworkTransport {
     case notImplemented
   }
 
+  private var connection: any WebSocketConnection
+
+  public init(connection: any WebSocketConnection) {
+    self.connection = connection
+  }
+
   public func send<Subscription: GraphQLSubscription>(
     subscription: Subscription,
     fetchBehavior: Apollo.FetchBehavior,
@@ -18,4 +24,17 @@ public final class WebSocketTransport: SubscriptionNetworkTransport {
     throw Error.notImplemented
   }
 
+}
+
+public protocol WebSocketConnection: Actor {
+
+  func openConnection() async throws
+
+  func sendOperation(with: Any) throws -> AsyncThrowingStream<JSONObject, any Swift.Error>
+
+}
+
+public protocol SubscriptionURLSession: Sendable {
+
+//  func
 }
