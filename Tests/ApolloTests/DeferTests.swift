@@ -672,8 +672,7 @@ final class DeferTests: XCTestCase, MockResponseProvider {
       query: TVShowQuery(),
       fetchBehavior: .NetworkOnly,
       requestConfiguration: RequestConfiguration(writeResultsToCache: false)
-    )
-      .getAllValues()
+    ).getAllValues()
 
     expect(results.count).to(equal(1))
   }
