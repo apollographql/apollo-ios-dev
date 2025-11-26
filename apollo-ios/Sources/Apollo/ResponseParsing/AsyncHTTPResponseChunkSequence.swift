@@ -86,7 +86,7 @@ public struct AsyncHTTPResponseChunkSequence: AsyncChunkSequence {
         buffer.removeFirst(Constants.CRLF.count)
       }
 
-      if buffer == Constants.CloseDelimiter {
+      if buffer.starts(with: Constants.CloseDelimiter) {
         buffer.removeAll()
       }
     }
