@@ -96,11 +96,18 @@ public extension SelectionSet where Self: ResponseModel {
       case let .list(innerType):
         addData(for: innerType, inList: true)
 
-      case let .object(selectionSetType):
+      case let .object(childSelections):
         switch inList {
         case false:
           guard let objectData = fieldData as? DataDict else {
             preconditionFailure("Expected object data for object field: \(field)")
+          }
+          switch childSelections {
+          case let .model(rm):
+            fields[field.responseKey] = responseModelType.init(_dataDict: objectData)
+
+          case let .inline(selections):
+
           }
           // Create a ResponseModel instance using the proper initializer
           if let responseModelType = selectionSetType as? any ResponseModel.Type {

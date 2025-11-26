@@ -55,8 +55,10 @@ public protocol SelectionSet: Sendable, Hashable, CustomDebugStringConvertible {
   /// A `SelectionSet` with fragments should provide a type that conforms to `FragmentContainer`
   associatedtype Fragments = NoFragments
 
+  associatedtype ModelType
+
   @_spi(Execution)
-  static var __selections: [Selection] { get }
+  static var __selections: [Selection<ModelType>] { get }
 
   /// The GraphQL type for the `SelectionSet`.
   ///
@@ -76,16 +78,14 @@ public protocol SelectionSet: Sendable, Hashable, CustomDebugStringConvertible {
 extension SelectionSet {
 
   @_spi(Execution)
-  public static var __selections: [Selection] { [] }
-
-  @_spi(Execution)
   @inlinable public static var __deferredFragments: [any Deferrable.Type] { [] }
 
 }
 
 // MARK: - Response Model
 
-public protocol ResponseModel: SelectionSet {
+public protocol ResponseModel: SelectionSet where ModelType == any ResponseModel {
+
   /// The data of the underlying GraphQL object represented by the generated selection set.
   @_spi(Unsafe)
   var __data: DataDict { get }
@@ -110,6 +110,10 @@ public protocol ResponseModel: SelectionSet {
 }
 
 extension ResponseModel {
+
+  @_spi(Execution)
+  public static var __selections: [Selection<any ResponseModel>] { [] }
+
   public var __typename: String? { __data["__typename"] }
   
   @_spi(Execution)
@@ -182,6 +186,11 @@ extension RootSelectionSet where Self: ResponseModel {
 
 // MARK: - JSON Model
 
-public protocol JSONModel: SelectionSet {
+public protocol JSONModel: SelectionSet where ModelType == any JSONModel {
   var rawJSON: String { get set }
+}
+
+extension JSONModel {
+  @_spi(Execution)
+  public static var __selections: [Selection<any ResponseModel>] { [] }
 }

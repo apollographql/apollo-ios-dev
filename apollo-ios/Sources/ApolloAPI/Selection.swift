@@ -1,4 +1,5 @@
-public enum Selection: Sendable {
+///
+public enum Selection<ObjectModelType>: Sendable {
   /// A single field selection.
   case field(Field)
   /// A fragment spread of a named fragment definition.
@@ -60,8 +61,8 @@ public enum Selection: Sendable {
   
   public enum ChildSelections: Sendable, Equatable, Hashable {
     case inline([Selection])
-    case model(any RootSelectionSet.Type)
-    
+    case model(any ResponseModel.Type)
+
     public static func == (lhs: ChildSelections, rhs: ChildSelections) -> Bool {
       switch (lhs, rhs) {
       case let (.inline(lhsSelections), .inline(rhsSelections)):
