@@ -53,7 +53,7 @@ class AsyncHTTPResponseChunkSequenceTests: XCTestCase, MockResponseProvider {
     return request
   }
 
-  func test__multipartResponse__givenBeginWith_Delimeter_Boundary_shouldParseOut() async throws {
+  func test__multipartResponse__givenBeginWith_Delimiter_Boundary_shouldParseOut() async throws {
     let url = URL(string: "http://www.test.com/multipart-single-chunk")!
     let boundary = "-"
     let multipartString = "\r\n--\(boundary)\r\nTest"
@@ -76,7 +76,7 @@ class AsyncHTTPResponseChunkSequenceTests: XCTestCase, MockResponseProvider {
     }.to(equal(expectedChunks))
   }
 
-  func test__multipartResponse__givenBeginWith_CRLF_Delimeter_Boundary_shouldParseOut() async throws {
+  func test__multipartResponse__givenBeginWith_CRLF_Delimiter_Boundary_shouldParseOut() async throws {
     let url = URL(string: "http://www.test.com/multipart-single-chunk")!
     let boundary = "-"
     let multipartString = "\r\n\r\n--\(boundary)\r\nTest"
@@ -122,7 +122,7 @@ class AsyncHTTPResponseChunkSequenceTests: XCTestCase, MockResponseProvider {
     }.to(equal(expectedChunks))
   }
 
-  func test__multipartResponse__givenEndWithCloseDelimeterAfterBoundary_shouldParseOutDelimeter() async throws {
+  func test__multipartResponse__givenEndWithCloseDelimiterAfterBoundary_shouldParseOutDelimiter() async throws {
     let url = URL(string: "http://www.test.com/multipart-single-chunk")!
     let boundary = "-"
     let multipartString = "\r\n--\(boundary)\r\nTest\r\n--\(boundary)--"
@@ -145,7 +145,7 @@ class AsyncHTTPResponseChunkSequenceTests: XCTestCase, MockResponseProvider {
     }.to(equal(expectedChunks))
   }
 
-  func test__multipartResponse__givenEndWithCRLF_Boundary_CloseDelimeter_shouldParseOutEnd() async throws {
+  func test__multipartResponse__givenEndWithCRLF_Boundary_CloseDelimiter_shouldParseOutEnd() async throws {
     let url = URL(string: "http://www.test.com/multipart-single-chunk")!
     let boundary = "-"
     let multipartString = "\r\n--\(boundary)\r\nTest\r\n\r\n--\(boundary)--"

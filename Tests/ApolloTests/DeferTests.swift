@@ -633,4 +633,48 @@ final class DeferTests: XCTestCase, MockResponseProvider {
     expect(requestCount).to(equal(2))
   }
 
+  func test__parsing__givenResponse_withDataAfterCloseDelimiter_shouldParseSuccessfully() async throws {
+    await registerRequestHandler(
+      responseData: """
+        
+        --graphql
+        content-type: application/json
+        
+        {
+          "hasNext": true,
+          "data": {
+            "show" : {
+              "__typename": "show",
+              "name": "The Scooby-Doo Show",
+              "characters": [
+                {
+                  "__typename": "Character",
+                  "name": "Scooby-Doo"
+                },
+                {
+                  "__typename": "Character",
+                  "name": "Shaggy Rogers"
+                },
+                {
+                  "__typename": "Character",
+                  "name": "Velma Dinkley"
+                }
+              ]
+            }
+          }
+        }
+        --graphql--
+        
+        """.crlfFormattedData()
+    )
+
+    let results = try await network.send(
+      query: TVShowQuery(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
+
+    expect(results.count).to(equal(1))
+  }
+
 }
