@@ -106,6 +106,8 @@ For example, a custom scalar `GeoPoint` that has a JSON representation of `"100.
 ```swift title="MySchema/CustomScalars/GeoPoint.swift"
 import Foundation
 
+@_spi(Internal) @_spi(Execution) import ApolloAPI
+
 extension MySchema {
     public struct GeoPoint: CustomScalarType, Hashable {
         let x: Float
@@ -146,15 +148,19 @@ When this happens, because you don't know the type that's coming in, you can't s
 This happens most often with JSON, which can return either an array or a dictionary. Here's an example of how you can use an enum to allow dynamic-but-limited types to parse (with `CustomJSON` as a placeholder type name`):
 
 ```swift title="MySchema/CustomScalars/CustomJSON.swift"
+import Foundation
+
+@_spi(Internal) @_spi(Execution) import ApolloAPI
+
 extension MySchema {
     public enum CustomJSON: CustomScalarType, Hashable {
-        case dictionary([String: AnyHashable])
-        case array([AnyHashable])
+        case dictionary([String: JSONValue])
+        case array([JSONValue])
 
         public init(_jsonValue value: JSONValue) throws {
-            if let dict = value as? [String: AnyHashable] {
+            if let dict = value as? [String: JSONValue] {
                 self = .dictionary(dict)
-            } else if let array = value as? [AnyHashable] {
+            } else if let array = value as? [JSONValue] {
                 self = .array(array)
             } else {
                 throw JSONDecodingError.couldNotConvert(value: value, to: CustomJSON.self)
@@ -163,14 +169,14 @@ extension MySchema {
 
         public var _jsonValue: JSONValue {
             switch self {
-            case let .dictionary(json as AnyHashable),
-                 let .array(json as AnyHashable):
+            case let .dictionary(json as JSONValue),
+                 let .array(json as JSONValue):
                 return json
             }
         }
 
         public static func == (lhs: CustomJSON, rhs: CustomJSON) -> Bool {
-            lhs._jsonValue == rhs._jsonValue
+            AnyHashable(lhs._jsonValue) == AnyHashable(rhs._jsonValue)
         }
 
         public func hash(into hasher: inout Hasher) {
