@@ -69,6 +69,61 @@ final class ApolloClientOperationTests: XCTestCase {
     ] as JSONValue
   ]
 
+  // MARK: - Cancellation Tests
+
+  func test__fetch__givenSingleResponse_cancelledBeforeResultReturned_throwsCancellationError() async throws {
+    let query = MockQuery<MockSelectionSet>()
+
+    let task = Task { [client] in
+      try await client.fetch(query: query, cachePolicy: .networkOnly)
+    }
+
+    task.cancel()
+
+    switch await task.result {
+      case .success:
+      XCTFail("Expected task to fail with a CancellationError")
+    case .failure(let error):
+      XCTAssertTrue(error is CancellationError)
+    }
+  }
+
+  func test__performMutation__givenSingleResponse_cancelledBeforeResultReturned_throwsCancellationError() async throws {
+    let mutation = MockMutation<MockSelectionSet>()
+
+    let task = Task { [client] in
+      try await client?.perform(mutation: mutation)
+    }
+
+    task.cancel()
+
+    switch await task.result {
+      case .success:
+      XCTFail("Expected task to fail with a CancellationError")
+    case .failure(let error):
+      XCTAssertTrue(error is CancellationError)
+    }
+  }
+
+  func test__upload__givenSingleResponse_cancelledBeforeResultReturned_throwsCancellationError() async throws {
+    let query = MockQuery<MockSelectionSet>()
+
+    let task = Task { [client] in
+      try await client.upload(operation: query, files: [])
+    }
+
+    task.cancel()
+
+    switch await task.result {
+      case .success:
+      XCTFail("Expected task to fail with a CancellationError")
+    case .failure(let error):
+      XCTAssertTrue(error is CancellationError)
+    }
+  }
+
+  // MARK: - Mutation Tests
+
   func test__performMutation_givenPublishResultToStore_true_publishResultsToStore() async throws {
     let mutation = MockMutation<GivenSelectionSet>()
 

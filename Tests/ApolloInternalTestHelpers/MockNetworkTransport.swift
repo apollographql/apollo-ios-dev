@@ -2,7 +2,7 @@
 import ApolloAPI
 import Foundation
 
-public final class MockNetworkTransport: NetworkTransport {
+public final class MockNetworkTransport: NetworkTransport, UploadingNetworkTransport {
   public let mockServer: MockGraphQLServer
   public let requestChainTransport: RequestChainNetworkTransport
 
@@ -44,6 +44,17 @@ public final class MockNetworkTransport: NetworkTransport {
     )
   }
 
+  public func upload<Operation>(
+    operation: Operation,
+    files: [GraphQLFile],
+    requestConfiguration: RequestConfiguration
+  ) throws -> AsyncThrowingStream<GraphQLResponse<Operation>, any Error> where Operation: GraphQLOperation {
+    try requestChainTransport.upload(
+      operation: operation,
+      files: files,
+      requestConfiguration: requestConfiguration
+    )
+  }
 
   private struct MockInterceptorProvider: InterceptorProvider {
     func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any GraphQLInterceptor] {
@@ -122,4 +133,3 @@ public struct MockAsyncChunkSequence: AsyncChunkSequence {
     return (Self.init(underlying: s), c)
   }
 }
-

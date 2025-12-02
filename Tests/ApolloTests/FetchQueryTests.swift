@@ -36,6 +36,8 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
     try super.tearDownWithError()
   }
 
+  // MARK: - Cache Policy Tests
+
   func test__fetch__givenCachePolicy_networkOnly_onlyHitsNetwork() async throws {
     class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] {
