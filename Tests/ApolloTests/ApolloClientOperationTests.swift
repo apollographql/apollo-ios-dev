@@ -92,7 +92,7 @@ final class ApolloClientOperationTests: XCTestCase {
     let mutation = MockMutation<MockSelectionSet>()
 
     let task = Task { [client] in
-      try await client?.perform(mutation: mutation)
+      try await client.perform(mutation: mutation)
     }
 
     task.cancel()
