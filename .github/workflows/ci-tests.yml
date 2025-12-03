@@ -5,7 +5,8 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  XCODE_VERSION: "26.0"
+  MACOS_VERSION: "macos-26"
+  XCODE_VERSION: "26.1"
 
 jobs:
   changes:
@@ -41,7 +42,7 @@ jobs:
               - '.mise.toml'
 
   tuist-generation:
-    runs-on: macos-26
+    runs-on: ${{ env.MACOS_VERSION }}
     needs: [changes]
     if: ${{ needs.changes.outputs.ios == 'true' || needs.changes.outputs.codegen  == 'true' || needs.changes.outputs.pagination  == 'true' || needs.changes.outputs.tuist == 'true' }}
     timeout-minutes: 8
@@ -64,7 +65,7 @@ jobs:
         key: ${{ github.run_id }}-dependencies
 
   run-swift-builds:
-    runs-on: macos-26
+    runs-on: ${{ env.MACOS_VERSION }}
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -86,7 +87,7 @@ jobs:
         cd ${{ matrix.package }} && swift build
 
   build-and-unit-test:
-    runs-on: macos-26
+    runs-on: ${{ env.MACOS_VERSION }}
     needs: [tuist-generation, changes]
     timeout-minutes: 20
     strategy:
@@ -179,7 +180,7 @@ jobs:
         path: |
           TestResults/ResultBundle.zip
   run-codegen-test-configurations:
-    runs-on: macos-26
+    runs-on: ${{ env.MACOS_VERSION }}
     timeout-minutes: 20
     name: Codegen Test Configurations - macOS
     steps:
@@ -194,7 +195,7 @@ jobs:
         ./scripts/run-test-codegen-configurations.sh -t
 
   verify-frontend-bundle-latest:
-    runs-on: macos-26
+    runs-on: ${{ env.MACOS_VERSION }}
     needs: [changes]
     if: ${{ needs.changes.outputs.codegen  == 'true' }}
     timeout-minutes: 5
@@ -212,7 +213,7 @@ jobs:
         git diff --exit-code
 
   verify-cli-binary-archive:
-    runs-on: macos-26
+    runs-on: ${{ env.MACOS_VERSION }}
     needs: [changes]
     if: ${{ needs.changes.outputs.codegen  == 'true' }}
     timeout-minutes: 5
