@@ -7,16 +7,6 @@ actor AsyncReadWriteLock {
     case writing
   }
 
-  private final class ReadTask: Sendable {
-    let task: Task<Void, any Swift.Error>
-
-    init(_ body: @Sendable @escaping () async throws -> Void) {
-      task = Task {
-        try await body()
-      }
-    }
-  }
-
   private var state: State = .idle
   private var queue: Queue = Queue()
   private var runningReadCount: UInt = 0
