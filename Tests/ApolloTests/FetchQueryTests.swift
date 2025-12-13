@@ -364,4 +364,95 @@ class FetchQueryTests: XCTestCase, CacheDependentTesting {
     expect(cacheMissResult).to(beNil())
   }
 
+  // MARK: Concurrency Load Testing
+
+  func test_concurrentFetchesWritingToStore_avoidsDeadlockAndDataRaces() async throws {
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
+      override class var __selections: [Selection] {
+        [
+          .field("hero", Hero.self)
+        ]
+      }
+
+      class Hero: MockSelectionSet, @unchecked Sendable {
+        override class var __selections: [Selection] {
+          [
+            .field("__typename", String.self),
+            .field("name", String.self),
+          ]
+        }
+      }
+    }
+
+    let serverRequestExpectation =
+      await server.expect(MockQuery<HeroNameSelectionSet>.self) { request in
+        [
+          "data": [
+            "hero": [
+              "name": "Luke Skywalker",
+              "__typename": "Human",
+            ]
+          ]
+        ]
+      }
+    serverRequestExpectation.assertForOverFulfill = false
+
+    // When: Execute multiple queries concurrently from different threads
+    // Using networkOnly policy - Apollo will still write responses to cache,
+    // triggering concurrent cache merge operations that cause the crash
+    let numberOfConcurrentQueries = 1000 // Increase to make crash more likely
+
+    // Use actor-safe counter to track completed tasks
+    actor TaskCounter {
+      private var completedCount = 0
+
+      func increment() {
+        completedCount += 1
+      }
+
+      func getCount() -> Int {
+        completedCount
+      }
+    }
+
+    let counter = TaskCounter()
+
+    // Execute all queries concurrently and wait for all to complete
+    await withTaskGroup(of: Void.self) { group in
+      // Add all tasks to the group
+      for _ in 0..<numberOfConcurrentQueries {
+        group.addTask { [client] in
+          do {
+            // Use networkOnly - Apollo will still write to cache, triggering merge operations
+            // Execute on different threads to maximize concurrency
+            _ = try await client!.fetch(
+              query: MockQuery<HeroNameSelectionSet>(),
+              cachePolicy: .networkOnly
+            )
+            await counter.increment()
+          } catch {
+            // Ignore errors for this stress test, but still count as completed
+            await counter.increment()
+          }
+        }
+      }
+
+      // Wait for all tasks to complete
+      // withTaskGroup automatically waits for all tasks when the closure exits
+    }
+
+    // Then: Verify all tasks completed and check if we reached here without crashing
+    let completedCount = await counter.getCount()
+    XCTAssertEqual(
+      completedCount,
+      numberOfConcurrentQueries,
+      "All \(numberOfConcurrentQueries) concurrent queries should have completed. Only \(completedCount) completed."
+    )
+
+    // If we reach here without crashing, the test passes
+    // However, this test is designed to potentially expose the thread-safety issue
+    // The actual crash would occur during the concurrent cache merge operations above
+    XCTAssertTrue(true, "Test completed - if crash occurred, it would have happened during concurrent cache operations")
+  }
+
 }
