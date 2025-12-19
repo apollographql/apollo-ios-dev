@@ -120,7 +120,6 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
       if let urlForGet = transformer.createGetURL() {
         request.url = urlForGet
         request.httpMethod = GraphQLHTTPMethod.GET.rawValue
-        request.cachePolicy = requestCachePolicy
 
         // GET requests shouldn't have a content-type since they do not provide actual content.
         request.allHTTPHeaderFields?.removeValue(forKey: "Content-Type")
@@ -172,22 +171,6 @@ public struct JSONRequest<Operation: GraphQLOperation>: GraphQLRequest, AutoPers
     )
 
     return body
-  }
-
-  /// Convert the Apollo iOS fetch behavior into a matching cache policy for URLRequest.
-  private var requestCachePolicy: URLRequest.CachePolicy {
-    switch fetchBehavior {
-      case .CacheFirst:
-        return .returnCacheDataElseLoad
-      case .CacheAndNetwork:
-        return .returnCacheDataElseLoad
-      case .CacheOnly:
-        return .returnCacheDataDontLoad
-      case .NetworkOnly:
-        return .reloadIgnoringLocalCacheData
-      default:
-        return .useProtocolCachePolicy
-    }
   }
 
   // MARK: - Equtable/Hashable Conformance
