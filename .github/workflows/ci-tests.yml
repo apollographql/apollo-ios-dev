@@ -128,6 +128,10 @@ jobs:
         xcode-version: ${{ env.XCODE_VERSION }}
     - name: Checkout Repo
       uses: actions/checkout@v3
+    - name: Switch to Node v22
+      uses: actions/setup-node@v6
+      with:
+        node-version: 22
     - name: Retrieve Build Cache
       uses: actions/cache@v3
       with:
@@ -145,7 +149,7 @@ jobs:
         destination: ${{ matrix.destination }}
         scheme: ${{ matrix.scheme }}
         test-plan: ${{ matrix.test-plan }}
-    - name: Run-JS-Tests
+    - name: Run JS Tests
       if: ${{ matrix.run-js-tests == true }}
       shell: bash
       working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript/
@@ -202,6 +206,10 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v3
+    - name: Switch to Node v22
+      uses: actions/setup-node@v6
+      with:
+        node-version: 22
     - name: Build JS Bundle
       shell: bash
       working-directory: apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript
