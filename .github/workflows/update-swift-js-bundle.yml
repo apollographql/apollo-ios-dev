@@ -21,6 +21,10 @@ jobs:
       uses: actions/checkout@v4
       with:
         ref: ${{ env.BRANCH_NAME }}
+    - name: Switch to Node v22
+      uses: actions/setup-node@v6
+      with:
+        node-version: 22
     - name: Setup SSH Keys
       uses: webfactory/ssh-agent@v0.7.0
       with:
