@@ -10,8 +10,8 @@
     "test": "jest"
   },
   "engines": {
-    "node": "^22",
-    "npm": "^10"
+    "node": "^22.21.1",
+    "npm": "^10.9.4"
   },
   "dependencies": {
     "graphql": "17.0.0-alpha.9",
