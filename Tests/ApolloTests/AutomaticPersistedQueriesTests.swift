@@ -423,13 +423,14 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
     )
   }
 
-  func testQueryStringForAPQsUseGetMethod() async throws {
+  func testAPQsRespectQueriesMethod_GetWhenTrue() async throws {
     let network = RequestChainNetworkTransport(
       urlSession: mockSession,
       interceptorProvider: DefaultInterceptorProvider.shared,
       store: store,
       endpointURL: Self.endpoint,
-      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true)
+      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true),
+      useGETForQueries: true
     )
 
     let query = MockHeroNameQuery()
@@ -447,7 +448,9 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
     ).getAllValues()
 
     let request = try XCTUnwrap(lastRequest, "last request should not be nil")
+
     XCTAssertEqual(request.url?.host, network.endpointURL.host)
+    XCTAssertEqual(request.httpMethod, "GET")
 
     try self.validateUrlParams(
       with: request,
@@ -456,13 +459,50 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
     )
   }
 
-  func testQueryStringForAPQsUseGetMethodWithVariable() async throws {
+  func testAPQsRespectQueriesMethod_PostWhenFalse() async throws {
     let network = RequestChainNetworkTransport(
       urlSession: mockSession,
       interceptorProvider: DefaultInterceptorProvider.shared,
       store: store,
       endpointURL: Self.endpoint,
-      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true)
+      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true),
+      useGETForQueries: false
+    )
+
+    let query = MockHeroNameQuery()
+    nonisolated(unsafe) var lastRequest: URLRequest?
+
+    await Self.registerRequestHandler(for: Self.endpoint) {
+      lastRequest = $0
+      return (HTTPURLResponse.mock(), Self.mockResponseData())
+    }
+
+    _ = try await network.send(
+      query: query,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
+
+    let request = try XCTUnwrap(lastRequest, "last request should not be nil")
+
+    XCTAssertEqual(request.url?.host, network.endpointURL.host)
+    XCTAssertEqual(request.httpMethod, "POST")
+
+    try self.validatePostBody(
+      with: request,
+      operation: query,
+      persistedQuery: true
+    )
+  }
+
+  func testAPQsRespectQueriesMethod_GetWhenTrue_withVariable() async throws {
+    let network = RequestChainNetworkTransport(
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
+      endpointURL: Self.endpoint,
+      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true),
+      useGETForQueries: true
     )
 
     let query = MockHeroNameQuery(episode: .some(.EMPIRE))
@@ -635,42 +675,6 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
     )
   }
 
-  func testNotUseGETForQueriesAPQsGETRequest() async throws {
-    let network = RequestChainNetworkTransport(
-      urlSession: mockSession,
-      interceptorProvider: DefaultInterceptorProvider.shared,
-      store: store,
-      endpointURL: Self.endpoint,
-      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true),
-      useGETForQueries: false
-    )
-
-    let query = MockHeroNameQuery(episode: .some(.EMPIRE))
-    nonisolated(unsafe) var lastRequest: URLRequest?
-
-    await Self.registerRequestHandler(for: Self.endpoint) {
-      lastRequest = $0
-      return (HTTPURLResponse.mock(), Self.mockResponseData())
-    }
-
-    _ = try await network.send(
-      query: query,
-      fetchBehavior: .NetworkOnly,
-      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
-    ).getAllValues()
-
-    let request = try XCTUnwrap(lastRequest, "last request should not be nil")
-
-    XCTAssertEqual(request.url?.host, network.endpointURL.host)
-    XCTAssertEqual(request.httpMethod, "GET")
-
-    try self.validateUrlParams(
-      with: request,
-      query: query,
-      persistedQuery: true
-    )
-  }
-
   // MARK: Persisted Query Retrying Tests
 
   func
@@ -729,6 +733,138 @@ class AutomaticPersistedQueriesTests: XCTestCase, MockResponseProvider {
     try self.validatePostBody(
       with: requests[1],
       operation: query,
+      queryDocument: true,
+      persistedQuery: true
+    )
+  }
+
+  func
+    test__retryPersistedQuery__givenGetForRetry_false_retriesWithPOSTRequest()
+    async throws
+  {
+    // given
+    let network = RequestChainNetworkTransport(
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
+      endpointURL: Self.endpoint,
+      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: false),
+      useGETForQueries: true
+    )
+
+    let query = MockHeroNameQuery(episode: .some(.EMPIRE))
+
+    nonisolated(unsafe) var requests: [URLRequest] = []
+
+    await Self.registerRequestHandler(for: Self.endpoint) { request in
+      requests.append(request)
+
+      let response = HTTPURLResponse(
+        url: TestURL.mockServer.url,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: nil
+      )!
+      if requests.count == 1 {
+        let data = try JSONSerialization.data(
+          withJSONObject: ["errors": [["message": "PersistedQueryNotFound"]]]
+        )
+        return (response, data)
+      } else {
+        return (response, Self.mockResponseData())
+      }
+    }
+
+    // when
+    _ = try await network.send(
+      query: query,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
+
+    // then
+    expect(requests.count).to(equal(2))
+
+    expect(requests[0].httpMethod).to(equal("GET"))
+
+    try self.validateUrlParams(
+      with: requests[0],
+      query: query,
+      queryDocument: false,
+      persistedQuery: true
+    )
+
+    expect(requests[1].httpMethod).to(equal("POST"))
+
+    try self.validatePostBody(
+      with: requests[1],
+      operation: query,
+      queryDocument: true,
+      persistedQuery: true
+    )
+  }
+
+  func
+    test__retryPersistedQuery__givenGetForRetry_true_retriesWithGETRequest()
+    async throws
+  {
+    // given
+    let network = RequestChainNetworkTransport(
+      urlSession: mockSession,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: store,
+      endpointURL: Self.endpoint,
+      apqConfig: .init(autoPersistQueries: true, useGETForPersistedQueryRetry: true),
+      useGETForQueries: true
+    )
+
+    let query = MockHeroNameQuery(episode: .some(.EMPIRE))
+
+    nonisolated(unsafe) var requests: [URLRequest] = []
+
+    await Self.registerRequestHandler(for: Self.endpoint) { request in
+      requests.append(request)
+
+      let response = HTTPURLResponse(
+        url: TestURL.mockServer.url,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: nil
+      )!
+      if requests.count == 1 {
+        let data = try JSONSerialization.data(
+          withJSONObject: ["errors": [["message": "PersistedQueryNotFound"]]]
+        )
+        return (response, data)
+      } else {
+        return (response, Self.mockResponseData())
+      }
+    }
+
+    // when
+    _ = try await network.send(
+      query: query,
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
+
+    // then
+    expect(requests.count).to(equal(2))
+
+    expect(requests[0].httpMethod).to(equal("GET"))
+
+    try self.validateUrlParams(
+      with: requests[0],
+      query: query,
+      queryDocument: false,
+      persistedQuery: true
+    )
+
+    expect(requests[1].httpMethod).to(equal("GET"))
+
+    try self.validateUrlParams(
+      with: requests[1],
+      query: query,
       queryDocument: true,
       persistedQuery: true
     )
