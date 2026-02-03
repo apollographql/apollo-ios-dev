@@ -10,13 +10,71 @@ public actor WebSocketTransport: SubscriptionNetworkTransport {
     case notImplemented
   }
 
-  private var connection: WebSocketConnection?
+  struct Constants {
+//    static let headerWSUpgradeName     = "Upgrade"
+//    static let headerWSUpgradeValue    = "websocket"
+//    static let headerWSHostName        = "Host"
+//    static let headerWSConnectionName  = "Connection"
+//    static let headerWSConnectionValue = "Upgrade"
+    static let headerWSProtocolName    = "Sec-WebSocket-Protocol"
+//    static let headerWSVersionName     = "Sec-WebSocket-Version"
+//    static let headerWSVersionValue    = "13"
+//    static let headerWSExtensionName   = "Sec-WebSocket-Extensions"
+//    static let headerWSKeyName         = "Sec-WebSocket-Key"
+    static let headerOriginName        = "Origin"
+//    static let headerWSAcceptName      = "Sec-WebSocket-Accept"
+//    static let BUFFER_MAX              = 4096
+//    static let FinMask: UInt8          = 0x80
+//    static let OpCodeMask: UInt8       = 0x0F
+//    static let RSVMask: UInt8          = 0x70
+//    static let RSV1Mask: UInt8         = 0x40
+//    static let MaskMask: UInt8         = 0x80
+//    static let PayloadLenMask: UInt8   = 0x7F
+//    static let MaxFrameSize: Int       = 32
+//    static let httpSwitchProtocolCode  = 101
+//    static let supportedSSLSchemes     = ["wss", "https"]
+//    static let WebsocketDisconnectionErrorKeyName = "WebsocketDisconnectionErrorKeyName"
+//
+//    struct Notifications {
+//      static let WebsocketDidConnect = "WebsocketDidConnectNotification"
+//      static let WebsocketDidDisconnect = "WebsocketDidDisconnectNotification"
+//    }
+  }
 
   public let session: WebSocketURLSession
 
-  public init(session: WebSocketURLSession) {
+  private let request: URLRequest
+
+  private var connection: WebSocketConnection?
+
+  public init(
+    url: URL,
+    session: WebSocketURLSession,
+    protocol: WebSocketProtocol
+  ) {
     self.session = session
-//    self.connection = WebSocketConnection()
+    self.request = Self.makeRequest(url: url, protocol: `protocol`)
+    self.connection = WebSocketConnection(task: session.webSocketTask(with: request))
+  }
+
+  private static func makeRequest(
+    url: URL,
+    protocol: WebSocketProtocol
+  ) -> URLRequest {
+    var request = URLRequest(url: url)
+
+    if request.value(forHTTPHeaderField: Constants.headerOriginName) == nil {
+      var origin = url.absoluteString
+      if let hostUrl = URL (string: "/", relativeTo: url) {
+        origin = hostUrl.absoluteString
+        origin.remove(at: origin.index(before: origin.endIndex))
+      }
+      request.setValue(origin, forHTTPHeaderField: Constants.headerOriginName)
+    }
+
+    request.setValue(`protocol`.description, forHTTPHeaderField: Constants.headerWSProtocolName)
+
+    return request
   }
 
   nonisolated public func send<Subscription: GraphQLSubscription>(
