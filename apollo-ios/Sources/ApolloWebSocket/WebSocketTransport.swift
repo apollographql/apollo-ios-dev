@@ -41,31 +41,35 @@ public actor WebSocketTransport: SubscriptionNetworkTransport {
 //    }
   }
 
-  public let session: WebSocketURLSession
+  public let urlSession: WebSocketURLSession
+
+  public let store: ApolloStore
 
   private let request: URLRequest
 
   private var connection: WebSocketConnection?
 
   public init(
-    url: URL,
-    session: WebSocketURLSession,
+    urlSession: WebSocketURLSession,
+    store: ApolloStore,
+    endpointURL: URL,
     protocol: WebSocketProtocol
   ) {
-    self.session = session
-    self.request = Self.makeRequest(url: url, protocol: `protocol`)
-    self.connection = WebSocketConnection(task: session.webSocketTask(with: request))
+    self.urlSession = urlSession
+    self.store = store
+    self.request = Self.makeRequest(endpointURL: endpointURL, protocol: `protocol`)
+    self.connection = WebSocketConnection(task: urlSession.webSocketTask(with: request))
   }
 
   private static func makeRequest(
-    url: URL,
+    endpointURL: URL,
     protocol: WebSocketProtocol
   ) -> URLRequest {
-    var request = URLRequest(url: url)
+    var request = URLRequest(url:     endpointURL)
 
     if request.value(forHTTPHeaderField: Constants.headerOriginName) == nil {
-      var origin = url.absoluteString
-      if let hostUrl = URL (string: "/", relativeTo: url) {
+      var origin =     endpointURL.absoluteString
+      if let hostUrl = URL (string: "/", relativeTo:     endpointURL) {
         origin = hostUrl.absoluteString
         origin.remove(at: origin.index(before: origin.endIndex))
       }
