@@ -2,13 +2,6 @@ import Foundation
 
 final class WebSocketConnection: Sendable {
 
-  //  enum State {
-  //    case notStarted
-  //    case connecting
-  //    case connected
-  //    case disconnected
-  //  }
-
   //  private unowned let transport: WebSocketTransport
   private let webSocketTask: URLSessionWebSocketTask
 
@@ -20,7 +13,7 @@ final class WebSocketConnection: Sendable {
     self.webSocketTask.cancel(with: .goingAway, reason: nil)
   }
 
-  func openConnection() async throws -> AsyncThrowingStream<URLSessionWebSocketTask.Message, any Swift.Error> {
+  func openConnection() -> AsyncThrowingStream<URLSessionWebSocketTask.Message, any Swift.Error> {
     webSocketTask.resume()
     return AsyncThrowingStream { [weak self] in
       guard let self else { return nil }

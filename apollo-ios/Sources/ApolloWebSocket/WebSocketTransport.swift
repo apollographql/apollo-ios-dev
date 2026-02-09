@@ -13,7 +13,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   struct Constants {
     //    static let headerWSUpgradeName     = "Upgrade"
     //    static let headerWSUpgradeValue    = "websocket"
-    //    static let headerWSHostName        = "Host"
+    //    static let headerWSHostName        = "Host"
     //    static let headerWSConnectionName  = "Connection"
     //    static let headerWSConnectionValue = "Upgrade"
     static let headerWSProtocolName = "Sec-WebSocket-Protocol"
@@ -41,13 +41,22 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     //    }
   }
 
+  enum ConnectionState {
+    case notStarted
+    case connecting
+    case connected
+    case disconnected
+  }
+
   public let urlSession: WebSocketURLSession
 
   public let store: ApolloStore
 
   private let request: URLRequest
 
-  private var connection: WebSocketConnection?
+  private var connection: WebSocketConnection
+
+  private var connectionState: ConnectionState = .notStarted
 
   public init(
     urlSession: WebSocketURLSession,
@@ -57,11 +66,11 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   ) {
     self.urlSession = urlSession
     self.store = store
-    self.request = Self.makeRequest(endpointURL: endpointURL, protocol: `protocol`)
+    self.request = Self.createURLRequest(endpointURL: endpointURL, protocol: `protocol`)
     self.connection = WebSocketConnection(task: urlSession.webSocketTask(with: request))
   }
 
-  private static func makeRequest(
+  private static func createURLRequest(
     endpointURL: URL,
     protocol: WebSocketProtocol
   ) -> URLRequest {
@@ -80,6 +89,34 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
 
     return request
   }
+
+  // MARK: - Connection Management
+
+  private func startWebSocketConnection() async throws {
+    guard case .notStarted = self.connectionState else {
+      return
+    }
+    self.connectionState = .connecting
+
+    do {
+      let connectionStream = self.connection.openConnection()
+
+      for try await message in connectionStream {
+        didReceive(message: message)
+      }
+
+    } catch {
+      self.connectionState = .disconnected
+    }
+  }
+
+  // MARK: - Processing Messages
+
+  private func didReceive(message: URLSessionWebSocketTask.Message) {
+    self.connectionState = .connected
+  }
+
+  // MARK: - Network Transport Protocol Conformance
 
   nonisolated public func send<Subscription: GraphQLSubscription>(
     subscription: Subscription,
