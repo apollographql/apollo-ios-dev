@@ -1,5 +1,6 @@
-import Apollo
-import ApolloAPI
+@_spi(Internal) import Apollo
+@_spi(Internal) import ApolloAPI
+import Foundation
 
 extension WebSocketTransport {
   typealias OperationID = Int
@@ -105,25 +106,77 @@ extension WebSocketTransport {
     let query: String
     let variables: GraphQLOperation.Variables?
     let extensions: JSONObject?
+
+    var jsonPayload: JSONObject {
+      var payload: JSONObject = [
+        "query": query
+      ]
+
+      if let operationName {
+        payload["operationName"] = operationName
+      }
+
+      if let variables {
+        payload["variables"] = variables._jsonEncodableObject._jsonValue
+      }
+
+      if let extensions {
+        payload["extensions"] = extensions as JSONValue
+      }
+      return payload
+    }
   }
 
 }
 
-// MARK: - Message Type Values
+// MARK: - Message Serialization
 
 extension WebSocketTransport.Message.Outgoing {
-  var type: String {
+
+  // For best performance, raw strings for messages are inlined. This avoids needing to serialize more JSON than is
+  // absolutely necessary (for arbitrary payloads).
+  func toWebSocketMessage() throws -> URLSessionWebSocketTask.Message {
+    var data: Data
     switch self {
-    case .connectionInit: return "connection_init"
-    case .ping: return "ping"
-    case .pong: return "pong"
-    case .subscribe: return "subscribe"
+    case .connectionInit(let payload):
+      data = Data(#"{"type":"connection_init""#.utf8)
+      if let payload {
+        data.append(contentsOf: #","payload":"#.utf8)
+        data.append(try JSONSerializationFormat.serialize(value: payload))
+      }
+      data.append(UInt8(ascii: "}"))
+
+    case .ping(let payload):
+      data = Data(#"{"type":"ping""#.utf8)
+      if let payload {
+        data.append(contentsOf: #","payload":"#.utf8)
+        data.append(try JSONSerializationFormat.serialize(value: payload))
+      }
+      data.append(UInt8(ascii: "}"))
+
+    case .pong(let payload):
+      data = Data(#"{"type":"pong""#.utf8)
+      if let payload {
+        data.append(contentsOf: #","payload":"#.utf8)
+        data.append(try JSONSerializationFormat.serialize(value: payload))
+      }
+      data.append(UInt8(ascii: "}"))
+
+    case .subscribe(let id, let payload):
+      data = Data(#"{"type":"subscribe","id":""#.utf8)
+      data.append(contentsOf: "\(id)".utf8)
+      data.append(contentsOf: #"","payload":"#.utf8)
+      data.append(try JSONSerializationFormat.serialize(value: payload.jsonPayload))
+      data.append(UInt8(ascii: "}"))
     }
+
+    return .data(data)
   }
+
 }
 
 extension WebSocketTransport.Message.Incoming {
-  var type: String {
+  var type: StaticString {
     switch self {
     case .connectionAck: return "connection_ack"
     case .ping: return "ping"
