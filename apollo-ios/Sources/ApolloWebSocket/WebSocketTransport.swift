@@ -5,10 +5,9 @@ import Foundation
 public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport {
 
   public enum Error: Swift.Error {
-    /// WebSocketTransport has not yet been implemented for Apollo iOS 2.0. This will be implemented in a future
-    /// release.
-    case notImplemented
-    case invalidURL(url: URL)
+    /// WebSocketTransport has not yet been implemented for Apollo iOS 2.0.
+    /// This will be implemented in a future release.
+    case notImplemented    
   }
 
   struct Constants {

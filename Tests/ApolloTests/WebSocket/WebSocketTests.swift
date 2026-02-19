@@ -1,8 +1,8 @@
 import XCTest
 import Nimble
-import Apollo
-import ApolloAPI
-import ApolloInternalTestHelpers
+@testable import Apollo
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 @testable import ApolloWebSocket
 
 #warning("Rewrite when websocket is implemented")
@@ -14,90 +14,85 @@ import ApolloInternalTestHelpers
 //    }
 //  }
 //}
-//
-//class WebSocketTests: XCTestCase {
-//  var networkTransport: WebSocketTransport!
-//  var client: ApolloClient!
-//  var websocket: MockWebSocket!
-//  
+
+class WebSocketTests: XCTestCase, MockResponseProvider {
+  var networkTransport: WebSocketTransport!
+  var client: ApolloClient!
+  var session: MockURLSession!
+
+  static let endpointURL = TestURL.mockWebSocket.url
+
 //  struct CustomOperationMessageIdCreator: OperationMessageIdCreator {
 //    func requestId() -> String {
 //      return "12345678"
 //    }
 //  }
 //
-//  class ReviewAddedData: MockSelectionSet {
-//    override class var __selections: [Selection] { [
-//      .field("reviewAdded", ReviewAdded.self),
-//    ]}
-//
-//    class ReviewAdded: MockSelectionSet {
-//      override class var __selections: [Selection] { [
-//        .field("__typename", String.self),
-//        .field("stars", Int.self),
-//        .field("commentary", String?.self),
-//      ] }
-//    }
-//  }
-//  
-//  override func setUp() {
-//    super.setUp()
-//
-//    let store = ApolloStore.mock()
-//    let websocket = MockWebSocket(
-//      request:URLRequest(url: TestURL.mockServer.url),
-//      protocol: .graphql_ws
-//    )
-//    networkTransport = WebSocketTransport(websocket: websocket, store: store)
-//    client = ApolloClient(networkTransport: networkTransport!, store: store)
-//  }
-//    
-//  override func tearDown() {
-//    networkTransport = nil
-//    client = nil
-//    websocket = nil
-//    
-//    super.tearDown()
-//  }
-//    
-//  func testLocalSingleSubscription() throws {
-//    let expectation = self.expectation(description: "Single subscription")
-//    
-//    let subject = client.subscribe(
-//      subscription: MockSubscription<ReviewAddedData>()
-//    ) { result in
-//      defer { expectation.fulfill() }
-//      switch result {
-//      case .success(let graphQLResult):
-//        expect(graphQLResult.data?.reviewAdded?.stars).to(equal(5))
-//
-//      case .failure(let error):
-//        XCTFail("Unexpected error: \(error)")
-//      }
-//    }
-//        
-//    let message : JSONEncodableDictionary = [
-//      "type": "data",
-//      "id": "1",
-//      "payload": [
-//        "data": [
-//          "reviewAdded": [
-//            "__typename": "ReviewAdded",
-//            "episode": "JEDI",
-//            "stars": 5,
-//            "commentary": "A great movie"
-//          ]
-//        ]
-//      ]
-//    ]
-//        
+  class ReviewAddedData: MockSelectionSet, @unchecked Sendable {
+    override class var __selections: [Selection] { [
+      .field("reviewAdded", ReviewAdded.self),
+    ]}
+
+    class ReviewAdded: MockSelectionSet, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("__typename", String.self),
+        .field("stars", Int.self),
+        .field("commentary", String?.self),
+      ] }
+    }
+  }
+
+  override func setUpWithError() throws {
+    try super.setUpWithError()
+
+    session = MockURLSession(responseProvider: Self.self)
+    let store = ApolloStore.mock()
+    try networkTransport = WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+  }
+    
+  override func tearDown() async throws {
+    await WebSocketTests.cleanUpRequestHandlers()
+
+    session = nil
+    networkTransport = nil
+    client = nil
+    
+    try await super.tearDown()
+  }
+    
+  func testLocalSingleSubscription() async throws {
+    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+
+    let results = try await subscription.getAllValues()
+
+    expect(results.count).to(equal(1))
+    expect(results[0].data?.reviewAdded?.stars).to(equal(5))
+
+    let message : JSONEncodableDictionary = [
+      "type": "data",
+      "id": "1",
+      "payload": [
+        "data": [
+          "reviewAdded": [
+            "__typename": "ReviewAdded",
+            "episode": "JEDI",
+            "stars": 5,
+            "commentary": "A great movie"
+          ]
+        ]
+      ]
+    ]
+        
 //    networkTransport.write(message: message)
-//        
-//    waitForExpectations(timeout: 5, handler: nil)
+  }
+  #warning("test client side and server side cancellation of subscription")
 //
-//    subject.cancel()
-//  }
-//  
 //  func testLocalMissingSubscription() throws {
 //    let expectation = self.expectation(description: "Missing subscription")
 //    expectation.isInverted = true
@@ -204,4 +199,4 @@ import ApolloInternalTestHelpers
 //
 //    subject.cancel()
 //  }
-//}
+}
