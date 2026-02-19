@@ -67,29 +67,21 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
     
   func testLocalSingleSubscription() async throws {
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    let mockTask = session.mockWebSocketTask
 
+    // Buffer messages before subscribing — they'll be consumed when the receive loop starts.
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+    mockTask.emit(.string(
+      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","episode":"JEDI","stars":5,"commentary":"A great movie"}}}}"#
+    ))
+    mockTask.finish()
+
+    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
     let results = try await subscription.getAllValues()
 
     expect(results.count).to(equal(1))
     expect(results[0].data?.reviewAdded?.stars).to(equal(5))
-
-    let message : JSONEncodableDictionary = [
-      "type": "data",
-      "id": "1",
-      "payload": [
-        "data": [
-          "reviewAdded": [
-            "__typename": "ReviewAdded",
-            "episode": "JEDI",
-            "stars": 5,
-            "commentary": "A great movie"
-          ]
-        ]
-      ]
-    ]
-        
-//    networkTransport.write(message: message)
+    expect(results[0].data?.reviewAdded?.commentary).to(equal("A great movie"))
   }
   #warning("test client side and server side cancellation of subscription")
 //

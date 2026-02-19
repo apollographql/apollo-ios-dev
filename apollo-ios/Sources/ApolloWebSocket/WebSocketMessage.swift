@@ -186,3 +186,76 @@ extension WebSocketTransport.Message.Incoming {
     }
   }
 }
+
+// MARK: - Message Deserialization
+
+extension WebSocketTransport.Message.Incoming {
+
+  static func from(_ webSocketMessage: URLSessionWebSocketTask.Message) throws -> Self {
+    let data: Data
+    switch webSocketMessage {
+    case .string(let string):
+      data = Data(string.utf8)
+    case .data(let d):
+      data = d
+    @unknown default:
+      throw WebSocketTransport.Error.unrecognizedMessage
+    }
+
+    let json: JSONObject = try JSONSerializationFormat.deserialize(data: data)
+
+    guard let type = json["type"] as? String else {
+      throw WebSocketTransport.Error.unrecognizedMessage
+    }
+
+    switch type {
+    case "connection_ack":
+      return .connectionAck(payload: json["payload"] as? JSONObject)
+
+    case "ping":
+      return .ping(payload: json["payload"] as? JSONObject)
+
+    case "pong":
+      return .pong(payload: json["payload"] as? JSONObject)
+
+    case "next":
+      guard
+        let idValue = json["id"],
+        let id = Self.parseOperationID(idValue)
+      else {
+        throw WebSocketTransport.Error.unrecognizedMessage
+      }
+      guard let payload = json["payload"] as? JSONObject else {
+        throw WebSocketTransport.Error.unrecognizedMessage
+      }
+      return .next(id: id, payload: payload)
+
+    case "error":
+      guard
+        let idValue = json["id"],
+        let id = Self.parseOperationID(idValue)
+      else {
+        throw WebSocketTransport.Error.unrecognizedMessage
+      }
+      let errorObjects = (json["payload"] as? [JSONObject]) ?? []
+      return .error(id: id, payload: errorObjects.map { GraphQLError($0) })
+
+    default:
+      throw WebSocketTransport.Error.unrecognizedMessage
+    }
+  }
+
+  /// Parses an operation ID from a JSON value.
+  ///
+  /// The `graphql-transport-ws` protocol transmits IDs as strings, but our internal representation
+  /// uses `Int`. This handles both string and numeric JSON values.
+  private static func parseOperationID(_ value: Any) -> WebSocketTransport.OperationID? {
+    if let stringID = value as? String {
+      return Int(stringID)
+    }
+    if let intID = value as? Int {
+      return intID
+    }
+    return nil
+  }
+}
