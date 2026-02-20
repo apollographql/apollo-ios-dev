@@ -41,7 +41,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
       ] }
     }
   }
-  
+
   override func setUpWithError() throws {
     try super.setUpWithError()
 
@@ -283,19 +283,6 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   #warning("test client side and server side cancellation of subscription")
-//
-//  func testLocalMissingSubscription() throws {
-//    let expectation = self.expectation(description: "Missing subscription")
-//    expectation.isInverted = true
-//
-//    let subject = client.subscribe(subscription: MockSubscription<ReviewAddedData>()) { _ in
-//      expectation.fulfill()
-//    }
-//    
-//    waitForExpectations(timeout: 2, handler: nil)
-//
-//    subject.cancel()
-//  }
 //  
 //  func testLocalErrorMissingId() throws {
 //    let expectation = self.expectation(description: "Missing id for subscription")

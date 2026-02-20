@@ -14,7 +14,7 @@ public enum TestURL {
     case .mockPort8080:
       urlString = "http://localhost:8080/graphql"
     case .mockWebSocket:
-      urlString = "ws://localhost:8080/subscriptions"
+      urlString = "wss://localhost:8080/subscriptions"
     }
     
     return URL(string: urlString)!
