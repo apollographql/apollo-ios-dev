@@ -145,6 +145,10 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
         _ = errors
         _ = id
 
+      case .complete(let id):
+        subscribers[id]?.finish()
+        subscribers.removeValue(forKey: id)
+
       case .ping, .pong:
         break
       }
