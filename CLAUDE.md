@@ -2,6 +2,26 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Distributed Context Convention
+
+Context is distributed across multiple files rather than kept in one large root file. Claude Code auto-discovers CLAUDE.md files by walking up from the working directory, but the `claude/` directory requires explicit reads.
+
+**IMPORTANT — Before working in a subtree directory (`apollo-ios/`, `apollo-ios-codegen/`, or `apollo-ios-pagination/`) or any nested path within one, you MUST read the corresponding context file:**
+- Working in `apollo-ios/` or any path under it → read `claude/apollo-ios.md`
+- Working in `apollo-ios-codegen/` or any path under it → read `claude/apollo-ios-codegen.md`
+- Working in `apollo-ios-pagination/` or any path under it → read `claude/apollo-ios-pagination.md`
+
+When working in a nested subdirectory within a subtree (e.g., `apollo-ios/Sources/Apollo/Caching/`), also check for and read any matching deeper context files in `claude/` (e.g., `claude/apollo-ios/Sources/Apollo/Execution/*.md`).
+
+These files live in `claude/` instead of inside the subtree directories because anything inside a subtree directory gets pushed to the upstream repo. The `claude/` directory is not auto-discovered, so you must read these files yourself.
+
+**Non-subtree context** (Tests, Sources, scripts, etc.) can use CLAUDE.md files directly in those directories since they are not affected by subtree pushes. For example, `Tests/CLAUDE.md` or `Sources/AnimalKingdomAPI/CLAUDE.md`. These are auto-discovered normally.
+
+When adding new context, place it in the most specific applicable location:
+- For subtree content → add to the corresponding file in `claude/`, or create deeper files like `claude/apollo-ios/caching.md`
+- For non-subtree content → add a CLAUDE.md in the relevant directory
+- For general repo context → add to this root CLAUDE.md
+
 ## Development Setup
 
 This is the apollo-ios-dev repository, a development environment for the Apollo iOS ecosystem using git subtrees. It contains:
@@ -41,42 +61,18 @@ This is the apollo-ios-dev repository, a development environment for the Apollo 
 - Clean build artifacts: `cd apollo-ios-codegen && make clean`
 - Wipe build directory: `cd apollo-ios-codegen && make wipe`
 
-## Project Architecture
-
-### Repository Structure
+## Repository Structure
 - **Sources/**: Test API implementations (AnimalKingdomAPI, StarWarsAPI, GitHubAPI, etc.)
 - **Tests/**: Unit tests, performance tests, integration tests
 - **Tests/TestCodeGenConfigurations/**: Code generation configuration test projects
 - **Tests/TestPlans/**: Xcode test plans for organized test execution
-- **apollo-ios/**: Main Apollo iOS library subtree
-- **apollo-ios-codegen/**: Code generation library subtree
-- **apollo-ios-pagination/**: Pagination library subtree
+- **apollo-ios/**: Main Apollo iOS library subtree (see `claude/apollo-ios.md`)
+- **apollo-ios-codegen/**: Code generation library subtree (see `claude/apollo-ios-codegen.md`)
+- **apollo-ios-pagination/**: Pagination library subtree (see `claude/apollo-ios-pagination.md`)
 
-### Modules by Subtree
+## Git Subtrees
 
-**apollo-ios** — `apollo-ios/Sources/`
-- `Apollo` — Core networking, caching, and client
-- `ApolloAPI` — Type definitions for generated code
-- `ApolloSQLite` — SQLite-backed normalized cache
-- `ApolloWebSocket` — WebSocket subscriptions (`graphql-transport-ws` protocol)
-- `ApolloTestSupport` — Public test utilities
-
-**apollo-ios-codegen** — `apollo-ios-codegen/Sources/`
-- `ApolloCodegenLib` — Code generation library
-- `CodegenCLI` — CLI command definitions
-- `apollo-ios-cli` — CLI executable
-
-**apollo-ios-pagination** — `apollo-ios-pagination/Sources/`
-- `ApolloPagination` — Cursor/offset pagination helpers
-
-### Key Components
-- **Tuist Project**: Uses `Project.swift` and `Workspace.swift` for workspace generation
-- **Test APIs**: 6 GraphQL API implementations in `Sources/` (AnimalKingdomAPI, StarWarsAPI, GitHubAPI, SubscriptionAPI, UploadAPI, Schema)
-- **Test Plans**: Organized test execution using Xcode test plans (see Testing Strategy)
-- **CLI Integration**: apollo-ios-cli built from codegen package
-
-### Git Subtrees
-The three library directories (`apollo-ios/`, `apollo-ios-codegen/`, `apollo-ios-pagination/`) are git subtrees. On PR merge to `main`, GitHub Actions (`.github/workflows/pr-subtree-push.yml`) automatically splits and pushes changes to the respective upstream repositories.
+The three library directories are git subtrees. On PR merge to `main`, GitHub Actions (`.github/workflows/pr-subtree-push.yml`) automatically splits and pushes changes to the respective upstream repositories. Context files for subtrees are kept in `claude/` (outside subtree directories) so they are never included in subtree pushes.
 
 ### Development Workflow
 1. Make changes in appropriate subtree directory
