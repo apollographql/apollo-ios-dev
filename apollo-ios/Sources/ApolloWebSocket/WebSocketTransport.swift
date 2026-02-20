@@ -173,6 +173,19 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     return (id, stream)
   }
 
+  /// Cancels a subscription from the client side. Removes the subscriber from the registry,
+  /// finishes its payload stream, and sends a `complete` message to the server.
+  /// No-ops if the subscriber was already removed (e.g. server already completed it).
+  private func cancelSubscription(operationID: OperationID) {
+    guard let continuation = subscribers.removeValue(forKey: operationID) else { return }
+    continuation.finish()
+
+    let message = Message.Outgoing.complete(id: operationID)
+    if let wsMessage = try? message.toWebSocketMessage() {
+      connection.send(wsMessage)
+    }
+  }
+
   private func sendSubscribeMessage<Subscription: GraphQLSubscription>(
     operationID: OperationID,
     subscription: Subscription
@@ -192,10 +205,11 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   }
 
   private func finishAllSubscribers(throwing error: (any Swift.Error)? = nil) {
-    for (_, continuation) in subscribers {
+    let active = subscribers
+    subscribers.removeAll()
+    for (_, continuation) in active {
       continuation.finish(throwing: error)
     }
-    subscribers.removeAll()
   }
 
   // MARK: - Processing Messages
@@ -218,8 +232,8 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
         _ = id
 
       case .complete(let id):
-        subscribers[id]?.finish()
-        subscribers.removeValue(forKey: id)
+        let continuation = subscribers.removeValue(forKey: id)
+        continuation?.finish()
 
       case .ping, .pong:
         break
@@ -238,9 +252,15 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   ) throws -> AsyncThrowingStream<Apollo.GraphQLResponse<Subscription>, any Swift.Error> {
 
     return AsyncThrowingStream { continuation in
-      Task {
+      let innerTask = Task {
         do {
           let (operationID, payloadStream) = await self.registerSubscriber()
+
+          continuation.onTermination = { @Sendable [weak self] reason in
+            guard case .cancelled = reason, let self else { return }            
+            Task { await self.cancelSubscription(operationID: operationID) }
+          }
+
           try await self.ensureConnected()
           try await self.sendSubscribeMessage(operationID: operationID, subscription: subscription)
 
@@ -257,6 +277,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
           continuation.finish(throwing: error)
         }
       }
+      _ = innerTask
     }
   }
 

@@ -282,7 +282,128 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     }
   }
 
-  #warning("test client side and server side cancellation of subscription")
+  // MARK: - Client-Side Cancellation
+
+  func testSubscription__whenTaskCancelled__shouldSendCompleteToServer() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+
+    // Start a subscription in a cancellable task.
+    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+
+    // Give the connection and subscribe message time to process.
+    try await Task.sleep(nanoseconds: 50_000_000) // 50ms
+
+    // Verify subscribe was sent (type "subscribe", id "1").
+    let subscribeMessages = mockTask.clientSentMessages.filter { message in
+      if case .data(let data) = message,
+         let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+         json["type"] as? String == "subscribe" {
+        return true
+      }
+      return false
+    }
+    expect(subscribeMessages.count).to(equal(1))
+
+    // Now consume the subscription in a task we can cancel.
+    let task = Task {
+      for try await _ in subscription {}
+    }
+
+    // Cancel the consuming task — this should trigger onTermination → complete message.
+    task.cancel()
+
+    // Give the cancellation and onTermination handler time to propagate through
+    // the actor hop (Task { await self.subscriberTerminated(...) }).
+    try await Task.sleep(nanoseconds: 200_000_000) // 200ms
+
+    // Verify a complete message was sent for operation ID 1.
+    let completeMessages: [[String: Any]] = mockTask.clientSentMessages.compactMap { message in
+      guard case .data(let data) = message,
+            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            json["type"] as? String == "complete" else {
+        return nil
+      }
+      return json
+    }
+    expect(completeMessages.count).to(equal(1))
+    expect(completeMessages.first?["id"] as? String).to(equal("1"))
+  }
+
+  func testSubscription__whenServerCompletes__shouldNotSendCompleteBack() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+    mockTask.emit(.string(
+      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"Great"}}}}"#
+    ))
+    // Server sends complete — the client should NOT echo a complete back.
+    mockTask.emit(.string(#"{"type":"complete","id":"1"}"#))
+
+    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    let results = try await subscription.getAllValues()
+
+    expect(results.count).to(equal(1))
+
+    // Give any potential onTermination handler time to fire.
+    try await Task.sleep(nanoseconds: 100_000_000) // 100ms
+
+    // No complete messages should have been sent by the client.
+    let completeMessages = mockTask.clientSentMessages.filter { message in
+      if case .data(let data) = message,
+         let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+         json["type"] as? String == "complete" {
+        return true
+      }
+      return false
+    }
+    expect(completeMessages.count).to(equal(0))
+  }
+
+  func testSubscription__whenCancelledWithMultipleSubscribers__shouldOnlyCancelOne() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+
+    // Start two subscriptions.
+    let sub1 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    let sub2 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+
+    // Give connection and subscribe messages time to process.
+    try await Task.sleep(nanoseconds: 50_000_000) // 50ms
+
+    // Consume sub1 in a cancellable task.
+    let task1 = Task {
+      for try await _ in sub1 {}
+    }
+
+    // Cancel only sub1.
+    task1.cancel()
+    try await Task.sleep(nanoseconds: 200_000_000) // 200ms
+
+    // A complete message should have been sent for sub1 (id "1").
+    let completeMessages: [[String: Any]] = mockTask.clientSentMessages.compactMap { message in
+      guard case .data(let data) = message,
+            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            json["type"] as? String == "complete" else {
+        return nil
+      }
+      return json
+    }
+    expect(completeMessages.count).to(equal(1))
+    expect(completeMessages.first?["id"] as? String).to(equal("1"))
+
+    // Sub2 should still work — send it data and complete from server.
+    mockTask.emit(.string(
+      #"{"type":"next","id":"2","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":3,"commentary":"Still alive"}}}}"#
+    ))
+    mockTask.emit(.string(#"{"type":"complete","id":"2"}"#))
+
+    let results2 = try await sub2.getAllValues()
+    expect(results2.count).to(equal(1))
+    expect(results2[0].data?.reviewAdded?.commentary).to(equal("Still alive"))
+  }
 //  
 //  func testLocalErrorMissingId() throws {
 //    let expectation = self.expectation(description: "Missing id for subscription")
