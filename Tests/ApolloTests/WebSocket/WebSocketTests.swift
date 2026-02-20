@@ -66,6 +66,8 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     try await super.tearDown()
   }
     
+  // MARK: - Single Subscription (notStarted → connected)
+
   func testLocalSingleSubscription() async throws {
     let mockTask = session.mockWebSocketTask
 
@@ -74,6 +76,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     mockTask.emit(.string(
       #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","episode":"JEDI","stars":5,"commentary":"A great movie"}}}}"#
     ))
+    mockTask.emit(.string(#"{"type":"complete","id":"1"}"#))
     mockTask.finish()
 
     let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
@@ -83,6 +86,174 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     expect(results[0].data?.reviewAdded?.stars).to(equal(5))
     expect(results[0].data?.reviewAdded?.commentary).to(equal("A great movie"))
   }
+
+  // MARK: - Concurrent Subscriptions (connecting state)
+
+  func testConcurrentSubscriptions__whileConnecting__bothReceiveData() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    // Start two subscriptions concurrently BEFORE emitting connection_ack.
+    // Both should wait for the connection to be established.
+    let sub1 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    let sub2 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+
+    // Now emit connection_ack — both waiters should be resumed.
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+
+    // Emit data for both subscriptions (IDs 1 and 2 since they're registered sequentially).
+    mockTask.emit(.string(
+      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"First"}}}}"#
+    ))
+    mockTask.emit(.string(#"{"type":"complete","id":"1"}"#))
+    mockTask.emit(.string(
+      #"{"type":"next","id":"2","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":3,"commentary":"Second"}}}}"#
+    ))
+    mockTask.emit(.string(#"{"type":"complete","id":"2"}"#))
+
+    let results1 = try await sub1.getAllValues()
+    let results2 = try await sub2.getAllValues()
+
+    expect(results1.count).to(equal(1))
+    expect(results1[0].data?.reviewAdded?.commentary).to(equal("First"))
+    expect(results2.count).to(equal(1))
+    expect(results2[0].data?.reviewAdded?.commentary).to(equal("Second"))
+  }
+
+  // MARK: - Second Subscription (connected state)
+
+  func testSecondSubscription__whenAlreadyConnected__shouldNotReconnect() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    // Start the first subscription and get through the connection handshake.
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let sub1 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+
+    // Give the connection loop time to process connection_ack.
+    try await Task.sleep(nanoseconds: 50_000_000) // 50ms
+
+    // Now start a second subscription — the connection is already established,
+    // so ensureConnected() should return immediately without reconnecting.
+    let sub2 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+
+    // Emit data for both and complete.
+    mockTask.emit(.string(
+      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"First"}}}}"#
+    ))
+    mockTask.emit(.string(#"{"type":"complete","id":"1"}"#))
+    mockTask.emit(.string(
+      #"{"type":"next","id":"2","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":3,"commentary":"Second"}}}}"#
+    ))
+    mockTask.emit(.string(#"{"type":"complete","id":"2"}"#))
+
+    let results1 = try await sub1.getAllValues()
+    let results2 = try await sub2.getAllValues()
+
+    expect(results1.count).to(equal(1))
+    expect(results1[0].data?.reviewAdded?.stars).to(equal(5))
+    expect(results2.count).to(equal(1))
+    expect(results2[0].data?.reviewAdded?.stars).to(equal(3))
+
+    // Only one connection_init should have been sent (no reconnect).
+    let connectionInits = mockTask.clientSentMessages.filter { message in
+      if case .data(let data) = message,
+         let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+         json["type"] as? String == "connection_init" {
+        return true
+      }
+      return false
+    }
+    expect(connectionInits.count).to(equal(1))
+  }
+
+  // MARK: - Reconnection (disconnected state)
+
+  func testSubscription__afterDisconnect__shouldReconnectWithNewTask() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1, task2])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    // First subscription on task1.
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+    task1.emit(.string(
+      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"First connection"}}}}"#
+    ))
+    task1.emit(.string(#"{"type":"complete","id":"1"}"#))
+
+    let sub1 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    let results1 = try await sub1.getAllValues()
+
+    expect(results1.count).to(equal(1))
+    expect(results1[0].data?.reviewAdded?.commentary).to(equal("First connection"))
+
+    // Disconnect: finish task1's stream to simulate server closing the connection.
+    task1.finish()
+
+    // Give the receive loop time to process the disconnection.
+    try await Task.sleep(nanoseconds: 50_000_000) // 50ms
+
+    // Second subscription should trigger reconnection on task2.
+    task2.emit(.string(#"{"type":"connection_ack"}"#))
+    task2.emit(.string(
+      #"{"type":"next","id":"2","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":3,"commentary":"Second connection"}}}}"#
+    ))
+    task2.emit(.string(#"{"type":"complete","id":"2"}"#))
+
+    let sub2 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    let results2 = try await sub2.getAllValues()
+
+    expect(results2.count).to(equal(1))
+    expect(results2[0].data?.reviewAdded?.commentary).to(equal("Second connection"))
+
+    // Both tasks should have been resumed (started).
+    expect(task1.isResumed).to(beTrue())
+    expect(task2.isResumed).to(beTrue())
+  }
+
+  // MARK: - Connection Failure
+
+  func testSubscription__whenConnectionFailsBeforeAck__shouldThrowError() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    // Simulate an error before connection_ack.
+    struct MockConnectionError: Error, Equatable {}
+    mockTask.throw(MockConnectionError())
+
+    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+
+    do {
+      _ = try await subscription.getAllValues()
+      fail("Expected an error to be thrown")
+    } catch {
+      expect(error).to(beAKindOf(MockConnectionError.self))
+    }
+  }
+
+  func testSubscription__whenStreamEndsBeforeAck__shouldThrowConnectionClosed() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    // Finish the stream without ever sending connection_ack.
+    mockTask.finish()
+
+    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+
+    do {
+      _ = try await subscription.getAllValues()
+      fail("Expected an error to be thrown")
+    } catch {
+      expect(error).to(matchError(WebSocketTransport.Error.connectionClosed))
+    }
+  }
+
   #warning("test client side and server side cancellation of subscription")
 //
 //  func testLocalMissingSubscription() throws {
