@@ -6,14 +6,6 @@ import Nimble
 @testable import ApolloWebSocket
 
 #warning("Rewrite when websocket is implemented")
-//extension WebSocketTransport {
-//  func write(message: JSONEncodableDictionary) {
-//    let serialized = try! JSONSerializationFormat.serialize(value: message)
-//    if let str = String(data: serialized, encoding: .utf8) {
-//      self.websocket.write(string: str)
-//    }
-//  }
-//}
 
 class WebSocketTests: XCTestCase, MockResponseProvider {
   var networkTransport: WebSocketTransport!
@@ -65,7 +57,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     
     try await super.tearDown()
   }
-    
+
   // MARK: - Single Subscription (notStarted → connected)
 
   func testLocalSingleSubscription() async throws {
@@ -100,7 +92,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Now emit connection_ack — both waiters should be resumed.
     mockTask.emit(.string(#"{"type":"connection_ack"}"#))
 
-    // Emit data for both subscriptions (IDs 1 and 2 since they're registered sequentially).
+    // Emit data for both subscriptions (IDs 1 and 2).
     mockTask.emit(.string(
       #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"First"}}}}"#
     ))
@@ -113,10 +105,18 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     let results1 = try await sub1.getAllValues()
     let results2 = try await sub2.getAllValues()
 
+    // Both subscriptions should receive exactly one result each.
     expect(results1.count).to(equal(1))
-    expect(results1[0].data?.reviewAdded?.commentary).to(equal("First"))
     expect(results2.count).to(equal(1))
-    expect(results2[0].data?.reviewAdded?.commentary).to(equal("Second"))
+
+    // The order in which the inner Tasks call registerSubscriber() on the actor
+    // is non-deterministic, so sub1 may get ID 1 or ID 2. Assert that both
+    // commentaries are present without assuming which subscription received which.
+    let commentaries = Set<String?>([
+      results1[0].data?.reviewAdded?.commentary,
+      results2[0].data?.reviewAdded?.commentary,
+    ])
+    expect(commentaries).to(equal(Set(["First", "Second"])))
   }
 
   // MARK: - Second Subscription (connected state)
@@ -130,7 +130,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     let sub1 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
 
     // Give the connection loop time to process connection_ack.
-    try await Task.sleep(nanoseconds: 50_000_000) // 50ms
+    try await Task.sleep(nanoseconds: 5_000_000) // 5ms
 
     // Now start a second subscription — the connection is already established,
     // so ensureConnected() should return immediately without reconnecting.
@@ -199,7 +199,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     task1.finish()
 
     // Give the receive loop time to process the disconnection.
-    try await Task.sleep(nanoseconds: 50_000_000) // 50ms
+    try await Task.sleep(nanoseconds: 5_000_000) // 5ms
 
     // Second subscription should trigger reconnection on task2.
     task2.emit(.string(#"{"type":"connection_ack"}"#))
@@ -283,6 +283,56 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   // MARK: - Client-Side Cancellation
+
+  func testSubscription__whenCancelledBeforeConnectionAck__shouldNotSendSubscribe() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    // Do NOT emit connection_ack — the inner task will be stuck at ensureConnected().
+    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+
+    // Give the inner task time to register the subscriber and start connecting.
+    try await Task.sleep(nanoseconds: 5_000_000) // 5ms
+
+    // Consume in a cancellable task.
+    let task = Task {
+      for try await _ in subscription {}
+    }
+
+    // Cancel before connection_ack arrives.
+    task.cancel()
+    try await Task.sleep(nanoseconds: 5_000_000) // 5ms
+
+    // Record the subscribe count before connection_ack. Since the subscription was
+    // cancelled before connection_ack, no subscribe should have been sent yet.
+    let subscribeCountBefore = mockTask.clientSentMessages.filter { message in
+      if case .data(let data) = message,
+         let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+         json["type"] as? String == "subscribe" {
+        return true
+      }
+      return false
+    }.count
+    expect(subscribeCountBefore).to(equal(0))
+
+    // Now emit connection_ack — this unblocks the inner task which was waiting at
+    // ensureConnected(). Because the task was already cancelled, checkCancellation()
+    // should throw before sendSubscribeMessage is reached.
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+    try await Task.sleep(nanoseconds: 100_000_000) // 100ms
+
+    let subscribeCountAfter = mockTask.clientSentMessages.filter { message in
+      if case .data(let data) = message,
+         let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+         json["type"] as? String == "subscribe" {
+        return true
+      }
+      return false
+    }.count
+
+    // No subscribe message should have been sent — the inner task detected cancellation
+    // after ensureConnected() returned and bailed out before sending subscribe.
+    expect(subscribeCountAfter).to(equal(0))
+  }
 
   func testSubscription__whenTaskCancelled__shouldSendCompleteToServer() async throws {
     let mockTask = session.mockWebSocketTask

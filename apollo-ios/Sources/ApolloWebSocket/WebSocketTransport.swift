@@ -48,7 +48,8 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   /// Continuations of callers waiting for the connection to reach the `connected` state.
   /// Populated only while `connectionState == .connecting`. Resumed when `connectionAck` arrives
   /// or failed if the connection stream terminates before acknowledgement.
-  private var connectionWaiters: [CheckedContinuation<Void, any Swift.Error>] = []
+  /// Keyed by UUID so individual waiters can be cancelled via `withTaskCancellationHandler`.
+  private var connectionWaiters: [UUID: CheckedContinuation<Void, any Swift.Error>] = [:]
 
   public init(
     urlSession: WebSocketURLSession,
@@ -135,11 +136,30 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   ///
   /// If the connection is already `connected` (e.g. because `connection_ack` was buffered and
   /// processed before this method runs), returns immediately without suspending.
+  /// Responds to task cancellation by resuming the waiter with `CancellationError`.
   private func waitForConnectionAck() async throws {
     if connectionState == .connected { return }
 
-    try await withCheckedThrowingContinuation { continuation in
-      connectionWaiters.append(continuation)
+    let waiterID = UUID()
+    try await withTaskCancellationHandler {
+      try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Swift.Error>) in
+        if Task.isCancelled {
+          continuation.resume(throwing: CancellationError())
+        } else {
+          connectionWaiters[waiterID] = continuation
+        }
+      }
+    } onCancel: {
+      Task { await self.cancelConnectionWaiter(id: waiterID) }
+    }
+  }
+
+  /// Cancels a single connection waiter identified by its UUID.
+  /// Called from the `onCancel` handler of `withTaskCancellationHandler` when the
+  /// waiting task is cancelled before `connection_ack` arrives.
+  private func cancelConnectionWaiter(id: UUID) {
+    if let waiter = connectionWaiters.removeValue(forKey: id) {
+      waiter.resume(throwing: CancellationError())
     }
   }
 
@@ -147,7 +167,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   private func resumeConnectionWaiters() {
     let waiters = connectionWaiters
     connectionWaiters.removeAll()
-    for waiter in waiters {
+    for (_, waiter) in waiters {
       waiter.resume()
     }
   }
@@ -156,7 +176,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   private func failConnectionWaiters(with error: any Swift.Error) {
     let waiters = connectionWaiters
     connectionWaiters.removeAll()
-    for waiter in waiters {
+    for (_, waiter) in waiters {
       waiter.resume(throwing: error)
     }
   }
@@ -250,18 +270,12 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     fetchBehavior: Apollo.FetchBehavior,
     requestConfiguration: Apollo.RequestConfiguration
   ) throws -> AsyncThrowingStream<Apollo.GraphQLResponse<Subscription>, any Swift.Error> {
-
     return AsyncThrowingStream { continuation in
       let innerTask = Task {
+        let (operationID, payloadStream) = await self.registerSubscriber()
         do {
-          let (operationID, payloadStream) = await self.registerSubscriber()
-
-          continuation.onTermination = { @Sendable [weak self] reason in
-            guard case .cancelled = reason, let self else { return }            
-            Task { await self.cancelSubscription(operationID: operationID) }
-          }
-
           try await self.ensureConnected()
+          try Task.checkCancellation()
           try await self.sendSubscribeMessage(operationID: operationID, subscription: subscription)
 
           for try await payload in payloadStream {
@@ -272,12 +286,21 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
             let parsedResult = try await handler.execute(includeCacheRecords: false)
             continuation.yield(parsedResult.result)
           }
+
+          if Task.isCancelled {
+            await self.cancelSubscription(operationID: operationID)
+          }
           continuation.finish()
         } catch {
+          await self.cancelSubscription(operationID: operationID)
           continuation.finish(throwing: error)
         }
       }
-      _ = innerTask
+
+      continuation.onTermination = { @Sendable reason in
+        guard case .cancelled = reason else { return }
+        innerTask.cancel()
+      }
     }
   }
 
