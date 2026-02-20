@@ -12,6 +12,8 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     case unrecognizedMessage
     /// The WebSocket connection was closed before the server acknowledged the connection.
     case connectionClosed
+    /// The subscription operation does not have a query document definition.
+    case missingQueryDocument
   }
 
   struct Constants {
@@ -174,19 +176,19 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   private func sendSubscribeMessage<Subscription: GraphQLSubscription>(
     operationID: OperationID,
     subscription: Subscription
-  ) {
+  ) throws {
+    guard let queryDocument = Subscription.definition?.queryDocument else {
+      throw Error.missingQueryDocument
+    }
+
     let payload = SubscribePayload(
       operationName: Subscription.operationName,
-      query: Subscription.definition?.queryDocument ?? "",
+      query: queryDocument,
       variables: subscription.__variables,
       extensions: nil
     )
     let message = Message.Outgoing.subscribe(id: operationID, payload: payload)
-    do {
-      connection.send(try message.toWebSocketMessage())
-    } catch {
-      // Serialization error — subscriber will be notified when connection drops
-    }
+    connection.send(try message.toWebSocketMessage())
   }
 
   private func finishAllSubscribers(throwing error: (any Swift.Error)? = nil) {
@@ -240,7 +242,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
         do {
           let (operationID, payloadStream) = await self.registerSubscriber()
           try await self.ensureConnected()
-          await self.sendSubscribeMessage(operationID: operationID, subscription: subscription)
+          try await self.sendSubscribeMessage(operationID: operationID, subscription: subscription)
 
           for try await payload in payloadStream {
             let handler = JSONResponseParser.SingleResponseExecutionHandler<Subscription>(

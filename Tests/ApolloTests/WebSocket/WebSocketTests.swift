@@ -41,7 +41,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
       ] }
     }
   }
-
+  
   override func setUpWithError() throws {
     try super.setUpWithError()
 
@@ -251,6 +251,34 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
       fail("Expected an error to be thrown")
     } catch {
       expect(error).to(matchError(WebSocketTransport.Error.connectionClosed))
+    }
+  }
+
+  // MARK: - Missing Query Document
+
+  func testSubscription__whenDefinitionIsNil__shouldThrowMissingQueryDocument() async throws {
+    /// A mock subscription whose `operationDocument` has no `definition`,
+    /// simulating a persisted-queries-only configuration.
+    class MockSubscriptionWithoutDefinition<SelectionSet: RootSelectionSet>:
+      MockSubscription<SelectionSet>, @unchecked Sendable
+    {
+      override class var operationDocument: OperationDocument {
+        .init(operationIdentifier: "abc123", definition: nil)
+      }
+    }
+
+    let mockTask = session.mockWebSocketTask
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let subscription = try client.subscribe(
+      subscription: MockSubscriptionWithoutDefinition<ReviewAddedData>()
+    )
+
+    do {
+      _ = try await subscription.getAllValues()
+      fail("Expected an error to be thrown")
+    } catch {
+      expect(error).to(matchError(WebSocketTransport.Error.missingQueryDocument))
     }
   }
 
