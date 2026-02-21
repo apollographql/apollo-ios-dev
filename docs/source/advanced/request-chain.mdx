@@ -287,7 +287,7 @@ It is not required that every interceptor implement error handling. A `GraphQLIn
 
 #### Example - Re-authentication interceptor
 
-In this example, when an `AuthencticationError` is thrown, the interceptor will attempt to refresh the user's auth token and then retry the request.
+In this example, when an `AuthenticationError` is thrown, the interceptor will attempt to refresh the user's auth token and then retry the request.
 
 ```swift
 struct ReauthenticationInterceptor: GraphQLInterceptor {
