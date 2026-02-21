@@ -295,15 +295,15 @@ struct ReauthenticationInterceptor: GraphQLInterceptor {
 
   func intercept<Request: GraphQLRequest>(
     request: Request,
-    next: @escaping NextGraphQLInterceptorFunction<Request>
-  ) -> InterceptorResultStream<Request> {
+    next: NextInterceptorFunction<Request>
+  ) async throws -> InterceptorResultStream<Request> {
     return await next(request)
       .mapErrors { error in
         if let authError = error as? AuthenticationError {
           // Handle authentication errors by refreshing an auth token and then retrying the request
           let newAuthToken = try await authManager.refreshUserToken()
           var refreshedRequest = request
-          refreshedRequest.additionalHeaders["Authorization": "Bearer \(newAuthToken)"]
+          refreshedRequest.additionalHeaders["Authorization"] = "Bearer \(newAuthToken)"
           throw RequestChain<Request>.Retry(request: refreshedRequest)
         }
         throw error // Re-throw other errors
@@ -404,11 +404,9 @@ struct UserContext {
   let userId: String
   let tenantId: String
   let permissions: Set<String>
-}
 
-extension TaskLocal where Value == UserContext? {
   @TaskLocal
-  static var userContext: UserContext?
+  static var current: UserContext?
 }
 ```
 
@@ -424,7 +422,7 @@ struct AuthenticatedApolloClient {
     cachePolicy: CachePolicy = .default
   ) async throws -> GraphQLResponse<Query.Data> {
 
-    return try await TaskLocal.$userContext.withValue(userContext) {
+    return try await UserContext.$current.withValue(userContext) {
       return try await apolloClient.fetch(query: query, cachePolicy: cachePolicy)
     }
   }
@@ -440,7 +438,7 @@ struct AuthorizationInterceptor: GraphQLInterceptor {
     next: NextInterceptorFunction<Request>
   ) async throws -> InterceptorResultStream<Request> {
 
-    guard let userContext = TaskLocal.userContext else {
+    guard let userContext = UserContext.current else {
       throw AuthError.noUserContext
     }
 
@@ -467,7 +465,7 @@ struct AuditInterceptor: GraphQLInterceptor {
     return await next(request)
       .map { result in
         // Audit successful operations
-        if let userContext = TaskLocal.userContext {
+        if let userContext = UserContext.current {
           auditLog.record(
             operation: request.operation.operationName ?? "unknown",
             userId: userContext.userId,
