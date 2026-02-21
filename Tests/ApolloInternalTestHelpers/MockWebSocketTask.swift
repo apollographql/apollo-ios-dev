@@ -79,4 +79,19 @@ public final class MockWebSocketTask: WebSocketTask, @unchecked Sendable {
     cancelCode = closeCode
     cancelReason = reason
   }
+
+  // MARK: - Client Message Inspection (used by tests)
+
+  /// Returns the parsed JSON dictionaries for all client-sent messages matching the given
+  /// `graphql-transport-ws` message type (e.g. `"subscribe"`, `"complete"`, `"connection_init"`).
+  public func clientSentMessages(ofType type: String) -> [[String: Any]] {
+    clientSentMessages.compactMap { message in
+      guard case .data(let data) = message,
+            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            json["type"] as? String == type else {
+        return nil
+      }
+      return json
+    }
+  }
 }

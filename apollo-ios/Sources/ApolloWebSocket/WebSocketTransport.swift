@@ -36,14 +36,14 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
 
   private var connection: WebSocketConnection
 
-  private var connectionState: ConnectionState = .notStarted
+  var connectionState: ConnectionState = .notStarted
 
   private var nextOperationID: OperationID = 1
 
   /// Active subscribers keyed by operation ID. Each continuation receives raw JSON payloads
   /// from incoming `next` messages that are then parsed into typed `GraphQLResponse`s
   /// per-subscriber.
-  private var subscribers: [OperationID: AsyncThrowingStream<JSONObject, any Swift.Error>.Continuation] = [:]
+  var subscribers: [OperationID: AsyncThrowingStream<JSONObject, any Swift.Error>.Continuation] = [:]
 
   /// Continuations of callers waiting for the connection to reach the `connected` state.
   /// Populated only while `connectionState == .connecting`. Resumed when `connectionAck` arrives
