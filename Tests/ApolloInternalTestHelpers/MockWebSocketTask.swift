@@ -70,7 +70,10 @@ public final class MockWebSocketTask: WebSocketTask, @unchecked Sendable {
 
   public func receive() async throws -> URLSessionWebSocketTask.Message {
     guard let message = try await serverMessageIterator.next() else {
-      throw CancellationError()
+      // Real URLSessionWebSocketTask throws POSIXError(.ENOTCONN) (code 57) when the
+      // server closes the connection gracefully. Match that behavior so the transport's
+      // receive loop handles mock disconnection the same way as real disconnection.
+      throw POSIXError(.ENOTCONN)
     }
     return message
   }

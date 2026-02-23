@@ -22,6 +22,10 @@ public final class MockWebSocketTaskFactory: @unchecked Sendable {
   }
 
   func next() -> MockWebSocketTask {
+    precondition(
+      index < tasks.count,
+      "MockWebSocketTaskFactory: requested task at index \(index) but only \(tasks.count) tasks were provided"
+    )
     let task = tasks[index]
     index += 1
     return task

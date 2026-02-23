@@ -84,6 +84,10 @@ The three library directories are git subtrees. On PR merge to `main`, GitHub Ac
 
 Primary CI is **GitHub Actions** (`.github/workflows/ci-tests.yml`). CircleCI (`.circleci/config.yml`) only runs security scans (gitleaks, semgrep).
 
+## Tool Preferences
+
+- **Use the Xcode MCP tools** (`BuildProject`, `RunSomeTests`, `RunAllTests`, `GetTestList`, etc.) for building and running tests instead of invoking `xcodebuild` directly via Bash.
+
 ## Testing Strategy
 
 - **Unit Tests**: Core logic testing in each package
