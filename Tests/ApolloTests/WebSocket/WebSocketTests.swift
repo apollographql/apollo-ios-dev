@@ -1064,6 +1064,208 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     expect(task2.isResumed).to(beFalse())
   }
 
+  // MARK: - Queries
+
+  func testQuery__shouldReceiveSingleResult() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+    mockTask.emit(.string(
+      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"Query result"}}}}"#
+    ))
+    mockTask.emit(.string(#"{"type":"complete","id":"1"}"#))
+
+    let result = try await client.fetch(
+      query: MockQuery<ReviewAddedData>(),
+      cachePolicy: .networkOnly
+    )
+
+    expect(result.data?.reviewAdded?.stars).to(equal(5))
+    expect(result.data?.reviewAdded?.commentary).to(equal("Query result"))
+
+    // Should have sent a subscribe message (graphql-ws uses subscribe for all operation types).
+    expect(mockTask.clientSentMessages(ofType: "subscribe").count).to(equal(1))
+  }
+
+  func testQuery__whenServerSendsError__shouldThrow() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+    mockTask.emit(.string(
+      #"{"type":"error","id":"1","payload":[{"message":"Query failed"}]}"#
+    ))
+
+    do {
+      _ = try await client.fetch(
+        query: MockQuery<ReviewAddedData>(),
+        cachePolicy: .networkOnly
+      )
+      fail("Expected an error to be thrown")
+    } catch {
+      guard case WebSocketTransport.Error.graphQLErrors(let errors) = error else {
+        fail("Expected graphQLErrors but got \(error)")
+        return
+      }
+      expect(errors.count).to(equal(1))
+      expect(errors[0].message).to(equal("Query failed"))
+    }
+  }
+
+  func testQuery__whenConnectionDropsWithReconnect__shouldNotRetry() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1, task2])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(reconnectionInterval: 0)
+    )
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+
+    // Start a query — it blocks waiting for the response.
+    let queryTask = Task {
+      try await client.fetch(
+        query: MockQuery<ReviewAddedData>(),
+        cachePolicy: .networkOnly
+      )
+    }
+
+    // Wait for the subscribe message to arrive.
+    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Disconnect — query should be terminated immediately, NOT retried.
+    struct MockTransportError: Swift.Error {}
+    task1.throw(MockTransportError())
+
+    do {
+      _ = try await queryTask.value
+      fail("Expected an error to be thrown")
+    } catch {
+      expect(error).to(beAKindOf(MockTransportError.self))
+    }
+  }
+
+  // MARK: - Mutations
+
+  func testMutation__shouldReceiveSingleResult() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+    mockTask.emit(.string(
+      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":3,"commentary":"Mutation result"}}}}"#
+    ))
+    mockTask.emit(.string(#"{"type":"complete","id":"1"}"#))
+
+    let result = try await client.perform(mutation: MockMutation<ReviewAddedData>())
+
+    expect(result.data?.reviewAdded?.stars).to(equal(3))
+    expect(result.data?.reviewAdded?.commentary).to(equal("Mutation result"))
+
+    expect(mockTask.clientSentMessages(ofType: "subscribe").count).to(equal(1))
+  }
+
+  func testMutation__whenConnectionDropsWithReconnect__shouldNotRetry() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1, task2])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(reconnectionInterval: 0)
+    )
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let mutationTask = Task {
+      try await client.perform(mutation: MockMutation<ReviewAddedData>())
+    }
+
+    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Disconnect — mutation should be terminated immediately, NOT retried.
+    struct MockTransportError: Swift.Error {}
+    task1.throw(MockTransportError())
+
+    do {
+      _ = try await mutationTask.value
+      fail("Expected an error to be thrown")
+    } catch {
+      expect(error).to(beAKindOf(MockTransportError.self))
+    }
+  }
+
+  // MARK: - Mixed Operations and Reconnection
+
+  func testQueryAndSubscription__whenConnectionDropsWithReconnect__shouldOnlyResubscribeSubscription() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1, task2])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(reconnectionInterval: 0)
+    )
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+
+    // Start a subscription first.
+    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Start a query — it blocks waiting for the response.
+    let queryTask = Task {
+      try await client.fetch(
+        query: MockQuery<ReviewAddedData>(),
+        cachePolicy: .networkOnly
+      )
+    }
+    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
+
+    // Disconnect — triggers reconnection for the subscription.
+    struct MockTransportError: Swift.Error {}
+    task1.throw(MockTransportError())
+
+    // The query should terminate immediately with the transport error.
+    do {
+      _ = try await queryTask.value
+      fail("Expected an error to be thrown for the query")
+    } catch {
+      expect(error).to(beAKindOf(MockTransportError.self))
+    }
+
+    // The subscription should survive — task2 reconnects.
+    task2.emit(.string(#"{"type":"connection_ack"}"#))
+
+    // Only the subscription should be re-subscribed on task2 (not the query).
+    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Deliver data on the new connection and complete.
+    task2.emit(.string(
+      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":4,"commentary":"After reconnect"}}}}"#
+    ))
+    task2.emit(.string(#"{"type":"complete","id":"1"}"#))
+
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(1))
+    expect(results[0].data?.reviewAdded?.commentary).to(equal("After reconnect"))
+  }
+
 //
 //  func testLocalErrorMissingId() throws {
 //    let expectation = self.expectation(description: "Missing id for subscription")
