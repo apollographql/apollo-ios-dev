@@ -891,6 +891,139 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     expect(results2[0].data?.reviewAdded?.commentary).to(equal("Sub2 recovered"))
   }
 
+  // MARK: - Ping / Pong
+
+  func testPing__whenServerSendsPing__shouldReplyWithPong() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Server sends a ping — transport should reply with a pong.
+    mockTask.emit(.string(#"{"type":"ping"}"#))
+
+    await expect(mockTask.clientSentMessages(ofType: "pong").count).toEventually(equal(1))
+
+    // The pong should have no payload.
+    let pongMessage = mockTask.clientSentMessages(ofType: "pong").first
+    expect(pongMessage?["payload"]).to(beNil())
+
+    // Complete the subscription normally.
+    mockTask.emit(.string(
+      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"After ping"}}}}"#
+    ))
+    mockTask.emit(.string(#"{"type":"complete","id":"1"}"#))
+
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(1))
+    expect(results[0].data?.reviewAdded?.commentary).to(equal("After ping"))
+  }
+
+  func testPing__whenServerSendsPingWithPayload__shouldReplyWithPongWithoutPayload() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Server sends a ping with payload — transport should reply with a pong (no payload).
+    mockTask.emit(.string(#"{"type":"ping","payload":{"hello":"world"}}"#))
+
+    await expect(mockTask.clientSentMessages(ofType: "pong").count).toEventually(equal(1))
+
+    // The pong should have no payload — we don't echo the ping's payload.
+    let pongMessage = mockTask.clientSentMessages(ofType: "pong").first
+    expect(pongMessage?["payload"]).to(beNil())
+
+    // Complete the subscription normally.
+    mockTask.emit(.string(
+      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"After payload ping"}}}}"#
+    ))
+    mockTask.emit(.string(#"{"type":"complete","id":"1"}"#))
+
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(1))
+    expect(results[0].data?.reviewAdded?.commentary).to(equal("After payload ping"))
+  }
+
+  func testPong__whenServerSendsPong__shouldNotReply() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Server sends an unsolicited pong — transport should NOT reply.
+    mockTask.emit(.string(#"{"type":"pong"}"#))
+
+    // Give time for any potential response to be sent.
+    try await Task.sleep(nanoseconds: 100_000_000)
+
+    // No ping or pong messages should have been sent by the client.
+    expect(mockTask.clientSentMessages(ofType: "ping").count).to(equal(0))
+    expect(mockTask.clientSentMessages(ofType: "pong").count).to(equal(0))
+
+    // The subscription should still work normally.
+    mockTask.emit(.string(
+      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"After pong"}}}}"#
+    ))
+    mockTask.emit(.string(#"{"type":"complete","id":"1"}"#))
+
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(1))
+    expect(results[0].data?.reviewAdded?.commentary).to(equal("After pong"))
+  }
+
+  func testPing__whenServerSendsMultiplePings__shouldReplyToEach() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Server sends multiple pings — transport should reply to each.
+    mockTask.emit(.string(#"{"type":"ping"}"#))
+    mockTask.emit(.string(#"{"type":"ping","payload":{"seq":2}}"#))
+    mockTask.emit(.string(#"{"type":"ping","payload":{"seq":3}}"#))
+
+    await expect(mockTask.clientSentMessages(ofType: "pong").count).toEventually(equal(3))
+
+    // Complete the subscription.
+    mockTask.emit(.string(
+      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"After pings"}}}}"#
+    ))
+    mockTask.emit(.string(#"{"type":"complete","id":"1"}"#))
+
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(1))
+  }
+
+  // MARK: - Unrecognized Messages
+
+  func testSubscription__whenServerSendsUnrecognizedMessage__shouldTerminateWithError() async throws {
+    let mockTask = session.mockWebSocketTask
+
+    mockTask.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Server sends a message with an unknown type.
+    mockTask.emit(.string(#"{"type":"unknown_garbage"}"#))
+
+    do {
+      _ = try await subscription.getAllValues()
+      fail("Expected an error to be thrown")
+    } catch {
+      expect(error).to(matchError(WebSocketTransport.Error.unrecognizedMessage))
+    }
+  }
+
   // MARK: - Graceful Disconnection (reconnect disabled)
 
   func testSubscription__whenReconnectDisabled__shouldTerminateOnDisconnect() async throws {
