@@ -90,9 +90,9 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
 
   public let store: ApolloStore
 
-  public let configuration: Configuration
+  public private(set) var configuration: Configuration
 
-  private let request: URLRequest
+  private var request: URLRequest
 
   private var connection: WebSocketConnection
 
@@ -105,6 +105,11 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   private var subscriberRegistry: SubscriberRegistry
 
   private var connectionWaiters = ConnectionWaiterQueue()
+
+  /// Monotonically increasing counter used to invalidate stale receive loops.
+  /// Incremented each time an explicit reconnection is triggered (e.g. via
+  /// ``updateHeaderValues(_:reconnectIfConnected:)``).
+  private var connectionGeneration: Int = 0
 
   /// The number of active subscribers. Exposed for test assertions.
   var subscriberCount: Int { subscriberRegistry.count }
@@ -175,6 +180,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   /// - Otherwise: transitions to `disconnected`, fails pending connection waiters, and finishes
   ///   all subscriber streams.
   private func startConnectionReceiveLoop() {
+    let generation = self.connectionGeneration
     let connectionStream = self.connection.openConnection(
       connectingPayload: configuration.connectingPayload
     )
@@ -182,10 +188,13 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     Task {
       do {
         for try await message in connectionStream {
+          guard self.connectionGeneration == generation else { return }
           didReceive(message: message)
         }
+        guard self.connectionGeneration == generation else { return }
         await handleDisconnection()
       } catch {
+        guard self.connectionGeneration == generation else { return }
         // Use Task.isCancelled to distinguish genuine task cancellation from
         // connection errors. The WebSocket task's receive() may throw errors
         // (including CancellationError) when the connection closes, which should
@@ -229,6 +238,8 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   /// succeeds. If the reconnection attempt itself fails, `startConnectionReceiveLoop` will
   /// detect that the state was never `connected` and terminate everything.
   private func attemptReconnection() async {
+    let generation = self.connectionGeneration
+
     if configuration.reconnectionInterval > 0 {
       do {
         try await Task.sleep(nanoseconds: UInt64(configuration.reconnectionInterval * 1_000_000_000))
@@ -238,6 +249,10 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
         return
       }
     }
+
+    // If an explicit reconnection was triggered while waiting, bail out —
+    // that reconnection already started a new receive loop.
+    guard self.connectionGeneration == generation else { return }
 
     // If all subscribers were cancelled during the reconnection delay, no need to reconnect.
     guard !subscriberRegistry.isEmpty else {
@@ -276,6 +291,60 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   /// waiting task is cancelled before `connection_ack` arrives.
   private func cancelConnectionWaiter(id: UUID) {
     connectionWaiters.cancel(id: id)
+  }
+
+  // MARK: - Runtime Configuration Updates
+
+  /// Updates the HTTP headers used when creating new WebSocket connection requests.
+  ///
+  /// Headers are applied to the stored `URLRequest` and take effect on the next connection
+  /// (including reconnections). The `Sec-WebSocket-Protocol` header is always preserved.
+  ///
+  /// - Parameters:
+  ///   - headerValues: A dictionary of header field names to values. A `nil` value removes
+  ///     the header field.
+  ///   - reconnectIfConnected: If `true` and the transport is currently connected,
+  ///     disconnects and reconnects with the updated headers.
+  public func updateHeaderValues(
+    _ headerValues: [String: String?],
+    reconnectIfConnected: Bool = false
+  ) {
+    for (key, value) in headerValues {
+      request.setValue(value, forHTTPHeaderField: key)
+    }
+    if reconnectIfConnected && connectionState == .connected {
+      disconnectAndReconnect()
+    }
+  }
+
+  /// Updates the `connectingPayload` dictionary sent in the `connection_init` message.
+  ///
+  /// The payload takes effect on the next connection (including reconnections).
+  ///
+  /// - Parameters:
+  ///   - payload: The new connecting payload dictionary, or `nil` to clear it.
+  ///   - reconnectIfConnected: If `true` and the transport is currently connected,
+  ///     disconnects and reconnects with the updated payload.
+  public func updateConnectingPayload(
+    _ payload: JSONEncodableDictionary?,
+    reconnectIfConnected: Bool = false
+  ) {
+    configuration.connectingPayload = payload
+    if reconnectIfConnected && connectionState == .connected {
+      disconnectAndReconnect()
+    }
+  }
+
+  /// Disconnects the current WebSocket connection and immediately starts a new one.
+  ///
+  /// Increments the connection generation to invalidate the old receive loop, then creates
+  /// a fresh connection and starts the receive loop. Active subscribers will be resubscribed
+  /// when the new `connection_ack` arrives.
+  private func disconnectAndReconnect() {
+    connectionGeneration += 1
+    connection = WebSocketConnection(task: urlSession.webSocketTask(with: request))
+    connectionState = .connecting
+    startConnectionReceiveLoop()
   }
 
   // MARK: - Subscriber Management
