@@ -7,6 +7,75 @@ import Nimble
 
 #warning("Rewrite when websocket is implemented")
 
+/// A mock delegate that records lifecycle events from ``WebSocketTransport`` for test assertions.
+///
+/// Delegate methods are `isolated` to the `WebSocketTransport` actor, so writes to the
+/// internal event list are serialized through the actor. Reads from the test thread are
+/// protected by an `NSLock` to prevent data races with `toEventually` polling.
+final class MockWebSocketTransportDelegate: WebSocketTransportDelegate, @unchecked Sendable {
+  enum Event: Equatable, CustomStringConvertible {
+    case didConnect
+    case didReconnect
+    case didDisconnect(hasError: Bool)
+    case didReceivePing(hasPayload: Bool)
+    case didReceivePong(hasPayload: Bool)
+
+    var description: String {
+      switch self {
+      case .didConnect: return "didConnect"
+      case .didReconnect: return "didReconnect"
+      case .didDisconnect(let hasError): return "didDisconnect(hasError: \(hasError))"
+      case .didReceivePing(let hasPayload): return "didReceivePing(hasPayload: \(hasPayload))"
+      case .didReceivePong(let hasPayload): return "didReceivePong(hasPayload: \(hasPayload))"
+      }
+    }
+  }
+
+  private let lock = NSLock()
+  private var _events: [Event] = []
+
+  var events: [Event] {
+    lock.lock()
+    defer { lock.unlock() }
+    return _events
+  }
+
+  private func record(_ event: Event) {
+    lock.lock()
+    _events.append(event)
+    lock.unlock()
+  }
+
+  func webSocketTransportDidConnect(_ webSocketTransport: isolated WebSocketTransport) {
+    record(.didConnect)
+  }
+
+  func webSocketTransportDidReconnect(_ webSocketTransport: isolated WebSocketTransport) {
+    record(.didReconnect)
+  }
+
+  func webSocketTransport(
+    _ webSocketTransport: isolated WebSocketTransport,
+    didDisconnectWithError error: (any Error)?
+  ) {
+    record(.didDisconnect(hasError: error != nil))
+  }
+
+  func webSocketTransport(
+    _ webSocketTransport: isolated WebSocketTransport,
+    didReceivePingWithPayload payload: JSONObject?
+  ) {
+    record(.didReceivePing(hasPayload: payload != nil))
+  }
+
+  func webSocketTransport(
+    _ webSocketTransport: isolated WebSocketTransport,
+    didReceivePongWithPayload payload: JSONObject?
+  ) {
+    record(.didReceivePong(hasPayload: payload != nil))
+  }
+}
+
 class WebSocketTests: XCTestCase, MockResponseProvider {
   var networkTransport: WebSocketTransport!
   var client: ApolloClient!
@@ -52,6 +121,38 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     try await super.tearDown()
   }
 
+  // MARK: - Test Helpers
+
+  /// Creates a subscription, waits for its subscribe message to arrive on the mock task,
+  /// and returns the subscription stream along with the server-assigned operation ID.
+  ///
+  /// This helper ensures deterministic operation ID assignment when creating multiple
+  /// subscriptions by waiting for each subscribe message to be processed before returning.
+  /// Without this sequencing, concurrent inner Tasks race to register on the actor, making
+  /// ID assignment non-deterministic and causing tests that reference specific IDs to be flaky.
+  ///
+  /// ```swift
+  /// let (sub1, id1) = try await subscribe(on: mockTask, using: client)
+  /// let (sub2, id2) = try await subscribe(on: mockTask, using: client)
+  /// // sub1 is guaranteed to have id1, sub2 is guaranteed to have id2
+  /// ```
+  private func subscribe(
+    on mockTask: MockWebSocketTask,
+    using client: ApolloClient,
+    file: FileString = #filePath,
+    line: UInt = #line
+  ) async throws -> (
+    stream: AsyncThrowingStream<GraphQLResponse<MockSubscription<ReviewAddedData>>, any Error>,
+    operationID: String
+  ) {
+    let index = mockTask.clientSentMessages(ofType: "subscribe").count
+    let stream = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    await expect(file: file, line: line, mockTask.clientSentMessages(ofType: "subscribe").count)
+      .toEventually(equal(index + 1))
+    let operationID = mockTask.subscribeOperationID(at: index)
+    return (stream, operationID)
+  }
+
   // MARK: - Connecting Payload
 
   func testConnectionInit__withDefaultConfiguration__shouldSendNoPayload() async throws {
@@ -59,8 +160,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     mockTask.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect { await self.networkTransport.connectionState }.toEventually(equal(.connected))
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
 
     // The connection_init message should have been sent with no payload.
     let initMessages = mockTask.clientSentMessages(ofType: "connection_init")
@@ -89,8 +189,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     task1.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect { await transport.connectionState }.toEventually(equal(.connected))
+    let (subscription, _) = try await subscribe(on: task1, using: client)
 
     // Verify the connection_init message includes the connecting payload.
     let initMessages = task1.clientSentMessages(ofType: "connection_init")
@@ -124,8 +223,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Establish initial connection.
     task1.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (subscription, _) = try await subscribe(on: task1, using: client)
 
     // Verify first connection_init has the payload.
     let initMessages1 = task1.clientSentMessages(ofType: "connection_init")
@@ -218,16 +316,11 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Start the first subscription and get through the connection handshake.
     mockTask.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let sub1 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-
-    await expect { await self.networkTransport.connectionState }.toEventually(equal(.connected))
+    let (sub1, _) = try await subscribe(on: mockTask, using: client)
 
     // Now start a second subscription — the connection is already established,
     // so ensureConnected() should return immediately without reconnecting.
-    let sub2 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-
-    // Wait for both subscribe messages to arrive.
-    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
+    let (sub2, _) = try await subscribe(on: mockTask, using: client)
 
     // Only one connection_init should have been sent (no reconnect).
     expect(mockTask.clientSentMessages(ofType: "connection_init").count).to(equal(1))
@@ -357,11 +450,8 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     mockTask.emit(.string(#"{"type":"connection_ack"}"#))
 
-    // Start a subscription in a cancellable task.
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-
-    // Wait for the subscribe message to arrive (multiple actor hops).
-    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    // Start a subscription and get its dynamic ID.
+    let (subscription, operationID) = try await subscribe(on: mockTask, using: client)
 
     // Now consume the subscription in a task we can cancel.
     let task = Task {
@@ -371,10 +461,10 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Cancel the consuming task — this should trigger onTermination → complete message.
     task.cancel()
 
-    // Verify a complete message was sent for operation ID 1.
+    // Verify a complete message was sent for the operation.
     // Cancellation propagates through an actor hop, so use toEventually.
     await expect(mockTask.clientSentMessages(ofType: "complete").count).toEventually(equal(1))
-    expect(mockTask.clientSentMessages(ofType: "complete").first?["id"] as? String).to(equal("1"))
+    expect(mockTask.clientSentMessages(ofType: "complete").first?["id"] as? String).to(equal(operationID))
   }
 
   func testSubscription__whenServerCompletes__shouldNotSendCompleteBack() async throws {
@@ -428,15 +518,12 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     mockTask.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-
-    // Wait for subscribe message to arrive.
-    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (subscription, operationID) = try await subscribe(on: mockTask, using: client)
 
     // Server sends error — the subscription is terminated server-side, so client should not
     // send a complete message back.
     mockTask.emit(.string(
-      #"{"type":"error","id":"1","payload":[{"message":"Unauthorized"}]}"#
+      #"{"type":"error","id":"\#(operationID)","payload":[{"message":"Unauthorized"}]}"#
     ))
 
     do {
@@ -455,23 +542,19 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     mockTask.emit(.string(#"{"type":"connection_ack"}"#))
 
-    // Start sub1 first and wait for its subscribe message to ensure it gets ID 1.
-    let sub1 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (sub1, id1) = try await subscribe(on: mockTask, using: client)
+    let (sub2, id2) = try await subscribe(on: mockTask, using: client)
 
-    let sub2 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
-
-    // Server sends error only for sub1 (ID 1).
+    // Server sends error only for sub1.
     mockTask.emit(.string(
-      #"{"type":"error","id":"1","payload":[{"message":"Failed"}]}"#
+      #"{"type":"error","id":"\#(id1)","payload":[{"message":"Failed"}]}"#
     ))
 
-    // Sub2 (ID 2) should still receive data normally.
+    // Sub2 should still receive data normally.
     mockTask.emit(.string(
-      #"{"type":"next","id":"2","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":4,"commentary":"Still works"}}}}"#
+      #"{"type":"next","id":"\#(id2)","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":4,"commentary":"Still works"}}}}"#
     ))
-    mockTask.emit(.string(#"{"type":"complete","id":"2"}"#))
+    mockTask.emit(.string(#"{"type":"complete","id":"\#(id2)"}"#))
 
     // Sub1 should throw the error.
     do {
@@ -528,12 +611,10 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     mockTask.emit(.string(#"{"type":"connection_ack"}"#))
 
-    // Start two subscriptions.
-    let sub1 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    let sub2 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-
-    // Wait for both subscribe messages to arrive.
-    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
+    // Create subscriptions sequentially — the helper waits for each subscribe
+    // message to arrive, guaranteeing deterministic ID assignment.
+    let (sub1, id1) = try await subscribe(on: mockTask, using: client)
+    let (sub2, id2) = try await subscribe(on: mockTask, using: client)
 
     // Consume sub1 in a cancellable task.
     let task1 = Task {
@@ -543,15 +624,15 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Cancel only sub1.
     task1.cancel()
 
-    // A complete message should have been sent for sub1 (id "1").
+    // A complete message should have been sent for sub1.
     await expect(mockTask.clientSentMessages(ofType: "complete").count).toEventually(equal(1))
-    expect(mockTask.clientSentMessages(ofType: "complete").first?["id"] as? String).to(equal("1"))
+    expect(mockTask.clientSentMessages(ofType: "complete").first?["id"] as? String).to(equal(id1))
 
     // Sub2 should still work — send it data and complete from server.
     mockTask.emit(.string(
-      #"{"type":"next","id":"2","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":3,"commentary":"Still alive"}}}}"#
+      #"{"type":"next","id":"\#(id2)","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":3,"commentary":"Still alive"}}}}"#
     ))
-    mockTask.emit(.string(#"{"type":"complete","id":"2"}"#))
+    mockTask.emit(.string(#"{"type":"complete","id":"\#(id2)"}"#))
 
     let results2 = try await sub2.getAllValues()
     expect(results2.count).to(equal(1))
@@ -578,14 +659,11 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Establish connection and subscribe.
     task1.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-
-    // Wait for the subscribe message on task1.
-    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
 
     // Deliver one result on task1.
     task1.emit(.string(
-      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"Before disconnect"}}}}"#
+      #"{"type":"next","id":"\#(operationID)","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"Before disconnect"}}}}"#
     ))
 
     // Disconnect task1 — triggers reconnection.
@@ -596,13 +674,13 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     // Wait for the re-subscribe message on task2.
     await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
-    expect(task2.clientSentMessages(ofType: "subscribe").first?["id"] as? String).to(equal("1"))
+    expect(task2.clientSentMessages(ofType: "subscribe").first?["id"] as? String).to(equal(operationID))
 
     // Deliver a result on the new connection and complete.
     task2.emit(.string(
-      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":3,"commentary":"After reconnect"}}}}"#
+      #"{"type":"next","id":"\#(operationID)","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":3,"commentary":"After reconnect"}}}}"#
     ))
-    task2.emit(.string(#"{"type":"complete","id":"1"}"#))
+    task2.emit(.string(#"{"type":"complete","id":"\#(operationID)"}"#))
 
     let results = try await subscription.getAllValues()
 
@@ -637,11 +715,8 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     task1.emit(.string(#"{"type":"connection_ack"}"#))
 
     // Start sub1 and wait for its subscribe, then sub2.
-    let sub1 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
-
-    let sub2 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
+    let (sub1, id1) = try await subscribe(on: task1, using: client)
+    let (sub2, id2) = try await subscribe(on: task1, using: client)
 
     // Disconnect task1 — triggers reconnection.
     task1.finish()
@@ -654,17 +729,17 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     // Verify both IDs were re-subscribed.
     let resubscribedIDs = Set(task2.clientSentMessages(ofType: "subscribe").compactMap { $0["id"] as? String })
-    expect(resubscribedIDs).to(equal(Set(["1", "2"])))
+    expect(resubscribedIDs).to(equal(Set([id1, id2])))
 
     // Deliver data and complete for both on the new connection.
     task2.emit(.string(
-      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"Sub1 reconnected"}}}}"#
+      #"{"type":"next","id":"\#(id1)","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"Sub1 reconnected"}}}}"#
     ))
-    task2.emit(.string(#"{"type":"complete","id":"1"}"#))
+    task2.emit(.string(#"{"type":"complete","id":"\#(id1)"}"#))
     task2.emit(.string(
-      #"{"type":"next","id":"2","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":3,"commentary":"Sub2 reconnected"}}}}"#
+      #"{"type":"next","id":"\#(id2)","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":3,"commentary":"Sub2 reconnected"}}}}"#
     ))
-    task2.emit(.string(#"{"type":"complete","id":"2"}"#))
+    task2.emit(.string(#"{"type":"complete","id":"\#(id2)"}"#))
 
     let results1 = try await sub1.getAllValues()
     let results2 = try await sub2.getAllValues()
@@ -692,8 +767,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     task1.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (subscription, _) = try await subscribe(on: task1, using: client)
 
     // Disconnect task1 — triggers reconnection attempt on task2.
     task1.finish()
@@ -766,8 +840,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     task1.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (subscription, _) = try await subscribe(on: task1, using: client)
 
     // Consume in a cancellable task.
     let consumeTask = Task {
@@ -812,12 +885,11 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     task1.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
 
     // Deliver one result on task1.
     task1.emit(.string(
-      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"Before error"}}}}"#
+      #"{"type":"next","id":"\#(operationID)","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"Before error"}}}}"#
     ))
 
     // Simulate a transport error (e.g. network failure) — not a graceful close.
@@ -829,9 +901,9 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
 
     task2.emit(.string(
-      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":3,"commentary":"After error"}}}}"#
+      #"{"type":"next","id":"\#(operationID)","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":3,"commentary":"After error"}}}}"#
     ))
-    task2.emit(.string(#"{"type":"complete","id":"1"}"#))
+    task2.emit(.string(#"{"type":"complete","id":"\#(operationID)"}"#))
 
     let results = try await subscription.getAllValues()
 
@@ -859,12 +931,11 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     task1.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
 
     // Deliver one result then hit a transport error.
     task1.emit(.string(
-      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"Only result"}}}}"#
+      #"{"type":"next","id":"\#(operationID)","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"Only result"}}}}"#
     ))
 
     struct MockTransportError: Swift.Error {}
@@ -905,11 +976,8 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     task1.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let sub1 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
-
-    let sub2 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
+    let (sub1, id1) = try await subscribe(on: task1, using: client)
+    let (sub2, id2) = try await subscribe(on: task1, using: client)
 
     // Transport error kills the connection.
     struct MockTransportError: Swift.Error {}
@@ -920,17 +988,17 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
 
     let resubscribedIDs = Set(task2.clientSentMessages(ofType: "subscribe").compactMap { $0["id"] as? String })
-    expect(resubscribedIDs).to(equal(Set(["1", "2"])))
+    expect(resubscribedIDs).to(equal(Set([id1, id2])))
 
     // Deliver data and complete for both.
     task2.emit(.string(
-      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"Sub1 recovered"}}}}"#
+      #"{"type":"next","id":"\#(id1)","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"Sub1 recovered"}}}}"#
     ))
-    task2.emit(.string(#"{"type":"complete","id":"1"}"#))
+    task2.emit(.string(#"{"type":"complete","id":"\#(id1)"}"#))
     task2.emit(.string(
-      #"{"type":"next","id":"2","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":3,"commentary":"Sub2 recovered"}}}}"#
+      #"{"type":"next","id":"\#(id2)","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":3,"commentary":"Sub2 recovered"}}}}"#
     ))
-    task2.emit(.string(#"{"type":"complete","id":"2"}"#))
+    task2.emit(.string(#"{"type":"complete","id":"\#(id2)"}"#))
 
     let results1 = try await sub1.getAllValues()
     let results2 = try await sub2.getAllValues()
@@ -948,8 +1016,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     mockTask.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
 
     // Server sends a ping — transport should reply with a pong.
     mockTask.emit(.string(#"{"type":"ping"}"#))
@@ -968,8 +1035,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     mockTask.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
 
     // Server sends a ping with payload — transport should reply with a pong (no payload).
     mockTask.emit(.string(#"{"type":"ping","payload":{"hello":"world"}}"#))
@@ -988,8 +1054,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     mockTask.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
 
     // Server sends an unsolicited pong — transport should NOT reply.
     mockTask.emit(.string(#"{"type":"pong"}"#))
@@ -1009,8 +1074,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     mockTask.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
 
     // Server sends multiple pings — transport should reply to each.
     mockTask.emit(.string(#"{"type":"ping"}"#))
@@ -1029,8 +1093,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     mockTask.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
 
     // Server sends a message with an unknown type.
     mockTask.emit(.string(#"{"type":"unknown_garbage"}"#))
@@ -1062,12 +1125,11 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     task1.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
 
     // Deliver one result.
     task1.emit(.string(
-      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"Only result"}}}}"#
+      #"{"type":"next","id":"\#(operationID)","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"Only result"}}}}"#
     ))
 
     // Disconnect — with reconnection disabled, stream should terminate.
@@ -1244,8 +1306,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     task1.emit(.string(#"{"type":"connection_ack"}"#))
 
     // Start a subscription first.
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (subscription, subscriptionID) = try await subscribe(on: task1, using: client)
 
     // Start a query — it blocks waiting for the response.
     let queryTask = Task {
@@ -1276,9 +1337,9 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     // Deliver data on the new connection and complete.
     task2.emit(.string(
-      #"{"type":"next","id":"1","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":4,"commentary":"After reconnect"}}}}"#
+      #"{"type":"next","id":"\#(subscriptionID)","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":4,"commentary":"After reconnect"}}}}"#
     ))
-    task2.emit(.string(#"{"type":"complete","id":"1"}"#))
+    task2.emit(.string(#"{"type":"complete","id":"\#(subscriptionID)"}"#))
 
     let results = try await subscription.getAllValues()
     expect(results.count).to(equal(1))
@@ -1309,12 +1370,10 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     task1.emit(.string(#"{"type":"connection_ack"}"#))
 
-    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
 
     // The subscribe message should use the custom ID.
-    let subscribeMessage = task1.clientSentMessages(ofType: "subscribe").first
-    expect(subscribeMessage?["id"] as? String).to(equal("custom-id-123"))
+    expect(operationID).to(equal("custom-id-123"))
 
     // Server responds using the custom ID.
     task1.emit(.string(
@@ -1326,6 +1385,246 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     expect(results.count).to(equal(1))
     expect(results[0].data?.reviewAdded?.commentary).to(equal("Custom ID works"))
+  }
+
+  // MARK: - Delegate
+
+  func testDelegate__whenConnectionEstablished__shouldCallDidConnect() async throws {
+    let task1 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    let delegate = MockWebSocketTransportDelegate()
+    await transport.setDelegate(delegate)
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    expect(delegate.events).to(contain(.didConnect))
+    expect(delegate.events).toNot(contain(.didReconnect))
+
+    _ = subscription
+  }
+
+  func testDelegate__whenReconnected__shouldCallDidReconnectNotDidConnect() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1, task2])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(reconnectionInterval: 0)
+    )
+    let delegate = MockWebSocketTransportDelegate()
+    await transport.setDelegate(delegate)
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    // Establish initial connection.
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Disconnect — triggers reconnection on task2.
+    task1.finish()
+
+    // Reconnect.
+    task2.emit(.string(#"{"type":"connection_ack"}"#))
+    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Should have: didConnect, didDisconnect, didReconnect (in that order).
+    await expect(delegate.events).toEventually(contain(.didReconnect))
+    expect(delegate.events.filter { $0 == .didConnect }.count).to(equal(1))
+    expect(delegate.events.filter { $0 == .didReconnect }.count).to(equal(1))
+
+    _ = subscription
+  }
+
+  func testDelegate__whenDisconnectedWithError__shouldCallDidDisconnectWithError() async throws {
+    let task1 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    let delegate = MockWebSocketTransportDelegate()
+    await transport.setDelegate(delegate)
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Disconnect with an error.
+    struct MockDisconnectError: Error {}
+    task1.throw(MockDisconnectError())
+
+    do {
+      _ = try await subscription.getAllValues()
+    } catch {}
+
+    await expect(delegate.events).toEventually(contain(.didDisconnect(hasError: true)))
+  }
+
+  func testDelegate__whenDisconnectedCleanly__shouldCallDidDisconnectWithNilError() async throws {
+    let task1 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    let delegate = MockWebSocketTransportDelegate()
+    await transport.setDelegate(delegate)
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Clean disconnect (stream ends without error).
+    task1.finish()
+
+    _ = try? await subscription.getAllValues()
+
+    await expect(delegate.events).toEventually(contain(.didDisconnect(hasError: false)))
+  }
+
+  func testDelegate__whenPingReceived__shouldCallDidReceivePing() async throws {
+    let task1 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    let delegate = MockWebSocketTransportDelegate()
+    await transport.setDelegate(delegate)
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Server sends a ping without payload.
+    task1.emit(.string(#"{"type":"ping"}"#))
+
+    await expect(delegate.events).toEventually(contain(.didReceivePing(hasPayload: false)))
+
+    // Server sends a ping with payload.
+    task1.emit(.string(#"{"type":"ping","payload":{"key":"value"}}"#))
+
+    await expect(delegate.events).toEventually(contain(.didReceivePing(hasPayload: true)))
+
+    _ = subscription
+  }
+
+  func testDelegate__whenPongReceived__shouldCallDidReceivePong() async throws {
+    let task1 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    let delegate = MockWebSocketTransportDelegate()
+    await transport.setDelegate(delegate)
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Server sends a pong without payload.
+    task1.emit(.string(#"{"type":"pong"}"#))
+
+    await expect(delegate.events).toEventually(contain(.didReceivePong(hasPayload: false)))
+
+    // Server sends a pong with payload.
+    task1.emit(.string(#"{"type":"pong","payload":{"data":"test"}}"#))
+
+    await expect(delegate.events).toEventually(contain(.didReceivePong(hasPayload: true)))
+
+    _ = subscription
+  }
+
+  func testDelegate__fullLifecycle__shouldReceiveEventsInOrder() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1, task2])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(reconnectionInterval: 0)
+    )
+    let delegate = MockWebSocketTransportDelegate()
+    await transport.setDelegate(delegate)
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    // Connect.
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+
+    // Receive a ping.
+    task1.emit(.string(#"{"type":"ping"}"#))
+    await expect(delegate.events).toEventually(contain(.didReceivePing(hasPayload: false)))
+
+    // Disconnect.
+    task1.finish()
+
+    // Reconnect.
+    task2.emit(.string(#"{"type":"connection_ack"}"#))
+    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Complete the subscription to let the test finish.
+    task2.emit(.string(#"{"type":"complete","id":"\#(operationID)"}"#))
+    _ = try? await subscription.getAllValues()
+
+    // Verify the full sequence of events.
+    let events = delegate.events
+    expect(events).to(contain(.didConnect))
+    expect(events).to(contain(.didReceivePing(hasPayload: false)))
+    expect(events).to(contain(.didDisconnect(hasError: false)))
+    expect(events).to(contain(.didReconnect))
+
+    // Verify ordering: didConnect before didDisconnect, didDisconnect before didReconnect.
+    if let connectIdx = events.firstIndex(of: .didConnect),
+       let disconnectIdx = events.firstIndex(of: .didDisconnect(hasError: false)),
+       let reconnectIdx = events.firstIndex(of: .didReconnect) {
+      expect(connectIdx).to(beLessThan(disconnectIdx))
+      expect(disconnectIdx).to(beLessThan(reconnectIdx))
+    } else {
+      fail("Expected all lifecycle events to be present")
+    }
   }
 
   func testSubscription__withSequencedCreatorStartingAtCustomNumber__shouldUseSequentialIds() async throws {
@@ -1347,16 +1646,13 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     task1.emit(.string(#"{"type":"connection_ack"}"#))
 
     // Start first subscription — should get ID "100".
-    let sub1 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let (sub1, id1) = try await subscribe(on: task1, using: client)
 
     // Start second subscription — should get ID "101".
-    let sub2 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
-    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
+    let (sub2, id2) = try await subscribe(on: task1, using: client)
 
-    let subscribeMessages = task1.clientSentMessages(ofType: "subscribe")
-    let ids = Set(subscribeMessages.compactMap { $0["id"] as? String })
-    expect(ids).to(equal(Set(["100", "101"])))
+    expect(id1).to(equal("100"))
+    expect(id2).to(equal("101"))
 
     _ = (sub1, sub2)
   }

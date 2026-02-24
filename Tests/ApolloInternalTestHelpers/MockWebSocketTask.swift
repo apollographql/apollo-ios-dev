@@ -97,4 +97,22 @@ public final class MockWebSocketTask: WebSocketTask, @unchecked Sendable {
       return json
     }
   }
+
+  /// Returns the operation ID from the subscribe message at the given index.
+  ///
+  /// Use this to extract the actual server-assigned ID instead of hardcoding operation IDs
+  /// in test assertions and mock server messages.
+  ///
+  /// - Precondition: There must be at least `index + 1` subscribe messages already sent.
+  public func subscribeOperationID(at index: Int) -> String {
+    let messages = clientSentMessages(ofType: "subscribe")
+    precondition(
+      index < messages.count,
+      "Expected subscribe message at index \(index), but only \(messages.count) subscribe messages exist"
+    )
+    guard let id = messages[index]["id"] as? String else {
+      preconditionFailure("Subscribe message at index \(index) has no 'id' field")
+    }
+    return id
+  }
 }

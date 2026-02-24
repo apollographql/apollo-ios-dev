@@ -74,6 +74,18 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     case disconnected
   }
 
+  /// The delegate that receives lifecycle events from this transport.
+  ///
+  /// Delegate methods are `isolated` to this actor, meaning they execute within the
+  /// transport's isolation domain. The transport awaits each delegate call before
+  /// continuing its receive loop.
+  public weak var delegate: (any WebSocketTransportDelegate)?
+
+  /// Sets the delegate that receives lifecycle events from this transport.
+  public func setDelegate(_ delegate: (any WebSocketTransportDelegate)?) {
+    self.delegate = delegate
+  }
+
   public let urlSession: WebSocketURLSession
 
   public let store: ApolloStore
@@ -85,6 +97,10 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   private var connection: WebSocketConnection
 
   var connectionState: ConnectionState = .notStarted
+
+  /// Tracks whether the transport has ever successfully connected. Used to distinguish
+  /// initial connection from reconnection for delegate callbacks.
+  private var hasBeenConnected = false
 
   private var subscriberRegistry: SubscriberRegistry
 
@@ -191,6 +207,8 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   private func handleDisconnection(error: (any Swift.Error)? = nil) async {
     let wasConnected = (self.connectionState == .connected)
     self.connectionState = .disconnected
+
+    delegate?.webSocketTransport(self, didDisconnectWithError: error)
 
     // Terminate one-shot operations (queries/mutations) immediately, regardless of
     // whether reconnection is enabled. Only subscriptions survive reconnection.
@@ -319,9 +337,17 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
 
       switch incoming {
       case .connectionAck:
+        let isReconnect = hasBeenConnected
         self.connectionState = .connected
+        self.hasBeenConnected = true
         connectionWaiters.resumeAll()
         resubscribeActiveSubscribers()
+
+        if isReconnect {
+          delegate?.webSocketTransportDidReconnect(self)
+        } else {
+          delegate?.webSocketTransportDidConnect(self)
+        }
 
       case .next(let id, let payload):
         subscriberRegistry.yield(payload, for: id)
@@ -332,16 +358,16 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
       case .complete(let id):
         subscriberRegistry.finish(id)
 
-      case .ping:
+      case .ping(let payload):
         // Per the graphql-transport-ws protocol, a pong must be sent in response
         // to a ping "as soon as possible".
         if let pongMessage = try? Message.Outgoing.pong(payload: nil).toWebSocketMessage() {
           connection.send(pongMessage)
         }
+        delegate?.webSocketTransport(self, didReceivePingWithPayload: payload)
 
-      case .pong:
-        // Unsolicited or response pongs require no action from the transport.
-        break
+      case .pong(let payload):
+        delegate?.webSocketTransport(self, didReceivePongWithPayload: payload)
       }
     } catch {
       subscriberRegistry.finishAll(throwing: Error.unrecognizedMessage)
