@@ -15,8 +15,9 @@ Core Apollo iOS SDK providing networking, caching, and the client API for GraphQ
 ### Request Chain (Interceptor Pattern)
 The networking layer uses a chain-of-responsibility pattern in `Sources/Apollo/RequestChain/`:
 - `RequestChainNetworkTransport` creates a `RequestChain` for each operation
-- Interceptors process requests/responses sequentially (caching, HTTP, parsing, retry, APQ, etc.)
-- Custom interceptors can be added by conforming to the `ApolloInterceptor` protocol
+- Four interceptor types: `GraphQLInterceptor` (pre/post-flight on GraphQLRequest/Response), `HTTPInterceptor` (pre/post-flight on URLRequest/HTTPResponse), `CacheInterceptor` (cache reads/writes), `ResponseParsingInterceptor` (parses HTTPResponse chunks into GraphQLResponse)
+- Custom interceptors implement the appropriate protocol; `InterceptorProvider` supplies them to the chain
+- `DefaultInterceptorProvider` provides: `MaxRetryInterceptor`, `AutomaticPersistedQueryInterceptor` (GraphQL), `ResponseCodeInterceptor` (HTTP), `DefaultCacheInterceptor` (cache), `JSONResponseParsingInterceptor` (parser)
 
 ### Normalized Cache
 Cache system in `Sources/Apollo/Caching/`:
