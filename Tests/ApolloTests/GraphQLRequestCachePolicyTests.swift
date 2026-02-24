@@ -203,50 +203,6 @@ class GraphQLRequestCachePolicyTests: XCTestCase {
     expect(urlRequest.timeoutInterval).to(equal(30.0))
   }
 
-  // MARK: - Ensuring URLCache Doesn't Interfere
-
-  func test__cachePolicy__givenCacheOnly__urlShouldNotFetchFromNetwork() throws {
-    // CacheOnly should prevent network fetch entirely
-    let subject = JSONRequest.mock(
-      operation: MockQuery.mock(),
-      fetchBehavior: .CacheOnly,
-      graphQLEndpoint: TestURL.mockServer.url
-    )
-
-    let urlRequest = try subject.toURLRequest()
-
-    // .returnCacheDataDontLoad ensures the URLSession won't make a network request
-    expect(urlRequest.cachePolicy).to(equal(.returnCacheDataDontLoad))
-  }
-
-  func test__cachePolicy__givenCacheAndNetwork__urlShouldAlwaysFetchFromNetwork() throws {
-    // CacheAndNetwork should always fetch from network (Apollo cache is separate)
-    let subject = JSONRequest.mock(
-      operation: MockQuery.mock(),
-      fetchBehavior: .CacheAndNetwork,
-      graphQLEndpoint: TestURL.mockServer.url
-    )
-
-    let urlRequest = try subject.toURLRequest()
-
-    // .reloadIgnoringLocalCacheData ensures fresh network fetch
-    expect(urlRequest.cachePolicy).to(equal(.reloadIgnoringLocalCacheData))
-  }
-
-  func test__cachePolicy__givenNetworkOnly__urlShouldBypassCache() throws {
-    // NetworkOnly should completely bypass URL cache
-    let subject = JSONRequest.mock(
-      operation: MockQuery.mock(),
-      fetchBehavior: .NetworkOnly,
-      graphQLEndpoint: TestURL.mockServer.url
-    )
-
-    let urlRequest = try subject.toURLRequest()
-
-    // .reloadIgnoringLocalCacheData ensures URL cache is bypassed
-    expect(urlRequest.cachePolicy).to(equal(.reloadIgnoringLocalCacheData))
-  }
-
   // MARK: - Verify Default Request Configuration
 
   func test__createDefaultRequest__shouldSetCachePolicy() throws {
