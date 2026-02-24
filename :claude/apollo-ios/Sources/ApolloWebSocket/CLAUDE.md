@@ -2,12 +2,14 @@
 
 ## Architecture
 
-`WebSocketTransport` is a Swift `actor` implementing the `graphql-transport-ws` protocol. Key types:
+`WebSocketTransport` is a Swift `actor` implementing the `graphql-transport-ws` protocol for all operation types (queries, mutations, subscriptions). Key types:
 
 - **`WebSocketTransport`** — Main entry point. Manages connection lifecycle (state machine: `notStarted` → `connecting` → `connected` / `disconnected`), subscriber registry, and message routing.
 - **`WebSocketConnection`** — Wraps a `WebSocketTask`, handles `openConnection()` (returns `AsyncThrowingStream` of messages) and `send()`.
 - **`WebSocketTask`** protocol — Abstraction over `URLSessionWebSocketTask` for testability. Defined in `WebSocketURLSession.swift`.
 - **`Message.Incoming` / `Message.Outgoing`** — Enums in `WebSocketMessage.swift` for all `graphql-transport-ws` message types. Outgoing serializes to `.data` (not `.string`). Incoming deserializes from both `.string` and `.data`.
+- **`SubscriberRegistry`** — Manages operation subscribers keyed by `OperationID`. Extracted from `WebSocketTransport`.
+- **`ConnectionWaiterQueue`** — Manages `CheckedContinuation`s for callers awaiting connection. Extracted from `WebSocketTransport`.
 
 ## Connection Lifecycle
 
@@ -21,10 +23,17 @@ Connection waiters use `[CheckedContinuation<Void, any Error>]` array pattern (s
 
 ## Subscriber Registry
 
-- Keyed by `OperationID` (auto-incrementing `Int`)
-- Each subscriber gets an `AsyncThrowingStream<JSONObject, Error>.Continuation`
+- Lives in `SubscriberRegistry.swift`, keyed by `OperationID` (auto-incrementing `Int`)
+- Each subscriber gets an `AsyncThrowingStream<JSONObject, Error>.Continuation` and stores the operation type
 - `didReceive(message:)` routes `next` payloads to subscriber by ID, `complete` finishes the stream
-- On disconnect, all subscribers are finished (with error if connection failed)
+- On disconnect: non-subscriptions are terminated **immediately** with the actual error (before reconnection), subscriptions survive for re-subscribe
+- Unrecognized/unparseable messages throw `Error.unrecognizedMessage` and terminate all subscribers
+
+## Ping/Pong
+
+- Application-level JSON messages (separate from WebSocket-frame-level ping/pong)
+- On receiving `ping`: reply with `pong(payload: nil)` immediately — do NOT echo the ping's payload
+- On receiving `pong`: no action (break)
 
 ## Testing
 
@@ -52,11 +61,4 @@ expect(results.count).to(equal(1))
 
 ### Running WebSocket tests
 
-```bash
-xcodebuild test \
-  -workspace ApolloDev.xcworkspace \
-  -scheme ApolloTests \
-  -testPlan Apollo-UnitTestPlan \
-  -destination 'platform=macOS' \
-  -only-testing:"ApolloTests/WebSocketTests"
-```
+Use the Xcode MCP `RunSomeTests` tool (see root CLAUDE.md "Tool Preferences"). Target: `ApolloTests`, test identifier: `WebSocketTests`.

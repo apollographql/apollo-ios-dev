@@ -277,7 +277,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Do NOT emit connection_ack — the inner task will be stuck at ensureConnected().
     let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
 
-    await expect { await self.networkTransport.subscribers.count }.toEventually(equal(1))
+    await expect { await self.networkTransport.subscriberCount }.toEventually(equal(1))
 
     // Consume in a cancellable task.
     let task = Task {
@@ -286,7 +286,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     // Cancel before connection_ack arrives.
     task.cancel()
-    await expect { await self.networkTransport.subscribers.count }.toEventually(equal(0))
+    await expect { await self.networkTransport.subscriberCount }.toEventually(equal(0))
 
     // Since the subscription was cancelled before connection_ack, no subscribe
     // should have been sent yet.
@@ -731,7 +731,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     consumeTask.cancel()
 
     // Wait for subscriber to be removed from the transport.
-    await expect { await transport.subscribers.count }.toEventually(equal(0))
+    await expect { await transport.subscriberCount }.toEventually(equal(0))
 
     // Now let task2 connect — even if reconnection proceeds, no subscribers remain to re-subscribe.
     task2.emit(.string(#"{"type":"connection_ack"}"#))
