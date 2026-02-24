@@ -73,7 +73,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
   func test__connectionInit__withNestedPayload__shouldSerializeNestedValues() throws {
     let message = try WebSocketTransport.Message.Outgoing
       .connectionInit(payload: [
-        "auth": ["user": "admin", "pass": "secret"] as [String: String]
+        "auth": ["user": "admin", "pass": "secret"] as JSONEncodableDictionary
       ])
       .toWebSocketMessage()
 
