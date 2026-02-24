@@ -4,7 +4,7 @@ import Foundation
 
 public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport {
   
-  typealias OperationID = Int
+  typealias OperationID = String
   
   public enum Error: Swift.Error {
     /// The received WebSocket message could not be parsed as a valid `graphql-transport-ws` message.
@@ -45,14 +45,20 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     /// The payload to send on connection. Defaults to `nil`.
     public var connectingPayload: JSONEncodableDictionary?
 
+    /// The ``OperationMessageIdCreator`` used to generate a unique message identifier per
+    /// operation. Defaults to ``ApolloSequencedOperationMessageIdCreator``.
+    public var operationMessageIdCreator: any OperationMessageIdCreator
+
     public init(
       reconnectionInterval: TimeInterval = -1,
       requestBodyCreator: any JSONRequestBodyCreator = DefaultRequestBodyCreator(),
-      connectingPayload: JSONEncodableDictionary? = nil
+      connectingPayload: JSONEncodableDictionary? = nil,
+      operationMessageIdCreator: any OperationMessageIdCreator = ApolloSequencedOperationMessageIdCreator()
     ) {
       self.reconnectionInterval = reconnectionInterval
       self.requestBodyCreator = requestBodyCreator
       self.connectingPayload = connectingPayload
+      self.operationMessageIdCreator = operationMessageIdCreator
     }
   }
 
@@ -80,7 +86,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
 
   var connectionState: ConnectionState = .notStarted
 
-  private var subscriberRegistry = SubscriberRegistry()
+  private var subscriberRegistry: SubscriberRegistry
 
   private var connectionWaiters = ConnectionWaiterQueue()
 
@@ -98,6 +104,9 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     self.configuration = configuration
     self.request = try Self.createURLRequest(endpointURL: endpointURL)
     self.connection = WebSocketConnection(task: urlSession.webSocketTask(with: request))
+    self.subscriberRegistry = SubscriberRegistry(
+      operationMessageIdCreator: configuration.operationMessageIdCreator
+    )
   }
 
   // MARK: - Request Setup

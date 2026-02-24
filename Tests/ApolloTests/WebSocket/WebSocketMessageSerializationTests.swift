@@ -146,7 +146,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
     ]
 
     let message = try WebSocketTransport.Message.Outgoing
-      .subscribe(id: 1, payload: subscribePayload)
+      .subscribe(id: "1", payload: subscribePayload)
       .toWebSocketMessage()
 
     let json = try deserialize(message)
@@ -168,7 +168,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
     ]
 
     let message = try WebSocketTransport.Message.Outgoing
-      .subscribe(id: 5, payload: subscribePayload)
+      .subscribe(id: "5", payload: subscribePayload)
       .toWebSocketMessage()
 
     let json = try deserialize(message)
@@ -189,7 +189,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
     ] as JSONEncodableDictionary
 
     let message = try WebSocketTransport.Message.Outgoing
-      .subscribe(id: 3, payload: subscribePayload)
+      .subscribe(id: "3", payload: subscribePayload)
       .toWebSocketMessage()
 
     let json = try deserialize(message)
@@ -209,7 +209,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
     ] as JSONEncodableDictionary
 
     let message = try WebSocketTransport.Message.Outgoing
-      .subscribe(id: 7, payload: subscribePayload)
+      .subscribe(id: "7", payload: subscribePayload)
       .toWebSocketMessage()
 
     let json = try deserialize(message)
@@ -230,7 +230,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
     ] as JSONEncodableDictionary
 
     let message = try WebSocketTransport.Message.Outgoing
-      .subscribe(id: 42, payload: subscribePayload)
+      .subscribe(id: "42", payload: subscribePayload)
       .toWebSocketMessage()
 
     let json = try deserialize(message)
@@ -257,7 +257,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
 
   func test__complete__shouldSerializeTypeAndId() throws {
     let message = try WebSocketTransport.Message.Outgoing
-      .complete(id: 1)
+      .complete(id: "1")
       .toWebSocketMessage()
 
     let json = try deserialize(message)
@@ -269,7 +269,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
 
   func test__complete__shouldNotIncludePayload() throws {
     let message = try WebSocketTransport.Message.Outgoing
-      .complete(id: 3)
+      .complete(id: "3")
       .toWebSocketMessage()
 
     let json = try deserialize(message)
@@ -279,7 +279,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
 
   func test__complete__withLargeOperationId__shouldSerializeCorrectly() throws {
     let message = try WebSocketTransport.Message.Outgoing
-      .complete(id: 999999)
+      .complete(id: "999999")
       .toWebSocketMessage()
 
     let json = try deserialize(message)
@@ -298,7 +298,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
     ]
 
     let message = try WebSocketTransport.Message.Outgoing
-      .subscribe(id: 1, payload: subscribePayload)
+      .subscribe(id: "1", payload: subscribePayload)
       .toWebSocketMessage()
 
     let json = try deserialize(message)
@@ -312,7 +312,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
     ]
 
     let message = try WebSocketTransport.Message.Outgoing
-      .subscribe(id: 999999, payload: subscribePayload)
+      .subscribe(id: "999999", payload: subscribePayload)
       .toWebSocketMessage()
 
     let json = try deserialize(message)
@@ -327,12 +327,12 @@ class WebSocketMessageSerializationTests: XCTestCase {
       .ping(payload: nil),
       .pong(payload: nil),
       .subscribe(
-        id: 1,
+        id: "1",
         payload: [
           "query": "{ __typename }",
         ]
       ),
-      .complete(id: 1),
+      .complete(id: "1"),
     ]
 
     for outgoing in messages {
@@ -350,7 +350,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
       .ping(payload: ["key": "value"]),
       .pong(payload: ["key": "value"]),
       .subscribe(
-        id: 1,
+        id: "1",
         payload: [
           "operationName": "Op",
           "query": "subscription Op { onEvent { id } }",
@@ -358,7 +358,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
           "extensions": ["x": "y"] as JSONEncodableDictionary,
         ]
       ),
-      .complete(id: 1),
+      .complete(id: "1"),
     ]
 
     for outgoing in messages {
@@ -458,7 +458,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
       fail("Expected .next, got \(incoming)")
       return
     }
-    expect(id).to(equal(1))
+    expect(id).to(equal("1"))
     let data = payload["data"] as? [String: Any]
     let hero = data?["hero"] as? [String: Any]
     expect(hero?["name"] as? String).to(equal("Luke"))
@@ -473,7 +473,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
       fail("Expected .next, got \(incoming)")
       return
     }
-    expect(id).to(equal(5))
+    expect(id).to(equal("5"))
     let data = payload["data"] as? [String: Any]
     expect(data?["count"] as? Int).to(equal(42))
   }
@@ -505,7 +505,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
       fail("Expected .error, got \(incoming)")
       return
     }
-    expect(id).to(equal(2))
+    expect(id).to(equal("2"))
     expect(errors).to(haveCount(1))
     expect(errors[0].message).to(equal("Something went wrong"))
   }
@@ -519,7 +519,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
       fail("Expected .error, got \(incoming)")
       return
     }
-    expect(id).to(equal(3))
+    expect(id).to(equal("3"))
     expect(errors).to(haveCount(2))
     expect(errors[0].message).to(equal("Error one"))
     expect(errors[1].message).to(equal("Error two"))
@@ -542,7 +542,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
       fail("Expected .error, got \(incoming)")
       return
     }
-    expect(id).to(equal(1))
+    expect(id).to(equal("1"))
     expect(errors).to(beEmpty())
   }
 
@@ -557,7 +557,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
       fail("Expected .complete, got \(incoming)")
       return
     }
-    expect(id).to(equal(1))
+    expect(id).to(equal("1"))
   }
 
   func test__complete__deserialization__withIntId() throws {
@@ -569,7 +569,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
       fail("Expected .complete, got \(incoming)")
       return
     }
-    expect(id).to(equal(7))
+    expect(id).to(equal("7"))
   }
 
   func test__complete__deserialization__withLargeId() throws {
@@ -581,7 +581,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
       fail("Expected .complete, got \(incoming)")
       return
     }
-    expect(id).to(equal(999999))
+    expect(id).to(equal("999999"))
   }
 
   func test__complete__deserialization__withoutId__shouldThrow() throws {
@@ -602,7 +602,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
       fail("Expected .complete, got \(incoming)")
       return
     }
-    expect(id).to(equal(1))
+    expect(id).to(equal("1"))
   }
 
   // MARK: - Deserialization: edge cases

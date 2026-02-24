@@ -14,12 +14,6 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   static let endpointURL = TestURL.mockWebSocket.url
 
-//  struct CustomOperationMessageIdCreator: OperationMessageIdCreator {
-//    func requestId() -> String {
-//      return "12345678"
-//    }
-//  }
-//
   class ReviewAddedData: MockSelectionSet, @unchecked Sendable {
     override class var __selections: [Selection] { [
       .field("reviewAdded", ReviewAdded.self),
@@ -1291,98 +1285,79 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     expect(results[0].data?.reviewAdded?.commentary).to(equal("After reconnect"))
   }
 
-//
-//  func testLocalErrorMissingId() throws {
-//    let expectation = self.expectation(description: "Missing id for subscription")
-//
-//    let subject = client.subscribe(subscription: MockSubscription<ReviewAddedData>()) { result in
-//      defer { expectation.fulfill() }
-//
-//      switch result {
-//      case .success:
-//        XCTFail("This should have caused an error!")
-//      case .failure(let error):
-//        if let webSocketError = error as? WebSocketError {
-//          switch webSocketError.kind {
-//          case .unprocessedMessage:
-//            // Correct!
-//            break
-//          default:
-//            XCTFail("Unexpected websocket error: \(error)")
-//          }
-//        } else {
-//          XCTFail("Unexpected error: \(error)")
-//        }
-//      }
-//    }
-//
-//    // Message data below has missing 'id' and should notify all subscribers of the error
-//    let message : JSONEncodableDictionary = [
-//      "type": "data",
-//      "payload": [
-//        "data": [
-//          "reviewAdded": [
-//            "__typename": "ReviewAdded",
-//            "episode": "JEDI",
-//            "stars": 5,
-//            "commentary": "A great movie"
-//          ]
-//        ]
-//      ]
-//    ]
-//
-//    networkTransport.write(message: message)
-//
-//    waitForExpectations(timeout: 2, handler: nil)
-//
-//    subject.cancel()
-//  }
-//
-//  func testSingleSubscriptionWithCustomOperationMessageIdCreator() throws {
-//    let expectation = self.expectation(description: "Single Subscription with Custom Operation Message Id Creator")
-//
-//    let store = ApolloStore.mock()
-//    let websocket = MockWebSocket(
-//      request:URLRequest(url: TestURL.mockServer.url),
-//      protocol: .graphql_ws
-//    )
-//    networkTransport = WebSocketTransport(
-//      websocket: websocket,
-//      store: store,
-//      config: .init(
-//        operationMessageIdCreator: CustomOperationMessageIdCreator()
-//      ))
-//    client = ApolloClient(networkTransport: networkTransport!, store: store)
-//
-//    let subject = client.subscribe(subscription: MockSubscription<ReviewAddedData>()) { result in
-//      defer { expectation.fulfill() }
-//      switch result {
-//      case .success(let graphQLResult):
-//        XCTAssertEqual(graphQLResult.data?.reviewAdded?.stars, 5)
-//      case .failure(let error):
-//        XCTFail("Unexpected error: \(error)")
-//      }
-//    }
-//
-//    let message : JSONEncodableDictionary = [
-//      "type": "data",
-//      "id": "12345678", // subscribing on id = 12345678 from custom operation id
-//      "payload": [
-//        "data": [
-//          "reviewAdded": [
-//            "__typename": "ReviewAdded",
-//            "episode": "JEDI",
-//            "stars": 5,
-//            "commentary": "A great movie"
-//          ]
-//        ]
-//      ]
-//    ]
-//
-//    networkTransport.write(message: message)
-//
-//    waitForExpectations(timeout: 2, handler: nil)
-//
-//    subject.cancel()
-//  }
+  // MARK: - Custom Operation Message ID Creator
+
+  func testSubscription__withCustomOperationMessageIdCreator__shouldUseCustomIds() async throws {
+    struct FixedIdCreator: OperationMessageIdCreator {
+      mutating func requestId() -> String {
+        return "custom-id-123"
+      }
+    }
+
+    let task1 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(operationMessageIdCreator: FixedIdCreator())
+    )
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+
+    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // The subscribe message should use the custom ID.
+    let subscribeMessage = task1.clientSentMessages(ofType: "subscribe").first
+    expect(subscribeMessage?["id"] as? String).to(equal("custom-id-123"))
+
+    // Server responds using the custom ID.
+    task1.emit(.string(
+      #"{"type":"next","id":"custom-id-123","payload":{"data":{"reviewAdded":{"__typename":"ReviewAdded","stars":5,"commentary":"Custom ID works"}}}}"#
+    ))
+    task1.emit(.string(#"{"type":"complete","id":"custom-id-123"}"#))
+
+    let results = try await subscription.getAllValues()
+
+    expect(results.count).to(equal(1))
+    expect(results[0].data?.reviewAdded?.commentary).to(equal("Custom ID works"))
+  }
+
+  func testSubscription__withSequencedCreatorStartingAtCustomNumber__shouldUseSequentialIds() async throws {
+    let task1 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(
+        operationMessageIdCreator: ApolloSequencedOperationMessageIdCreator(startAt: 100)
+      )
+    )
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+
+    // Start first subscription — should get ID "100".
+    let sub1 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Start second subscription — should get ID "101".
+    let sub2 = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
+
+    let subscribeMessages = task1.clientSentMessages(ofType: "subscribe")
+    let ids = Set(subscribeMessages.compactMap { $0["id"] as? String })
+    expect(ids).to(equal(Set(["100", "101"])))
+
+    _ = (sub1, sub2)
+  }
 }
