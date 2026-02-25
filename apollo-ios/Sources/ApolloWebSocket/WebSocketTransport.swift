@@ -175,6 +175,8 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   /// - Otherwise: transitions to `disconnected`, fails pending connection waiters, and finishes
   ///   all subscriber streams.
   private func startConnectionReceiveLoop() {
+    /// Keeps a reference to the connection the the receive loop was opened on. If a reconnect occurs,
+    /// `self.connection` will be a new connection and we should ignore disconnection events for this loop.
     let loopConnection = self.connection
     let connectionStream = self.connection.openConnection(
       connectingPayload: configuration.connectingPayload
