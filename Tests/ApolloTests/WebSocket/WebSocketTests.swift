@@ -1869,4 +1869,172 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     task2.emit(.string(#"{"type":"complete","id":"\#(operationID)"}"#))
     _ = try await subscription.getAllValues()
   }
+
+  // MARK: - updateConnectingPayload
+
+  func testUpdateConnectingPayload__whenReconnectIfConnected__whenConnected__shouldReconnect() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1, task2])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    // Connect on task1.
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Update payload with reconnect — should create a new connection on task2.
+    await transport.updateConnectingPayload(
+      ["authToken": "new-token"],
+      reconnectIfConnected: true
+    )
+
+    // Task2 should be resumed (new connection started).
+    await expect(task2.isResumed).toEventually(beTrue())
+
+    // Ack the new connection and verify the connection_init payload.
+    task2.emit(.string(#"{"type":"connection_ack"}"#))
+    await expect(task2.clientSentMessages(ofType: "connection_init").count).toEventually(equal(1))
+
+    let initMessages = task2.clientSentMessages(ofType: "connection_init")
+    let payload = initMessages.first?["payload"] as? [String: Any]
+    expect(payload?["authToken"] as? String).to(equal("new-token"))
+
+    _ = subscription
+  }
+
+  func testUpdateConnectingPayload__withoutReconnect__whenConnected__shouldNotReconnect() async throws {
+    let task1 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(connectingPayload: ["authToken": "old-token"])
+    )
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    // Connect on task1.
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Update payload without reconnect (default).
+    await transport.updateConnectingPayload(["authToken": "new-token"])
+
+    // Should still be connected — only 1 task was created (the init task).
+    expect(factory.capturedRequests.count).to(equal(1))
+    await expect { await transport.connectionState }.to(equal(.connected))
+
+    _ = subscription
+  }
+
+  func testUpdateConnectingPayload__withReconnect__whenNotConnected__shouldNotReconnect() async throws {
+    let task1 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+
+    // Transport is in .notStarted state — no connection established.
+    await transport.updateConnectingPayload(
+      ["authToken": "new-token"],
+      reconnectIfConnected: true
+    )
+
+    // No reconnection should happen — still only the init task.
+    expect(factory.capturedRequests.count).to(equal(1))
+  }
+
+  func testUpdateConnectingPayload__withNilPayload__shouldClearPayload() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    let task3 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1, task2, task3])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(connectingPayload: ["authToken": "initial-token"])
+    )
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    // Connect on task1.
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Verify initial payload was sent.
+    let initMessages1 = task1.clientSentMessages(ofType: "connection_init")
+    let payload1 = initMessages1.first?["payload"] as? [String: Any]
+    expect(payload1?["authToken"] as? String).to(equal("initial-token"))
+
+    // Clear payload by passing nil and reconnect to task2.
+    await transport.updateConnectingPayload(nil, reconnectIfConnected: true)
+    await expect(task2.isResumed).toEventually(beTrue())
+
+    // Ack on task2.
+    task2.emit(.string(#"{"type":"connection_ack"}"#))
+    await expect(task2.clientSentMessages(ofType: "connection_init").count).toEventually(equal(1))
+
+    // Verify connection_init has no payload.
+    let initMessages2 = task2.clientSentMessages(ofType: "connection_init")
+    expect(initMessages2.first?["payload"]).to(beNil())
+
+    _ = subscription
+  }
+
+  func testUpdateConnectingPayload__shouldPersistAcrossReconnections() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1, task2])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(reconnectionInterval: 0)
+    )
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    // Connect on task1.
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+
+    // Set a payload without reconnecting — just stores it in configuration.
+    await transport.updateConnectingPayload(["authToken": "persistent-token"])
+
+    // Disconnect task1 — triggers auto-reconnection to task2.
+    task1.finish()
+    task2.emit(.string(#"{"type":"connection_ack"}"#))
+    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // The auto-reconnection's connection_init should include the updated payload.
+    let initMessages = task2.clientSentMessages(ofType: "connection_init")
+    expect(initMessages.count).to(equal(1))
+    let payload = initMessages.first?["payload"] as? [String: Any]
+    expect(payload?["authToken"] as? String).to(equal("persistent-token"))
+
+    // Complete the subscription so it doesn't block.
+    task2.emit(.string(#"{"type":"complete","id":"\#(operationID)"}"#))
+    _ = try await subscription.getAllValues()
+  }
 }
