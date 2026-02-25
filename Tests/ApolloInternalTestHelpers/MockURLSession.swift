@@ -17,11 +17,15 @@ public final class MockWebSocketTaskFactory: @unchecked Sendable {
   public let tasks: [MockWebSocketTask]
   private var index = 0
 
+  /// The `URLRequest`s passed to each `webSocketTask(with:)` call, in order.
+  public private(set) var capturedRequests: [URLRequest] = []
+
   public init(_ tasks: [MockWebSocketTask]) {
     self.tasks = tasks
   }
 
-  func next() -> MockWebSocketTask {
+  func next(for request: URLRequest) -> MockWebSocketTask {
+    capturedRequests.append(request)
     precondition(
       index < tasks.count,
       "MockWebSocketTaskFactory: requested task at index \(index) but only \(tasks.count) tasks were provided"
@@ -72,7 +76,7 @@ public struct MockURLSession: ApolloURLSession, WebSocketURLSession {
   }
 
   public func webSocketTask(with request: URLRequest) -> any WebSocketTask {
-    taskFactory?.next() ?? mockWebSocketTask
+    taskFactory?.next(for: request) ?? mockWebSocketTask
   }
 
 }

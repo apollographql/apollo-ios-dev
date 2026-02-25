@@ -1656,4 +1656,217 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     _ = (sub1, sub2)
   }
+
+  // MARK: - updateHeaderValues
+
+  func testUpdateHeaderValues__whenReconnectIfConnected__whenConnected__shouldReconnect() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1, task2])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    // Connect on task1.
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Update headers with reconnect — should create a new connection on task2.
+    await transport.updateHeaderValues(
+      ["Authorization": "Bearer token123"],
+      reconnectIfConnected: true
+    )
+
+    // Task2 should be resumed (new connection started).
+    await expect(task2.isResumed).toEventually(beTrue())
+
+    // The reconnection request should contain the updated header.
+    let reconnectRequest = factory.capturedRequests.last!
+    expect(reconnectRequest.value(forHTTPHeaderField: "Authorization")).to(equal("Bearer token123"))
+
+    // The Sec-WebSocket-Protocol header should be preserved.
+    expect(reconnectRequest.value(forHTTPHeaderField: "Sec-WebSocket-Protocol"))
+      .to(equal("graphql-transport-ws"))
+
+    _ = subscription
+  }
+
+  func testUpdateHeaderValues__withoutReconnect__whenConnected__shouldNotReconnect() async throws {
+    let task1 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    // Connect on task1.
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Update headers without reconnect (default).
+    await transport.updateHeaderValues(["Authorization": "Bearer token123"])
+
+    // Should still be connected — only 1 task was created (the init task).
+    expect(factory.capturedRequests.count).to(equal(1))
+    await expect { await transport.connectionState }.to(equal(.connected))
+
+    _ = subscription
+  }
+
+  func testUpdateHeaderValues__withReconnect__whenNotConnected__shouldNotReconnect() async throws {
+    let task1 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+
+    // Transport is in .notStarted state — no connection established.
+    await transport.updateHeaderValues(
+      ["Authorization": "Bearer token123"],
+      reconnectIfConnected: true
+    )
+
+    // No reconnection should happen — still only the init task.
+    expect(factory.capturedRequests.count).to(equal(1))
+  }
+
+  func testUpdateHeaderValues__withNilValue__shouldRemoveHeader() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    let task3 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1, task2, task3])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    // Connect on task1.
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Add a header and reconnect to task2.
+    await transport.updateHeaderValues(
+      ["Authorization": "Bearer token123"],
+      reconnectIfConnected: true
+    )
+    await expect(task2.isResumed).toEventually(beTrue())
+
+    // Verify the header was set.
+    let request2 = factory.capturedRequests[1]
+    expect(request2.value(forHTTPHeaderField: "Authorization")).to(equal("Bearer token123"))
+
+    // Ack on task2 so we're connected again.
+    task2.emit(.string(#"{"type":"connection_ack"}"#))
+    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Now remove the header by passing nil and reconnect to task3.
+    await transport.updateHeaderValues(
+      ["Authorization": nil],
+      reconnectIfConnected: true
+    )
+    await expect(task3.isResumed).toEventually(beTrue())
+
+    // Verify the header was removed.
+    let request3 = factory.capturedRequests[2]
+    expect(request3.value(forHTTPHeaderField: "Authorization")).to(beNil())
+
+    // Protocol header should still be there.
+    expect(request3.value(forHTTPHeaderField: "Sec-WebSocket-Protocol"))
+      .to(equal("graphql-transport-ws"))
+
+    _ = subscription
+  }
+
+  func testUpdateHeaderValues__withMultipleHeaders__shouldApplyAll() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1, task2])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    // Connect on task1.
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Update multiple headers at once.
+    await transport.updateHeaderValues([
+      "Authorization": "Bearer token123",
+      "X-Custom-Header": "custom-value",
+    ], reconnectIfConnected: true)
+
+    await expect(task2.isResumed).toEventually(beTrue())
+
+    let reconnectRequest = factory.capturedRequests.last!
+    expect(reconnectRequest.value(forHTTPHeaderField: "Authorization")).to(equal("Bearer token123"))
+    expect(reconnectRequest.value(forHTTPHeaderField: "X-Custom-Header")).to(equal("custom-value"))
+    expect(reconnectRequest.value(forHTTPHeaderField: "Sec-WebSocket-Protocol"))
+      .to(equal("graphql-transport-ws"))
+
+    _ = subscription
+  }
+
+  func testUpdateHeaderValues__shouldPersistAcrossReconnections() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    let task3 = MockWebSocketTask()
+    let factory = MockWebSocketTaskFactory([task1, task2, task3])
+
+    let session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    let store = ApolloStore.mock()
+    let transport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(reconnectionInterval: 0)
+    )
+    let client = ApolloClient(networkTransport: transport, store: store)
+
+    // Connect on task1.
+    task1.emit(.string(#"{"type":"connection_ack"}"#))
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+
+    // Set a header without reconnecting — just stores it on the request.
+    await transport.updateHeaderValues(["Authorization": "Bearer persistent"])
+
+    // Disconnect task1 — triggers auto-reconnection to task2.
+    task1.finish()
+    task2.emit(.string(#"{"type":"connection_ack"}"#))
+    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // The auto-reconnection request (task2) should include the previously set header.
+    let reconnectRequest = factory.capturedRequests[1]
+    expect(reconnectRequest.value(forHTTPHeaderField: "Authorization")).to(equal("Bearer persistent"))
+
+    // Complete the subscription so it doesn't block.
+    task2.emit(.string(#"{"type":"complete","id":"\#(operationID)"}"#))
+    _ = try await subscription.getAllValues()
+  }
 }
