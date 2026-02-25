@@ -14,7 +14,7 @@ import ApolloWebSocket
 /// // First call to next() returns task1, second returns task2
 /// ```
 public final class MockWebSocketTaskFactory: @unchecked Sendable {
-  public let tasks: [MockWebSocketTask]
+  public var tasks: [MockWebSocketTask]
   private var index = 0
 
   /// The `URLRequest`s passed to each `webSocketTask(with:)` call, in order.
