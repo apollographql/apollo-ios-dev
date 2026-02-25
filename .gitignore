@@ -97,3 +97,4 @@ Derived/**
 
 # VSCode
 .vscode
+.claude/worktrees
