@@ -106,11 +106,6 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
 
   private var connectionWaiters = ConnectionWaiterQueue()
 
-  /// Monotonically increasing counter used to invalidate stale receive loops.
-  /// Incremented each time an explicit reconnection is triggered (e.g. via
-  /// ``updateHeaderValues(_:reconnectIfConnected:)``).
-  private var connectionGeneration: Int = 0
-
   /// The number of active subscribers. Exposed for test assertions.
   var subscriberCount: Int { subscriberRegistry.count }
 
@@ -180,7 +175,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   /// - Otherwise: transitions to `disconnected`, fails pending connection waiters, and finishes
   ///   all subscriber streams.
   private func startConnectionReceiveLoop() {
-    let generation = self.connectionGeneration
+    let loopConnection = self.connection
     let connectionStream = self.connection.openConnection(
       connectingPayload: configuration.connectingPayload
     )
@@ -188,13 +183,12 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     Task {
       do {
         for try await message in connectionStream {
-          guard self.connectionGeneration == generation else { return }
           didReceive(message: message)
         }
-        guard self.connectionGeneration == generation else { return }
+        guard self.connection === loopConnection else { return }
         await handleDisconnection()
       } catch {
-        guard self.connectionGeneration == generation else { return }
+        guard self.connection === loopConnection else { return }
         // Use Task.isCancelled to distinguish genuine task cancellation from
         // connection errors. The WebSocket task's receive() may throw errors
         // (including CancellationError) when the connection closes, which should
@@ -238,7 +232,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   /// succeeds. If the reconnection attempt itself fails, `startConnectionReceiveLoop` will
   /// detect that the state was never `connected` and terminate everything.
   private func attemptReconnection() async {
-    let generation = self.connectionGeneration
+    let previousConnection = self.connection
 
     if configuration.reconnectionInterval > 0 {
       do {
@@ -250,9 +244,9 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
       }
     }
 
-    // If an explicit reconnection was triggered while waiting, bail out —
-    // that reconnection already started a new receive loop.
-    guard self.connectionGeneration == generation else { return }
+    // If the connection was replaced during the delay (e.g. by an explicit reconnection),
+    // bail out — that reconnection already started a new receive loop.
+    guard self.connection === previousConnection else { return }
 
     // If all subscribers were cancelled during the reconnection delay, no need to reconnect.
     guard !subscriberRegistry.isEmpty else {
@@ -337,11 +331,10 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
 
   /// Disconnects the current WebSocket connection and immediately starts a new one.
   ///
-  /// Increments the connection generation to invalidate the old receive loop, then creates
-  /// a fresh connection and starts the receive loop. Active subscribers will be resubscribed
+  /// Replaces the connection, which invalidates the old receive loop (it will see that
+  /// `self.connection` no longer matches and exit). Active subscribers will be resubscribed
   /// when the new `connection_ack` arrives.
   private func disconnectAndReconnect() {
-    connectionGeneration += 1
     connection = WebSocketConnection(task: urlSession.webSocketTask(with: request))
     connectionState = .connecting
     startConnectionReceiveLoop()
