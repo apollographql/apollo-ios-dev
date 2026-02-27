@@ -90,7 +90,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     file: FileString = #filePath,
     line: UInt = #line
   ) async throws -> (
-    stream: AsyncThrowingStream<GraphQLResponse<MockSubscription<ReviewAddedData>>, any Error>,
+    stream: SubscriptionStream<GraphQLResponse<MockSubscription<ReviewAddedData>>>,
     operationID: String
   ) {
     let index = mockTask.clientSentMessages(ofType: "subscribe").count

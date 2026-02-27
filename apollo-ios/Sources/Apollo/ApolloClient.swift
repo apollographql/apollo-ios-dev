@@ -569,7 +569,7 @@ public final class ApolloClient: Sendable {
   ///
   /// ## Subscription Termination
   /// Subscriptions will continue to receive results from a server as long as the subscription remains open. A
-  /// subscription may be terminated by the server, in which case the returned `AsyncThrowingStream` by this function
+  /// subscription may be terminated by the server, in which case the returned ``SubscriptionStream`` by this function
   /// will terminate naturally. To cancel the subscription from the client, cancel the `Task` the subscription was
   /// initiated in.
   /// ```
@@ -582,16 +582,28 @@ public final class ApolloClient: Sendable {
   /// task.cancel() // Subscription will be terminated
   /// ```
   ///
+  /// ## Observing Subscription State
+  /// The returned ``SubscriptionStream`` exposes a ``SubscriptionStream/state`` property that
+  /// reflects the subscription's current lifecycle state:
+  /// ```
+  /// let stream = try client.subscribe(subscription: MySubscription())
+  /// print(stream.state) // .pending
+  ///
+  /// for try await response in stream {
+  ///   print(stream.state) // .active
+  /// }
+  /// ```
+  ///
   /// - Parameters:
   ///   - subscription: The `GraphQLSubscription` to subscribe to.
   ///   - cachePolicy: A ``CachePolicy/Subscription`` ``CachePolicy`` to use for this request.
   ///   Determines if fetching will include cache/network fetches.
-  /// - Returns: An ``AsyncThrowingStream`` of `GraphQLResponse` results for the subscription.
+  /// - Returns: A ``SubscriptionStream`` of `GraphQLResponse` results for the subscription.
   public func subscribe<Subscription: GraphQLSubscription>(
     subscription: Subscription,
     cachePolicy: CachePolicy.Subscription = .cacheThenNetwork,
     requestConfiguration: RequestConfiguration? = nil
-  ) throws -> AsyncThrowingStream<GraphQLResponse<Subscription>, any Swift.Error> {
+  ) throws -> SubscriptionStream<GraphQLResponse<Subscription>> {
     guard let subscriptionTransport = self.networkTransport as? (any SubscriptionNetworkTransport) else {
       assertionFailure(
         "Trying to subscribe without a subscription transport. Please make sure your network transport conforms to `SubscriptionNetworkTransport`."
@@ -831,13 +843,27 @@ extension ApolloClient {
     queue: DispatchQueue = .main,
     resultHandler: @escaping GraphQLResultHandler<Subscription>
   ) -> any Cancellable {
-    return awaitStreamInTask(
-      {
-        try self.subscribe(subscription: subscription)
-      },
-      callbackQueue: queue,
-      completion: resultHandler
-    )
+    let task = Task {
+      do {
+        let resultStream = try self.subscribe(subscription: subscription)
+
+        for try await result in resultStream {
+          DispatchQueue.returnResultAsyncIfNeeded(
+            on: queue,
+            action: resultHandler,
+            result: .success(result)
+          )
+        }
+
+      } catch {
+        DispatchQueue.returnResultAsyncIfNeeded(
+          on: queue,
+          action: resultHandler,
+          result: .failure(error)
+        )
+      }
+    }
+    return TaskCancellable(task: task)
   }
 
 }

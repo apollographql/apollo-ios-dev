@@ -1,3 +1,4 @@
+import Apollo
 @_spi(Unsafe) import ApolloAPI
 
 /// Manages the collection of active operation subscribers for a WebSocket transport.
@@ -19,6 +20,7 @@ struct SubscriberRegistry {
     let continuation: AsyncThrowingStream<JSONObject, any Swift.Error>.Continuation
     let operation: any GraphQLOperation
     var status: Status
+    let stateStorage: SubscriptionStateStorage?
   }
 
   /// Active subscribers keyed by operation ID.
@@ -40,8 +42,14 @@ struct SubscriberRegistry {
   ///
   /// Returns the assigned operation ID and the stream that will receive JSON payloads
   /// from incoming `next` messages.
+  ///
+  /// - Parameters:
+  ///   - operation: The GraphQL operation to register.
+  ///   - stateStorage: An optional state storage for tracking the subscription's lifecycle
+  ///     state. Pass `nil` for non-subscription operations (queries/mutations).
   mutating func register(
-    for operation: any GraphQLOperation
+    for operation: any GraphQLOperation,
+    stateStorage: SubscriptionStateStorage? = nil
   ) -> (WebSocketTransport.OperationID, AsyncThrowingStream<JSONObject, any Swift.Error>) {
     let id = operationMessageIdCreator.requestId()
 
@@ -49,7 +57,8 @@ struct SubscriberRegistry {
     records[id] = Record(
       continuation: continuation,
       operation: operation,
-      status: .pending
+      status: .pending,
+      stateStorage: stateStorage
     )
 
     return (id, stream)
@@ -67,6 +76,7 @@ struct SubscriberRegistry {
   @discardableResult
   mutating func finish(_ id: WebSocketTransport.OperationID, throwing error: (any Swift.Error)? = nil) -> Bool {
     guard let record = records.removeValue(forKey: id) else { return false }
+    record.stateStorage?.set(.stopped)
     record.continuation.finish(throwing: error)
     return true
   }
@@ -74,6 +84,7 @@ struct SubscriberRegistry {
   /// Marks a subscriber as having sent its subscribe message to the server.
   mutating func markSubscribed(_ id: WebSocketTransport.OperationID) {
     records[id]?.status = .subscribed
+    records[id]?.stateStorage?.set(.active)
   }
 
   /// The IDs and operations of all subscribers with `.subscribed` status.
@@ -91,6 +102,7 @@ struct SubscriberRegistry {
     let active = records
     records.removeAll()
     for (_, record) in active {
+      record.stateStorage?.set(.stopped)
       record.continuation.finish(throwing: error)
     }
   }
@@ -103,7 +115,30 @@ struct SubscriberRegistry {
     for (id, record) in records {
       guard type(of: record.operation).operationType != .subscription else { continue }
       records.removeValue(forKey: id)
+      record.stateStorage?.set(.stopped)
       record.continuation.finish(throwing: error)
+    }
+  }
+
+  /// Sets the state of all subscriptions with `.subscribed` status to ``SubscriptionState/reconnecting``.
+  ///
+  /// Called when the connection is lost and auto-reconnection is being attempted.
+  /// Only affects subscriptions (not queries/mutations) that have already been subscribed.
+  func markSubscriptionsReconnecting() {
+    for (_, record) in records {
+      guard record.status == .subscribed else { continue }
+      record.stateStorage?.set(.reconnecting)
+    }
+  }
+
+  /// Sets the state of all surviving subscriptions to ``SubscriptionState/paused``.
+  ///
+  /// Called when the transport is paused. Only subscriptions survive a pause;
+  /// queries and mutations are terminated before this is called.
+  func markSubscriptionsPaused() {
+    for (_, record) in records {
+      guard type(of: record.operation).operationType == .subscription else { continue }
+      record.stateStorage?.set(.paused)
     }
   }
 }

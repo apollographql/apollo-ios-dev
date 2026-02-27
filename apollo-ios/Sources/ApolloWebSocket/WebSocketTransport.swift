@@ -230,6 +230,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     subscriberRegistry.finishNonSubscriptions(throwing: error ?? Error.connectionClosed)
 
     if wasConnected && !subscriberRegistry.isEmpty && configuration.isReconnectEnabled {
+      subscriberRegistry.markSubscriptionsReconnecting()
       await attemptReconnection()
     } else {
       connectionWaiters.failAll(with: error ?? Error.connectionClosed)
@@ -391,6 +392,9 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     // a mutation could cause duplicate side effects.
     subscriberRegistry.finishNonSubscriptions(throwing: Error.connectionClosed)
 
+    // Mark surviving subscriptions as paused so consumers can observe the state.
+    subscriberRegistry.markSubscriptionsPaused()
+
     // Close the underlying WebSocket task. This causes the receive loop's stream to
     // end, at which point the loop checks connectionState, sees `.paused`, and exits
     // without triggering auto-reconnection or finishing subscriber streams.
@@ -432,9 +436,10 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   // MARK: - Subscriber Management
 
   private func registerSubscriber(
-    for operation: any GraphQLOperation
+    for operation: any GraphQLOperation,
+    stateStorage: SubscriptionStateStorage? = nil
   ) -> (OperationID, AsyncThrowingStream<JSONObject, any Swift.Error>) {
-    subscriberRegistry.register(for: operation)
+    subscriberRegistry.register(for: operation, stateStorage: stateStorage)
   }
 
   /// Cancels a subscription from the client side. Removes the subscriber from the registry,
@@ -570,6 +575,58 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     }
   }
 
+  /// Sends a GraphQL subscription over the WebSocket connection and returns a
+  /// ``SubscriptionStream`` that tracks the subscription's lifecycle state.
+  ///
+  /// This method creates a ``SubscriptionStateStorage`` that is updated as the subscription
+  /// moves through its lifecycle: pending → active → (reconnecting/paused) → stopped.
+  private nonisolated func sendSubscription<Operation: GraphQLSubscription>(
+    subscription: Operation
+  ) -> SubscriptionStream<GraphQLResponse<Operation>> {
+    let stateStorage = SubscriptionStateStorage()
+
+    let stream = AsyncThrowingStream<GraphQLResponse<Operation>, any Swift.Error> { continuation in
+      let innerTask = Task {
+        let (operationID, payloadStream) = await self.registerSubscriber(
+          for: subscription,
+          stateStorage: stateStorage
+        )
+        do {
+          try await self.ensureConnected()
+          try Task.checkCancellation()
+          try await self.sendSubscribeMessage(operationID: operationID, operation: subscription)
+
+          for try await payload in payloadStream {
+            let handler = JSONResponseParser.SingleResponseExecutionHandler<Operation>(
+              responseBody: payload,
+              operationVariables: subscription.__variables
+            )
+            let parsedResult = try await handler.execute(includeCacheRecords: false)
+            continuation.yield(parsedResult.result)
+          }
+
+          if Task.isCancelled {
+            await self.cancelSubscription(operationID: operationID)
+          }
+          stateStorage.set(.stopped)
+          continuation.finish()
+
+        } catch {
+          await self.cancelSubscription(operationID: operationID)
+          stateStorage.set(.stopped)
+          continuation.finish(throwing: error)
+        }
+      }
+
+      continuation.onTermination = { @Sendable reason in
+        guard case .cancelled = reason else { return }
+        innerTask.cancel()
+      }
+    }
+
+    return SubscriptionStream(stream: stream, stateProvider: { stateStorage.state })
+  }
+
   // MARK: - Network Transport Protocol Conformance
 
   nonisolated public func send<Query: GraphQLQuery>(
@@ -591,8 +648,8 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     subscription: Subscription,
     fetchBehavior: Apollo.FetchBehavior,
     requestConfiguration: Apollo.RequestConfiguration
-  ) throws -> AsyncThrowingStream<Apollo.GraphQLResponse<Subscription>, any Swift.Error> {
-    sendOperation(operation: subscription)
+  ) throws -> SubscriptionStream<Apollo.GraphQLResponse<Subscription>> {
+    sendSubscription(subscription: subscription)
   }
 
 }

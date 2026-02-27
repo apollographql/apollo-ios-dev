@@ -150,7 +150,7 @@ extension RequestChainNetworkTransport: SubscriptionNetworkTransport {
     subscription: Subscription,
     fetchBehavior: FetchBehavior,
     requestConfiguration: RequestConfiguration
-  ) throws -> AsyncThrowingStream<GraphQLResponse<Subscription>, any Error> where Subscription: GraphQLSubscription {
+  ) throws -> SubscriptionStream<GraphQLResponse<Subscription>> where Subscription: GraphQLSubscription {
     let request = self.constructRequest(
       for: subscription,
       fetchBehavior: fetchBehavior,
@@ -158,8 +158,8 @@ extension RequestChainNetworkTransport: SubscriptionNetworkTransport {
     )
 
     let chain = makeChain(for: request)
-    
-    return chain.kickoff(request: request)
+
+    return SubscriptionStream(stream: chain.kickoff(request: request))
   }
 }
 
