@@ -1692,4 +1692,424 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     task2.emit(.complete(id: operationID))
     _ = try await subscription.getAllValues()
   }
+
+  // MARK: - Pause / Resume
+
+  func testPause__whenConnected__shouldTransitionToPausedAndPreserveSubscribers() async throws {
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
+
+    // Pause while connected.
+    await networkTransport.pause()
+
+    await expect { await self.networkTransport.connectionState }.toEventually(equal(.paused))
+
+    // The subscriber should still be registered — not finished.
+    await expect { await self.networkTransport.subscriberCount }.to(equal(1))
+
+    // The underlying WebSocket task should have been cancelled.
+    expect(self.mockTask.cancelCode).to(equal(.goingAway))
+
+    _ = subscription
+  }
+
+  func testPause__whenNotStarted__shouldBeNoop() async throws {
+    // Transport is in .notStarted state — pause should be a no-op.
+    await networkTransport.pause()
+
+    await expect { await self.networkTransport.connectionState }.to(equal(.notStarted))
+  }
+
+  func testPause__whenAlreadyPaused__shouldBeNoop() async throws {
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
+
+    // Pause once.
+    await networkTransport.pause()
+    await expect { await self.networkTransport.connectionState }.toEventually(equal(.paused))
+
+    // Pause again — should be a no-op.
+    await networkTransport.pause()
+    await expect { await self.networkTransport.connectionState }.to(equal(.paused))
+    await expect { await self.networkTransport.subscriberCount }.to(equal(1))
+
+    _ = subscription
+  }
+
+  func testPause__shouldNotTriggerDidDisconnectDelegate() async throws {
+    let delegate = MockWebSocketTransportDelegate()
+    await networkTransport.setDelegate(delegate)
+
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
+
+    expect(delegate.events).to(contain(.didConnect))
+
+    // Pause.
+    await networkTransport.pause()
+    await expect { await self.networkTransport.connectionState }.toEventually(equal(.paused))
+
+    // Give time for any potential delegate callback.
+    try await Task.sleep(nanoseconds: 100_000_000)
+
+    // didDisconnect should NOT have been called — pause is intentional.
+    expect(delegate.events).toNot(contain(.didDisconnect(hasError: false)))
+    expect(delegate.events).toNot(contain(.didDisconnect(hasError: true)))
+
+    _ = subscription
+  }
+
+  func testResume__whenPaused__shouldReconnectAndResubscribe() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    factory.tasks.append(contentsOf: [task1, task2])
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    // Connect on task1.
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+
+    // Deliver one result before pause.
+    task1.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 5, commentary: "Before pause")))
+
+    // Pause — closes connection, preserves subscriber.
+    await networkTransport.pause()
+    await expect { await self.networkTransport.connectionState }.toEventually(equal(.paused))
+
+    // Resume — creates new connection on task2.
+    await networkTransport.resume()
+
+    // Acknowledge the new connection.
+    task2.emit(.connectionAck(payload: nil))
+
+    // The subscription should be re-subscribed on the new connection.
+    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // The re-subscribe should use the same operation ID.
+    let resubscribedID = task2.subscribeOperationID(at: 0)
+    expect(resubscribedID).to(equal(operationID))
+
+    // Deliver data on the new connection and complete.
+    task2.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 3, commentary: "After resume")))
+    task2.emit(.complete(id: operationID))
+
+    let results = try await subscription.getAllValues()
+
+    // Should have received data from both before pause and after resume.
+    guard results.count == 2 else {
+      fail("Expected 2 results but got \(results.count)")
+      return
+    }
+    expect(results[0].data?.reviewAdded?.commentary).to(equal("Before pause"))
+    expect(results[1].data?.reviewAdded?.commentary).to(equal("After resume"))
+  }
+
+  func testResume__whenPaused__shouldFireDidReconnectDelegate() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    factory.tasks.append(contentsOf: [task1, task2])
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    let delegate = MockWebSocketTransportDelegate()
+    await networkTransport.setDelegate(delegate)
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    // Connect on task1.
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    expect(delegate.events).to(contain(.didConnect))
+
+    // Pause and resume.
+    await networkTransport.pause()
+    await expect { await self.networkTransport.connectionState }.toEventually(equal(.paused))
+
+    await networkTransport.resume()
+    task2.emit(.connectionAck(payload: nil))
+
+    // Should fire didReconnect (not didConnect) since hasBeenConnected is true.
+    await expect(delegate.events).toEventually(contain(.didReconnect))
+
+    // Only one didConnect (the initial one).
+    expect(delegate.events.filter { $0 == .didConnect }.count).to(equal(1))
+
+    _ = subscription
+  }
+
+  func testResume__whenNotStarted__shouldOpenConnection() async throws {
+    // Transport starts in .notStarted state. Resume should open the connection eagerly.
+    await networkTransport.resume()
+
+    // The mock task should have been resumed (connection opened).
+    await expect(self.mockTask.isResumed).toEventually(beTrue())
+
+    // State should transition to .connecting.
+    await expect { await self.networkTransport.connectionState }.to(equal(.connecting))
+
+    // Acknowledge the connection.
+    mockTask.emit(.connectionAck(payload: nil))
+    await expect { await self.networkTransport.connectionState }.toEventually(equal(.connected))
+
+    // Now a subscribe call should reuse this connection (no extra connection_init).
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
+
+    // Only one connection_init should have been sent total.
+    expect(self.mockTask.clientSentMessages(ofType: "connection_init").count).to(equal(1))
+
+    _ = subscription
+  }
+
+  func testResume__whenDisconnected__shouldOpenConnection() async throws {
+    let task2 = MockWebSocketTask()
+    factory.tasks.append(task2)
+
+    // Connect and disconnect (reconnection disabled by default).
+    mockTask.emit(.connectionAck(payload: nil))
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
+
+    // Disconnect — finishes all subscribers since reconnection is disabled.
+    mockTask.finish()
+    _ = try? await subscription.getAllValues()
+
+    await expect { await self.networkTransport.connectionState }.toEventually(equal(.disconnected))
+
+    // Resume from disconnected state — should open a new connection on task2.
+    await networkTransport.resume()
+
+    task2.emit(.connectionAck(payload: nil))
+    await expect { await self.networkTransport.connectionState }.toEventually(equal(.connected))
+
+    // New subscribe call should work on the new connection.
+    let (subscription2, operationID2) = try await subscribe(on: task2, using: client)
+
+    task2.emit(.next(id: operationID2, payload: Self.reviewAddedPayload(stars: 4, commentary: "After resume")))
+    task2.emit(.complete(id: operationID2))
+
+    let results = try await subscription2.getAllValues()
+    expect(results.count).to(equal(1))
+    expect(results[0].data?.reviewAdded?.commentary).to(equal("After resume"))
+  }
+
+  func testResume__whenConnected__shouldBeNoop() async throws {
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
+
+    // Already connected — resume should be a no-op.
+    await networkTransport.resume()
+
+    await expect { await self.networkTransport.connectionState }.to(equal(.connected))
+
+    // No additional connection_init should have been sent.
+    expect(self.mockTask.clientSentMessages(ofType: "connection_init").count).to(equal(1))
+
+    _ = subscription
+  }
+
+  func testPause__withMultipleSubscribers__shouldPreserveAll() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    factory.tasks.append(contentsOf: [task1, task2])
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    // Connect on task1.
+    task1.emit(.connectionAck(payload: nil))
+
+    let (sub1, id1) = try await subscribe(on: task1, using: client)
+    let (sub2, id2) = try await subscribe(on: task1, using: client)
+
+    // Pause — both subscribers should be preserved.
+    await networkTransport.pause()
+    await expect { await self.networkTransport.connectionState }.toEventually(equal(.paused))
+    await expect { await self.networkTransport.subscriberCount }.to(equal(2))
+
+    // Resume on task2.
+    await networkTransport.resume()
+    task2.emit(.connectionAck(payload: nil))
+
+    // Both subscriptions should be re-subscribed.
+    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
+
+    let resubscribedIDs = Set(task2.clientSentMessages(ofType: "subscribe").compactMap { $0["id"] as? String })
+    expect(resubscribedIDs).to(equal(Set([id1, id2])))
+
+    // Deliver data and complete for both.
+    task2.emit(.next(id: id1, payload: Self.reviewAddedPayload(stars: 5, commentary: "Sub1 resumed")))
+    task2.emit(.complete(id: id1))
+    task2.emit(.next(id: id2, payload: Self.reviewAddedPayload(stars: 3, commentary: "Sub2 resumed")))
+    task2.emit(.complete(id: id2))
+
+    let results1 = try await sub1.getAllValues()
+    let results2 = try await sub2.getAllValues()
+
+    expect(results1.count).to(equal(1))
+    expect(results1[0].data?.reviewAdded?.commentary).to(equal("Sub1 resumed"))
+    expect(results2.count).to(equal(1))
+    expect(results2[0].data?.reviewAdded?.commentary).to(equal("Sub2 resumed"))
+  }
+
+  func testPause__duringReconnectionDelay__shouldStopReconnection() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    factory.tasks.append(contentsOf: [task1, task2])
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(reconnectionInterval: 0.5)
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Disconnect — triggers reconnection with 0.5s delay.
+    task1.finish()
+
+    // Pause during the reconnection delay.
+    // Wait briefly to ensure we're in the reconnection delay.
+    try await Task.sleep(nanoseconds: 50_000_000)
+    await networkTransport.pause()
+
+    // Wait for the reconnection delay to expire.
+    try await Task.sleep(nanoseconds: 600_000_000)
+
+    // Task2 should NOT have been used for auto-reconnection because we paused.
+    expect(task2.isResumed).to(beFalse())
+
+    // State should be .paused.
+    await expect { await self.networkTransport.connectionState }.to(equal(.paused))
+
+    // Subscriber should still be alive.
+    await expect { await self.networkTransport.subscriberCount }.to(equal(1))
+
+    // Resume — consumes task2 (auto-reconnection was suppressed, so task2 is still available).
+    await networkTransport.resume()
+    task2.emit(.connectionAck(payload: nil))
+    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    _ = subscription
+  }
+
+  func testSubscription__whilePaused__shouldWaitForResume() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    factory.tasks.append(contentsOf: [task1, task2])
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    // Connect on task1.
+    task1.emit(.connectionAck(payload: nil))
+
+    let (sub1, id1) = try await subscribe(on: task1, using: client)
+
+    // Pause.
+    await networkTransport.pause()
+    await expect { await self.networkTransport.connectionState }.toEventually(equal(.paused))
+
+    // Start a new subscription while paused — it should wait.
+    let client = self.client!
+    let sub2Task = Task {
+      try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    }
+
+    // Give time for the subscribe to register but not complete.
+    try await Task.sleep(nanoseconds: 100_000_000)
+
+    // Resume on task2.
+    await networkTransport.resume()
+    task2.emit(.connectionAck(payload: nil))
+
+    // The original subscription should be re-subscribed, and the new one should also subscribe.
+    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
+
+    let sub2 = try await sub2Task.value
+    let id2 = task2.subscribeOperationID(at: 1)
+
+    // Deliver data for both.
+    task2.emit(.next(id: id1, payload: Self.reviewAddedPayload(stars: 5, commentary: "Existing sub")))
+    task2.emit(.complete(id: id1))
+    task2.emit(.next(id: id2, payload: Self.reviewAddedPayload(stars: 3, commentary: "New sub")))
+    task2.emit(.complete(id: id2))
+
+    let results1 = try await sub1.getAllValues()
+    let results2 = try await sub2.getAllValues()
+
+    expect(results1.count).to(equal(1))
+    expect(results1[0].data?.reviewAdded?.commentary).to(equal("Existing sub"))
+    expect(results2.count).to(equal(1))
+    expect(results2[0].data?.reviewAdded?.commentary).to(equal("New sub"))
+  }
+
+  func testMultiplePauseResumeCycles__shouldPreserveSubscriptions() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    let task3 = MockWebSocketTask()
+    factory.tasks.append(contentsOf: [task1, task2, task3])
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    // Connect on task1.
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+
+    // First pause/resume cycle.
+    await networkTransport.pause()
+    await expect { await self.networkTransport.connectionState }.toEventually(equal(.paused))
+
+    await networkTransport.resume()
+    task2.emit(.connectionAck(payload: nil))
+    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Second pause/resume cycle.
+    await networkTransport.pause()
+    await expect { await self.networkTransport.connectionState }.toEventually(equal(.paused))
+
+    await networkTransport.resume()
+    task3.emit(.connectionAck(payload: nil))
+    await expect(task3.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Deliver data on the final connection and complete.
+    task3.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 4, commentary: "After two cycles")))
+    task3.emit(.complete(id: operationID))
+
+    let results = try await subscription.getAllValues()
+
+    expect(results.count).to(equal(1))
+    expect(results[0].data?.reviewAdded?.commentary).to(equal("After two cycles"))
+  }
 }
