@@ -720,11 +720,12 @@ extension ApolloClient {
   }
 
   @available(*, deprecated)
-  private func awaitStreamInTask<T: Sendable>(
-    _ body: @escaping @Sendable () async throws -> AsyncThrowingStream<T, any Swift.Error>,
+  private func awaitStreamInTask<T: Sendable, Stream: AsyncSequence & Sendable>(
+    _ body: @escaping @Sendable () async throws -> Stream,
     callbackQueue: DispatchQueue?,
     completion: (@Sendable (Result<T, any Swift.Error>) -> Void)?
-  ) -> some Cancellable {
+  ) -> some Cancellable
+  where Stream.Element == T {
     let task = Task {
       do {
         let resultStream = try await body()
@@ -843,27 +844,13 @@ extension ApolloClient {
     queue: DispatchQueue = .main,
     resultHandler: @escaping GraphQLResultHandler<Subscription>
   ) -> any Cancellable {
-    let task = Task {
-      do {
-        let resultStream = try self.subscribe(subscription: subscription)
-
-        for try await result in resultStream {
-          DispatchQueue.returnResultAsyncIfNeeded(
-            on: queue,
-            action: resultHandler,
-            result: .success(result)
-          )
-        }
-
-      } catch {
-        DispatchQueue.returnResultAsyncIfNeeded(
-          on: queue,
-          action: resultHandler,
-          result: .failure(error)
-        )
-      }
-    }
-    return TaskCancellable(task: task)
+    return awaitStreamInTask(
+      {
+        try self.subscribe(subscription: subscription)
+      },
+      callbackQueue: queue,
+      completion: resultHandler
+    )
   }
 
 }
