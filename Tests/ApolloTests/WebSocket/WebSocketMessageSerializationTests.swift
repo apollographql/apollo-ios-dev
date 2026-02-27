@@ -141,12 +141,9 @@ class WebSocketMessageSerializationTests: XCTestCase {
   // MARK: - subscribe
 
   func test__subscribe__withQueryOnly__shouldSerializeMinimalSubscription() throws {
-    let subscribePayload = WebSocketTransport.SubscribePayload(
-      operationName: nil,
-      query: "subscription { onMessage { text } }",
-      variables: nil,
-      extensions: nil
-    )
+    let subscribePayload = [
+      "query": "subscription { onMessage { text } }",
+    ]
 
     let message = try WebSocketTransport.Message.Outgoing
       .subscribe(id: 1, payload: subscribePayload)
@@ -165,12 +162,10 @@ class WebSocketMessageSerializationTests: XCTestCase {
   }
 
   func test__subscribe__withOperationName__shouldIncludeOperationName() throws {
-    let subscribePayload = WebSocketTransport.SubscribePayload(
-      operationName: "OnMessage",
-      query: "subscription OnMessage { onMessage { text } }",
-      variables: nil,
-      extensions: nil
-    )
+    let subscribePayload = [
+      "operationName": "OnMessage",
+      "query": "subscription OnMessage { onMessage { text } }",
+    ]
 
     let message = try WebSocketTransport.Message.Outgoing
       .subscribe(id: 5, payload: subscribePayload)
@@ -187,17 +182,11 @@ class WebSocketMessageSerializationTests: XCTestCase {
   }
 
   func test__subscribe__withVariables__shouldIncludeSerializedVariables() throws {
-    let variables: GraphQLOperation.Variables = [
-      "channel": "general",
-      "limit": 10,
-    ]
-
-    let subscribePayload = WebSocketTransport.SubscribePayload(
-      operationName: "OnMessage",
-      query: "subscription OnMessage($channel: String!, $limit: Int) { onMessage(channel: $channel, limit: $limit) { text } }",
-      variables: variables,
-      extensions: nil
-    )
+    let subscribePayload = [
+      "operationName": "OnMessage",
+      "query": "subscription OnMessage($channel: String!, $limit: Int) { onMessage(channel: $channel, limit: $limit) { text } }",
+      "variables": ["channel": "general", "limit": 10] as JSONEncodableDictionary,
+    ] as JSONEncodableDictionary
 
     let message = try WebSocketTransport.Message.Outgoing
       .subscribe(id: 3, payload: subscribePayload)
@@ -212,17 +201,12 @@ class WebSocketMessageSerializationTests: XCTestCase {
   }
 
   func test__subscribe__withExtensions__shouldIncludeExtensions() throws {
-    let subscribePayload = WebSocketTransport.SubscribePayload(
-      operationName: nil,
-      query: "subscription { onMessage { text } }",
-      variables: nil,
-      extensions: [
-        "persistedQuery": [
-          "sha256Hash": "abc123",
-          "version": 1,
-        ] as JSONValue
-      ]
-    )
+    let subscribePayload = [
+      "query": "subscription { onMessage { text } }",
+      "extensions": [
+        "persistedQuery": ["sha256Hash": "abc123", "version": 1] as JSONEncodableDictionary
+      ] as JSONEncodableDictionary,
+    ] as JSONEncodableDictionary
 
     let message = try WebSocketTransport.Message.Outgoing
       .subscribe(id: 7, payload: subscribePayload)
@@ -238,16 +222,12 @@ class WebSocketMessageSerializationTests: XCTestCase {
   }
 
   func test__subscribe__withAllFields__shouldIncludeAllFields() throws {
-    let variables: GraphQLOperation.Variables = [
-      "episode": "JEDI",
-    ]
-
-    let subscribePayload = WebSocketTransport.SubscribePayload(
-      operationName: "OnReview",
-      query: "subscription OnReview($episode: Episode!) { onReview(episode: $episode) { stars commentary } }",
-      variables: variables,
-      extensions: ["version": 1]
-    )
+    let subscribePayload = [
+      "operationName": "OnReview",
+      "query": "subscription OnReview($episode: Episode!) { onReview(episode: $episode) { stars commentary } }",
+      "variables": ["episode": "JEDI"] as JSONEncodableDictionary,
+      "extensions": ["version": 1] as JSONEncodableDictionary,
+    ] as JSONEncodableDictionary
 
     let message = try WebSocketTransport.Message.Outgoing
       .subscribe(id: 42, payload: subscribePayload)
@@ -313,12 +293,9 @@ class WebSocketMessageSerializationTests: XCTestCase {
   func test__subscribe__withSpecialCharactersInQuery__shouldEscapeProperly() throws {
     let queryWithSpecialChars = "subscription { onMessage(filter: \"hello\\nworld\") { text } }"
 
-    let subscribePayload = WebSocketTransport.SubscribePayload(
-      operationName: nil,
-      query: queryWithSpecialChars,
-      variables: nil,
-      extensions: nil
-    )
+    let subscribePayload = [
+      "query": queryWithSpecialChars,
+    ]
 
     let message = try WebSocketTransport.Message.Outgoing
       .subscribe(id: 1, payload: subscribePayload)
@@ -330,12 +307,9 @@ class WebSocketMessageSerializationTests: XCTestCase {
   }
 
   func test__subscribe__withLargeOperationId__shouldSerializeCorrectly() throws {
-    let subscribePayload = WebSocketTransport.SubscribePayload(
-      operationName: nil,
-      query: "subscription { onEvent { id } }",
-      variables: nil,
-      extensions: nil
-    )
+    let subscribePayload = [
+      "query": "subscription { onEvent { id } }",
+    ]
 
     let message = try WebSocketTransport.Message.Outgoing
       .subscribe(id: 999999, payload: subscribePayload)
@@ -354,12 +328,9 @@ class WebSocketMessageSerializationTests: XCTestCase {
       .pong(payload: nil),
       .subscribe(
         id: 1,
-        payload: WebSocketTransport.SubscribePayload(
-          operationName: nil,
-          query: "{ __typename }",
-          variables: nil,
-          extensions: nil
-        )
+        payload: [
+          "query": "{ __typename }",
+        ]
       ),
       .complete(id: 1),
     ]
@@ -380,12 +351,12 @@ class WebSocketMessageSerializationTests: XCTestCase {
       .pong(payload: ["key": "value"]),
       .subscribe(
         id: 1,
-        payload: WebSocketTransport.SubscribePayload(
-          operationName: "Op",
-          query: "subscription Op { onEvent { id } }",
-          variables: ["a": "b"],
-          extensions: ["x": "y"]
-        )
+        payload: [
+          "operationName": "Op",
+          "query": "subscription Op { onEvent { id } }",
+          "variables": ["a": "b"] as JSONEncodableDictionary,
+          "extensions": ["x": "y"] as JSONEncodableDictionary,
+        ]
       ),
       .complete(id: 1),
     ]
