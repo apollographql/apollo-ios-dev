@@ -109,8 +109,8 @@ public final class MockWebSocketTask: WebSocketTask, @unchecked Sendable {
     cancelCode = closeCode
     cancelReason = reason
     // Match real URLSessionWebSocketTask behavior: cancelling the task causes any
-    // pending receive() call to fail, effectively ending the server message stream.
-    serverMessages.finish()
+    // pending receive() call to throw URLError(.cancelled).
+    serverMessages.throw(URLError(.cancelled))
   }
 
   // MARK: - Client Message Inspection (used by tests)
