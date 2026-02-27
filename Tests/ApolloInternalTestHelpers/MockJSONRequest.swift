@@ -6,14 +6,16 @@ extension JSONRequest {
   public static func mock(
     operation: Operation,
     fetchBehavior: FetchBehavior,
-    graphQLEndpoint: URL = TestURL.mockServer.url
+    graphQLEndpoint: URL = TestURL.mockServer.url,
+    useGETForQueries: Bool = false
   ) -> JSONRequest<Operation> {
     return JSONRequest(
       operation: operation,
       graphQLEndpoint: graphQLEndpoint,
       fetchBehavior: fetchBehavior,
       writeResultsToCache: true,
-      requestTimeout: nil
+      requestTimeout: nil,
+      useGETForQueries: useGETForQueries
     )
   }
 }

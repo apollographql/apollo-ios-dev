@@ -52,4 +52,16 @@ class JSONRequestTests: XCTestCase {
       )
   }
 
+  func test__URLRequest__givenQuery_withGETMethod_shouldSetPreflightHeader() {
+    let subject = JSONRequest.mock(
+      operation: MockQuery.mock(),
+      fetchBehavior: .NetworkOnly,
+      graphQLEndpoint: TestURL.mockServer.url,
+      useGETForQueries: true
+    )
+
+    expect(try subject.toURLRequest().allHTTPHeaderFields?["Apollo-Require-Preflight"])
+      .to(equal("true"))
+  }
+
 }
