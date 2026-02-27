@@ -9,3 +9,4 @@
 - **Test helpers**: Shared mock infrastructure lives in `ApolloInternalTestHelpers/` (separate target from test APIs in `Sources/`)
 - **Mock operations**: `MockQuery`, `MockMutation`, `MockSubscription` in `ApolloInternalTestHelpers/MockOperation.swift` — subclass to customize `operationDocument`, `__selections`, etc.
 - **Mock selection sets**: Use `MockSelectionSet` (typealias for `AbstractMockSelectionSet<NoFragments, MockSchemaMetadata>`) with `@dynamicMemberLookup` for field access
+- **MockWebSocketTask cancel behavior**: `cancel()` calls `serverMessages.finish()` to match real `URLSessionWebSocketTask` — cancelling the task ends the receive stream. This matters for tests involving `pause()` or connection teardown.

@@ -105,6 +105,9 @@ The three library directories are git subtrees. On PR merge to `main`, GitHub Ac
 
 Primary CI is **GitHub Actions** (`.github/workflows/ci-tests.yml`). CircleCI (`.circleci/config.yml`) only runs security scans (gitleaks, semgrep).
 
+### GitHub CLI Quirks
+- `gh pr edit` may fail with GraphQL deprecation errors for repos using Projects (classic). Use `gh api repos/{owner}/{repo}/pulls/{number} -X PATCH -f title="..." -f body="..."` as a workaround.
+
 ## Tool Preferences
 
 - **Use the Xcode MCP tools** (`BuildProject`, `RunSomeTests`, `RunAllTests`, `GetTestList`, etc.) for building and running tests instead of invoking `xcodebuild` directly via Bash.
