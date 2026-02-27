@@ -48,6 +48,33 @@ public final class MockWebSocketTask: WebSocketTask, @unchecked Sendable {
     serverMessages.emit(message)
   }
 
+  /// Emit a typed server message (serializes to JSON internally).
+  ///
+  /// Prefer this over the raw `.string(...)` overload so tests read as structured
+  /// message values instead of hand-written JSON strings.
+  public func emit(_ message: ServerMessage) {
+    var json: [String: Any]
+    switch message {
+    case .connectionAck(let payload):
+      json = ["type": "connection_ack"]
+      if let payload { json["payload"] = payload }
+    case .ping(let payload):
+      json = ["type": "ping"]
+      if let payload { json["payload"] = payload }
+    case .pong(let payload):
+      json = ["type": "pong"]
+      if let payload { json["payload"] = payload }
+    case .next(let id, let payload):
+      json = ["type": "next", "id": id, "payload": payload]
+    case .error(let id, let payload):
+      json = ["type": "error", "id": id, "payload": payload]
+    case .complete(let id):
+      json = ["type": "complete", "id": id]
+    }
+    let data = try! JSONSerialization.data(withJSONObject: json)
+    emit(.string(String(data: data, encoding: .utf8)!))
+  }
+
   /// Close the server's message stream with an error.
   public func `throw`(_ error: any Error) {
     serverMessages.throw(error)
@@ -96,5 +123,38 @@ public final class MockWebSocketTask: WebSocketTask, @unchecked Sendable {
       }
       return json
     }
+  }
+
+  /// Returns the operation ID from the subscribe message at the given index.
+  ///
+  /// Use this to extract the actual server-assigned ID instead of hardcoding operation IDs
+  /// in test assertions and mock server messages.
+  ///
+  /// - Precondition: There must be at least `index + 1` subscribe messages already sent.
+  public func subscribeOperationID(at index: Int) -> String {
+    let messages = clientSentMessages(ofType: "subscribe")
+    precondition(
+      index < messages.count,
+      "Expected subscribe message at index \(index), but only \(messages.count) subscribe messages exist"
+    )
+    guard let id = messages[index]["id"] as? String else {
+      preconditionFailure("Subscribe message at index \(index) has no 'id' field")
+    }
+    return id
+  }
+
+  // MARK: - Typed Server Message Helpers
+
+  /// A test-friendly representation of `graphql-transport-ws` server messages.
+  ///
+  /// Mirrors `WebSocketTransport.Message.Incoming` but uses `[String: Any]` for payloads
+  /// so tests can construct nested dictionaries without `JSONObject` type constraints.
+  public enum ServerMessage {
+    case connectionAck(payload: [String: Any]? = nil)
+    case ping(payload: [String: Any]? = nil)
+    case pong(payload: [String: Any]? = nil)
+    case next(id: String, payload: [String: Any])
+    case error(id: String, payload: [[String: Any]])
+    case complete(id: String)
   }
 }
