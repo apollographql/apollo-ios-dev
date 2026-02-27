@@ -53,10 +53,9 @@ public struct SubscriptionStream<Element: Sendable>: AsyncSequence, Sendable {
   /// - Parameters:
   ///   - stream: The underlying stream of elements.
   ///   - stateProvider: A closure that returns the current subscription state.
-  ///     Defaults to always returning ``SubscriptionState/active``.
-  public init(
+  package init(
     stream: AsyncThrowingStream<Element, any Error>,
-    stateProvider: @escaping @Sendable () -> SubscriptionState = { .active }
+    stateProvider: @escaping @Sendable () -> SubscriptionState
   ) {
     self.stream = stream
     self.stateProvider = stateProvider
