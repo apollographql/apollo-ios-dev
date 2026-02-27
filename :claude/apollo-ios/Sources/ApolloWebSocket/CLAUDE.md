@@ -39,25 +39,16 @@ Connection waiters use `[CheckedContinuation<Void, any Error>]` array pattern (s
 
 Tests live in `Tests/ApolloTests/WebSocket/`. Mock infrastructure in `Tests/ApolloInternalTestHelpers/`:
 
-- **`MockWebSocketTask`** — Uses `AsyncStreamMocker<URLSessionWebSocketTask.Message>` for server→client messaging. API: `emit()` to send messages, `finish()` to end stream, `throw()` to inject errors. `clientSentMessages` captures outgoing messages for assertions.
-- **`MockWebSocketTaskFactory`** — Vends fresh `MockWebSocketTask` instances sequentially for reconnection tests.
-- **`MockURLSession`** — Conforms to `WebSocketURLSession`. Accepts optional factory; defaults to single shared `mockWebSocketTask`.
+- **`MockWebSocketTask`** (`MockWebSocketTask.swift`) — Uses `AsyncStreamMocker<URLSessionWebSocketTask.Message>` for server→client messaging. API: `emit()` to send messages, `finish()` to end stream, `throw()` to inject errors. `clientSentMessages` captures outgoing messages for assertions.
+- **`MockWebSocketTaskFactory`** (`MockURLSession.swift`) — Vends fresh `MockWebSocketTask` instances sequentially via internal index. `tasks` is a `var` so tests can append additional tasks for reconnection scenarios.
+- **`MockURLSession`** (`MockURLSession.swift`) — Conforms to `WebSocketURLSession`. Delegates task creation to a `MockWebSocketTaskFactory`.
 
-### Test pattern
+### WebSocketTests setup pattern
 
-```swift
-// 1. Buffer server messages before subscribing
-mockTask.emit(.string(#"{"type":"connection_ack"}"#))
-mockTask.emit(.string(#"{"type":"next","id":"1","payload":{...}}"#))
-mockTask.emit(.string(#"{"type":"complete","id":"1"}"#))
-
-// 2. Subscribe and collect results
-let sub = try client.subscribe(subscription: MockSubscription<MyData>())
-let results = try await sub.getAllValues()
-
-// 3. Assert with Nimble
-expect(results.count).to(equal(1))
-```
+`setUp()` creates a factory with one default task, a session, transport, and client. Tests access the default task via the `mockTask` computed property. Three patterns:
+- **Default config**: Use setUp's transport directly; append extra tasks to `factory.tasks` if reconnection is needed
+- **Custom config**: Append tasks to `factory.tasks`, then overwrite `networkTransport` and `client` with new instances using the same `session`
+- **`self.` requirement**: `mockTask` is a computed property — use `self.mockTask` inside `expect()` closures. Capture `self.client!` in a local `let` before `Task { }` closures to avoid `sending` parameter data race errors.
 
 ### Running WebSocket tests
 
