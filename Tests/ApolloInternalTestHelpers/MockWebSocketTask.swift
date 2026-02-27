@@ -108,6 +108,9 @@ public final class MockWebSocketTask: WebSocketTask, @unchecked Sendable {
   public func cancel(with closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
     cancelCode = closeCode
     cancelReason = reason
+    // Match real URLSessionWebSocketTask behavior: cancelling the task causes any
+    // pending receive() call to fail, effectively ending the server message stream.
+    serverMessages.finish()
   }
 
   // MARK: - Client Message Inspection (used by tests)

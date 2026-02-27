@@ -2,10 +2,10 @@
 
 ## Architecture
 
-`WebSocketTransport` is a Swift `actor` implementing the `graphql-transport-ws` protocol for all operation types (queries, mutations, subscriptions). Key types:
+`WebSocketTransport` is a Swift `actor` implementing the `graphql-transport-ws` protocol for all operation types (queries, mutations, subscriptions). Supports pause/resume lifecycle for app backgrounding. Key types:
 
-- **`WebSocketTransport`** — Main entry point. Manages connection lifecycle (state machine: `notStarted` → `connecting` → `connected` / `disconnected`), subscriber registry, and message routing.
-- **`WebSocketConnection`** — Wraps a `WebSocketTask`, handles `openConnection()` (returns `AsyncThrowingStream` of messages) and `send()`.
+- **`WebSocketTransport`** — Main entry point. Manages connection lifecycle (state machine: `notStarted` → `connecting` → `connected` / `disconnected` / `paused`), subscriber registry, and message routing. `pause()` closes the socket without triggering auto-reconnection or terminating subscriber streams; `resume()` re-establishes and re-subscribes.
+- **`WebSocketConnection`** — Wraps a `WebSocketTask`, handles `openConnection()` (returns `AsyncThrowingStream` of messages) and `send()`. `close()` explicitly cancels the underlying task (used by `pause()`), separate from `deinit` cancellation.
 - **`WebSocketTask`** protocol — Abstraction over `URLSessionWebSocketTask` for testability. Defined in `WebSocketURLSession.swift`.
 - **`Message.Incoming` / `Message.Outgoing`** — Enums in `WebSocketMessage.swift` for all `graphql-transport-ws` message types. Outgoing serializes to `.data` (not `.string`). Incoming deserializes from both `.string` and `.data`.
 - **`SubscriberRegistry`** — Manages operation subscribers keyed by `OperationID`. Extracted from `WebSocketTransport`.
@@ -13,11 +13,12 @@
 
 ## Connection Lifecycle
 
-`ensureConnected()` handles all four states:
+`ensureConnected()` handles all five states:
 - `notStarted`: Opens connection, spawns receive loop, waits for `connection_ack`
 - `connecting`: Suspends caller via `CheckedContinuation` until ack arrives
 - `connected`: Returns immediately
 - `disconnected`: Creates fresh `WebSocketConnection` with new task, reconnects
+- `paused`: Waits for `connection_ack` (blocks until `resume()` is called)
 
 Connection waiters use `[CheckedContinuation<Void, any Error>]` array pattern (same as `AsyncReadWriteLock`).
 
