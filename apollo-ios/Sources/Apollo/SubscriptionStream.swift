@@ -36,7 +36,8 @@ public struct SubscriptionStream<Element: Sendable>: AsyncSequence, Sendable {
     }
   }
 
-  private let stream: AsyncThrowingStream<Element, any Error>
+  /// The underlying stream wrapped by the `SubscriptionStream`.
+  public let stream: AsyncThrowingStream<Element, any Error>
   private let stateProvider: @Sendable () -> SubscriptionState
 
   /// The current lifecycle state of this subscription.
