@@ -64,6 +64,14 @@ struct SubscriberRegistry {
     let id = operationMessageIdCreator.requestId()
 
     let (stream, continuation) = AsyncThrowingStream<JSONObject, any Swift.Error>.makeStream()
+
+    // When the consuming task is cancelled the runtime invokes onTermination.
+    // Finishing the continuation here unblocks any pending `next()` call so the
+    // consumer's `for try await` loop can exit and run its own cleanup.
+    continuation.onTermination = { @Sendable _ in
+      continuation.finish()
+    }
+
     records[id] = Record(
       continuation: continuation,
       operation: operation,
