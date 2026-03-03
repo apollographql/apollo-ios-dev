@@ -1969,6 +1969,184 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     expect(results2[0].data?.reviewAdded?.commentary).to(equal("Sub2 resumed"))
   }
 
+  // MARK: - Subscription State
+
+  func testSubscriptionState__shouldBePending__beforeConnectionAck() async throws {
+    // Don't emit connectionAck yet — subscribe while the connection is still being established.
+    let stream = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+
+    expect(stream.state).to(equal(.pending))
+
+    // Now acknowledge so the subscription can proceed — then complete it so cleanup runs.
+    mockTask.emit(.connectionAck(payload: nil))
+    await expect(self.mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let operationID = mockTask.subscribeOperationID(at: 0)
+    mockTask.emit(.complete(id: operationID))
+
+    _ = try await stream.getAllValues()
+  }
+
+  func testSubscriptionState__shouldBecomeActive__afterSubscribeMessageSent() async throws {
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (stream, operationID) = try await subscribe(on: mockTask, using: client)
+
+    // After subscribe message has been sent, state should be active.
+    expect(stream.state).to(equal(.active))
+
+    // Complete the subscription.
+    mockTask.emit(.complete(id: operationID))
+    _ = try await stream.getAllValues()
+  }
+
+  func testSubscriptionState__shouldBeFinishedCompleted__afterServerComplete() async throws {
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (stream, operationID) = try await subscribe(on: mockTask, using: client)
+    expect(stream.state).to(equal(.active))
+
+    // Server completes the subscription.
+    mockTask.emit(.complete(id: operationID))
+    _ = try await stream.getAllValues()
+
+    expect(stream.state).to(equal(.finished(.completed)))
+  }
+
+  func testSubscriptionState__shouldBeFinishedError__afterServerError() async throws {
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (stream, operationID) = try await subscribe(on: mockTask, using: client)
+    expect(stream.state).to(equal(.active))
+
+    // Server sends an error for this subscription.
+    mockTask.emit(.error(id: operationID, payload: [["message": "Something went wrong"]]))
+
+    do {
+      _ = try await stream.getAllValues()
+      fail("Expected stream to throw")
+    } catch {
+      // Expected
+    }
+
+    expect(stream.state).to(equal(.finished(.error(WebSocketTransport.Error.graphQLErrors([])))))
+  }
+
+  func testSubscriptionState__shouldBeFinishedCancelled__whenClientCancels() async throws {
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (stream, _) = try await subscribe(on: mockTask, using: client)
+    expect(stream.state).to(equal(.active))
+
+    // Cancel the subscription by wrapping iteration in a task and cancelling it.
+    let iterationTask = Task {
+      for try await _ in stream {}
+    }
+    iterationTask.cancel()
+
+    // Wait for cancellation to propagate.
+    _ = try? await iterationTask.value
+
+    await expect(stream.state).toEventually(equal(.finished(.cancelled)))
+  }
+
+  func testSubscriptionState__shouldBecomeReconnecting__onDisconnectWithReconnectEnabled() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    factory.tasks.append(contentsOf: [task1, task2])
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(reconnectionInterval: 0)
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+    let (stream, operationID) = try await subscribe(on: task1, using: client)
+    expect(stream.state).to(equal(.active))
+
+    // Disconnect — should trigger reconnection.
+    task1.finish()
+
+    await expect(stream.state).toEventually(equal(.reconnecting))
+
+    // Complete reconnection.
+    task2.emit(.connectionAck(payload: nil))
+    await expect(stream.state).toEventually(equal(.active))
+
+    // Complete the subscription.
+    task2.emit(.complete(id: operationID))
+    _ = try await stream.getAllValues()
+  }
+
+  func testSubscriptionState__shouldBecomePaused__whenTransportPaused() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    factory.tasks.append(contentsOf: [task1, task2])
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+    let (stream, operationID) = try await subscribe(on: task1, using: client)
+    expect(stream.state).to(equal(.active))
+
+    // Pause the transport.
+    await networkTransport.pause()
+    expect(stream.state).to(equal(.paused))
+
+    // Resume — should reconnect and restore active.
+    await networkTransport.resume()
+    task2.emit(.connectionAck(payload: nil))
+    await expect(stream.state).toEventually(equal(.active))
+
+    // Complete the subscription.
+    task2.emit(.complete(id: operationID))
+    _ = try await stream.getAllValues()
+  }
+
+  func testSubscriptionState__shouldBeFinishedCompleted__whenDisconnectWithReconnectDisabled() async throws {
+    // Default configuration has reconnectionInterval = -1 (disabled).
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (stream, operationID) = try await subscribe(on: mockTask, using: client)
+    expect(stream.state).to(equal(.active))
+
+    // Deliver one result then disconnect.
+    mockTask.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 5, commentary: "Before disconnect")))
+    mockTask.finish()
+
+    _ = try await stream.getAllValues()
+
+    // Without error, disconnect finishes with .completed.
+    expect(stream.state).to(equal(.finished(.completed)))
+  }
+
+  func testSubscriptionState__shouldBeFinishedError__whenDisconnectWithError() async throws {
+    // Default configuration has reconnectionInterval = -1 (disabled).
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (stream, _) = try await subscribe(on: mockTask, using: client)
+    expect(stream.state).to(equal(.active))
+
+    // Disconnect with an error.
+    mockTask.throw(URLError(.networkConnectionLost))
+
+    do {
+      _ = try await stream.getAllValues()
+      fail("Expected stream to throw")
+    } catch {
+      // Expected
+    }
+
+    expect(stream.state).to(equal(.finished(.error(URLError(.networkConnectionLost)))))
+  }
+
   func testPause__duringReconnectionDelay__shouldStopReconnection() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
