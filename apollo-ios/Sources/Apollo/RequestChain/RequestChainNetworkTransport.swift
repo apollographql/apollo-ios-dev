@@ -168,10 +168,14 @@ extension RequestChainNetworkTransport: SubscriptionNetworkTransport {
             stateStorage.set(.active)
             continuation.yield(value)
           }
-          stateStorage.set(.stopped)
+          stateStorage.set(.finished(Task.isCancelled ? .cancelled : .completed))
           continuation.finish()
         } catch {
-          stateStorage.set(.stopped)
+          if error is CancellationError {
+            stateStorage.set(.finished(.cancelled))
+          } else {
+            stateStorage.set(.finished(.error(error)))
+          }
           continuation.finish(throwing: error)
         }
       }

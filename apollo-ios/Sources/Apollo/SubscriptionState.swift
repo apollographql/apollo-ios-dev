@@ -7,6 +7,33 @@
 /// states like ``reconnecting`` and ``paused`` that reflect the health of
 /// the underlying connection.
 public enum SubscriptionState: Sendable, Equatable, CustomStringConvertible {
+
+  /// The reason a subscription finished.
+  public enum FinishReason: Sendable, Equatable {
+    /// The server completed the subscription normally.
+    case completed
+    /// The subscription was cancelled by the client.
+    case cancelled
+    /// The subscription was terminated due to an error.
+    ///
+    /// Use pattern matching to extract the error:
+    /// ```swift
+    /// if case .finished(.error(let error)) = stream.state {
+    ///   print("Subscription failed: \(error)")
+    /// }
+    /// ```
+    case error(any Error)
+
+    public static func == (lhs: FinishReason, rhs: FinishReason) -> Bool {
+      switch (lhs, rhs) {
+      case (.completed, .completed): return true
+      case (.cancelled, .cancelled): return true
+      case (.error, .error): return true
+      default: return false
+      }
+    }
+  }
+
   /// The subscription has been initiated but is not yet active.
   ///
   /// The transport may still be establishing a connection or sending
@@ -30,9 +57,21 @@ public enum SubscriptionState: Sendable, Equatable, CustomStringConvertible {
 
   /// The subscription has ended.
   ///
-  /// The subscription was either completed normally by the server,
-  /// terminated due to an error, or cancelled by the client.
-  case stopped
+  /// Inspect the associated ``FinishReason`` to determine whether the
+  /// subscription completed normally, was cancelled by the client,
+  /// or terminated due to an error.
+  case finished(FinishReason)
+
+  public static func == (lhs: SubscriptionState, rhs: SubscriptionState) -> Bool {
+    switch (lhs, rhs) {
+    case (.pending, .pending): return true
+    case (.active, .active): return true
+    case (.paused, .paused): return true
+    case (.reconnecting, .reconnecting): return true
+    case (.finished(let l), .finished(let r)): return l == r
+    default: return false
+    }
+  }
 
   public var description: String {
     switch self {
@@ -40,7 +79,12 @@ public enum SubscriptionState: Sendable, Equatable, CustomStringConvertible {
     case .active: return "active"
     case .paused: return "paused"
     case .reconnecting: return "reconnecting"
-    case .stopped: return "stopped"
+    case .finished(let reason):
+      switch reason {
+      case .completed: return "finished(completed)"
+      case .cancelled: return "finished(cancelled)"
+      case .error(let error): return "finished(error: \(error))"
+      }
     }
   }
 }

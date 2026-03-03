@@ -21,6 +21,16 @@ struct SubscriberRegistry {
     let operation: any GraphQLOperation
     var status: Status
     let stateStorage: SubscriptionStateStorage?
+
+    func finish(reason: SubscriptionState.FinishReason) {
+      stateStorage?.set(.finished(reason))
+      switch reason {
+      case .completed, .cancelled:
+        continuation.finish()
+      case .error(let error):
+        continuation.finish(throwing: error)
+      }
+    }
   }
 
   /// Active subscribers keyed by operation ID.
@@ -74,10 +84,9 @@ struct SubscriberRegistry {
   /// Returns `true` if a subscriber with the given ID existed and was removed,
   /// `false` if the subscriber was already removed (e.g. by a prior server `complete`).
   @discardableResult
-  mutating func finish(_ id: WebSocketTransport.OperationID, throwing error: (any Swift.Error)? = nil) -> Bool {
+  mutating func finish(_ id: WebSocketTransport.OperationID, reason: SubscriptionState.FinishReason = .completed) -> Bool {
     guard let record = records.removeValue(forKey: id) else { return false }
-    record.stateStorage?.set(.stopped)
-    record.continuation.finish(throwing: error)
+    record.finish(reason: reason)
     return true
   }
 
@@ -97,13 +106,12 @@ struct SubscriberRegistry {
     }
   }
 
-  /// Finishes all subscribers, optionally with an error, and clears the registry.
-  mutating func finishAll(throwing error: (any Swift.Error)? = nil) {
+  /// Finishes all subscribers with the given reason and clears the registry.
+  mutating func finishAll(reason: SubscriptionState.FinishReason = .completed) {
     let active = records
     records.removeAll()
     for (_, record) in active {
-      record.stateStorage?.set(.stopped)
-      record.continuation.finish(throwing: error)
+      record.finish(reason: reason)
     }
   }
 
@@ -115,8 +123,7 @@ struct SubscriberRegistry {
     for (id, record) in records {
       guard type(of: record.operation).operationType != .subscription else { continue }
       records.removeValue(forKey: id)
-      record.stateStorage?.set(.stopped)
-      record.continuation.finish(throwing: error)
+      record.finish(reason: .error(error))
     }
   }
 

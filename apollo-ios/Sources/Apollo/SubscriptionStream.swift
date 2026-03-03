@@ -15,7 +15,7 @@ import Foundation
 ///   // process response
 /// }
 ///
-/// print(stream.state) // .stopped
+/// print(stream.state) // .finished(.completed)
 /// ```
 ///
 /// The ``state`` property reflects the subscription's position in its lifecycle

@@ -234,7 +234,11 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
       await attemptReconnection()
     } else {
       connectionWaiters.failAll(with: error ?? Error.connectionClosed)
-      subscriberRegistry.finishAll(throwing: error)
+      if let error {
+        subscriberRegistry.finishAll(reason: .error(error))
+      } else {
+        subscriberRegistry.finishAll(reason: .completed)
+      }
     }
   }
 
@@ -252,7 +256,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
         try await Task.sleep(nanoseconds: UInt64(configuration.reconnectionInterval * 1_000_000_000))
       } catch {
         // Sleep was cancelled — terminate everything
-        subscriberRegistry.finishAll()
+        subscriberRegistry.finishAll(reason: .cancelled)
         return
       }
     }
@@ -446,7 +450,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   /// finishes its payload stream, and sends a `complete` message to the server.
   /// No-ops if the subscriber was already removed (e.g. server already completed it).
   private func cancelSubscription(operationID: OperationID) {
-    guard subscriberRegistry.finish(operationID) else { return }
+    guard subscriberRegistry.finish(operationID, reason: .cancelled) else { return }
 
     let message = Message.Outgoing.complete(id: operationID)
     if let wsMessage = try? message.toWebSocketMessage() {
@@ -480,7 +484,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
       } catch {
         // Defensive: if re-subscribe fails (e.g. missing query document — shouldn't happen
         // since the first subscribe succeeded), terminate this individual subscriber.
-        subscriberRegistry.finish(id, throwing: error)
+        subscriberRegistry.finish(id, reason: .error(error))
       }
     }
   }
@@ -509,10 +513,10 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
         subscriberRegistry.yield(payload, for: id)
 
       case .error(let id, let errors):
-        subscriberRegistry.finish(id, throwing: Error.graphQLErrors(errors))
+        subscriberRegistry.finish(id, reason: .error(Error.graphQLErrors(errors)))
 
       case .complete(let id):
-        subscriberRegistry.finish(id)
+        subscriberRegistry.finish(id, reason: .completed)
 
       case .ping(let payload):
         // Per the graphql-transport-ws protocol, a pong must be sent in response
@@ -526,7 +530,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
         delegate?.webSocketTransport(self, didReceivePongWithPayload: payload)
       }
     } catch {
-      subscriberRegistry.finishAll(throwing: Error.unrecognizedMessage)
+      subscriberRegistry.finishAll(reason: .error(Error.unrecognizedMessage))
     }
   }
 
@@ -608,12 +612,10 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
           if Task.isCancelled {
             await self.cancelSubscription(operationID: operationID)
           }
-          stateStorage.set(.stopped)
           continuation.finish()
 
         } catch {
           await self.cancelSubscription(operationID: operationID)
-          stateStorage.set(.stopped)
           continuation.finish(throwing: error)
         }
       }
