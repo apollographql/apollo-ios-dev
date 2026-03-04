@@ -26,16 +26,52 @@ public final class MockWebSocketTask: WebSocketTask, @unchecked Sendable {
 
   private lazy var serverMessageIterator = serverMessages.makeAsyncIterator()
 
+  // MARK: - Thread Safety
+  //
+  // WebSocketConnection.send() spawns unstructured Task blocks that run concurrently
+  // on the default executor (not actor-isolated). When multiple messages are sent in
+  // rapid succession (e.g. resubscribing all active subscriptions after reconnection),
+  // concurrent Tasks can race on the mutable state below. The lock serializes access.
+
+  private let lock = NSLock()
+
   // MARK: - Client → Server (SUT sends messages, test inspects them)
 
   /// Messages the client (system-under-test) has sent via `send(_:)`.
-  public private(set) var clientSentMessages: [URLSessionWebSocketTask.Message] = []
+  ///
+  /// - Important: Access is serialized via `lock` to prevent data races from concurrent
+  ///   `WebSocketConnection.send()` tasks. Use the public accessor which reads under the lock.
+  private var _clientSentMessages: [URLSessionWebSocketTask.Message] = []
+
+  public var clientSentMessages: [URLSessionWebSocketTask.Message] {
+    lock.lock()
+    defer { lock.unlock() }
+    return _clientSentMessages
+  }
 
   // MARK: - Lifecycle tracking
 
-  public private(set) var isResumed: Bool = false
-  public private(set) var cancelCode: URLSessionWebSocketTask.CloseCode?
-  public private(set) var cancelReason: Data?
+  private var _isResumed: Bool = false
+  private var _cancelCode: URLSessionWebSocketTask.CloseCode?
+  private var _cancelReason: Data?
+
+  public var isResumed: Bool {
+    lock.lock()
+    defer { lock.unlock() }
+    return _isResumed
+  }
+
+  public var cancelCode: URLSessionWebSocketTask.CloseCode? {
+    lock.lock()
+    defer { lock.unlock() }
+    return _cancelCode
+  }
+
+  public var cancelReason: Data? {
+    lock.lock()
+    defer { lock.unlock() }
+    return _cancelReason
+  }
 
   // MARK: - Init
 
@@ -88,11 +124,15 @@ public final class MockWebSocketTask: WebSocketTask, @unchecked Sendable {
   // MARK: - WebSocketTask conformance (called by SUT)
 
   public func resume() {
-    isResumed = true
+    lock.lock()
+    defer { lock.unlock() }
+    _isResumed = true
   }
 
   public func send(_ message: URLSessionWebSocketTask.Message) async throws {
-    clientSentMessages.append(message)
+    lock.withLock {
+      _clientSentMessages.append(message)
+    }
   }
 
   public func receive() async throws -> URLSessionWebSocketTask.Message {
@@ -106,8 +146,10 @@ public final class MockWebSocketTask: WebSocketTask, @unchecked Sendable {
   }
 
   public func cancel(with closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
-    cancelCode = closeCode
-    cancelReason = reason
+    lock.lock()
+    _cancelCode = closeCode
+    _cancelReason = reason
+    lock.unlock()
     // Match real URLSessionWebSocketTask behavior: cancelling the task causes any
     // pending receive() call to throw URLError(.cancelled).
     serverMessages.throw(URLError(.cancelled))
