@@ -71,8 +71,8 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     /// (`apollographql-client-name`, `apollographql-client-version`) on the WebSocket
     /// connection request.
     ///
-    /// Default: `nil` (no client awareness headers).
-    public var clientAwarenessMetadata: ClientAwarenessMetadata?
+    /// Default: `ClientAwarenessMetadata()` (includes Apollo library awareness headers).
+    public var clientAwarenessMetadata: ClientAwarenessMetadata
 
     public init(
       reconnectionInterval: TimeInterval = -1,
@@ -80,7 +80,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
       connectingPayload: JSONEncodableDictionary? = nil,
       operationMessageIdCreator: any OperationMessageIdCreator = ApolloSequencedOperationMessageIdCreator(),
       pingInterval: TimeInterval? = nil,
-      clientAwarenessMetadata: ClientAwarenessMetadata? = nil
+      clientAwarenessMetadata: ClientAwarenessMetadata = ClientAwarenessMetadata()
     ) {
       self.reconnectionInterval = reconnectionInterval
       self.requestBodyCreator = requestBodyCreator
@@ -168,13 +168,13 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
 
   private static func createURLRequest(
     endpointURL: URL,
-    clientAwarenessMetadata: ClientAwarenessMetadata? = nil
+    clientAwarenessMetadata: ClientAwarenessMetadata
   ) throws -> URLRequest {
     var request = URLRequest(url: endpointURL)
 
     request.setValue(Constants.headerWSProtocolValue, forHTTPHeaderField: Constants.headerWSProtocolName)
 
-    clientAwarenessMetadata?.applyHeaders(to: &request)
+    clientAwarenessMetadata.applyHeaders(to: &request)
 
     return request
   }
