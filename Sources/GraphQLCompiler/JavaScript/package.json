@@ -14,7 +14,7 @@
     "npm": "^10.9.2"
   },
   "dependencies": {
-    "graphql": "17.0.0-alpha.9",
+    "graphql": "17.0.0-alpha.10",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
