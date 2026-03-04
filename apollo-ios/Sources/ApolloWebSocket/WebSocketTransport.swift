@@ -49,16 +49,32 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     /// operation. Defaults to ``ApolloSequencedOperationMessageIdCreator``.
     public var operationMessageIdCreator: any OperationMessageIdCreator
 
+    /// The interval at which the client sends ping messages to the server as a keepalive.
+    ///
+    /// Some servers require clients to send periodic pings and will drop the connection
+    /// if they don't receive one within a certain timeframe.
+    ///
+    /// - A positive value (e.g. `20`) sends a ping every 20 seconds while connected.
+    /// - A value of `nil` disables client-initiated pings (the default).
+    ///
+    /// Pings are only sent after `connection_ack` is received. The timer is stopped on
+    /// disconnect or pause, and restarted on reconnect.
+    ///
+    /// Default: `nil` (disabled).
+    public var pingInterval: TimeInterval?
+
     public init(
       reconnectionInterval: TimeInterval = -1,
       requestBodyCreator: any JSONRequestBodyCreator = DefaultRequestBodyCreator(),
       connectingPayload: JSONEncodableDictionary? = nil,
-      operationMessageIdCreator: any OperationMessageIdCreator = ApolloSequencedOperationMessageIdCreator()
+      operationMessageIdCreator: any OperationMessageIdCreator = ApolloSequencedOperationMessageIdCreator(),
+      pingInterval: TimeInterval? = nil
     ) {
       self.reconnectionInterval = reconnectionInterval
       self.requestBodyCreator = requestBodyCreator
       self.connectingPayload = connectingPayload
       self.operationMessageIdCreator = operationMessageIdCreator
+      self.pingInterval = pingInterval
     }
   }
 
@@ -108,6 +124,10 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   private var subscriberRegistry: SubscriberRegistry
 
   private var connectionWaiters = ConnectionWaiterQueue()
+
+  /// The task that periodically sends client-initiated ping messages.
+  /// Created after `connection_ack` and cancelled on disconnect/pause.
+  private var pingTimerTask: Task<Void, Never>?
 
   /// The number of active subscribers. Exposed for test assertions.
   var subscriberCount: Int { subscriberRegistry.count }
@@ -222,6 +242,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
 
     let wasConnected = (self.connectionState == .connected)
     self.connectionState = .disconnected
+    stopPingTimer()
 
     delegate?.webSocketTransport(self, didDisconnectWithError: error)
 
@@ -305,6 +326,43 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   /// waiting task is cancelled before `connection_ack` arrives.
   private func cancelConnectionWaiter(id: UUID) {
     connectionWaiters.cancel(id: id)
+  }
+
+  // MARK: - Client-Initiated Ping Keepalive
+
+  /// Starts the periodic ping timer if `pingInterval` is configured.
+  ///
+  /// Spawns a task that sends a `ping` message at the configured interval. The task
+  /// runs until cancelled (via ``stopPingTimer()``). Called after `connection_ack`.
+  private func startPingTimer() {
+    guard let interval = configuration.pingInterval, interval > 0 else { return }
+
+    stopPingTimer()
+
+    let connection = self.connection
+    pingTimerTask = Task { [weak self] in
+      let nanoseconds = UInt64(interval * 1_000_000_000)
+      while !Task.isCancelled {
+        do {
+          try await Task.sleep(nanoseconds: nanoseconds)
+        } catch {
+          break
+        }
+
+        guard let _ = self, !Task.isCancelled else { break }
+
+        guard let pingMessage = try? Message.Outgoing.ping(payload: nil).toWebSocketMessage() else {
+          continue
+        }
+        connection.send(pingMessage)
+      }
+    }
+  }
+
+  /// Stops the periodic ping timer.
+  private func stopPingTimer() {
+    pingTimerTask?.cancel()
+    pingTimerTask = nil
   }
 
   // MARK: - Runtime Configuration Updates
@@ -391,6 +449,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     }
 
     connectionState = .paused
+    stopPingTimer()
 
     // Terminate one-shot operations — they cannot survive a pause because replaying
     // a mutation could cause duplicate side effects.
@@ -502,6 +561,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
         self.hasBeenConnected = true
         connectionWaiters.resumeAll()
         resubscribeActiveSubscribers()
+        startPingTimer()
 
         if isReconnect {
           delegate?.webSocketTransportDidReconnect(self)

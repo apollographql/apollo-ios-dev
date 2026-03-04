@@ -920,6 +920,152 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     _ = subscription
   }
 
+  // MARK: - Client-Initiated Ping Keepalive
+
+  func testPingInterval__whenConfigured__shouldSendPeriodicPings() async throws {
+    let task1 = MockWebSocketTask()
+    factory = MockWebSocketTaskFactory([task1])
+    session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(pingInterval: 0.1)
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Wait for at least 2 pings to be sent.
+    await expect(task1.clientSentMessages(ofType: "ping").count)
+      .toEventually(beGreaterThanOrEqualTo(2), timeout: .seconds(2))
+
+    _ = subscription
+  }
+
+  func testPingInterval__whenNotConfigured__shouldNotSendPings() async throws {
+    // Default configuration has no pingInterval.
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
+
+    // Wait a bit to ensure no pings are sent.
+    try await Task.sleep(nanoseconds: 300_000_000)
+
+    expect(self.mockTask.clientSentMessages(ofType: "ping").count).to(equal(0))
+
+    _ = subscription
+  }
+
+  func testPingInterval__shouldStopOnDisconnect() async throws {
+    let task1 = MockWebSocketTask()
+    factory = MockWebSocketTaskFactory([task1])
+    session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(pingInterval: 0.1)
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Wait for at least one ping.
+    await expect(task1.clientSentMessages(ofType: "ping").count)
+      .toEventually(beGreaterThanOrEqualTo(1), timeout: .seconds(2))
+
+    // Disconnect — pings should stop.
+    task1.finish()
+
+    // Record the count after disconnect and wait to confirm it doesn't grow.
+    try await Task.sleep(nanoseconds: 200_000_000)
+    let countAfterDisconnect = task1.clientSentMessages(ofType: "ping").count
+    try await Task.sleep(nanoseconds: 300_000_000)
+    expect(task1.clientSentMessages(ofType: "ping").count).to(equal(countAfterDisconnect))
+
+    _ = subscription
+  }
+
+  func testPingInterval__shouldStopOnPause__andRestartOnResume() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    factory = MockWebSocketTaskFactory([task1, task2])
+    session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(pingInterval: 0.1)
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Wait for at least one ping on task1.
+    await expect(task1.clientSentMessages(ofType: "ping").count)
+      .toEventually(beGreaterThanOrEqualTo(1), timeout: .seconds(2))
+
+    // Pause — pings should stop on task1.
+    await networkTransport.pause()
+
+    // Resume — should start a new connection on task2.
+    await networkTransport.resume()
+    task2.emit(.connectionAck(payload: nil))
+
+    // Pings should now arrive on task2.
+    await expect(task2.clientSentMessages(ofType: "ping").count)
+      .toEventually(beGreaterThanOrEqualTo(1), timeout: .seconds(2))
+
+    _ = subscription
+  }
+
+  func testPingInterval__shouldRestartOnReconnect() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    factory = MockWebSocketTaskFactory([task1, task2])
+    session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(reconnectionInterval: 0, pingInterval: 0.1)
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Wait for at least one ping on task1.
+    await expect(task1.clientSentMessages(ofType: "ping").count)
+      .toEventually(beGreaterThanOrEqualTo(1), timeout: .seconds(2))
+
+    // Disconnect task1 — triggers auto-reconnect to task2.
+    task1.finish()
+    task2.emit(.connectionAck(payload: nil))
+
+    // Pings should now arrive on task2.
+    await expect(task2.clientSentMessages(ofType: "ping").count)
+      .toEventually(beGreaterThanOrEqualTo(1), timeout: .seconds(2))
+
+    _ = subscription
+  }
+
   // MARK: - Unrecognized Messages
 
   func testSubscription__whenServerSendsUnrecognizedMessage__shouldTerminateWithError() async throws {
