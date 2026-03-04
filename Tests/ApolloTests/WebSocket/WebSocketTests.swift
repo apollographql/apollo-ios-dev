@@ -2436,4 +2436,135 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     expect(results.count).to(equal(1))
     expect(results[0].data?.reviewAdded?.commentary).to(equal("After two cycles"))
   }
+
+  // MARK: - Client Awareness Headers
+
+  func testClientAwarenessHeaders__withMetadata__shouldApplyHeadersToConnectionRequest() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(
+        clientAwarenessMetadata: ClientAwarenessMetadata(
+          clientApplicationName: "test-app",
+          clientApplicationVersion: "1.2.3"
+        )
+      )
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+
+    // Verify the client awareness headers were applied to the captured request.
+    let capturedRequest = factory.capturedRequests.last!
+    expect(capturedRequest.value(forHTTPHeaderField: "apollographql-client-name"))
+      .to(equal("test-app"))
+    expect(capturedRequest.value(forHTTPHeaderField: "apollographql-client-version"))
+      .to(equal("1.2.3"))
+
+    task1.emit(.complete(id: operationID))
+    _ = subscription
+  }
+
+  func testClientAwarenessHeaders__withoutMetadata__shouldNotApplyHeaders() async throws {
+    // Default setUp creates a transport with no clientAwarenessMetadata.
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (subscription, operationID) = try await subscribe(on: mockTask, using: client)
+
+    let capturedRequest = factory.capturedRequests.last!
+    expect(capturedRequest.value(forHTTPHeaderField: "apollographql-client-name"))
+      .to(beNil())
+    expect(capturedRequest.value(forHTTPHeaderField: "apollographql-client-version"))
+      .to(beNil())
+
+    mockTask.emit(.complete(id: operationID))
+    _ = subscription
+  }
+
+  func testClientAwarenessHeaders__withNameOnly__shouldApplyOnlyNameHeader() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(
+        clientAwarenessMetadata: ClientAwarenessMetadata(
+          clientApplicationName: "my-app",
+          clientApplicationVersion: nil
+        )
+      )
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+
+    let capturedRequest = factory.capturedRequests.last!
+    expect(capturedRequest.value(forHTTPHeaderField: "apollographql-client-name"))
+      .to(equal("my-app"))
+    expect(capturedRequest.value(forHTTPHeaderField: "apollographql-client-version"))
+      .to(beNil())
+
+    task1.emit(.complete(id: operationID))
+    _ = subscription
+  }
+
+  func testClientAwarenessHeaders__shouldPersistAcrossReconnection() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    factory.tasks.append(contentsOf: [task1, task2])
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(
+        reconnectionInterval: 0,
+        clientAwarenessMetadata: ClientAwarenessMetadata(
+          clientApplicationName: "reconnect-app",
+          clientApplicationVersion: "2.0.0"
+        )
+      )
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Verify headers on initial connection.
+    let initialRequest = factory.capturedRequests.last!
+    expect(initialRequest.value(forHTTPHeaderField: "apollographql-client-name"))
+      .to(equal("reconnect-app"))
+    expect(initialRequest.value(forHTTPHeaderField: "apollographql-client-version"))
+      .to(equal("2.0.0"))
+
+    // Simulate disconnect → triggers auto-reconnection.
+    task1.finish()
+
+    // Wait for the reconnected connection's subscribe message.
+    task2.emit(.connectionAck(payload: nil))
+    await expect(task2.clientSentMessages(ofType: "subscribe").count)
+      .toEventually(equal(1))
+
+    // Verify headers persisted on the reconnection request.
+    let reconnectRequest = factory.capturedRequests.last!
+    expect(reconnectRequest.value(forHTTPHeaderField: "apollographql-client-name"))
+      .to(equal("reconnect-app"))
+    expect(reconnectRequest.value(forHTTPHeaderField: "apollographql-client-version"))
+      .to(equal("2.0.0"))
+
+    task2.emit(.complete(id: task2.subscribeOperationID(at: 0)))
+    let results = try await subscription.getAllValues()
+    _ = results
+  }
 }
