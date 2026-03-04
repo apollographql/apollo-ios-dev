@@ -119,8 +119,16 @@ public final class MockWebSocketTask: WebSocketTask, @unchecked Sendable {
   /// `graphql-transport-ws` message type (e.g. `"subscribe"`, `"complete"`, `"connection_init"`).
   public func clientSentMessages(ofType type: String) -> [[String: Any]] {
     clientSentMessages.compactMap { message in
-      guard case .data(let data) = message,
-            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+      let data: Data
+      switch message {
+      case .string(let string):
+        data = Data(string.utf8)
+      case .data(let d):
+        data = d
+      @unknown default:
+        return nil
+      }
+      guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
             json["type"] as? String == type else {
         return nil
       }
