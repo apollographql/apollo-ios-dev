@@ -942,7 +942,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     // Wait for at least 2 pings to be sent.
     await expect(task1.clientSentMessages(ofType: "ping").count)
-      .toEventually(beGreaterThanOrEqualTo(2), timeout: .seconds(2))
+      .toEventually(beGreaterThanOrEqualTo(2), timeout: .seconds(1))
 
     _ = subscription
   }

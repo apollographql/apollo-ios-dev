@@ -35,6 +35,7 @@ Connection waiters use `[CheckedContinuation<Void, any Error>]` array pattern (s
 - Application-level JSON messages (separate from WebSocket-frame-level ping/pong)
 - On receiving `ping`: reply with `pong(payload: nil)` immediately — do NOT echo the ping's payload
 - On receiving `pong`: no action (break)
+- Client-initiated pings: `Configuration.pingInterval` (default `nil`/disabled). Timer starts after `connection_ack`, stops on disconnect/pause, restarts on reconnect. Implemented via `pingTimerTask` (`Task`) that captures the current `connection`.
 
 ## Testing
 
@@ -48,7 +49,7 @@ Tests live in `Tests/ApolloTests/WebSocket/`. Mock infrastructure in `Tests/Apol
 
 `setUp()` creates a factory with one default task, a session, transport, and client. Tests access the default task via the `mockTask` computed property. Three patterns:
 - **Default config**: Use setUp's transport directly; append extra tasks to `factory.tasks` if reconnection is needed
-- **Custom config**: Append tasks to `factory.tasks`, then overwrite `networkTransport` and `client` with new instances using the same `session`
+- **Custom config**: Recreate `factory` (with a fresh `MockWebSocketTaskFactory`) and `session` before creating new `networkTransport` and `client`. The setUp transport consumes factory index 0, so reusing the old session causes the new transport to get the wrong task or crash.
 - **`self.` requirement**: `mockTask` is a computed property — use `self.mockTask` inside `expect()` closures. Capture `self.client!` in a local `let` before `Task { }` closures to avoid `sending` parameter data race errors.
 
 ### Running WebSocket tests
