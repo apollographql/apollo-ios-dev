@@ -1,9 +1,9 @@
 import XCTest
 import Nimble
-@testable import Apollo
+@testable @_spi(Execution) import Apollo
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 @_spi(Execution) import ApolloInternalTestHelpers
-@testable import ApolloWebSocket
+@testable @_spi(Execution) import ApolloWebSocket
 
 class WebSocketTests: XCTestCase, MockResponseProvider {
   var networkTransport: WebSocketTransport!
@@ -2566,5 +2566,398 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     task2.emit(.complete(id: task2.subscribeOperationID(at: 0)))
     let results = try await subscription.getAllValues()
     _ = results
+  }
+
+  // MARK: - Subscription Cache Read
+
+  func testSubscription__cacheThenNetwork__cacheHit__yieldsCacheThenServerResults() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    // Pre-populate the cache with subscription data.
+    try await store.publish(records: [
+      "SUBSCRIPTION_ROOT": ["reviewAdded": CacheReference("SUBSCRIPTION_ROOT.reviewAdded")],
+      "SUBSCRIPTION_ROOT.reviewAdded": [
+        "__typename": "ReviewAdded",
+        "stars": 3,
+        "commentary": "Cached review",
+      ],
+    ])
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let subscription = try client.subscribe(
+      subscription: MockSubscription<ReviewAddedData>(),
+      cachePolicy: .cacheThenNetwork
+    )
+
+    // Wait for the subscribe message, then send a server result and complete.
+    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let operationID = task1.subscribeOperationID(at: 0)
+    task1.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 5, commentary: "Server review")))
+    task1.emit(.complete(id: operationID))
+
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(2))
+
+    // First result from cache
+    expect(results[0].source).to(equal(.cache))
+    expect(results[0].data?.reviewAdded?.stars).to(equal(3))
+    expect(results[0].data?.reviewAdded?.commentary).to(equal("Cached review"))
+
+    // Second result from server
+    expect(results[1].source).to(equal(.server))
+    expect(results[1].data?.reviewAdded?.stars).to(equal(5))
+    expect(results[1].data?.reviewAdded?.commentary).to(equal("Server review"))
+  }
+
+  func testSubscription__cacheThenNetwork__cacheMiss__yieldsOnlyServerResults() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    // Do not populate cache — cache miss.
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let subscription = try client.subscribe(
+      subscription: MockSubscription<ReviewAddedData>(),
+      cachePolicy: .cacheThenNetwork
+    )
+
+    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let operationID = task1.subscribeOperationID(at: 0)
+    task1.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 5, commentary: "Server only")))
+    task1.emit(.complete(id: operationID))
+
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(1))
+    expect(results[0].source).to(equal(.server))
+    expect(results[0].data?.reviewAdded?.stars).to(equal(5))
+  }
+
+  func testSubscription__networkOnly__doesNotReadCache() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    // Pre-populate the cache — but networkOnly should not read it.
+    try await store.publish(records: [
+      "SUBSCRIPTION_ROOT": ["reviewAdded": CacheReference("SUBSCRIPTION_ROOT.reviewAdded")],
+      "SUBSCRIPTION_ROOT.reviewAdded": [
+        "__typename": "ReviewAdded",
+        "stars": 3,
+        "commentary": "Cached review",
+      ],
+    ])
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let subscription = try client.subscribe(
+      subscription: MockSubscription<ReviewAddedData>(),
+      cachePolicy: .networkOnly
+    )
+
+    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let operationID = task1.subscribeOperationID(at: 0)
+    task1.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 5, commentary: "Server review")))
+    task1.emit(.complete(id: operationID))
+
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(1))
+    expect(results[0].source).to(equal(.server))
+    expect(results[0].data?.reviewAdded?.stars).to(equal(5))
+  }
+
+  // MARK: - Subscription Cache Write
+
+  func testSubscription__writeResultsToCache__writesServerResponsesToStore() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let subscription = try client.subscribe(
+      subscription: MockSubscription<ReviewAddedData>(),
+      cachePolicy: .networkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: true)
+    )
+
+    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let operationID = task1.subscribeOperationID(at: 0)
+    task1.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 4, commentary: "Written to cache")))
+    task1.emit(.complete(id: operationID))
+
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(1))
+    expect(results[0].data?.reviewAdded?.stars).to(equal(4))
+
+    // Verify data was written to the cache.
+    let cachedResponse = try await store.load(MockSubscription<ReviewAddedData>())
+    expect(cachedResponse).toNot(beNil())
+    expect(cachedResponse?.data?.reviewAdded?.stars).to(equal(4))
+    expect(cachedResponse?.data?.reviewAdded?.commentary).to(equal("Written to cache"))
+  }
+
+  func testSubscription__writeResultsToCache_false__doesNotWriteToStore() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let subscription = try client.subscribe(
+      subscription: MockSubscription<ReviewAddedData>(),
+      cachePolicy: .networkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let operationID = task1.subscribeOperationID(at: 0)
+    task1.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 4, commentary: "Not cached")))
+    task1.emit(.complete(id: operationID))
+
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(1))
+
+    // Verify data was NOT written to the cache.
+    let cachedResponse = try await store.load(MockSubscription<ReviewAddedData>())
+    expect(cachedResponse).to(beNil())
+  }
+
+  // MARK: - Query Cache Behaviors (over WebSocket)
+
+  func testQuery__cacheFirst__cacheHit__returnsCacheWithoutWebSocketMessage() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    // Pre-populate cache with query data.
+    try await store.publish(records: [
+      "QUERY_ROOT": ["reviewAdded": CacheReference("QUERY_ROOT.reviewAdded")],
+      "QUERY_ROOT.reviewAdded": [
+        "__typename": "ReviewAdded",
+        "stars": 3,
+        "commentary": "Cached query",
+      ],
+    ])
+
+    let result = try await client.fetch(
+      query: MockQuery<ReviewAddedData>(),
+      cachePolicy: .cacheFirst
+    )
+
+    expect(result.source).to(equal(.cache))
+    expect(result.data?.reviewAdded?.stars).to(equal(3))
+    expect(result.data?.reviewAdded?.commentary).to(equal("Cached query"))
+
+    // No WebSocket subscribe message should have been sent.
+    expect(task1.clientSentMessages(ofType: "subscribe").count).to(equal(0))
+  }
+
+  func testQuery__cacheFirst__cacheMiss__fetchesViaWebSocket() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    // Empty cache — cache miss triggers network fetch.
+    task1.emit(.connectionAck(payload: nil))
+    task1.emit(.next(id: "1", payload: Self.reviewAddedPayload(stars: 5, commentary: "Server query")))
+    task1.emit(.complete(id: "1"))
+
+    let result = try await client.fetch(
+      query: MockQuery<ReviewAddedData>(),
+      cachePolicy: .cacheFirst
+    )
+
+    expect(result.source).to(equal(.server))
+    expect(result.data?.reviewAdded?.stars).to(equal(5))
+    expect(task1.clientSentMessages(ofType: "subscribe").count).to(equal(1))
+  }
+
+  func testQuery__cacheOnly__cacheHit__returnsCache() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    try await store.publish(records: [
+      "QUERY_ROOT": ["reviewAdded": CacheReference("QUERY_ROOT.reviewAdded")],
+      "QUERY_ROOT.reviewAdded": [
+        "__typename": "ReviewAdded",
+        "stars": 2,
+        "commentary": "Cache only hit",
+      ],
+    ])
+
+    let result = try await client.fetch(
+      query: MockQuery<ReviewAddedData>(),
+      cachePolicy: .cacheOnly
+    )
+
+    expect(result).toNot(beNil())
+    expect(result?.source).to(equal(.cache))
+    expect(result?.data?.reviewAdded?.stars).to(equal(2))
+
+    // No WebSocket connection should have been opened.
+    expect(task1.clientSentMessages(ofType: "subscribe").count).to(equal(0))
+    expect(task1.clientSentMessages(ofType: "connection_init").count).to(equal(0))
+  }
+
+  func testQuery__cacheOnly__cacheMiss__returnsNil() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    let result = try await client.fetch(
+      query: MockQuery<ReviewAddedData>(),
+      cachePolicy: .cacheOnly
+    )
+
+    expect(result).to(beNil())
+    expect(task1.clientSentMessages(ofType: "subscribe").count).to(equal(0))
+  }
+
+  func testQuery__networkOnly__writeResultsToCache__populatesCache() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+    task1.emit(.next(id: "1", payload: Self.reviewAddedPayload(stars: 5, commentary: "Cached by write")))
+    task1.emit(.complete(id: "1"))
+
+    let result = try await client.fetch(
+      query: MockQuery<ReviewAddedData>(),
+      cachePolicy: .networkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: true)
+    )
+
+    expect(result.source).to(equal(.server))
+    expect(result.data?.reviewAdded?.stars).to(equal(5))
+
+    // Verify the result was written to the cache.
+    let cachedResponse = try await store.load(MockQuery<ReviewAddedData>())
+    expect(cachedResponse).toNot(beNil())
+    expect(cachedResponse?.data?.reviewAdded?.stars).to(equal(5))
+    expect(cachedResponse?.data?.reviewAdded?.commentary).to(equal("Cached by write"))
+  }
+
+  // MARK: - Mutation Cache Write (over WebSocket)
+
+  func testMutation__writeResultsToCache__populatesCache() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+    task1.emit(.next(id: "1", payload: Self.reviewAddedPayload(stars: 4, commentary: "Mutation cached")))
+    task1.emit(.complete(id: "1"))
+
+    let result = try await client.perform(
+      mutation: MockMutation<ReviewAddedData>(),
+      requestConfiguration: RequestConfiguration(writeResultsToCache: true)
+    )
+
+    expect(result.data?.reviewAdded?.stars).to(equal(4))
+
+    // Verify the result was written to the cache.
+    let cachedResponse = try await store.load(MockMutation<ReviewAddedData>())
+    expect(cachedResponse).toNot(beNil())
+    expect(cachedResponse?.data?.reviewAdded?.stars).to(equal(4))
+  }
+
+  func testMutation__writeResultsToCache_false__doesNotPopulateCache() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+    task1.emit(.next(id: "1", payload: Self.reviewAddedPayload(stars: 4, commentary: "Not cached")))
+    task1.emit(.complete(id: "1"))
+
+    let result = try await client.perform(
+      mutation: MockMutation<ReviewAddedData>(),
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    expect(result.data?.reviewAdded?.stars).to(equal(4))
+
+    // Verify the result was NOT written to the cache.
+    let cachedResponse = try await store.load(MockMutation<ReviewAddedData>())
+    expect(cachedResponse).to(beNil())
   }
 }
