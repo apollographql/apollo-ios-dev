@@ -688,7 +688,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
 
   // MARK: - Operation Execution
 
-  /// Sends a GraphQL operation over the WebSocket connection and returns a stream of responses.
+  /// Core implementation for executing any GraphQL operation over the WebSocket connection.
   ///
   /// This is the shared implementation for queries, mutations, and subscriptions. All three
   /// use the same `subscribe` message type in the `graphql-transport-ws` protocol. The server
@@ -700,10 +700,15 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   /// - `fetchBehavior.networkFetch` determines whether a WebSocket fetch is performed.
   /// - `requestConfiguration.writeResultsToCache` determines whether server responses are
   ///   written to the normalized cache.
-  private nonisolated func sendOperation<Operation: GraphQLOperation>(
+  ///
+  /// - Parameter stateStorage: When provided (for subscriptions), the storage is updated as
+  ///   the operation moves through its lifecycle. When `nil` (for queries/mutations), no
+  ///   state tracking is performed.
+  private nonisolated func executeOperation<Operation: GraphQLOperation>(
     operation: Operation,
     fetchBehavior: FetchBehavior,
-    requestConfiguration: RequestConfiguration
+    requestConfiguration: RequestConfiguration,
+    stateStorage: SubscriptionStateStorage? = nil
   ) -> AsyncThrowingStream<GraphQLResponse<Operation>, any Swift.Error> {
     AsyncThrowingStream { continuation in
       let innerTask = Task {
@@ -716,12 +721,16 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
           )
 
           guard shouldFetchFromNetwork else {
+            stateStorage?.set(.finished(.completed))
             continuation.finish()
             return
           }
 
           // Step 2: WebSocket fetch
-          let (operationID, payloadStream) = await self.registerSubscriber(for: operation)
+          let (operationID, payloadStream) = await self.registerSubscriber(
+            for: operation,
+            stateStorage: stateStorage
+          )
           do {
             try await self.ensureConnected()
             try Task.checkCancellation()
@@ -763,6 +772,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
           }
 
         } catch {
+          stateStorage?.set(.finished(.error(error)))
           continuation.finish(throwing: error)
         }
       }
@@ -776,92 +786,18 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
 
   /// Sends a GraphQL subscription over the WebSocket connection and returns a
   /// ``SubscriptionStream`` that tracks the subscription's lifecycle state.
-  ///
-  /// This method creates a ``SubscriptionStateStorage`` that is updated as the subscription
-  /// moves through its lifecycle: pending → active → (reconnecting/paused) → stopped.
-  ///
-  /// Cache behavior is the same as ``sendOperation``: `fetchBehavior` controls cache reads
-  /// and `requestConfiguration.writeResultsToCache` controls cache writes.
   private nonisolated func sendSubscription<Operation: GraphQLSubscription>(
     subscription: Operation,
     fetchBehavior: FetchBehavior,
     requestConfiguration: RequestConfiguration
   ) -> SubscriptionStream<GraphQLResponse<Operation>> {
     let stateStorage = SubscriptionStateStorage()
-
-    let stream = AsyncThrowingStream<GraphQLResponse<Operation>, any Swift.Error> { continuation in
-      let innerTask = Task {
-        do {
-          // Step 1: Cache read before network (if applicable)
-          let shouldFetchFromNetwork = try await self.readCacheBeforeNetworkIfNeeded(
-            operation: subscription,
-            fetchBehavior: fetchBehavior,
-            continuation: continuation
-          )
-
-          guard shouldFetchFromNetwork else {
-            stateStorage.set(.finished(.completed))
-            continuation.finish()
-            return
-          }
-
-          // Step 2: WebSocket subscription
-          let (operationID, payloadStream) = await self.registerSubscriber(
-            for: subscription,
-            stateStorage: stateStorage
-          )
-          do {
-            try await self.ensureConnected()
-            try Task.checkCancellation()
-            try await self.sendSubscribeMessage(operationID: operationID, operation: subscription)
-
-            for try await payload in payloadStream {
-              let response = try await self.parseAndCacheResponse(
-                payload: payload,
-                operation: subscription,
-                requestConfiguration: requestConfiguration
-              )
-              continuation.yield(response)
-            }
-
-            if Task.isCancelled {
-              await self.cancelSubscription(operationID: operationID)
-            }
-            continuation.finish()
-
-          } catch {
-            // Step 3: Cache read on transport failure (if applicable).
-            // Only fall back to cache for transport/connection errors, not GraphQL
-            // application errors (e.g. validation failures, resolver errors).
-            let isGraphQLError: Bool
-            if case .graphQLErrors = error as? Error { isGraphQLError = true }
-            else { isGraphQLError = false }
-
-            if fetchBehavior.cacheRead == .onNetworkFailure, !isGraphQLError {
-              if let cacheResponse = try? await self.store.load(subscription) {
-                continuation.yield(cacheResponse)
-                await self.cleanupSubscription(operationID: operationID)
-                continuation.finish()
-                return
-              }
-            }
-
-            await self.cancelSubscription(operationID: operationID)
-            continuation.finish(throwing: error)
-          }
-
-        } catch {
-          stateStorage.set(.finished(.error(error)))
-          continuation.finish(throwing: error)
-        }
-      }
-
-      continuation.onTermination = { @Sendable reason in
-        guard case .cancelled = reason else { return }
-        innerTask.cancel()
-      }
-    }
-
+    let stream = executeOperation(
+      operation: subscription,
+      fetchBehavior: fetchBehavior,
+      requestConfiguration: requestConfiguration,
+      stateStorage: stateStorage
+    )
     return SubscriptionStream(stream: stream, stateProvider: { stateStorage.state })
   }
 
@@ -872,14 +808,14 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     fetchBehavior: FetchBehavior,
     requestConfiguration: RequestConfiguration
   ) throws -> AsyncThrowingStream<GraphQLResponse<Query>, any Swift.Error> {
-    sendOperation(operation: query, fetchBehavior: fetchBehavior, requestConfiguration: requestConfiguration)
+    executeOperation(operation: query, fetchBehavior: fetchBehavior, requestConfiguration: requestConfiguration)
   }
 
   nonisolated public func send<Mutation: GraphQLMutation>(
     mutation: Mutation,
     requestConfiguration: RequestConfiguration
   ) throws -> AsyncThrowingStream<GraphQLResponse<Mutation>, any Swift.Error> {
-    sendOperation(operation: mutation, fetchBehavior: .NetworkOnly, requestConfiguration: requestConfiguration)
+    executeOperation(operation: mutation, fetchBehavior: .NetworkOnly, requestConfiguration: requestConfiguration)
   }
 
   nonisolated public func send<Subscription: GraphQLSubscription>(
