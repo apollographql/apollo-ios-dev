@@ -30,6 +30,16 @@ Connection waiters use `[CheckedContinuation<Void, any Error>]` array pattern (s
 - On disconnect: non-subscriptions are terminated **immediately** with the actual error (before reconnection), subscriptions survive for re-subscribe
 - Unrecognized/unparseable messages throw `Error.unrecognizedMessage` and terminate all subscribers
 
+## Caching
+
+`WebSocketTransport` integrates with `ApolloStore` for cache reads and writes:
+
+- **`readCacheBeforeNetworkIfNeeded()`** — Evaluates `FetchBehavior.cacheRead`/`.networkFetch` to yield cached data before the WebSocket fetch and decide whether the network fetch should proceed.
+- **`parseAndCacheResponse()`** — Parses WebSocket JSON payloads via `SingleResponseExecutionHandler`, writes `RecordSet` to store via `store.publish(records:)` when `requestConfiguration.writeResultsToCache` is true. Cache write errors propagate (terminate the stream).
+- **`executeOperation()`** — Unified 3-step flow (cache read → network fetch → cache fallback on failure) used by both queries/mutations and subscriptions. Takes optional `SubscriptionStateStorage` for subscription state tracking.
+- **GraphQL errors skip cache fallback** — `onNetworkFailure` cache fallback only triggers for transport/connection errors, not `Error.graphQLErrors` (application-level errors should not be masked by stale cache).
+- Uses `store.load()` / `store.publish()` directly — does NOT use `CacheInterceptor` (which is tied to `GraphQLRequest` with HTTP-specific requirements like `graphQLEndpoint` and `toURLRequest()`).
+
 ## Ping/Pong
 
 - Application-level JSON messages (separate from WebSocket-frame-level ping/pong)
