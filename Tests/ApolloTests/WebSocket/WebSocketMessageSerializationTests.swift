@@ -8,18 +8,18 @@ class WebSocketMessageSerializationTests: XCTestCase {
 
   // MARK: - Helpers
 
-  /// Extracts the raw `Data` bytes from a `.data` message.
+  /// Extracts the raw `Data` bytes from a `.string` message.
   private func messageData(
     _ message: URLSessionWebSocketTask.Message
   ) throws -> Data {
-    guard case .data(let data) = message else {
-      fail("Expected .data message, got .string")
+    guard case .string(let string) = message else {
+      fail("Expected .string message, got .data")
       return Data()
     }
-    return data
+    return Data(string.utf8)
   }
 
-  /// Deserializes a `.data` WebSocket message into a JSON dictionary.
+  /// Deserializes a `.string` WebSocket message into a JSON dictionary.
   private func deserialize(
     _ message: URLSessionWebSocketTask.Message
   ) throws -> [String: Any] {
@@ -321,7 +321,7 @@ class WebSocketMessageSerializationTests: XCTestCase {
 
   // MARK: - Output format
 
-  func test__allMessages__shouldReturnDataFormat() throws {
+  func test__allMessages__shouldReturnStringFormat() throws {
     let messages: [WebSocketTransport.Message.Outgoing] = [
       .connectionInit(payload: nil),
       .ping(payload: nil),
@@ -337,8 +337,8 @@ class WebSocketMessageSerializationTests: XCTestCase {
 
     for outgoing in messages {
       let message = try outgoing.toWebSocketMessage()
-      guard case .data = message else {
-        fail("Expected .data message for \(outgoing), got .string")
+      guard case .string = message else {
+        fail("Expected .string message for \(outgoing), got .data")
         return
       }
     }
