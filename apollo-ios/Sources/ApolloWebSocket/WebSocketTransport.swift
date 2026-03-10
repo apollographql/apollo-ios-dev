@@ -221,7 +221,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   /// - Otherwise: transitions to `disconnected`, fails pending connection waiters, and finishes
   ///   all subscriber streams.
   private func startConnectionReceiveLoop() {
-    /// Keeps a reference to the connection the the receive loop was opened on. If a reconnect occurs,
+    /// Keeps a reference to the connection the receive loop was opened on. If a reconnect occurs,
     /// `self.connection` will be a new connection and we should ignore disconnection events for this loop.
     let loopConnection = self.connection
     let connectionStream = self.connection.openConnection(
@@ -536,6 +536,13 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     }
   }
 
+  /// Removes a subscriber from the registry with a `.completed` finish reason without
+  /// sending a `complete` message to the server. Used when the connection is already
+  /// down (e.g. network-failure cache fallback) or when no server cleanup is needed.
+  private func cleanupSubscription(operationID: OperationID) {
+    subscriberRegistry.finish(operationID, reason: .completed)
+  }
+
   private func sendSubscribeMessage<Operation: GraphQLOperation>(
     operationID: OperationID,
     operation: Operation
@@ -735,11 +742,17 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
             continuation.finish()
 
           } catch {
-            // Step 3: Cache read on network failure (if applicable)
-            if fetchBehavior.cacheRead == .onNetworkFailure {
+            // Step 3: Cache read on transport failure (if applicable).
+            // Only fall back to cache for transport/connection errors, not GraphQL
+            // application errors (e.g. validation failures, resolver errors).
+            let isGraphQLError: Bool
+            if case .graphQLErrors = error as? Error { isGraphQLError = true }
+            else { isGraphQLError = false }
+
+            if fetchBehavior.cacheRead == .onNetworkFailure, !isGraphQLError {
               if let cacheResponse = try? await self.store.load(operation) {
                 continuation.yield(cacheResponse)
-                await self.cancelSubscription(operationID: operationID)
+                await self.cleanupSubscription(operationID: operationID)
                 continuation.finish()
                 return
               }
@@ -787,6 +800,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
           )
 
           guard shouldFetchFromNetwork else {
+            stateStorage.set(.finished(.completed))
             continuation.finish()
             return
           }
@@ -816,11 +830,17 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
             continuation.finish()
 
           } catch {
-            // Step 3: Cache read on network failure (if applicable)
-            if fetchBehavior.cacheRead == .onNetworkFailure {
+            // Step 3: Cache read on transport failure (if applicable).
+            // Only fall back to cache for transport/connection errors, not GraphQL
+            // application errors (e.g. validation failures, resolver errors).
+            let isGraphQLError: Bool
+            if case .graphQLErrors = error as? Error { isGraphQLError = true }
+            else { isGraphQLError = false }
+
+            if fetchBehavior.cacheRead == .onNetworkFailure, !isGraphQLError {
               if let cacheResponse = try? await self.store.load(subscription) {
                 continuation.yield(cacheResponse)
-                await self.cancelSubscription(operationID: operationID)
+                await self.cleanupSubscription(operationID: operationID)
                 continuation.finish()
                 return
               }
@@ -831,6 +851,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
           }
 
         } catch {
+          stateStorage.set(.finished(.error(error)))
           continuation.finish(throwing: error)
         }
       }

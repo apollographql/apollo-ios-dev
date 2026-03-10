@@ -2805,6 +2805,8 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     client = ApolloClient(networkTransport: networkTransport!, store: store)
 
     // Empty cache — cache miss triggers network fetch.
+    // Messages are pre-emitted and queued by MockWebSocketTask. The operation ID "1" relies on
+    // ApolloSequencedOperationMessageIdCreator starting at 1 (the default).
     task1.emit(.connectionAck(payload: nil))
     task1.emit(.next(id: "1", payload: Self.reviewAddedPayload(stars: 5, commentary: "Server query")))
     task1.emit(.complete(id: "1"))
@@ -2960,4 +2962,137 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     let cachedResponse = try await store.load(MockMutation<ReviewAddedData>())
     expect(cachedResponse).to(beNil())
   }
+
+  // MARK: - Network Failure Cache Fallback
+
+  func testQuery__networkFirst__connectionFailure__fallsBackToCache() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    // Pre-populate the cache with query data.
+    try await store.publish(records: [
+      "QUERY_ROOT": ["reviewAdded": CacheReference("QUERY_ROOT.reviewAdded")],
+      "QUERY_ROOT.reviewAdded": [
+        "__typename": "ReviewAdded",
+        "stars": 3,
+        "commentary": "Cached fallback",
+      ],
+    ])
+
+    // Connection fails before ack — transport error.
+    struct MockTransportError: Swift.Error {}
+    task1.throw(MockTransportError())
+
+    let result = try await client.fetch(
+      query: MockQuery<ReviewAddedData>(),
+      cachePolicy: .networkFirst
+    )
+
+    // Should fall back to cached data on transport failure.
+    expect(result.source).to(equal(.cache))
+    expect(result.data?.reviewAdded?.stars).to(equal(3))
+    expect(result.data?.reviewAdded?.commentary).to(equal("Cached fallback"))
+  }
+
+  func testQuery__networkFirst__graphQLError__doesNotFallBackToCache() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    // Pre-populate the cache so fallback data is available if incorrectly triggered.
+    try await store.publish(records: [
+      "QUERY_ROOT": ["reviewAdded": CacheReference("QUERY_ROOT.reviewAdded")],
+      "QUERY_ROOT.reviewAdded": [
+        "__typename": "ReviewAdded",
+        "stars": 99,
+        "commentary": "Should not see this",
+      ],
+    ])
+
+    // Messages are pre-emitted and queued. ID "1" relies on the default sequenced ID creator.
+    task1.emit(.connectionAck(payload: nil))
+    task1.emit(.error(id: "1", payload: [["message": "Validation failed"]]))
+
+    // Should propagate the GraphQL error, NOT fall back to cache.
+    do {
+      _ = try await client.fetch(
+        query: MockQuery<ReviewAddedData>(),
+        cachePolicy: .networkFirst
+      )
+      fail("Expected a GraphQL error to be thrown")
+    } catch {
+      expect(error).to(matchError(WebSocketTransport.Error.graphQLErrors([])))
+    }
+  }
+
+  // MARK: - Cache Write Failure Propagation
+
+  func testSubscription__writeResultsToCache__cacheWriteFailure__terminatesStream() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+
+    // A cache that throws on writes but works for reads.
+    let failingCache = FailingWriteCache()
+    let store = ApolloStore(cache: failingCache)
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let subscription = try client.subscribe(
+      subscription: MockSubscription<ReviewAddedData>(),
+      cachePolicy: .networkOnly
+    )
+
+    await expect(task1.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let operationID = task1.subscribeOperationID(at: 0)
+
+    // Server sends valid data, but the cache write will fail.
+    task1.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 5, commentary: "Will fail write")))
+
+    // The stream should terminate with the cache write error.
+    do {
+      _ = try await subscription.getAllValues()
+      fail("Expected a cache write error to be thrown")
+    } catch {
+      expect(error).to(beAKindOf(FailingWriteCache.WriteError.self))
+    }
+  }
+}
+
+// MARK: - Test Helpers
+
+/// A ``NormalizedCache`` that always throws on write operations (merge).
+/// Used to verify that cache write errors propagate correctly.
+private final class FailingWriteCache: NormalizedCache, @unchecked Sendable {
+  struct WriteError: Swift.Error, Equatable {}
+
+  func loadRecords(forKeys keys: Set<CacheKey>) async throws -> [CacheKey: Record] {
+    return [:]
+  }
+
+  func merge(records: RecordSet) async throws -> Set<CacheKey> {
+    throw WriteError()
+  }
+
+  func removeRecord(for key: CacheKey) async throws {}
+  func removeRecords(matching pattern: CacheKey) async throws {}
+  func clear() async throws {}
 }
