@@ -63,18 +63,31 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     /// Default: `nil` (disabled).
     public var pingInterval: TimeInterval?
 
+    /// Metadata used by GraphOS Studio's
+    /// [client awareness](https://www.apollographql.com/docs/graphos/platform/insights/client-segmentation)
+    /// feature.
+    ///
+    /// When set, the client application name and version are sent as HTTP headers
+    /// (`apollographql-client-name`, `apollographql-client-version`) on the WebSocket
+    /// connection request.
+    ///
+    /// Default: `ClientAwarenessMetadata()` (includes Apollo library awareness headers).
+    public var clientAwarenessMetadata: ClientAwarenessMetadata
+
     public init(
       reconnectionInterval: TimeInterval = -1,
       requestBodyCreator: any JSONRequestBodyCreator = DefaultRequestBodyCreator(),
       connectingPayload: JSONEncodableDictionary? = nil,
       operationMessageIdCreator: any OperationMessageIdCreator = ApolloSequencedOperationMessageIdCreator(),
-      pingInterval: TimeInterval? = nil
+      pingInterval: TimeInterval? = nil,
+      clientAwarenessMetadata: ClientAwarenessMetadata = ClientAwarenessMetadata()
     ) {
       self.reconnectionInterval = reconnectionInterval
       self.requestBodyCreator = requestBodyCreator
       self.connectingPayload = connectingPayload
       self.operationMessageIdCreator = operationMessageIdCreator
       self.pingInterval = pingInterval
+      self.clientAwarenessMetadata = clientAwarenessMetadata
     }
   }
 
@@ -141,7 +154,10 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     self.urlSession = urlSession
     self.store = store
     self.configuration = configuration
-    self.request = try Self.createURLRequest(endpointURL: endpointURL)
+    self.request = try Self.createURLRequest(
+      endpointURL: endpointURL,
+      clientAwarenessMetadata: configuration.clientAwarenessMetadata
+    )
     self.connection = WebSocketConnection(task: urlSession.webSocketTask(with: request))
     self.subscriberRegistry = SubscriberRegistry(
       operationMessageIdCreator: configuration.operationMessageIdCreator
@@ -151,11 +167,14 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   // MARK: - Request Setup
 
   private static func createURLRequest(
-    endpointURL: URL
+    endpointURL: URL,
+    clientAwarenessMetadata: ClientAwarenessMetadata
   ) throws -> URLRequest {
     var request = URLRequest(url: endpointURL)
 
     request.setValue(Constants.headerWSProtocolValue, forHTTPHeaderField: Constants.headerWSProtocolName)
+
+    clientAwarenessMetadata.applyHeaders(to: &request)
 
     return request
   }

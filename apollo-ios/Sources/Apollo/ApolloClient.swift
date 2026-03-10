@@ -102,7 +102,8 @@ public final class ApolloClient: Sendable {
     self.init(
       networkTransport: transport,
       store: store,
-      defaultRequestConfiguration: defaultRequestConfiguration
+      defaultRequestConfiguration: defaultRequestConfiguration,
+      clientAwarenessMetadata: clientAwarenessMetadata
     )
   }
 
