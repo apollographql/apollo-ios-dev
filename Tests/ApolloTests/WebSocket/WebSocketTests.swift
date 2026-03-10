@@ -90,7 +90,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     file: FileString = #filePath,
     line: UInt = #line
   ) async throws -> (
-    stream: AsyncThrowingStream<GraphQLResponse<MockSubscription<ReviewAddedData>>, any Error>,
+    stream: SubscriptionStream<GraphQLResponse<MockSubscription<ReviewAddedData>>>,
     operationID: String
   ) {
     let index = mockTask.clientSentMessages(ofType: "subscribe").count
@@ -916,6 +916,152 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     mockTask.emit(.ping(payload: ["seq": 3]))
 
     await expect(self.mockTask.clientSentMessages(ofType: "pong").count).toEventually(equal(3))
+
+    _ = subscription
+  }
+
+  // MARK: - Client-Initiated Ping Keepalive
+
+  func testPingInterval__whenConfigured__shouldSendPeriodicPings() async throws {
+    let task1 = MockWebSocketTask()
+    factory = MockWebSocketTaskFactory([task1])
+    session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(pingInterval: 0.1)
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Wait for at least 2 pings to be sent.
+    await expect(task1.clientSentMessages(ofType: "ping").count)
+      .toEventually(beGreaterThanOrEqualTo(2), timeout: .seconds(1))
+
+    _ = subscription
+  }
+
+  func testPingInterval__whenNotConfigured__shouldNotSendPings() async throws {
+    // Default configuration has no pingInterval.
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
+
+    // Wait a bit to ensure no pings are sent.
+    try await Task.sleep(nanoseconds: 300_000_000)
+
+    expect(self.mockTask.clientSentMessages(ofType: "ping").count).to(equal(0))
+
+    _ = subscription
+  }
+
+  func testPingInterval__shouldStopOnDisconnect() async throws {
+    let task1 = MockWebSocketTask()
+    factory = MockWebSocketTaskFactory([task1])
+    session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(pingInterval: 0.1)
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Wait for at least one ping.
+    await expect(task1.clientSentMessages(ofType: "ping").count)
+      .toEventually(beGreaterThanOrEqualTo(1), timeout: .seconds(2))
+
+    // Disconnect — pings should stop.
+    task1.finish()
+
+    // Record the count after disconnect and wait to confirm it doesn't grow.
+    try await Task.sleep(nanoseconds: 200_000_000)
+    let countAfterDisconnect = task1.clientSentMessages(ofType: "ping").count
+    try await Task.sleep(nanoseconds: 300_000_000)
+    expect(task1.clientSentMessages(ofType: "ping").count).to(equal(countAfterDisconnect))
+
+    _ = subscription
+  }
+
+  func testPingInterval__shouldStopOnPause__andRestartOnResume() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    factory = MockWebSocketTaskFactory([task1, task2])
+    session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(pingInterval: 0.1)
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Wait for at least one ping on task1.
+    await expect(task1.clientSentMessages(ofType: "ping").count)
+      .toEventually(beGreaterThanOrEqualTo(1), timeout: .seconds(2))
+
+    // Pause — pings should stop on task1.
+    await networkTransport.pause()
+
+    // Resume — should start a new connection on task2.
+    await networkTransport.resume()
+    task2.emit(.connectionAck(payload: nil))
+
+    // Pings should now arrive on task2.
+    await expect(task2.clientSentMessages(ofType: "ping").count)
+      .toEventually(beGreaterThanOrEqualTo(1), timeout: .seconds(2))
+
+    _ = subscription
+  }
+
+  func testPingInterval__shouldRestartOnReconnect() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    factory = MockWebSocketTaskFactory([task1, task2])
+    session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(reconnectionInterval: 0, pingInterval: 0.1)
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Wait for at least one ping on task1.
+    await expect(task1.clientSentMessages(ofType: "ping").count)
+      .toEventually(beGreaterThanOrEqualTo(1), timeout: .seconds(2))
+
+    // Disconnect task1 — triggers auto-reconnect to task2.
+    task1.finish()
+    task2.emit(.connectionAck(payload: nil))
+
+    // Pings should now arrive on task2.
+    await expect(task2.clientSentMessages(ofType: "ping").count)
+      .toEventually(beGreaterThanOrEqualTo(1), timeout: .seconds(2))
 
     _ = subscription
   }
@@ -1969,6 +2115,184 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     expect(results2[0].data?.reviewAdded?.commentary).to(equal("Sub2 resumed"))
   }
 
+  // MARK: - Subscription State
+
+  func testSubscriptionState__shouldBePending__beforeConnectionAck() async throws {
+    // Don't emit connectionAck yet — subscribe while the connection is still being established.
+    let stream = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+
+    expect(stream.state).to(equal(.pending))
+
+    // Now acknowledge so the subscription can proceed — then complete it so cleanup runs.
+    mockTask.emit(.connectionAck(payload: nil))
+    await expect(self.mockTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let operationID = mockTask.subscribeOperationID(at: 0)
+    mockTask.emit(.complete(id: operationID))
+
+    _ = try await stream.getAllValues()
+  }
+
+  func testSubscriptionState__shouldBecomeActive__afterSubscribeMessageSent() async throws {
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (stream, operationID) = try await subscribe(on: mockTask, using: client)
+
+    // After subscribe message has been sent, state should be active.
+    expect(stream.state).to(equal(.active))
+
+    // Complete the subscription.
+    mockTask.emit(.complete(id: operationID))
+    _ = try await stream.getAllValues()
+  }
+
+  func testSubscriptionState__shouldBeFinishedCompleted__afterServerComplete() async throws {
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (stream, operationID) = try await subscribe(on: mockTask, using: client)
+    expect(stream.state).to(equal(.active))
+
+    // Server completes the subscription.
+    mockTask.emit(.complete(id: operationID))
+    _ = try await stream.getAllValues()
+
+    expect(stream.state).to(equal(.finished(.completed)))
+  }
+
+  func testSubscriptionState__shouldBeFinishedError__afterServerError() async throws {
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (stream, operationID) = try await subscribe(on: mockTask, using: client)
+    expect(stream.state).to(equal(.active))
+
+    // Server sends an error for this subscription.
+    mockTask.emit(.error(id: operationID, payload: [["message": "Something went wrong"]]))
+
+    do {
+      _ = try await stream.getAllValues()
+      fail("Expected stream to throw")
+    } catch {
+      // Expected
+    }
+
+    expect(stream.state).to(equal(.finished(.error(WebSocketTransport.Error.graphQLErrors([])))))
+  }
+
+  func testSubscriptionState__shouldBeFinishedCancelled__whenClientCancels() async throws {
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (stream, _) = try await subscribe(on: mockTask, using: client)
+    expect(stream.state).to(equal(.active))
+
+    // Cancel the subscription by wrapping iteration in a task and cancelling it.
+    let iterationTask = Task {
+      for try await _ in stream {}
+    }
+    iterationTask.cancel()
+
+    // Wait for cancellation to propagate.
+    _ = try? await iterationTask.value
+
+    await expect(stream.state).toEventually(equal(.finished(.cancelled)))
+  }
+
+  func testSubscriptionState__shouldBecomeReconnecting__onDisconnectWithReconnectEnabled() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    factory.tasks.append(contentsOf: [task1, task2])
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(reconnectionInterval: 0)
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+    let (stream, operationID) = try await subscribe(on: task1, using: client)
+    expect(stream.state).to(equal(.active))
+
+    // Disconnect — should trigger reconnection.
+    task1.finish()
+
+    await expect(stream.state).toEventually(equal(.reconnecting))
+
+    // Complete reconnection.
+    task2.emit(.connectionAck(payload: nil))
+    await expect(stream.state).toEventually(equal(.active))
+
+    // Complete the subscription.
+    task2.emit(.complete(id: operationID))
+    _ = try await stream.getAllValues()
+  }
+
+  func testSubscriptionState__shouldBecomePaused__whenTransportPaused() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    factory.tasks.append(contentsOf: [task1, task2])
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+    let (stream, operationID) = try await subscribe(on: task1, using: client)
+    expect(stream.state).to(equal(.active))
+
+    // Pause the transport.
+    await networkTransport.pause()
+    expect(stream.state).to(equal(.paused))
+
+    // Resume — should reconnect and restore active.
+    await networkTransport.resume()
+    task2.emit(.connectionAck(payload: nil))
+    await expect(stream.state).toEventually(equal(.active))
+
+    // Complete the subscription.
+    task2.emit(.complete(id: operationID))
+    _ = try await stream.getAllValues()
+  }
+
+  func testSubscriptionState__shouldBeFinishedCompleted__whenDisconnectWithReconnectDisabled() async throws {
+    // Default configuration has reconnectionInterval = -1 (disabled).
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (stream, operationID) = try await subscribe(on: mockTask, using: client)
+    expect(stream.state).to(equal(.active))
+
+    // Deliver one result then disconnect.
+    mockTask.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 5, commentary: "Before disconnect")))
+    mockTask.finish()
+
+    _ = try await stream.getAllValues()
+
+    // Without error, disconnect finishes with .completed.
+    expect(stream.state).to(equal(.finished(.completed)))
+  }
+
+  func testSubscriptionState__shouldBeFinishedError__whenDisconnectWithError() async throws {
+    // Default configuration has reconnectionInterval = -1 (disabled).
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (stream, _) = try await subscribe(on: mockTask, using: client)
+    expect(stream.state).to(equal(.active))
+
+    // Disconnect with an error.
+    mockTask.throw(URLError(.networkConnectionLost))
+
+    do {
+      _ = try await stream.getAllValues()
+      fail("Expected stream to throw")
+    } catch {
+      // Expected
+    }
+
+    expect(stream.state).to(equal(.finished(.error(URLError(.networkConnectionLost)))))
+  }
+
   func testPause__duringReconnectionDelay__shouldStopReconnection() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
@@ -2111,5 +2435,136 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     expect(results.count).to(equal(1))
     expect(results[0].data?.reviewAdded?.commentary).to(equal("After two cycles"))
+  }
+
+  // MARK: - Client Awareness Headers
+
+  func testClientAwarenessHeaders__withMetadata__shouldApplyHeadersToConnectionRequest() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(
+        clientAwarenessMetadata: ClientAwarenessMetadata(
+          clientApplicationName: "test-app",
+          clientApplicationVersion: "1.2.3"
+        )
+      )
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+
+    // Verify the client awareness headers were applied to the captured request.
+    let capturedRequest = factory.capturedRequests.last!
+    expect(capturedRequest.value(forHTTPHeaderField: "apollographql-client-name"))
+      .to(equal("test-app"))
+    expect(capturedRequest.value(forHTTPHeaderField: "apollographql-client-version"))
+      .to(equal("1.2.3"))
+
+    task1.emit(.complete(id: operationID))
+    _ = subscription
+  }
+
+  func testClientAwarenessHeaders__withoutMetadata__shouldNotApplyHeaders() async throws {
+    // Default setUp creates a transport with no clientAwarenessMetadata.
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (subscription, operationID) = try await subscribe(on: mockTask, using: client)
+
+    let capturedRequest = factory.capturedRequests.last!
+    expect(capturedRequest.value(forHTTPHeaderField: "apollographql-client-name"))
+      .to(beNil())
+    expect(capturedRequest.value(forHTTPHeaderField: "apollographql-client-version"))
+      .to(beNil())
+
+    mockTask.emit(.complete(id: operationID))
+    _ = subscription
+  }
+
+  func testClientAwarenessHeaders__withNameOnly__shouldApplyOnlyNameHeader() async throws {
+    let task1 = MockWebSocketTask()
+    factory.tasks.append(task1)
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(
+        clientAwarenessMetadata: ClientAwarenessMetadata(
+          clientApplicationName: "my-app",
+          clientApplicationVersion: nil
+        )
+      )
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+
+    let capturedRequest = factory.capturedRequests.last!
+    expect(capturedRequest.value(forHTTPHeaderField: "apollographql-client-name"))
+      .to(equal("my-app"))
+    expect(capturedRequest.value(forHTTPHeaderField: "apollographql-client-version"))
+      .to(beNil())
+
+    task1.emit(.complete(id: operationID))
+    _ = subscription
+  }
+
+  func testClientAwarenessHeaders__shouldPersistAcrossReconnection() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    factory.tasks.append(contentsOf: [task1, task2])
+    let store = ApolloStore.mock()
+    networkTransport = try WebSocketTransport(
+      urlSession: session,
+      store: store,
+      endpointURL: Self.endpointURL,
+      configuration: .init(
+        reconnectionInterval: 0,
+        clientAwarenessMetadata: ClientAwarenessMetadata(
+          clientApplicationName: "reconnect-app",
+          clientApplicationVersion: "2.0.0"
+        )
+      )
+    )
+    client = ApolloClient(networkTransport: networkTransport!, store: store)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Verify headers on initial connection.
+    let initialRequest = factory.capturedRequests.last!
+    expect(initialRequest.value(forHTTPHeaderField: "apollographql-client-name"))
+      .to(equal("reconnect-app"))
+    expect(initialRequest.value(forHTTPHeaderField: "apollographql-client-version"))
+      .to(equal("2.0.0"))
+
+    // Simulate disconnect → triggers auto-reconnection.
+    task1.finish()
+
+    // Wait for the reconnected connection's subscribe message.
+    task2.emit(.connectionAck(payload: nil))
+    await expect(task2.clientSentMessages(ofType: "subscribe").count)
+      .toEventually(equal(1))
+
+    // Verify headers persisted on the reconnection request.
+    let reconnectRequest = factory.capturedRequests.last!
+    expect(reconnectRequest.value(forHTTPHeaderField: "apollographql-client-name"))
+      .to(equal("reconnect-app"))
+    expect(reconnectRequest.value(forHTTPHeaderField: "apollographql-client-version"))
+      .to(equal("2.0.0"))
+
+    task2.emit(.complete(id: task2.subscribeOperationID(at: 0)))
+    let results = try await subscription.getAllValues()
+    _ = results
   }
 }
