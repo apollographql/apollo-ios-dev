@@ -20,6 +20,17 @@ public final class MockWebSocketTaskFactory: @unchecked Sendable {
   /// The `URLRequest`s passed to each `webSocketTask(with:)` call, in order.
   public private(set) var capturedRequests: [URLRequest] = []
 
+  /// The most recently vended task — i.e. the task currently being used by the mock session.
+  ///
+  /// This is useful in tests that need to emit server messages or inspect client messages
+  /// on the active connection without maintaining a separate local variable.
+  ///
+  /// - Precondition: At least one task must have been vended via `next(for:)`.
+  public var currentTask: MockWebSocketTask {
+    precondition(index > 0, "MockWebSocketTaskFactory: no task has been vended yet")
+    return tasks[index - 1]
+  }
+
   public init(_ tasks: [MockWebSocketTask]) {
     self.tasks = tasks
   }

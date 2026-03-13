@@ -1,9 +1,9 @@
 import XCTest
 import Nimble
-@testable import Apollo
+@testable @_spi(Execution) import Apollo
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 @_spi(Execution) import ApolloInternalTestHelpers
-@testable import ApolloWebSocket
+@testable @_spi(Execution) import ApolloWebSocket
 
 class WebSocketTests: XCTestCase, MockResponseProvider {
   var networkTransport: WebSocketTransport!
@@ -31,14 +31,21 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   override func setUpWithError() throws {
     try super.setUpWithError()
+    try setUpTransport()
+  }
 
-    factory = MockWebSocketTaskFactory([MockWebSocketTask()])
+  private func setUpTransport(
+    tasks: [MockWebSocketTask] = [MockWebSocketTask()],
+    configuration: WebSocketTransport.Configuration = .init(),
+    store: ApolloStore = .mock()
+  ) throws {
+    factory = MockWebSocketTaskFactory(tasks)
     session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
-    let store = ApolloStore.mock()
     networkTransport = try WebSocketTransport(
       urlSession: session,
       store: store,
-      endpointURL: Self.endpointURL
+      endpointURL: Self.endpointURL,
+      configuration: configuration
     )
     client = ApolloClient(networkTransport: networkTransport!, store: store)
   }
@@ -117,26 +124,17 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testConnectionInit__withConnectingPayload__shouldSendPayloadInConnectionInit() async throws {
-    let task1 = MockWebSocketTask()
-    factory.tasks.append(task1)
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(connectingPayload: [
-        "authToken": "my-secret-token",
-        "version": 2,
-      ])
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(configuration: .init(connectingPayload: [
+      "authToken": "my-secret-token",
+      "version": 2,
+    ]))
 
-    task1.emit(.connectionAck(payload: nil))
+    factory.currentTask.emit(.connectionAck(payload: nil))
 
-    let (subscription, _) = try await subscribe(on: task1, using: client)
+    let (subscription, _) = try await subscribe(on: factory.currentTask, using: client)
 
     // Verify the connection_init message includes the connecting payload.
-    let initMessages = task1.clientSentMessages(ofType: "connection_init")
+    let initMessages = factory.currentTask.clientSentMessages(ofType: "connection_init")
     expect(initMessages.count).to(equal(1))
 
     let payload = initMessages.first?["payload"] as? [String: Any]
@@ -149,18 +147,10 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testConnectionInit__withConnectingPayload__shouldResendPayloadOnReconnect() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(
-        reconnectionInterval: 0,
-        connectingPayload: ["authToken": "reconnect-token"]
-      )
+    try setUpTransport(
+      tasks: [task1, task2],
+      configuration: .init(reconnectionInterval: 0, connectingPayload: ["authToken": "reconnect-token"])
     )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
 
     // Establish initial connection.
     task1.emit(.connectionAck(payload: nil))
@@ -173,10 +163,10 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     let payload1 = initMessages1.first?["payload"] as? [String: Any]
     expect(payload1?["authToken"] as? String).to(equal("reconnect-token"))
 
-    // Disconnect — triggers reconnection on task2.
+    // Disconnect — triggers reconnection.
     task1.finish()
 
-    // Task2 reconnects.
+    // The reconnection task reconnects (pre-buffered messages are consumed when the transport picks up task2).
     task2.emit(.connectionAck(payload: nil))
     await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
 
@@ -265,7 +255,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testSubscription__afterDisconnect__shouldReconnectWithNewTask() async throws {
     let task2 = MockWebSocketTask()
-    factory.tasks.append(task2)
+    try setUpTransport(tasks: [MockWebSocketTask(), task2])
 
     // First subscription on mockTask — buffer all messages including the stream close
     // so the receive loop processes the disconnection as part of the same iteration batch.
@@ -530,15 +520,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenConnectionDropsWithReconnect__shouldContinueReceivingData() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     // Establish connection and subscribe.
     task1.emit(.connectionAck(payload: nil))
@@ -551,10 +533,10 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Disconnect task1 — triggers reconnection.
     task1.finish()
 
-    // Task2 should be connected and re-subscribed.
+    // The reconnection task should be connected and re-subscribed.
     task2.emit(.connectionAck(payload: nil))
 
-    // Wait for the re-subscribe message on task2.
+    // Wait for the re-subscribe message on the reconnection task.
     await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
     expect(task2.clientSentMessages(ofType: "subscribe").first?["id"] as? String).to(equal(operationID))
 
@@ -580,15 +562,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenConnectionDropsWithReconnect__shouldResubscribeAllActive() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -599,10 +573,10 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Disconnect task1 — triggers reconnection.
     task1.finish()
 
-    // Task2: connection_ack triggers re-subscribe of both active subscriptions.
+    // Reconnection task: connection_ack triggers re-subscribe of both active subscriptions.
     task2.emit(.connectionAck(payload: nil))
 
-    // Wait for both re-subscribe messages on task2.
+    // Wait for both re-subscribe messages on the reconnection task.
     await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
 
     // Verify both IDs were re-subscribed.
@@ -627,15 +601,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenReconnectionFails__shouldTerminateSubscribers() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -644,7 +610,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Disconnect task1 — triggers reconnection attempt on task2.
     task1.finish()
 
-    // Task2 fails immediately before connection_ack — reconnection fails.
+    // The reconnection task fails immediately before connection_ack — reconnection fails.
     struct MockReconnectError: Swift.Error {}
     task2.throw(MockReconnectError())
 
@@ -661,15 +627,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenConnectionDropsWithNoSubscribers__shouldNotReconnect() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     // Connect, subscribe, get data, and complete — leaving no active subscribers.
     task1.emit(.connectionAck(payload: nil))
@@ -694,15 +652,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenCancelledDuringReconnect__shouldNotResubscribe() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0.1)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0.1))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -722,13 +672,13 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Wait for subscriber to be removed from the transport.
     await expect { await self.networkTransport.subscriberCount }.toEventually(equal(0))
 
-    // Now let task2 connect — even if reconnection proceeds, no subscribers remain to re-subscribe.
+    // Now let the reconnection task connect — even if reconnection proceeds, no subscribers remain to re-subscribe.
     task2.emit(.connectionAck(payload: nil))
 
     // Give time for any potential re-subscribe to happen.
     try await Task.sleep(nanoseconds: 200_000_000)
 
-    // No subscribe messages should have been sent on task2.
+    // No subscribe messages should have been sent on the reconnection task.
     expect(task2.clientSentMessages(ofType: "subscribe").count).to(equal(0))
   }
 
@@ -737,15 +687,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenTransportErrorWithReconnect__shouldContinueReceivingData() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -758,7 +700,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     struct MockTransportError: Swift.Error {}
     task1.throw(MockTransportError())
 
-    // Task2 reconnects and re-subscribes.
+    // The reconnection task reconnects and re-subscribes.
     task2.emit(.connectionAck(payload: nil))
     await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
 
@@ -777,7 +719,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testSubscription__whenTransportErrorWithReconnectDisabled__shouldTerminateWithError() async throws {
     let task2 = MockWebSocketTask()
-    factory.tasks.append(task2)
+    try setUpTransport(tasks: [MockWebSocketTask(), task2])
 
     mockTask.emit(.connectionAck(payload: nil))
 
@@ -810,15 +752,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenTransportErrorWithMultipleSubscribers__shouldReconnectAll() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -829,7 +763,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     struct MockTransportError: Swift.Error {}
     task1.throw(MockTransportError())
 
-    // Task2 reconnects — both subscriptions should be re-subscribed.
+    // The reconnection task reconnects — both subscriptions should be re-subscribed.
     task2.emit(.connectionAck(payload: nil))
     await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
 
@@ -923,25 +857,14 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   // MARK: - Client-Initiated Ping Keepalive
 
   func testPingInterval__whenConfigured__shouldSendPeriodicPings() async throws {
-    let task1 = MockWebSocketTask()
-    factory = MockWebSocketTaskFactory([task1])
-    session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    try setUpTransport(configuration: .init(pingInterval: 0.1))
 
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(pingInterval: 0.1)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    factory.currentTask.emit(.connectionAck(payload: nil))
 
-    task1.emit(.connectionAck(payload: nil))
-
-    let (subscription, _) = try await subscribe(on: task1, using: client)
+    let (subscription, _) = try await subscribe(on: factory.currentTask, using: client)
 
     // Wait for at least 2 pings to be sent.
-    await expect(task1.clientSentMessages(ofType: "ping").count)
+    await expect(self.factory.currentTask.clientSentMessages(ofType: "ping").count)
       .toEventually(beGreaterThanOrEqualTo(2), timeout: .seconds(1))
 
     _ = subscription
@@ -962,35 +885,24 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testPingInterval__shouldStopOnDisconnect() async throws {
-    let task1 = MockWebSocketTask()
-    factory = MockWebSocketTaskFactory([task1])
-    session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    try setUpTransport(configuration: .init(pingInterval: 0.1))
 
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(pingInterval: 0.1)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    factory.currentTask.emit(.connectionAck(payload: nil))
 
-    task1.emit(.connectionAck(payload: nil))
-
-    let (subscription, _) = try await subscribe(on: task1, using: client)
+    let (subscription, _) = try await subscribe(on: factory.currentTask, using: client)
 
     // Wait for at least one ping.
-    await expect(task1.clientSentMessages(ofType: "ping").count)
+    await expect(self.factory.currentTask.clientSentMessages(ofType: "ping").count)
       .toEventually(beGreaterThanOrEqualTo(1), timeout: .seconds(2))
 
     // Disconnect — pings should stop.
-    task1.finish()
+    factory.currentTask.finish()
 
     // Record the count after disconnect and wait to confirm it doesn't grow.
     try await Task.sleep(nanoseconds: 200_000_000)
-    let countAfterDisconnect = task1.clientSentMessages(ofType: "ping").count
+    let countAfterDisconnect = factory.currentTask.clientSentMessages(ofType: "ping").count
     try await Task.sleep(nanoseconds: 300_000_000)
-    expect(task1.clientSentMessages(ofType: "ping").count).to(equal(countAfterDisconnect))
+    expect(self.factory.currentTask.clientSentMessages(ofType: "ping").count).to(equal(countAfterDisconnect))
 
     _ = subscription
   }
@@ -998,17 +910,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testPingInterval__shouldStopOnPause__andRestartOnResume() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory = MockWebSocketTaskFactory([task1, task2])
-    session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
-
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(pingInterval: 0.1)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2], configuration: .init(pingInterval: 0.1))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -1021,11 +923,11 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Pause — pings should stop on task1.
     await networkTransport.pause()
 
-    // Resume — should start a new connection on task2.
+    // Resume — should start a new connection on the next task.
     await networkTransport.resume()
     task2.emit(.connectionAck(payload: nil))
 
-    // Pings should now arrive on task2.
+    // Pings should now arrive on the resumed task.
     await expect(task2.clientSentMessages(ofType: "ping").count)
       .toEventually(beGreaterThanOrEqualTo(1), timeout: .seconds(2))
 
@@ -1035,17 +937,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testPingInterval__shouldRestartOnReconnect() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory = MockWebSocketTaskFactory([task1, task2])
-    session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
-
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0, pingInterval: 0.1)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0, pingInterval: 0.1))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -1055,11 +947,11 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     await expect(task1.clientSentMessages(ofType: "ping").count)
       .toEventually(beGreaterThanOrEqualTo(1), timeout: .seconds(2))
 
-    // Disconnect task1 — triggers auto-reconnect to task2.
+    // Disconnect task1 — triggers auto-reconnect.
     task1.finish()
     task2.emit(.connectionAck(payload: nil))
 
-    // Pings should now arrive on task2.
+    // Pings should now arrive on the reconnection task.
     await expect(task2.clientSentMessages(ofType: "ping").count)
       .toEventually(beGreaterThanOrEqualTo(1), timeout: .seconds(2))
 
@@ -1088,7 +980,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testSubscription__whenReconnectDisabled__shouldTerminateOnDisconnect() async throws {
     let task2 = MockWebSocketTask()
-    factory.tasks.append(task2)
+    try setUpTransport(tasks: [MockWebSocketTask(), task2])
 
     // Default configuration has reconnectionInterval = -1 (disabled).
     mockTask.emit(.connectionAck(payload: nil))
@@ -1152,16 +1044,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testQuery__whenConnectionDropsWithReconnect__shouldNotRetry() async throws {
     let task1 = MockWebSocketTask()
-    let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, MockWebSocketTask()], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -1206,16 +1089,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testMutation__whenConnectionDropsWithReconnect__shouldNotRetry() async throws {
     let task1 = MockWebSocketTask()
-    let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, MockWebSocketTask()], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -1243,15 +1117,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testQueryAndSubscription__whenConnectionDropsWithReconnect__shouldOnlyResubscribeSubscription() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -1280,10 +1146,10 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
       expect(error).to(beAKindOf(MockTransportError.self))
     }
 
-    // The subscription should survive — task2 reconnects.
+    // The subscription should survive — the reconnection task reconnects.
     task2.emit(.connectionAck(payload: nil))
 
-    // Only the subscription should be re-subscribed on task2 (not the query).
+    // Only the subscription should be re-subscribed on the reconnection task (not the query).
     await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
 
     // Deliver data on the new connection and complete.
@@ -1304,27 +1170,18 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
       }
     }
 
-    let task1 = MockWebSocketTask()
-    factory.tasks.append(task1)
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(operationMessageIdCreator: FixedIdCreator())
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(configuration: .init(operationMessageIdCreator: FixedIdCreator()))
 
-    task1.emit(.connectionAck(payload: nil))
+    factory.currentTask.emit(.connectionAck(payload: nil))
 
-    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+    let (subscription, operationID) = try await subscribe(on: factory.currentTask, using: client)
 
     // The subscribe message should use the custom ID.
     expect(operationID).to(equal("custom-id-123"))
 
     // Server responds using the custom ID.
-    task1.emit(.next(id: "custom-id-123", payload: Self.reviewAddedPayload(stars: 5, commentary: "Custom ID works")))
-    task1.emit(.complete(id: "custom-id-123"))
+    factory.currentTask.emit(.next(id: "custom-id-123", payload: Self.reviewAddedPayload(stars: 5, commentary: "Custom ID works")))
+    factory.currentTask.emit(.complete(id: "custom-id-123"))
 
     let results = try await subscription.getAllValues()
 
@@ -1351,24 +1208,16 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testDelegate__whenReconnected__shouldCallDidReconnectNotDidConnect() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0)
-    )
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
     let delegate = MockWebSocketTransportDelegate()
     await networkTransport.setDelegate(delegate)
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
 
     // Establish initial connection.
     task1.emit(.connectionAck(payload: nil))
 
     let (subscription, _) = try await subscribe(on: task1, using: client)
 
-    // Disconnect — triggers reconnection on task2.
+    // Disconnect — triggers reconnection.
     task1.finish()
 
     // Reconnect.
@@ -1463,17 +1312,9 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testDelegate__fullLifecycle__shouldReceiveEventsInOrder() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0)
-    )
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
     let delegate = MockWebSocketTransportDelegate()
     await networkTransport.setDelegate(delegate)
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
 
     // Connect.
     task1.emit(.connectionAck(payload: nil))
@@ -1514,26 +1355,17 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testSubscription__withSequencedCreatorStartingAtCustomNumber__shouldUseSequentialIds() async throws {
-    let task1 = MockWebSocketTask()
-    factory.tasks.append(task1)
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(
-        operationMessageIdCreator: ApolloSequencedOperationMessageIdCreator(startAt: 100)
-      )
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(configuration: .init(
+      operationMessageIdCreator: ApolloSequencedOperationMessageIdCreator(startAt: 100)
+    ))
 
-    task1.emit(.connectionAck(payload: nil))
+    factory.currentTask.emit(.connectionAck(payload: nil))
 
     // Start first subscription — should get ID "100".
-    let (sub1, id1) = try await subscribe(on: task1, using: client)
+    let (sub1, id1) = try await subscribe(on: factory.currentTask, using: client)
 
     // Start second subscription — should get ID "101".
-    let (sub2, id2) = try await subscribe(on: task1, using: client)
+    let (sub2, id2) = try await subscribe(on: factory.currentTask, using: client)
 
     expect(id1).to(equal("100"))
     expect(id2).to(equal("101"))
@@ -1544,21 +1376,20 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   // MARK: - updateHeaderValues
 
   func testUpdateHeaderValues__whenReconnectIfConnected__whenConnected__shouldReconnect() async throws {
-    let task2 = MockWebSocketTask()
-    factory.tasks.append(task2)
+    try setUpTransport(tasks: [MockWebSocketTask(), MockWebSocketTask()])
 
     // Connect on mockTask.
     mockTask.emit(.connectionAck(payload: nil))
     let (subscription, _) = try await subscribe(on: mockTask, using: client)
 
-    // Update headers with reconnect — should create a new connection on task2.
+    // Update headers with reconnect — should create a new connection on the next task.
     await networkTransport.updateHeaderValues(
       ["Authorization": "Bearer token123"],
       reconnectIfConnected: true
     )
 
-    // Task2 should be resumed (new connection started).
-    await expect(task2.isResumed).toEventually(beTrue())
+    // The reconnection task should be resumed (new connection started).
+    await expect(self.factory.currentTask.isResumed).toEventually(beTrue())
 
     // The reconnection request should contain the updated header.
     let reconnectRequest = factory.capturedRequests.last!
@@ -1598,35 +1429,33 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testUpdateHeaderValues__withNilValue__shouldRemoveHeader() async throws {
-    let task2 = MockWebSocketTask()
-    let task3 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task2, task3])
+    try setUpTransport(tasks: [MockWebSocketTask(), MockWebSocketTask(), MockWebSocketTask()])
 
     // Connect on mockTask.
     mockTask.emit(.connectionAck(payload: nil))
     let (subscription, _) = try await subscribe(on: mockTask, using: client)
 
-    // Add a header and reconnect to task2.
+    // Add a header and reconnect to the next task.
     await networkTransport.updateHeaderValues(
       ["Authorization": "Bearer token123"],
       reconnectIfConnected: true
     )
-    await expect(task2.isResumed).toEventually(beTrue())
+    await expect(self.factory.currentTask.isResumed).toEventually(beTrue())
 
     // Verify the header was set.
     let request2 = factory.capturedRequests[1]
     expect(request2.value(forHTTPHeaderField: "Authorization")).to(equal("Bearer token123"))
 
-    // Ack on task2 so we're connected again.
-    task2.emit(.connectionAck(payload: nil))
-    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    // Ack on the current task so we're connected again.
+    factory.currentTask.emit(.connectionAck(payload: nil))
+    await expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
 
-    // Now remove the header by passing nil and reconnect to task3.
+    // Now remove the header by passing nil and reconnect to the next task.
     await networkTransport.updateHeaderValues(
       ["Authorization": nil],
       reconnectIfConnected: true
     )
-    await expect(task3.isResumed).toEventually(beTrue())
+    await expect(self.factory.currentTask.isResumed).toEventually(beTrue())
 
     // Verify the header was removed.
     let request3 = factory.capturedRequests[2]
@@ -1640,8 +1469,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testUpdateHeaderValues__withMultipleHeaders__shouldApplyAll() async throws {
-    let task2 = MockWebSocketTask()
-    factory.tasks.append(task2)
+    try setUpTransport(tasks: [MockWebSocketTask(), MockWebSocketTask()])
 
     // Connect on mockTask.
     mockTask.emit(.connectionAck(payload: nil))
@@ -1653,7 +1481,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
       "X-Custom-Header": "custom-value",
     ], reconnectIfConnected: true)
 
-    await expect(task2.isResumed).toEventually(beTrue())
+    await expect(self.factory.currentTask.isResumed).toEventually(beTrue())
 
     let reconnectRequest = factory.capturedRequests.last!
     expect(reconnectRequest.value(forHTTPHeaderField: "Authorization")).to(equal("Bearer token123"))
@@ -1667,15 +1495,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testUpdateHeaderValues__shouldPersistAcrossReconnections() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     // Connect on task1.
     task1.emit(.connectionAck(payload: nil))
@@ -1684,13 +1504,13 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Set a header without reconnecting — just stores it on the request.
     await networkTransport.updateHeaderValues(["Authorization": "Bearer persistent"])
 
-    // Disconnect task1 — triggers auto-reconnection to task2.
+    // Disconnect task1 — triggers auto-reconnection.
     task1.finish()
     task2.emit(.connectionAck(payload: nil))
     await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
 
-    // The auto-reconnection request (task2) should include the previously set header.
-    let reconnectRequest = factory.capturedRequests[2]
+    // The auto-reconnection request should include the previously set header.
+    let reconnectRequest = factory.capturedRequests[1]
     expect(reconnectRequest.value(forHTTPHeaderField: "Authorization")).to(equal("Bearer persistent"))
 
     // Complete the subscription so it doesn't block.
@@ -1701,27 +1521,26 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   // MARK: - updateConnectingPayload
 
   func testUpdateConnectingPayload__whenReconnectIfConnected__whenConnected__shouldReconnect() async throws {
-    let task2 = MockWebSocketTask()
-    factory.tasks.append(task2)
+    try setUpTransport(tasks: [MockWebSocketTask(), MockWebSocketTask()])
 
     // Connect on mockTask.
     mockTask.emit(.connectionAck(payload: nil))
     let (subscription, _) = try await subscribe(on: mockTask, using: client)
 
-    // Update payload with reconnect — should create a new connection on task2.
+    // Update payload with reconnect — should create a new connection on the next task.
     await networkTransport.updateConnectingPayload(
       ["authToken": "new-token"],
       reconnectIfConnected: true
     )
 
-    // Task2 should be resumed (new connection started).
-    await expect(task2.isResumed).toEventually(beTrue())
+    // The reconnection task should be resumed (new connection started).
+    await expect(self.factory.currentTask.isResumed).toEventually(beTrue())
 
     // Ack the new connection and verify the connection_init payload.
-    task2.emit(.connectionAck(payload: nil))
-    await expect(task2.clientSentMessages(ofType: "connection_init").count).toEventually(equal(1))
+    factory.currentTask.emit(.connectionAck(payload: nil))
+    await expect(self.factory.currentTask.clientSentMessages(ofType: "connection_init").count).toEventually(equal(1))
 
-    let initMessages = task2.clientSentMessages(ofType: "connection_init")
+    let initMessages = factory.currentTask.clientSentMessages(ofType: "connection_init")
     let payload = initMessages.first?["payload"] as? [String: Any]
     expect(payload?["authToken"] as? String).to(equal("new-token"))
 
@@ -1729,26 +1548,20 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testUpdateConnectingPayload__withoutReconnect__whenConnected__shouldNotReconnect() async throws {
-    let task1 = MockWebSocketTask()
-    factory.tasks.append(task1)
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
+    try setUpTransport(
+      tasks: [MockWebSocketTask(), MockWebSocketTask()],
       configuration: .init(connectingPayload: ["authToken": "old-token"])
     )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
 
-    // Connect on task1.
-    task1.emit(.connectionAck(payload: nil))
-    let (subscription, _) = try await subscribe(on: task1, using: client)
+    // Connect on the factory's current task.
+    factory.currentTask.emit(.connectionAck(payload: nil))
+    let (subscription, _) = try await subscribe(on: factory.currentTask, using: client)
 
     // Update payload without reconnect (default).
     await networkTransport.updateConnectingPayload(["authToken": "new-token"])
 
     // Should still be connected — no reconnection triggered.
-    expect(self.factory.capturedRequests.count).to(equal(2))
+    expect(self.factory.capturedRequests.count).to(equal(1))
     await expect { await self.networkTransport.connectionState }.to(equal(.connected))
 
     _ = subscription
@@ -1766,38 +1579,30 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testUpdateConnectingPayload__withNilPayload__shouldClearPayload() async throws {
-    let task1 = MockWebSocketTask()
-    let task2 = MockWebSocketTask()
-    let task3 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2, task3])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
+    try setUpTransport(
+      tasks: [MockWebSocketTask(), MockWebSocketTask(), MockWebSocketTask()],
       configuration: .init(connectingPayload: ["authToken": "initial-token"])
     )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
 
-    // Connect on task1.
-    task1.emit(.connectionAck(payload: nil))
-    let (subscription, _) = try await subscribe(on: task1, using: client)
+    // Connect on the factory's current task.
+    factory.currentTask.emit(.connectionAck(payload: nil))
+    let (subscription, _) = try await subscribe(on: factory.currentTask, using: client)
 
     // Verify initial payload was sent.
-    let initMessages1 = task1.clientSentMessages(ofType: "connection_init")
+    let initMessages1 = factory.currentTask.clientSentMessages(ofType: "connection_init")
     let payload1 = initMessages1.first?["payload"] as? [String: Any]
     expect(payload1?["authToken"] as? String).to(equal("initial-token"))
 
-    // Clear payload by passing nil and reconnect to task2.
+    // Clear payload by passing nil and reconnect to the next task.
     await networkTransport.updateConnectingPayload(nil, reconnectIfConnected: true)
-    await expect(task2.isResumed).toEventually(beTrue())
+    await expect(self.factory.currentTask.isResumed).toEventually(beTrue())
 
-    // Ack on task2.
-    task2.emit(.connectionAck(payload: nil))
-    await expect(task2.clientSentMessages(ofType: "connection_init").count).toEventually(equal(1))
+    // Ack on the current task.
+    factory.currentTask.emit(.connectionAck(payload: nil))
+    await expect(self.factory.currentTask.clientSentMessages(ofType: "connection_init").count).toEventually(equal(1))
 
     // Verify connection_init has no payload.
-    let initMessages2 = task2.clientSentMessages(ofType: "connection_init")
+    let initMessages2 = factory.currentTask.clientSentMessages(ofType: "connection_init")
     expect(initMessages2.first?["payload"]).to(beNil())
 
     _ = subscription
@@ -1806,15 +1611,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testUpdateConnectingPayload__shouldPersistAcrossReconnections() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     // Connect on task1.
     task1.emit(.connectionAck(payload: nil))
@@ -1823,7 +1620,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Set a payload without reconnecting — just stores it in configuration.
     await networkTransport.updateConnectingPayload(["authToken": "persistent-token"])
 
-    // Disconnect task1 — triggers auto-reconnection to task2.
+    // Disconnect task1 — triggers auto-reconnection.
     task1.finish()
     task2.emit(.connectionAck(payload: nil))
     await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
@@ -1910,15 +1707,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testResume__whenPaused__shouldReconnectAndResubscribe() async throws {
     let task1 = MockWebSocketTask()
-    let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, MockWebSocketTask()])
 
     // Connect on task1.
     task1.emit(.connectionAck(payload: nil))
@@ -1932,22 +1721,22 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     await networkTransport.pause()
     await expect { await self.networkTransport.connectionState }.toEventually(equal(.paused))
 
-    // Resume — creates new connection on task2.
+    // Resume — creates new connection on the next task.
     await networkTransport.resume()
 
     // Acknowledge the new connection.
-    task2.emit(.connectionAck(payload: nil))
+    factory.currentTask.emit(.connectionAck(payload: nil))
 
     // The subscription should be re-subscribed on the new connection.
-    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    await expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
 
     // The re-subscribe should use the same operation ID.
-    let resubscribedID = task2.subscribeOperationID(at: 0)
+    let resubscribedID = factory.currentTask.subscribeOperationID(at: 0)
     expect(resubscribedID).to(equal(operationID))
 
     // Deliver data on the new connection and complete.
-    task2.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 3, commentary: "After resume")))
-    task2.emit(.complete(id: operationID))
+    factory.currentTask.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 3, commentary: "After resume")))
+    factory.currentTask.emit(.complete(id: operationID))
 
     let results = try await subscription.getAllValues()
 
@@ -1962,17 +1751,9 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testResume__whenPaused__shouldFireDidReconnectDelegate() async throws {
     let task1 = MockWebSocketTask()
-    let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL
-    )
+    try setUpTransport(tasks: [task1, MockWebSocketTask()])
     let delegate = MockWebSocketTransportDelegate()
     await networkTransport.setDelegate(delegate)
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
 
     // Connect on task1.
     task1.emit(.connectionAck(payload: nil))
@@ -1986,7 +1767,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     await expect { await self.networkTransport.connectionState }.toEventually(equal(.paused))
 
     await networkTransport.resume()
-    task2.emit(.connectionAck(payload: nil))
+    factory.currentTask.emit(.connectionAck(payload: nil))
 
     // Should fire didReconnect (not didConnect) since hasBeenConnected is true.
     await expect(delegate.events).toEventually(contain(.didReconnect))
@@ -2021,8 +1802,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testResume__whenDisconnected__shouldOpenConnection() async throws {
-    let task2 = MockWebSocketTask()
-    factory.tasks.append(task2)
+    try setUpTransport(tasks: [MockWebSocketTask(), MockWebSocketTask()])
 
     // Connect and disconnect (reconnection disabled by default).
     mockTask.emit(.connectionAck(payload: nil))
@@ -2034,17 +1814,17 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     await expect { await self.networkTransport.connectionState }.toEventually(equal(.disconnected))
 
-    // Resume from disconnected state — should open a new connection on task2.
+    // Resume from disconnected state — should open a new connection.
     await networkTransport.resume()
 
-    task2.emit(.connectionAck(payload: nil))
+    factory.currentTask.emit(.connectionAck(payload: nil))
     await expect { await self.networkTransport.connectionState }.toEventually(equal(.connected))
 
     // New subscribe call should work on the new connection.
-    let (subscription2, operationID2) = try await subscribe(on: task2, using: client)
+    let (subscription2, operationID2) = try await subscribe(on: factory.currentTask, using: client)
 
-    task2.emit(.next(id: operationID2, payload: Self.reviewAddedPayload(stars: 4, commentary: "After resume")))
-    task2.emit(.complete(id: operationID2))
+    factory.currentTask.emit(.next(id: operationID2, payload: Self.reviewAddedPayload(stars: 4, commentary: "After resume")))
+    factory.currentTask.emit(.complete(id: operationID2))
 
     let results = try await subscription2.getAllValues()
     expect(results.count).to(equal(1))
@@ -2069,15 +1849,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testPause__withMultipleSubscribers__shouldPreserveAll() async throws {
     let task1 = MockWebSocketTask()
-    let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, MockWebSocketTask()])
 
     // Connect on task1.
     task1.emit(.connectionAck(payload: nil))
@@ -2090,21 +1862,21 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     await expect { await self.networkTransport.connectionState }.toEventually(equal(.paused))
     await expect { await self.networkTransport.subscriberCount }.to(equal(2))
 
-    // Resume on task2.
+    // Resume on the next task.
     await networkTransport.resume()
-    task2.emit(.connectionAck(payload: nil))
+    factory.currentTask.emit(.connectionAck(payload: nil))
 
     // Both subscriptions should be re-subscribed.
-    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
+    await expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
 
-    let resubscribedIDs = Set(task2.clientSentMessages(ofType: "subscribe").compactMap { $0["id"] as? String })
+    let resubscribedIDs = Set(factory.currentTask.clientSentMessages(ofType: "subscribe").compactMap { $0["id"] as? String })
     expect(resubscribedIDs).to(equal(Set([id1, id2])))
 
     // Deliver data and complete for both.
-    task2.emit(.next(id: id1, payload: Self.reviewAddedPayload(stars: 5, commentary: "Sub1 resumed")))
-    task2.emit(.complete(id: id1))
-    task2.emit(.next(id: id2, payload: Self.reviewAddedPayload(stars: 3, commentary: "Sub2 resumed")))
-    task2.emit(.complete(id: id2))
+    factory.currentTask.emit(.next(id: id1, payload: Self.reviewAddedPayload(stars: 5, commentary: "Sub1 resumed")))
+    factory.currentTask.emit(.complete(id: id1))
+    factory.currentTask.emit(.next(id: id2, payload: Self.reviewAddedPayload(stars: 3, commentary: "Sub2 resumed")))
+    factory.currentTask.emit(.complete(id: id2))
 
     let results1 = try await sub1.getAllValues()
     let results2 = try await sub2.getAllValues()
@@ -2198,15 +1970,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscriptionState__shouldBecomeReconnecting__onDisconnectWithReconnectEnabled() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
     let (stream, operationID) = try await subscribe(on: task1, using: client)
@@ -2228,15 +1992,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testSubscriptionState__shouldBecomePaused__whenTransportPaused() async throws {
     let task1 = MockWebSocketTask()
-    let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, MockWebSocketTask()])
 
     task1.emit(.connectionAck(payload: nil))
     let (stream, operationID) = try await subscribe(on: task1, using: client)
@@ -2248,11 +2004,11 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     // Resume — should reconnect and restore active.
     await networkTransport.resume()
-    task2.emit(.connectionAck(payload: nil))
+    factory.currentTask.emit(.connectionAck(payload: nil))
     await expect(stream.state).toEventually(equal(.active))
 
     // Complete the subscription.
-    task2.emit(.complete(id: operationID))
+    factory.currentTask.emit(.complete(id: operationID))
     _ = try await stream.getAllValues()
   }
 
@@ -2296,15 +2052,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testPause__duringReconnectionDelay__shouldStopReconnection() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(reconnectionInterval: 0.5)
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0.5))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -2341,14 +2089,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whilePaused__shouldWaitForResume() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2])
 
     // Connect on task1.
     task1.emit(.connectionAck(payload: nil))
@@ -2397,14 +2138,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
     let task3 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2, task3])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    try setUpTransport(tasks: [task1, task2, task3])
 
     // Connect on task1.
     task1.emit(.connectionAck(payload: nil))
@@ -2440,25 +2174,16 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   // MARK: - Client Awareness Headers
 
   func testClientAwarenessHeaders__withMetadata__shouldApplyHeadersToConnectionRequest() async throws {
-    let task1 = MockWebSocketTask()
-    factory.tasks.append(task1)
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(
-        clientAwarenessMetadata: ClientAwarenessMetadata(
-          clientApplicationName: "test-app",
-          clientApplicationVersion: "1.2.3"
-        )
+    try setUpTransport(configuration: .init(
+      clientAwarenessMetadata: ClientAwarenessMetadata(
+        clientApplicationName: "test-app",
+        clientApplicationVersion: "1.2.3"
       )
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    ))
 
-    task1.emit(.connectionAck(payload: nil))
+    factory.currentTask.emit(.connectionAck(payload: nil))
 
-    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+    let (subscription, operationID) = try await subscribe(on: factory.currentTask, using: client)
 
     // Verify the client awareness headers were applied to the captured request.
     let capturedRequest = factory.capturedRequests.last!
@@ -2467,7 +2192,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     expect(capturedRequest.value(forHTTPHeaderField: "apollographql-client-version"))
       .to(equal("1.2.3"))
 
-    task1.emit(.complete(id: operationID))
+    factory.currentTask.emit(.complete(id: operationID))
     _ = subscription
   }
 
@@ -2488,25 +2213,16 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testClientAwarenessHeaders__withNameOnly__shouldApplyOnlyNameHeader() async throws {
-    let task1 = MockWebSocketTask()
-    factory.tasks.append(task1)
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(
-        clientAwarenessMetadata: ClientAwarenessMetadata(
-          clientApplicationName: "my-app",
-          clientApplicationVersion: nil
-        )
+    try setUpTransport(configuration: .init(
+      clientAwarenessMetadata: ClientAwarenessMetadata(
+        clientApplicationName: "my-app",
+        clientApplicationVersion: nil
       )
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    ))
 
-    task1.emit(.connectionAck(payload: nil))
+    factory.currentTask.emit(.connectionAck(payload: nil))
 
-    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+    let (subscription, operationID) = try await subscribe(on: factory.currentTask, using: client)
 
     let capturedRequest = factory.capturedRequests.last!
     expect(capturedRequest.value(forHTTPHeaderField: "apollographql-client-name"))
@@ -2514,28 +2230,20 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     expect(capturedRequest.value(forHTTPHeaderField: "apollographql-client-version"))
       .to(beNil())
 
-    task1.emit(.complete(id: operationID))
+    factory.currentTask.emit(.complete(id: operationID))
     _ = subscription
   }
 
   func testClientAwarenessHeaders__shouldPersistAcrossReconnection() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    factory.tasks.append(contentsOf: [task1, task2])
-    let store = ApolloStore.mock()
-    networkTransport = try WebSocketTransport(
-      urlSession: session,
-      store: store,
-      endpointURL: Self.endpointURL,
-      configuration: .init(
-        reconnectionInterval: 0,
-        clientAwarenessMetadata: ClientAwarenessMetadata(
-          clientApplicationName: "reconnect-app",
-          clientApplicationVersion: "2.0.0"
-        )
+    try setUpTransport(tasks: [task1, task2], configuration: .init(
+      reconnectionInterval: 0,
+      clientAwarenessMetadata: ClientAwarenessMetadata(
+        clientApplicationName: "reconnect-app",
+        clientApplicationVersion: "2.0.0"
       )
-    )
-    client = ApolloClient(networkTransport: networkTransport!, store: store)
+    ))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -2567,4 +2275,421 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     let results = try await subscription.getAllValues()
     _ = results
   }
+
+  // MARK: - Subscription Cache Read
+
+  func testSubscription__cacheThenNetwork__cacheHit__yieldsCacheThenServerResults() async throws {
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    try setUpTransport(store: store)
+
+    // Pre-populate the cache with subscription data.
+    try await store.publish(records: [
+      "SUBSCRIPTION_ROOT": ["reviewAdded": CacheReference("SUBSCRIPTION_ROOT.reviewAdded")],
+      "SUBSCRIPTION_ROOT.reviewAdded": [
+        "__typename": "ReviewAdded",
+        "stars": 3,
+        "commentary": "Cached review",
+      ],
+    ])
+
+    factory.currentTask.emit(.connectionAck(payload: nil))
+
+    let subscription = try client.subscribe(
+      subscription: MockSubscription<ReviewAddedData>(),
+      cachePolicy: .cacheThenNetwork
+    )
+
+    // Wait for the subscribe message, then send a server result and complete.
+    await expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let operationID = factory.currentTask.subscribeOperationID(at: 0)
+    factory.currentTask.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 5, commentary: "Server review")))
+    factory.currentTask.emit(.complete(id: operationID))
+
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(2))
+
+    // First result from cache
+    expect(results[0].source).to(equal(.cache))
+    expect(results[0].data?.reviewAdded?.stars).to(equal(3))
+    expect(results[0].data?.reviewAdded?.commentary).to(equal("Cached review"))
+
+    // Second result from server
+    expect(results[1].source).to(equal(.server))
+    expect(results[1].data?.reviewAdded?.stars).to(equal(5))
+    expect(results[1].data?.reviewAdded?.commentary).to(equal("Server review"))
+  }
+
+  func testSubscription__cacheThenNetwork__cacheMiss__yieldsOnlyServerResults() async throws {
+    try setUpTransport(store: ApolloStore(cache: InMemoryNormalizedCache()))
+
+    // Do not populate cache — cache miss.
+
+    factory.currentTask.emit(.connectionAck(payload: nil))
+
+    let subscription = try client.subscribe(
+      subscription: MockSubscription<ReviewAddedData>(),
+      cachePolicy: .cacheThenNetwork
+    )
+
+    await expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let operationID = factory.currentTask.subscribeOperationID(at: 0)
+    factory.currentTask.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 5, commentary: "Server only")))
+    factory.currentTask.emit(.complete(id: operationID))
+
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(1))
+    expect(results[0].source).to(equal(.server))
+    expect(results[0].data?.reviewAdded?.stars).to(equal(5))
+  }
+
+  func testSubscription__networkOnly__doesNotReadCache() async throws {
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    try setUpTransport(store: store)
+
+    // Pre-populate the cache — but networkOnly should not read it.
+    try await store.publish(records: [
+      "SUBSCRIPTION_ROOT": ["reviewAdded": CacheReference("SUBSCRIPTION_ROOT.reviewAdded")],
+      "SUBSCRIPTION_ROOT.reviewAdded": [
+        "__typename": "ReviewAdded",
+        "stars": 3,
+        "commentary": "Cached review",
+      ],
+    ])
+
+    factory.currentTask.emit(.connectionAck(payload: nil))
+
+    let subscription = try client.subscribe(
+      subscription: MockSubscription<ReviewAddedData>(),
+      cachePolicy: .networkOnly
+    )
+
+    await expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let operationID = factory.currentTask.subscribeOperationID(at: 0)
+    factory.currentTask.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 5, commentary: "Server review")))
+    factory.currentTask.emit(.complete(id: operationID))
+
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(1))
+    expect(results[0].source).to(equal(.server))
+    expect(results[0].data?.reviewAdded?.stars).to(equal(5))
+  }
+
+  // MARK: - Subscription Cache Write
+
+  func testSubscription__writeResultsToCache__writesServerResponsesToStore() async throws {
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    try setUpTransport(store: store)
+
+    factory.currentTask.emit(.connectionAck(payload: nil))
+
+    let subscription = try client.subscribe(
+      subscription: MockSubscription<ReviewAddedData>(),
+      cachePolicy: .networkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: true)
+    )
+
+    await expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let operationID = factory.currentTask.subscribeOperationID(at: 0)
+    factory.currentTask.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 4, commentary: "Written to cache")))
+    factory.currentTask.emit(.complete(id: operationID))
+
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(1))
+    expect(results[0].data?.reviewAdded?.stars).to(equal(4))
+
+    // Verify data was written to the cache.
+    let cachedResponse = try await store.load(MockSubscription<ReviewAddedData>())
+    expect(cachedResponse).toNot(beNil())
+    expect(cachedResponse?.data?.reviewAdded?.stars).to(equal(4))
+    expect(cachedResponse?.data?.reviewAdded?.commentary).to(equal("Written to cache"))
+  }
+
+  func testSubscription__writeResultsToCache_false__doesNotWriteToStore() async throws {
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    try setUpTransport(store: store)
+
+    factory.currentTask.emit(.connectionAck(payload: nil))
+
+    let subscription = try client.subscribe(
+      subscription: MockSubscription<ReviewAddedData>(),
+      cachePolicy: .networkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    await expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let operationID = factory.currentTask.subscribeOperationID(at: 0)
+    factory.currentTask.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 4, commentary: "Not cached")))
+    factory.currentTask.emit(.complete(id: operationID))
+
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(1))
+
+    // Verify data was NOT written to the cache.
+    let cachedResponse = try await store.load(MockSubscription<ReviewAddedData>())
+    expect(cachedResponse).to(beNil())
+  }
+
+  // MARK: - Query Cache Behaviors (over WebSocket)
+
+  func testQuery__cacheFirst__cacheHit__returnsCacheWithoutWebSocketMessage() async throws {
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    try setUpTransport(store: store)
+
+    // Pre-populate cache with query data.
+    try await store.publish(records: [
+      "QUERY_ROOT": ["reviewAdded": CacheReference("QUERY_ROOT.reviewAdded")],
+      "QUERY_ROOT.reviewAdded": [
+        "__typename": "ReviewAdded",
+        "stars": 3,
+        "commentary": "Cached query",
+      ],
+    ])
+
+    let result = try await client.fetch(
+      query: MockQuery<ReviewAddedData>(),
+      cachePolicy: .cacheFirst
+    )
+
+    expect(result.source).to(equal(.cache))
+    expect(result.data?.reviewAdded?.stars).to(equal(3))
+    expect(result.data?.reviewAdded?.commentary).to(equal("Cached query"))
+
+    // No WebSocket subscribe message should have been sent.
+    expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe").count).to(equal(0))
+  }
+
+  func testQuery__cacheFirst__cacheMiss__fetchesViaWebSocket() async throws {
+    try setUpTransport(store: ApolloStore(cache: InMemoryNormalizedCache()))
+
+    // Empty cache — cache miss triggers network fetch.
+    // Messages are pre-emitted and queued by MockWebSocketTask. The operation ID "1" relies on
+    // ApolloSequencedOperationMessageIdCreator starting at 1 (the default).
+    factory.currentTask.emit(.connectionAck(payload: nil))
+    factory.currentTask.emit(.next(id: "1", payload: Self.reviewAddedPayload(stars: 5, commentary: "Server query")))
+    factory.currentTask.emit(.complete(id: "1"))
+
+    let result = try await client.fetch(
+      query: MockQuery<ReviewAddedData>(),
+      cachePolicy: .cacheFirst
+    )
+
+    expect(result.source).to(equal(.server))
+    expect(result.data?.reviewAdded?.stars).to(equal(5))
+    expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe").count).to(equal(1))
+  }
+
+  func testQuery__cacheOnly__cacheHit__returnsCache() async throws {
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    try setUpTransport(store: store)
+
+    try await store.publish(records: [
+      "QUERY_ROOT": ["reviewAdded": CacheReference("QUERY_ROOT.reviewAdded")],
+      "QUERY_ROOT.reviewAdded": [
+        "__typename": "ReviewAdded",
+        "stars": 2,
+        "commentary": "Cache only hit",
+      ],
+    ])
+
+    let result = try await client.fetch(
+      query: MockQuery<ReviewAddedData>(),
+      cachePolicy: .cacheOnly
+    )
+
+    expect(result).toNot(beNil())
+    expect(result?.source).to(equal(.cache))
+    expect(result?.data?.reviewAdded?.stars).to(equal(2))
+
+    // No WebSocket connection should have been opened.
+    expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe").count).to(equal(0))
+    expect(self.factory.currentTask.clientSentMessages(ofType: "connection_init").count).to(equal(0))
+  }
+
+  func testQuery__cacheOnly__cacheMiss__returnsNil() async throws {
+    try setUpTransport(store: ApolloStore(cache: InMemoryNormalizedCache()))
+
+    let result = try await client.fetch(
+      query: MockQuery<ReviewAddedData>(),
+      cachePolicy: .cacheOnly
+    )
+
+    expect(result).to(beNil())
+    expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe").count).to(equal(0))
+  }
+
+  func testQuery__networkOnly__writeResultsToCache__populatesCache() async throws {
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    try setUpTransport(store: store)
+
+    factory.currentTask.emit(.connectionAck(payload: nil))
+    factory.currentTask.emit(.next(id: "1", payload: Self.reviewAddedPayload(stars: 5, commentary: "Cached by write")))
+    factory.currentTask.emit(.complete(id: "1"))
+
+    let result = try await client.fetch(
+      query: MockQuery<ReviewAddedData>(),
+      cachePolicy: .networkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: true)
+    )
+
+    expect(result.source).to(equal(.server))
+    expect(result.data?.reviewAdded?.stars).to(equal(5))
+
+    // Verify the result was written to the cache.
+    let cachedResponse = try await store.load(MockQuery<ReviewAddedData>())
+    expect(cachedResponse).toNot(beNil())
+    expect(cachedResponse?.data?.reviewAdded?.stars).to(equal(5))
+    expect(cachedResponse?.data?.reviewAdded?.commentary).to(equal("Cached by write"))
+  }
+
+  // MARK: - Mutation Cache Write (over WebSocket)
+
+  func testMutation__writeResultsToCache__populatesCache() async throws {
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    try setUpTransport(store: store)
+
+    factory.currentTask.emit(.connectionAck(payload: nil))
+    factory.currentTask.emit(.next(id: "1", payload: Self.reviewAddedPayload(stars: 4, commentary: "Mutation cached")))
+    factory.currentTask.emit(.complete(id: "1"))
+
+    let result = try await client.perform(
+      mutation: MockMutation<ReviewAddedData>(),
+      requestConfiguration: RequestConfiguration(writeResultsToCache: true)
+    )
+
+    expect(result.data?.reviewAdded?.stars).to(equal(4))
+
+    // Verify the result was written to the cache.
+    let cachedResponse = try await store.load(MockMutation<ReviewAddedData>())
+    expect(cachedResponse).toNot(beNil())
+    expect(cachedResponse?.data?.reviewAdded?.stars).to(equal(4))
+  }
+
+  func testMutation__writeResultsToCache_false__doesNotPopulateCache() async throws {
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    try setUpTransport(store: store)
+
+    factory.currentTask.emit(.connectionAck(payload: nil))
+    factory.currentTask.emit(.next(id: "1", payload: Self.reviewAddedPayload(stars: 4, commentary: "Not cached")))
+    factory.currentTask.emit(.complete(id: "1"))
+
+    let result = try await client.perform(
+      mutation: MockMutation<ReviewAddedData>(),
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    expect(result.data?.reviewAdded?.stars).to(equal(4))
+
+    // Verify the result was NOT written to the cache.
+    let cachedResponse = try await store.load(MockMutation<ReviewAddedData>())
+    expect(cachedResponse).to(beNil())
+  }
+
+  // MARK: - Network Failure Cache Fallback
+
+  func testQuery__networkFirst__connectionFailure__fallsBackToCache() async throws {
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    try setUpTransport(store: store)
+
+    // Pre-populate the cache with query data.
+    try await store.publish(records: [
+      "QUERY_ROOT": ["reviewAdded": CacheReference("QUERY_ROOT.reviewAdded")],
+      "QUERY_ROOT.reviewAdded": [
+        "__typename": "ReviewAdded",
+        "stars": 3,
+        "commentary": "Cached fallback",
+      ],
+    ])
+
+    // Connection fails before ack — transport error.
+    struct MockTransportError: Swift.Error {}
+    factory.currentTask.throw(MockTransportError())
+
+    let result = try await client.fetch(
+      query: MockQuery<ReviewAddedData>(),
+      cachePolicy: .networkFirst
+    )
+
+    // Should fall back to cached data on transport failure.
+    expect(result.source).to(equal(.cache))
+    expect(result.data?.reviewAdded?.stars).to(equal(3))
+    expect(result.data?.reviewAdded?.commentary).to(equal("Cached fallback"))
+  }
+
+  func testQuery__networkFirst__graphQLError__doesNotFallBackToCache() async throws {
+    let store = ApolloStore(cache: InMemoryNormalizedCache())
+    try setUpTransport(store: store)
+
+    // Pre-populate the cache so fallback data is available if incorrectly triggered.
+    try await store.publish(records: [
+      "QUERY_ROOT": ["reviewAdded": CacheReference("QUERY_ROOT.reviewAdded")],
+      "QUERY_ROOT.reviewAdded": [
+        "__typename": "ReviewAdded",
+        "stars": 99,
+        "commentary": "Should not see this",
+      ],
+    ])
+
+    // Messages are pre-emitted and queued. ID "1" relies on the default sequenced ID creator.
+    factory.currentTask.emit(.connectionAck(payload: nil))
+    factory.currentTask.emit(.error(id: "1", payload: [["message": "Validation failed"]]))
+
+    // Should propagate the GraphQL error, NOT fall back to cache.
+    do {
+      _ = try await client.fetch(
+        query: MockQuery<ReviewAddedData>(),
+        cachePolicy: .networkFirst
+      )
+      fail("Expected a GraphQL error to be thrown")
+    } catch {
+      expect(error).to(matchError(WebSocketTransport.Error.graphQLErrors([])))
+    }
+  }
+
+  // MARK: - Cache Write Failure Propagation
+
+  func testSubscription__writeResultsToCache__cacheWriteFailure__terminatesStream() async throws {
+    // A cache that throws on writes but works for reads.
+    try setUpTransport(store: ApolloStore(cache: FailingWriteCache()))
+
+    factory.currentTask.emit(.connectionAck(payload: nil))
+
+    let subscription = try client.subscribe(
+      subscription: MockSubscription<ReviewAddedData>(),
+      cachePolicy: .networkOnly
+    )
+
+    await expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    let operationID = factory.currentTask.subscribeOperationID(at: 0)
+
+    // Server sends valid data, but the cache write will fail.
+    factory.currentTask.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 5, commentary: "Will fail write")))
+
+    // The stream should terminate with the cache write error.
+    do {
+      _ = try await subscription.getAllValues()
+      fail("Expected a cache write error to be thrown")
+    } catch {
+      expect(error).to(beAKindOf(FailingWriteCache.WriteError.self))
+    }
+  }
+}
+
+// MARK: - Test Helpers
+
+/// A ``NormalizedCache`` that always throws on write operations (merge).
+/// Used to verify that cache write errors propagate correctly.
+private final class FailingWriteCache: NormalizedCache, @unchecked Sendable {
+  struct WriteError: Swift.Error, Equatable {}
+
+  func loadRecords(forKeys keys: Set<CacheKey>) async throws -> [CacheKey: Record] {
+    return [:]
+  }
+
+  func merge(records: RecordSet) async throws -> Set<CacheKey> {
+    throw WriteError()
+  }
+
+  func removeRecord(for key: CacheKey) async throws {}
+  func removeRecords(matching pattern: CacheKey) async throws {}
+  func clear() async throws {}
 }
