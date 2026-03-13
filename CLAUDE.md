@@ -108,6 +108,9 @@ Primary CI is **GitHub Actions** (`.github/workflows/ci-tests.yml`). CircleCI (`
 ### GitHub CLI Quirks
 - `gh pr edit` may fail with GraphQL deprecation errors for repos using Projects (classic). Use `gh api repos/{owner}/{repo}/pulls/{number} -X PATCH -f title="..." -f body="..."` as a workaround.
 
+### Git Quirks
+- **`index.lock` race with Xcode**: Xcode runs `git status` in the background, creating transient `index.lock` files that block git operations. Workaround: chain `rm -f .git/index.lock; git <command>` or use a retry loop: `while ! git <command> 2>/dev/null; do rm -f .git/index.lock; done`
+
 ## Tool Preferences
 
 - **Use the Xcode MCP tools** (`BuildProject`, `RunSomeTests`, `RunAllTests`, `GetTestList`, etc.) for building and running tests instead of invoking `xcodebuild` directly via Bash.

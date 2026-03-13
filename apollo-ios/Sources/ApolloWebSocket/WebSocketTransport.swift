@@ -49,16 +49,45 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     /// operation. Defaults to ``ApolloSequencedOperationMessageIdCreator``.
     public var operationMessageIdCreator: any OperationMessageIdCreator
 
+    /// The interval at which the client sends ping messages to the server as a keepalive.
+    ///
+    /// Some servers require clients to send periodic pings and will drop the connection
+    /// if they don't receive one within a certain timeframe.
+    ///
+    /// - A positive value (e.g. `20`) sends a ping every 20 seconds while connected.
+    /// - A value of `nil` disables client-initiated pings (the default).
+    ///
+    /// Pings are only sent after `connection_ack` is received. The timer is stopped on
+    /// disconnect or pause, and restarted on reconnect.
+    ///
+    /// Default: `nil` (disabled).
+    public var pingInterval: TimeInterval?
+
+    /// Metadata used by GraphOS Studio's
+    /// [client awareness](https://www.apollographql.com/docs/graphos/platform/insights/client-segmentation)
+    /// feature.
+    ///
+    /// When set, the client application name and version are sent as HTTP headers
+    /// (`apollographql-client-name`, `apollographql-client-version`) on the WebSocket
+    /// connection request.
+    ///
+    /// Default: `ClientAwarenessMetadata()` (includes Apollo library awareness headers).
+    public var clientAwarenessMetadata: ClientAwarenessMetadata
+
     public init(
       reconnectionInterval: TimeInterval = -1,
       requestBodyCreator: any JSONRequestBodyCreator = DefaultRequestBodyCreator(),
       connectingPayload: JSONEncodableDictionary? = nil,
-      operationMessageIdCreator: any OperationMessageIdCreator = ApolloSequencedOperationMessageIdCreator()
+      operationMessageIdCreator: any OperationMessageIdCreator = ApolloSequencedOperationMessageIdCreator(),
+      pingInterval: TimeInterval? = nil,
+      clientAwarenessMetadata: ClientAwarenessMetadata = ClientAwarenessMetadata()
     ) {
       self.reconnectionInterval = reconnectionInterval
       self.requestBodyCreator = requestBodyCreator
       self.connectingPayload = connectingPayload
       self.operationMessageIdCreator = operationMessageIdCreator
+      self.pingInterval = pingInterval
+      self.clientAwarenessMetadata = clientAwarenessMetadata
     }
   }
 
@@ -109,6 +138,10 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
 
   private var connectionWaiters = ConnectionWaiterQueue()
 
+  /// The task that periodically sends client-initiated ping messages.
+  /// Created after `connection_ack` and cancelled on disconnect/pause.
+  private var pingTimerTask: Task<Void, Never>?
+
   /// The number of active subscribers. Exposed for test assertions.
   var subscriberCount: Int { subscriberRegistry.count }
 
@@ -121,7 +154,10 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     self.urlSession = urlSession
     self.store = store
     self.configuration = configuration
-    self.request = try Self.createURLRequest(endpointURL: endpointURL)
+    self.request = try Self.createURLRequest(
+      endpointURL: endpointURL,
+      clientAwarenessMetadata: configuration.clientAwarenessMetadata
+    )
     self.connection = WebSocketConnection(task: urlSession.webSocketTask(with: request))
     self.subscriberRegistry = SubscriberRegistry(
       operationMessageIdCreator: configuration.operationMessageIdCreator
@@ -131,11 +167,14 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   // MARK: - Request Setup
 
   private static func createURLRequest(
-    endpointURL: URL
+    endpointURL: URL,
+    clientAwarenessMetadata: ClientAwarenessMetadata
   ) throws -> URLRequest {
     var request = URLRequest(url: endpointURL)
 
     request.setValue(Constants.headerWSProtocolValue, forHTTPHeaderField: Constants.headerWSProtocolName)
+
+    clientAwarenessMetadata.applyHeaders(to: &request)
 
     return request
   }
@@ -182,7 +221,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   /// - Otherwise: transitions to `disconnected`, fails pending connection waiters, and finishes
   ///   all subscriber streams.
   private func startConnectionReceiveLoop() {
-    /// Keeps a reference to the connection the the receive loop was opened on. If a reconnect occurs,
+    /// Keeps a reference to the connection the receive loop was opened on. If a reconnect occurs,
     /// `self.connection` will be a new connection and we should ignore disconnection events for this loop.
     let loopConnection = self.connection
     let connectionStream = self.connection.openConnection(
@@ -222,6 +261,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
 
     let wasConnected = (self.connectionState == .connected)
     self.connectionState = .disconnected
+    stopPingTimer()
 
     delegate?.webSocketTransport(self, didDisconnectWithError: error)
 
@@ -230,10 +270,15 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     subscriberRegistry.finishNonSubscriptions(throwing: error ?? Error.connectionClosed)
 
     if wasConnected && !subscriberRegistry.isEmpty && configuration.isReconnectEnabled {
+      subscriberRegistry.markSubscriptionsReconnecting()
       await attemptReconnection()
     } else {
       connectionWaiters.failAll(with: error ?? Error.connectionClosed)
-      subscriberRegistry.finishAll(throwing: error)
+      if let error {
+        subscriberRegistry.finishAll(reason: .error(error))
+      } else {
+        subscriberRegistry.finishAll(reason: .completed)
+      }
     }
   }
 
@@ -251,7 +296,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
         try await Task.sleep(nanoseconds: UInt64(configuration.reconnectionInterval * 1_000_000_000))
       } catch {
         // Sleep was cancelled — terminate everything
-        subscriberRegistry.finishAll()
+        subscriberRegistry.finishAll(reason: .cancelled)
         return
       }
     }
@@ -300,6 +345,43 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   /// waiting task is cancelled before `connection_ack` arrives.
   private func cancelConnectionWaiter(id: UUID) {
     connectionWaiters.cancel(id: id)
+  }
+
+  // MARK: - Client-Initiated Ping Keepalive
+
+  /// Starts the periodic ping timer if `pingInterval` is configured.
+  ///
+  /// Spawns a task that sends a `ping` message at the configured interval. The task
+  /// runs until cancelled (via ``stopPingTimer()``). Called after `connection_ack`.
+  private func startPingTimer() {
+    guard let interval = configuration.pingInterval, interval > 0 else { return }
+
+    stopPingTimer()
+
+    let connection = self.connection
+    pingTimerTask = Task { [weak self] in
+      let nanoseconds = UInt64(interval * 1_000_000_000)
+      while !Task.isCancelled {
+        do {
+          try await Task.sleep(nanoseconds: nanoseconds)
+        } catch {
+          break
+        }
+
+        guard let _ = self, !Task.isCancelled else { break }
+
+        guard let pingMessage = try? Message.Outgoing.ping(payload: nil).toWebSocketMessage() else {
+          continue
+        }
+        connection.send(pingMessage)
+      }
+    }
+  }
+
+  /// Stops the periodic ping timer.
+  private func stopPingTimer() {
+    pingTimerTask?.cancel()
+    pingTimerTask = nil
   }
 
   // MARK: - Runtime Configuration Updates
@@ -386,10 +468,14 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     }
 
     connectionState = .paused
+    stopPingTimer()
 
     // Terminate one-shot operations — they cannot survive a pause because replaying
     // a mutation could cause duplicate side effects.
     subscriberRegistry.finishNonSubscriptions(throwing: Error.connectionClosed)
+
+    // Mark surviving subscriptions as paused so consumers can observe the state.
+    subscriberRegistry.markSubscriptionsPaused()
 
     // Close the underlying WebSocket task. This causes the receive loop's stream to
     // end, at which point the loop checks connectionState, sees `.paused`, and exits
@@ -432,21 +518,29 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   // MARK: - Subscriber Management
 
   private func registerSubscriber(
-    for operation: any GraphQLOperation
+    for operation: any GraphQLOperation,
+    stateStorage: SubscriptionStateStorage? = nil
   ) -> (OperationID, AsyncThrowingStream<JSONObject, any Swift.Error>) {
-    subscriberRegistry.register(for: operation)
+    subscriberRegistry.register(for: operation, stateStorage: stateStorage)
   }
 
   /// Cancels a subscription from the client side. Removes the subscriber from the registry,
   /// finishes its payload stream, and sends a `complete` message to the server.
   /// No-ops if the subscriber was already removed (e.g. server already completed it).
   private func cancelSubscription(operationID: OperationID) {
-    guard subscriberRegistry.finish(operationID) else { return }
+    guard subscriberRegistry.finish(operationID, reason: .cancelled) else { return }
 
     let message = Message.Outgoing.complete(id: operationID)
     if let wsMessage = try? message.toWebSocketMessage() {
       connection.send(wsMessage)
     }
+  }
+
+  /// Removes a subscriber from the registry with a `.completed` finish reason without
+  /// sending a `complete` message to the server. Used when the connection is already
+  /// down (e.g. network-failure cache fallback) or when no server cleanup is needed.
+  private func cleanupSubscription(operationID: OperationID) {
+    subscriberRegistry.finish(operationID, reason: .completed)
   }
 
   private func sendSubscribeMessage<Operation: GraphQLOperation>(
@@ -475,7 +569,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
       } catch {
         // Defensive: if re-subscribe fails (e.g. missing query document — shouldn't happen
         // since the first subscribe succeeded), terminate this individual subscriber.
-        subscriberRegistry.finish(id, throwing: error)
+        subscriberRegistry.finish(id, reason: .error(error))
       }
     }
   }
@@ -493,6 +587,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
         self.hasBeenConnected = true
         connectionWaiters.resumeAll()
         resubscribeActiveSubscribers()
+        startPingTimer()
 
         if isReconnect {
           delegate?.webSocketTransportDidReconnect(self)
@@ -504,10 +599,10 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
         subscriberRegistry.yield(payload, for: id)
 
       case .error(let id, let errors):
-        subscriberRegistry.finish(id, throwing: Error.graphQLErrors(errors))
+        subscriberRegistry.finish(id, reason: .error(Error.graphQLErrors(errors)))
 
       case .complete(let id):
-        subscriberRegistry.finish(id)
+        subscriberRegistry.finish(id, reason: .completed)
 
       case .ping(let payload):
         // Per the graphql-transport-ws protocol, a pong must be sent in response
@@ -521,44 +616,163 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
         delegate?.webSocketTransport(self, didReceivePongWithPayload: payload)
       }
     } catch {
-      subscriberRegistry.finishAll(throwing: Error.unrecognizedMessage)
+      subscriberRegistry.finishAll(reason: .error(Error.unrecognizedMessage))
     }
+  }
+
+  // MARK: - Cache Helpers
+
+  /// Attempts a pre-network cache read based on `fetchBehavior` and determines whether the
+  /// network fetch should proceed.
+  ///
+  /// If the fetch behavior indicates a cache read before the network fetch, this method attempts
+  /// to load cached data from the store and yields it to the continuation. It then evaluates
+  /// whether a network fetch is still required.
+  ///
+  /// - Returns: `true` if the caller should proceed with the network (WebSocket) fetch,
+  ///   `false` if the stream should be finished without opening a connection.
+  private func readCacheBeforeNetworkIfNeeded<Operation: GraphQLOperation>(
+    operation: Operation,
+    fetchBehavior: FetchBehavior,
+    continuation: AsyncThrowingStream<GraphQLResponse<Operation>, any Swift.Error>.Continuation
+  ) async throws -> Bool {
+    var didYieldCacheData = false
+
+    if fetchBehavior.cacheRead == .beforeNetworkFetch {
+      do {
+        if let cacheResponse = try await store.load(operation) {
+          didYieldCacheData = true
+          continuation.yield(cacheResponse)
+        }
+      } catch {
+        // If we won't fetch from network, propagate the cache read error.
+        if fetchBehavior.networkFetch == .never {
+          throw error
+        }
+        // Otherwise swallow the error and proceed to network.
+      }
+    }
+
+    switch fetchBehavior.networkFetch {
+    case .never:
+      return false
+    case .always:
+      return true
+    case .onCacheMiss:
+      return !didYieldCacheData
+    }
+  }
+
+  /// Parses a WebSocket payload, writes cache records if configured, and returns the response.
+  private func parseAndCacheResponse<Operation: GraphQLOperation>(
+    payload: JSONObject,
+    operation: Operation,
+    requestConfiguration: RequestConfiguration
+  ) async throws -> GraphQLResponse<Operation> {
+    let handler = JSONResponseParser.SingleResponseExecutionHandler<Operation>(
+      responseBody: payload,
+      operationVariables: operation.__variables
+    )
+    let parsedResult = try await handler.execute(
+      includeCacheRecords: requestConfiguration.writeResultsToCache
+    )
+
+    if requestConfiguration.writeResultsToCache,
+       let cacheRecords = parsedResult.cacheRecords,
+       parsedResult.result.source == .server {
+      try await store.publish(records: cacheRecords)
+    }
+
+    return parsedResult.result
   }
 
   // MARK: - Operation Execution
 
-  /// Sends a GraphQL operation over the WebSocket connection and returns a stream of responses.
+  /// Core implementation for executing any GraphQL operation over the WebSocket connection.
   ///
   /// This is the shared implementation for queries, mutations, and subscriptions. All three
   /// use the same `subscribe` message type in the `graphql-transport-ws` protocol. The server
   /// replies with `next` (results) and `complete` (stream end) messages.
-  private nonisolated func sendOperation<Operation: GraphQLOperation>(
-    operation: Operation
+  ///
+  /// Cache behavior is controlled by `fetchBehavior` and `requestConfiguration`:
+  /// - `fetchBehavior.cacheRead` determines whether cached data is returned before or after
+  ///   a network fetch, or not at all.
+  /// - `fetchBehavior.networkFetch` determines whether a WebSocket fetch is performed.
+  /// - `requestConfiguration.writeResultsToCache` determines whether server responses are
+  ///   written to the normalized cache.
+  ///
+  /// - Parameter stateStorage: When provided (for subscriptions), the storage is updated as
+  ///   the operation moves through its lifecycle. When `nil` (for queries/mutations), no
+  ///   state tracking is performed.
+  private nonisolated func executeOperation<Operation: GraphQLOperation>(
+    operation: Operation,
+    fetchBehavior: FetchBehavior,
+    requestConfiguration: RequestConfiguration,
+    stateStorage: SubscriptionStateStorage? = nil
   ) -> AsyncThrowingStream<GraphQLResponse<Operation>, any Swift.Error> {
     AsyncThrowingStream { continuation in
       let innerTask = Task {
-        let (operationID, payloadStream) = await self.registerSubscriber(for: operation)
         do {
-          try await self.ensureConnected()
-          try Task.checkCancellation()
-          try await self.sendSubscribeMessage(operationID: operationID, operation: operation)
+          // Step 1: Cache read before network (if applicable)
+          let shouldFetchFromNetwork = try await self.readCacheBeforeNetworkIfNeeded(
+            operation: operation,
+            fetchBehavior: fetchBehavior,
+            continuation: continuation
+          )
 
-          for try await payload in payloadStream {
-            let handler = JSONResponseParser.SingleResponseExecutionHandler<Operation>(
-              responseBody: payload,
-              operationVariables: operation.__variables
-            )
-            let parsedResult = try await handler.execute(includeCacheRecords: false)
-            continuation.yield(parsedResult.result)
+          guard shouldFetchFromNetwork else {
+            stateStorage?.set(.finished(.completed))
+            continuation.finish()
+            return
           }
 
-          if Task.isCancelled {
+          // Step 2: WebSocket fetch
+          let (operationID, payloadStream) = await self.registerSubscriber(
+            for: operation,
+            stateStorage: stateStorage
+          )
+          do {
+            try await self.ensureConnected()
+            try Task.checkCancellation()
+            try await self.sendSubscribeMessage(operationID: operationID, operation: operation)
+
+            for try await payload in payloadStream {
+              let response = try await self.parseAndCacheResponse(
+                payload: payload,
+                operation: operation,
+                requestConfiguration: requestConfiguration
+              )
+              continuation.yield(response)
+            }
+
+            if Task.isCancelled {
+              await self.cancelSubscription(operationID: operationID)
+            }
+            continuation.finish()
+
+          } catch {
+            // Step 3: Cache read on transport failure (if applicable).
+            // Only fall back to cache for transport/connection errors, not GraphQL
+            // application errors (e.g. validation failures, resolver errors).
+            let isGraphQLError: Bool
+            if case .graphQLErrors = error as? Error { isGraphQLError = true }
+            else { isGraphQLError = false }
+
+            if fetchBehavior.cacheRead == .onNetworkFailure, !isGraphQLError {
+              if let cacheResponse = try? await self.store.load(operation) {
+                continuation.yield(cacheResponse)
+                await self.cleanupSubscription(operationID: operationID)
+                continuation.finish()
+                return
+              }
+            }
+
             await self.cancelSubscription(operationID: operationID)
+            continuation.finish(throwing: error)
           }
-          continuation.finish()
 
         } catch {
-          await self.cancelSubscription(operationID: operationID)
+          stateStorage?.set(.finished(.error(error)))
           continuation.finish(throwing: error)
         }
       }
@@ -570,6 +784,23 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     }
   }
 
+  /// Sends a GraphQL subscription over the WebSocket connection and returns a
+  /// ``SubscriptionStream`` that tracks the subscription's lifecycle state.
+  private nonisolated func sendSubscription<Operation: GraphQLSubscription>(
+    subscription: Operation,
+    fetchBehavior: FetchBehavior,
+    requestConfiguration: RequestConfiguration
+  ) -> SubscriptionStream<GraphQLResponse<Operation>> {
+    let stateStorage = SubscriptionStateStorage()
+    let stream = executeOperation(
+      operation: subscription,
+      fetchBehavior: fetchBehavior,
+      requestConfiguration: requestConfiguration,
+      stateStorage: stateStorage
+    )
+    return SubscriptionStream(stream: stream, stateProvider: { stateStorage.state })
+  }
+
   // MARK: - Network Transport Protocol Conformance
 
   nonisolated public func send<Query: GraphQLQuery>(
@@ -577,22 +808,22 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     fetchBehavior: FetchBehavior,
     requestConfiguration: RequestConfiguration
   ) throws -> AsyncThrowingStream<GraphQLResponse<Query>, any Swift.Error> {
-    sendOperation(operation: query)
+    executeOperation(operation: query, fetchBehavior: fetchBehavior, requestConfiguration: requestConfiguration)
   }
 
   nonisolated public func send<Mutation: GraphQLMutation>(
     mutation: Mutation,
     requestConfiguration: RequestConfiguration
   ) throws -> AsyncThrowingStream<GraphQLResponse<Mutation>, any Swift.Error> {
-    sendOperation(operation: mutation)
+    executeOperation(operation: mutation, fetchBehavior: .NetworkOnly, requestConfiguration: requestConfiguration)
   }
 
   nonisolated public func send<Subscription: GraphQLSubscription>(
     subscription: Subscription,
     fetchBehavior: Apollo.FetchBehavior,
     requestConfiguration: Apollo.RequestConfiguration
-  ) throws -> AsyncThrowingStream<Apollo.GraphQLResponse<Subscription>, any Swift.Error> {
-    sendOperation(operation: subscription)
+  ) throws -> SubscriptionStream<Apollo.GraphQLResponse<Subscription>> {
+    sendSubscription(subscription: subscription, fetchBehavior: fetchBehavior, requestConfiguration: requestConfiguration)
   }
 
 }

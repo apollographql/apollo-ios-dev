@@ -30,11 +30,22 @@ Connection waiters use `[CheckedContinuation<Void, any Error>]` array pattern (s
 - On disconnect: non-subscriptions are terminated **immediately** with the actual error (before reconnection), subscriptions survive for re-subscribe
 - Unrecognized/unparseable messages throw `Error.unrecognizedMessage` and terminate all subscribers
 
+## Caching
+
+`WebSocketTransport` integrates with `ApolloStore` for cache reads and writes:
+
+- **`readCacheBeforeNetworkIfNeeded()`** — Evaluates `FetchBehavior.cacheRead`/`.networkFetch` to yield cached data before the WebSocket fetch and decide whether the network fetch should proceed.
+- **`parseAndCacheResponse()`** — Parses WebSocket JSON payloads via `SingleResponseExecutionHandler`, writes `RecordSet` to store via `store.publish(records:)` when `requestConfiguration.writeResultsToCache` is true. Cache write errors propagate (terminate the stream).
+- **`executeOperation()`** — Unified 3-step flow (cache read → network fetch → cache fallback on failure) used by both queries/mutations and subscriptions. Takes optional `SubscriptionStateStorage` for subscription state tracking.
+- **GraphQL errors skip cache fallback** — `onNetworkFailure` cache fallback only triggers for transport/connection errors, not `Error.graphQLErrors` (application-level errors should not be masked by stale cache).
+- Uses `store.load()` / `store.publish()` directly — does NOT use `CacheInterceptor` (which is tied to `GraphQLRequest` with HTTP-specific requirements like `graphQLEndpoint` and `toURLRequest()`).
+
 ## Ping/Pong
 
 - Application-level JSON messages (separate from WebSocket-frame-level ping/pong)
 - On receiving `ping`: reply with `pong(payload: nil)` immediately — do NOT echo the ping's payload
 - On receiving `pong`: no action (break)
+- Client-initiated pings: `Configuration.pingInterval` (default `nil`/disabled). Timer starts after `connection_ack`, stops on disconnect/pause, restarts on reconnect. Implemented via `pingTimerTask` (`Task`) that captures the current `connection`.
 
 ## Testing
 
@@ -48,7 +59,7 @@ Tests live in `Tests/ApolloTests/WebSocket/`. Mock infrastructure in `Tests/Apol
 
 `setUp()` creates a factory with one default task, a session, transport, and client. Tests access the default task via the `mockTask` computed property. Three patterns:
 - **Default config**: Use setUp's transport directly; append extra tasks to `factory.tasks` if reconnection is needed
-- **Custom config**: Append tasks to `factory.tasks`, then overwrite `networkTransport` and `client` with new instances using the same `session`
+- **Custom config**: Recreate `factory` (with a fresh `MockWebSocketTaskFactory`) and `session` before creating new `networkTransport` and `client`. The setUp transport consumes factory index 0, so reusing the old session causes the new transport to get the wrong task or crash.
 - **`self.` requirement**: `mockTask` is a computed property — use `self.mockTask` inside `expect()` closures. Capture `self.client!` in a local `let` before `Task { }` closures to avoid `sending` parameter data race errors.
 
 ### Running WebSocket tests
