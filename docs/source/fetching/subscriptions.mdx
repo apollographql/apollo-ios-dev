@@ -110,21 +110,91 @@ Apollo iOS participates in Swift structured concurrency task cancellation for su
 
 When the task is cancelled, the subscription stream terminates gracefully and the operation is completed on the server.
 
+### In SwiftUI
+
+The idiomatic SwiftUI approach is to use the `.task {}` view modifier. It automatically starts the subscription when the view appears and cancels it when the view disappears — no manual task management required.
+
 ```swift
-class ReviewViewController {
+struct ReviewFeedView: View {
+  let client: ApolloClient
+  @State private var latestReview: ReviewAddedSubscription.Data.ReviewAdded?
+  @State private var error: Error?
+
+  var body: some View {
+    Group {
+      if let review = latestReview {
+        ReviewRow(review: review)
+      } else {
+        ProgressView("Waiting for reviews…")
+      }
+    }
+    .task {
+      do {
+        let subscription = try client.subscribe(subscription: ReviewAddedSubscription())
+        for try await result in subscription {
+          latestReview = result.data?.reviewAdded
+        }
+      } catch {
+        self.error = error
+      }
+    }
+  }
+}
+```
+
+For more complex views, extract subscription logic into an `@Observable` model and call it from `.task {}`:
+
+```swift
+@Observable
+class ReviewFeedModel {
+  var latestReview: ReviewAddedSubscription.Data.ReviewAdded?
+  var error: Error?
+
+  func subscribe(using client: ApolloClient) async {
+    do {
+      let subscription = try client.subscribe(subscription: ReviewAddedSubscription())
+      for try await result in subscription {
+        latestReview = result.data?.reviewAdded
+      }
+    } catch {
+      self.error = error
+    }
+  }
+}
+
+struct ReviewFeedView: View {
+  let client: ApolloClient
+  @State private var model = ReviewFeedModel()
+
+  var body: some View {
+    ReviewContent(model: model)
+      .task {
+        await model.subscribe(using: client)
+      }
+  }
+}
+```
+
+The `.task {}` modifier cancels its task when the view is removed from the hierarchy. Because the subscription's `for try await` loop is running inside that task, the subscription is automatically cancelled at the same time.
+
+### In UIKit
+
+In UIKit, store a reference to the `Task` and cancel it when the view controller is deallocated:
+
+```swift
+class ReviewViewController: UIViewController {
 
   let client: ApolloClient!
   private var subscriptionTask: Task<Void, Never>?
 
-  func subscribeToReviews() {
-    // Keep a reference to the subscription task
-    self.subscriptionTask = Task {
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    subscriptionTask = Task {
       do {
         let subscription = try client.subscribe(subscription: ReviewAddedSubscription())
-
         for try await result in subscription {
-          // Handle each update from the subscription
-          print("Received subscription update: \(result.data)")
+          // Update UI on the main actor
+          updateUI(with: result.data)
         }
       } catch {
         print("Subscription error: \(error)")
@@ -132,9 +202,9 @@ class ReviewViewController {
     }
   }
 
-  deinit {
-    // Cancel the subscription task when this object is deallocated
-    self.subscriptionTask?.cancel()
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    subscriptionTask?.cancel()
   }
 }
 ```
