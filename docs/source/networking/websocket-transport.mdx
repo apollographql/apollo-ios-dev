@@ -46,7 +46,8 @@ import ApolloWebSocket
 
 ### Subscriptions over WebSocket, queries and mutations over HTTP
 
-The most common configuration routes subscription operations through a WebSocket connection while sending queries and mutations over HTTP. Use `SplitNetworkTransport` to combine a `RequestChainNetworkTransport` (HTTP) with a `WebSocketTransport` (WebSocket):
+While `WebSocketTransport` supports sending all GraphQL operations over a WebSocket, the most common configuration routes subscription operations through a WebSocket connection while sending queries and mutations over HTTP.
+Use `SplitNetworkTransport` to combine a `RequestChainNetworkTransport` (HTTP) with a `WebSocketTransport` (WebSocket):
 
 ```swift
 import Apollo
@@ -78,7 +79,7 @@ let client = ApolloClient(networkTransport: splitTransport, store: store)
 
 ### All operations over WebSocket
 
-You can also send queries, mutations, and subscriptions all through a single WebSocket connection. Use `WebSocketTransport` directly as the `NetworkTransport`:
+You can also send queries, mutations, and subscriptions all through a single WebSocket connection by using `WebSocketTransport` directly as the `NetworkTransport`:
 
 ```swift
 let store = ApolloStore()
@@ -119,7 +120,7 @@ let wsTransport = try WebSocketTransport(
 |--------|------|---------|-------------|
 | `reconnectionInterval` | `TimeInterval` | `-1` (disabled) | Seconds to wait before reconnecting after a disconnect. `0` reconnects immediately. Negative values disable auto-reconnection. |
 | `connectingPayload` | `JSONEncodableDictionary?` | `nil` | Payload sent in the `connection_init` message. Commonly used for authentication. |
-| `pingInterval` | `TimeInterval?` | `nil` (disabled) | Interval at which the client sends `ping` keepalive messages to the server. |
+| `pingInterval` | `TimeInterval?` | `nil` (disabled) | Interval at which the client sends `ping` keepalive messages to the server. The transport will always respond to server initiated `ping` messages by sending a `pong` regardless of this setting. |
 | `requestBodyCreator` | `JSONRequestBodyCreator` | `DefaultRequestBodyCreator()` | Builds the JSON payload for `subscribe` messages. |
 | `operationMessageIdCreator` | `OperationMessageIdCreator` | `ApolloSequencedOperationMessageIdCreator()` | Generates unique IDs for each operation message. |
 | `clientAwarenessMetadata` | `ClientAwarenessMetadata` | `ClientAwarenessMetadata()` | Adds Apollo client name/version headers to the WebSocket handshake request. |
@@ -281,7 +282,7 @@ await wsTransport.setDelegate(myDelegate)
 
 ## Eager connection
 
-By default, `WebSocketTransport` opens the WebSocket connection lazily on the first `subscribe` call. To open the connection eagerly before any operations:
+By default, `WebSocketTransport` opens the WebSocket connection lazily on the first `subscribe` call. Use `resume()` to open the connection eagerly before any operations:
 
 ```swift
 let wsTransport = try WebSocketTransport(
@@ -322,28 +323,6 @@ struct UUIDMessageIdCreator: OperationMessageIdCreator {
 
 let config = WebSocketTransport.Configuration(
   operationMessageIdCreator: UUIDMessageIdCreator()
-)
-```
-
-## Testing
-
-`WebSocketTransport` accepts any type conforming to `WebSocketURLSession`, making it easy to inject mock WebSocket tasks in tests:
-
-```swift
-class MockWebSocketURLSession: WebSocketURLSession {
-  func webSocketTask(with request: URLRequest) -> any WebSocketTask {
-    MockWebSocketTask()
-  }
-}
-```
-
-Pass your mock session when creating the transport:
-
-```swift
-let transport = try WebSocketTransport(
-  urlSession: MockWebSocketURLSession(),
-  store: ApolloStore(),
-  endpointURL: URL(string: "wss://example.com/graphql")!
 )
 ```
 
