@@ -119,6 +119,8 @@ items:
     children:
       - label: Creating a Client
         href: ./networking/client-creation
+      - label: WebSocket Transport
+        href: ./networking/websocket-transport
   - label: Pagination
     children:
       - label: Introduction

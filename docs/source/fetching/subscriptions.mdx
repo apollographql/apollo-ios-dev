@@ -4,21 +4,45 @@ title: Subscriptions
 
 Subscriptions are long-lived GraphQL read operations that can update their response over time, enabling clients to receive new data as it becomes available.
 
-Apollo iOS 2.0 supports subscriptions over HTTP, using [chunked multipart responses](https://github.com/graphql/graphql-over-http/blob/main/rfcs/IncrementalDelivery.md)
-
-<Note>
-`ApolloWebSocket` support for 2.0 is coming soon. If you need to use web sockets, please continue using Apollo iOS 1.0 for now.
-</Note>
+Apollo iOS supports subscriptions over:
+- **HTTP** — using [chunked multipart responses](https://github.com/graphql/graphql-over-http/blob/main/rfcs/IncrementalDelivery.md) (no additional setup required)
+- **WebSocket** — using the [`graphql-transport-ws`](https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md) protocol via the `ApolloWebSocket` library
 
 **You must use whichever protocol is supported by your GraphQL endpoint.**
 
-## Enabling support
+## Enabling WebSocket subscription support
 
-To support GraphQL subscriptions, you need to initialize your `ApolloClient` instance with a [`NetworkTransport`](/ios/networking/client-creation#networktransport) that supports subscriptions.
+The default `NetworkTransport` for Apollo iOS is `RequestChainNetworkTransport`, which supports subscriptions over HTTP with no additional configuration.
 
-The default `NetworkTransport` for Apollo iOS is the [`RequestChainNetworkTransport`](/ios/api/Apollo/classes/RequestChainNetworkTransport). This transport supports subscriptions over HTTP, with no additional configuration required.
+To use WebSocket subscriptions, you need to set up a `WebSocketTransport` and configure your `ApolloClient` to use it. The most common pattern routes subscriptions through WebSocket while sending queries and mutations over HTTP, using `SplitNetworkTransport`:
 
-If you are building a custom network transport and want to support subscriptions, you may use the provided `JSONResponseParser` for parsing multi-part response data.
+```swift
+import Apollo
+import ApolloWebSocket
+
+let store = ApolloStore()
+
+let httpTransport = RequestChainNetworkTransport(
+  interceptorProvider: DefaultInterceptorProvider(store: store),
+  endpointURL: URL(string: "https://example.com/graphql")!
+)
+
+let wsTransport = try WebSocketTransport(
+  urlSession: URLSession.shared,
+  store: store,
+  endpointURL: URL(string: "wss://example.com/graphql")!
+)
+
+let splitTransport = SplitNetworkTransport(
+  queryTransport: httpTransport,
+  mutationTransport: httpTransport,
+  subscriptionTransport: wsTransport
+)
+
+let client = ApolloClient(networkTransport: splitTransport, store: store)
+```
+
+> For full WebSocket transport configuration options including authentication, auto-reconnection, pause/resume, and lifecycle events, see [WebSocket Transport](./../networking/websocket-transport).
 
 ## Generating and executing
 
@@ -33,10 +57,10 @@ subscription ReviewAdded {
 }
 ```
 
-After you generate these classes, you can execute subscriptions using `ApolloClient.subscribe(subscription:)` with a [subscription-supporting `NetworkTransport`](#enabling-support). If you do, your client continues to receive updated data until the subscription is [canceled](#canceling-a-subscription) or is terminated by the server.
+After you generate these classes, you can execute subscriptions using `ApolloClient.subscribe(subscription:)`. Your client continues to receive updated data until the subscription is [canceled](#canceling-a-subscription) or is terminated by the server.
 
 ```swift
-let subscription = try await client.subscribe(subscription: ReviewAddedSubscription())
+let subscription = try client.subscribe(subscription: ReviewAddedSubscription())
 
 Task {
   for try await result in subscription {
@@ -47,12 +71,44 @@ Task {
 
 > **Note:** GraphQL subscriptions are distinct from [watching queries](./queries#watching-queries). A query watcher is only updated when new data is written to the local cache (usually by another network operation). A GraphQL subscription is a long-lived request that might receive updated data from the server continually.
 
+## Subscription lifecycle state
+
+The `SubscriptionStream` returned by `subscribe` exposes a `state` property that reflects the subscription's current position in its lifecycle, regardless of which transport is in use:
+
+```swift
+let subscription = try client.subscribe(subscription: ReviewAddedSubscription())
+
+print(subscription.state) // .pending
+
+Task {
+  for try await result in subscription {
+    print(subscription.state) // .active
+    // handle result
+  }
+
+  print(subscription.state) // .finished(.completed)
+}
+```
+
+The possible states are:
+
+| State | Description |
+|-------|-------------|
+| `.pending` | Initiated but not yet active. |
+| `.active` | Active and receiving data. |
+| `.reconnecting` | Connection lost; transport is reconnecting. WebSocket only. |
+| `.paused` | Connection intentionally paused. WebSocket only. |
+| `.finished(.completed)` | Server completed the subscription normally. |
+| `.finished(.cancelled)` | Cancelled by the client. |
+| `.finished(.error(error))` | Terminated due to an error. |
+
+The `.reconnecting` and `.paused` states are specific to `WebSocketTransport`. When using HTTP-based subscriptions via `RequestChainNetworkTransport`, a subscription moves through `.pending` → `.active` → `.finished(…)` only.
+
 ## Canceling a subscription
 
-Apollo iOS 2.0 participates in Swift structured concurrency task cancellation for subscription cancellation.
-To cancel a subscription, you cancel the `Task` that the subscription was initiated in.
+Apollo iOS participates in Swift structured concurrency task cancellation for subscription cancellation. To cancel a subscription, cancel the `Task` that the subscription is being iterated in.
 
-When a task is cancelled, the subscription's `AsyncThrowingStream` will terminate gracefully and the connection to the server will be closed.
+When the task is cancelled, the subscription stream terminates gracefully and the operation is completed on the server.
 
 ```swift
 class ReviewViewController {
@@ -64,7 +120,7 @@ class ReviewViewController {
     // Keep a reference to the subscription task
     self.subscriptionTask = Task {
       do {
-        let subscription = try await client.subscribe(subscription: ReviewAddedSubscription())
+        let subscription = try client.subscribe(subscription: ReviewAddedSubscription())
 
         for try await result in subscription {
           // Handle each update from the subscription
