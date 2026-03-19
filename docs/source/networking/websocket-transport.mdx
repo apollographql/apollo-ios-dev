@@ -8,11 +8,35 @@ Apollo iOS supports executing GraphQL operations over [WebSocket](https://develo
 
 `WebSocketTransport` is included in the `ApolloWebSocket` library, which is part of the Apollo iOS SDK but is not included by default.
 
-Add the `ApolloWebSocket` library to your project via Swift Package Manager:
+### Xcode
 
-1. In Xcode, select **File > Add Package Dependencies…**
-2. Enter the Apollo iOS package URL and select the `ApolloWebSocket` library target.
-3. Import `ApolloWebSocket` where needed:
+1. Select **File > Add Package Dependencies…**
+2. Enter the Apollo iOS package URL (`https://github.com/apollographql/apollo-ios.git`) and click **Add Package**.
+3. Select the `ApolloWebSocket` library target and add it to your app target.
+
+### Package.swift
+
+Add `apollo-ios` to your dependencies and link the `ApolloWebSocket` product to any target that uses it:
+
+```swift title="Package.swift"
+dependencies: [
+    .package(
+        url: "https://github.com/apollographql/apollo-ios.git",
+        .upToNextMajor(from: "2.0.0")
+    ),
+],
+targets: [
+    .target(
+        name: "MyApp",
+        dependencies: [
+            .product(name: "Apollo", package: "apollo-ios"),
+            .product(name: "ApolloWebSocket", package: "apollo-ios"),
+        ]
+    ),
+]
+```
+
+Then import where needed:
 
 ```swift
 import ApolloWebSocket
