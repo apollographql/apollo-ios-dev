@@ -74,6 +74,27 @@ This is the apollo-ios-dev repository, a development environment for the Apollo 
 
 The three library directories are git subtrees. On PR merge to `main`, GitHub Actions (`.github/workflows/pr-subtree-push.yml`) automatically splits and pushes changes to the respective upstream repositories. Context files for subtrees are kept in `claude/` (outside subtree directories) so they are never included in subtree pushes.
 
+**apollo-ios** — `apollo-ios/Sources/`
+- `Apollo` — Core networking, caching, and client
+- `ApolloAPI` — Type definitions for generated code
+- `ApolloSQLite` — SQLite-backed normalized cache
+- `ApolloWebSocket` — WebSocket transport (`graphql-transport-ws` protocol) for queries, mutations, and subscriptions
+- `ApolloTestSupport` — Public test utilities
+
+**apollo-ios-codegen** — `apollo-ios-codegen/Sources/`
+- `ApolloCodegenLib` — Code generation library
+- `CodegenCLI` — CLI command definitions
+- `apollo-ios-cli` — CLI executable
+
+**apollo-ios-pagination** — `apollo-ios-pagination/Sources/`
+- `ApolloPagination` — Cursor/offset pagination helpers
+
+### Key Components
+- **Tuist Project**: Uses `Project.swift` and `Workspace.swift` for workspace generation
+- **Test APIs**: 6 GraphQL API implementations in `Sources/` (AnimalKingdomAPI, StarWarsAPI, GitHubAPI, SubscriptionAPI, UploadAPI, Schema)
+- **Test Plans**: Organized test execution using Xcode test plans (see Testing Strategy)
+- **CLI Integration**: apollo-ios-cli built from codegen package
+
 ### Development Workflow
 1. Make changes in appropriate subtree directory
 2. Test using relevant test plans in ApolloDev.xcworkspace
@@ -83,6 +104,18 @@ The three library directories are git subtrees. On PR merge to `main`, GitHub Ac
 ## CI/CD
 
 Primary CI is **GitHub Actions** (`.github/workflows/ci-tests.yml`). CircleCI (`.circleci/config.yml`) only runs security scans (gitleaks, semgrep).
+
+### GitHub CLI Quirks
+- `gh pr edit` may fail with GraphQL deprecation errors for repos using Projects (classic). Use `gh api repos/{owner}/{repo}/pulls/{number} -X PATCH -f title="..." -f body="..."` as a workaround.
+
+### Git Quirks
+- **`index.lock` race with Xcode**: Xcode runs `git status` in the background, creating transient `index.lock` files that block git operations. Workaround: chain `rm -f .git/index.lock; git <command>` or use a retry loop: `while ! git <command> 2>/dev/null; do rm -f .git/index.lock; done`
+
+## Tool Preferences
+
+- **Use the Xcode MCP tools** (`BuildProject`, `RunSomeTests`, `RunAllTests`, `GetTestList`, etc.) for building and running tests instead of invoking `xcodebuild` directly via Bash.
+- **Running tests**: Always use `RunSomeTests` (or `RunAllTests`) from the Xcode MCP. Do NOT run `xcodebuild test` via Bash. Use `GetTestList` to discover available tests and their identifiers first.
+- **Known issue — `RunSomeTests` schema bug**: `RunSomeTests` currently returns a `-32602` schema validation error after tests complete, even though the tests ran successfully. To verify test results, call `XcodeListNavigatorIssues` with `severity: "error"` — zero errors means all tests passed.
 
 ## Testing Strategy
 

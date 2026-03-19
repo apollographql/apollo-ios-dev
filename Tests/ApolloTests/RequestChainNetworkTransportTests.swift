@@ -35,6 +35,8 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     try await super.tearDown()
   }
 
+  // MARK: - Helpers
+
   struct MockProvider: InterceptorProvider {
     var interceptors: [any GraphQLInterceptor]
 
@@ -79,6 +81,85 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
       return await next(request)
     }
 
+  }
+
+  /// A control object that allows tests to yield multipart subscription events
+  /// to a response stream managed by a `MultiResponseHandler`.
+  ///
+  /// Yields data formatted as multipart chunks with `boundary=graphql` and
+  /// `subscriptionSpec=1.0`. Each `yieldEvent()` delivers one complete multipart
+  /// part that the `AsyncHTTPResponseChunkSequence` will split at the boundary
+  /// and pass to the `MultipartResponseSubscriptionParser`.
+  ///
+  /// Thread-safe: the continuation is set on a background thread (inside `MockURLProtocol`)
+  /// and consumed from the test's main context.
+  fileprivate class MultipartStreamControl: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _continuation: AsyncThrowingStream<Data, any Error>.Continuation?
+
+    /// Whether the response handler has been called and the continuation is available.
+    var isReady: Bool {
+      lock.withLock { _continuation != nil }
+    }
+
+    /// A single multipart subscription event.
+    ///
+    /// Format: `\r\n--graphql\r\n<part>\r\n--graphql`
+    ///
+    /// The `AsyncHTTPResponseChunkSequence` reads bytes and splits at the
+    /// `\r\n--graphql` boundary. The first boundary yields an empty buffer (skipped),
+    /// and the second boundary yields the part content as a chunk.
+    private static let eventData: Data = {
+      let part = "content-type: application/json\r\n\r\n{\"payload\":{\"data\":{}}}"
+      return "\r\n--graphql\r\n\(part)\r\n--graphql".data(using: .utf8)!
+    }()
+
+    /// A multipart chunk containing a transport error.
+    private static let errorEventData: Data = {
+      let part = "content-type: application/json\r\n\r\n{\"errors\":[{\"message\":\"subscription error\"}]}"
+      return "\r\n--graphql\r\n\(part)\r\n--graphql".data(using: .utf8)!
+    }()
+
+    func setContinuation(_ continuation: AsyncThrowingStream<Data, any Error>.Continuation) {
+      lock.withLock { _continuation = continuation }
+    }
+
+    func yieldEvent() {
+      _ = lock.withLock { _continuation?.yield(Self.eventData) }
+    }
+
+    func yieldErrorEvent() {
+      _ = lock.withLock { _continuation?.yield(Self.errorEventData) }
+    }
+
+    func finish() {
+      lock.withLock { _continuation?.finish() }
+    }
+  }
+  
+  /// The multipart Content-Type header for subscription responses.
+  private static let subscriptionContentType = [
+    "Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0"
+  ]
+
+  private func makeSubscriptionTransport(
+    withStreamControl control: MultipartStreamControl
+  ) async -> RequestChainNetworkTransport {
+    await Self.registerRequestHandler(for: serverUrl) { [control] request in
+      let (stream, continuation) = AsyncThrowingStream<Data, any Error>.makeStream()
+      control.setContinuation(continuation)
+      return (
+        .mock(headerFields: RequestChainNetworkTransportTests.subscriptionContentType),
+        stream
+      )
+    }
+
+    return RequestChainNetworkTransport(
+      urlSession: session,
+      interceptorProvider: MockProvider(interceptors: []),
+      store: .mock(),
+      endpointURL: serverUrl
+    )
   }
 
   // MARK: - Tests
@@ -144,6 +225,101 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     task.cancel()
 
     await expect(cancellationInterceptor.hasBeenCancelled).toEventually(beTrue())
+  }
+
+  // MARK: - Subscription State Tests
+
+  func testSubscriptionState__shouldBePending__beforeFirstValue() async throws {
+    let control = MultipartStreamControl()
+    let transport = await makeSubscriptionTransport(withStreamControl: control)
+
+    let subscriptionStream = try transport.send(
+      subscription: MockSubscription.mock(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    expect(subscriptionStream.state).to(equal(.pending))
+
+    control.finish()
+  }
+
+  func testSubscriptionState__shouldBecomeActive__afterFirstValue() async throws {
+    let control = MultipartStreamControl()
+    let transport = await makeSubscriptionTransport(withStreamControl: control)
+
+    let subscriptionStream = try transport.send(
+      subscription: MockSubscription.mock(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    await expect(control.isReady).toEventually(beTrue())
+    control.yieldEvent()
+
+    await expect(subscriptionStream.state).toEventually(equal(.active))
+
+    control.finish()
+  }
+
+  func testSubscriptionState__shouldBeFinishedCompleted__afterNormalCompletion() async throws {
+    let control = MultipartStreamControl()
+    let transport = await makeSubscriptionTransport(withStreamControl: control)
+
+    let subscriptionStream = try transport.send(
+      subscription: MockSubscription.mock(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    await expect(control.isReady).toEventually(beTrue())
+    control.yieldEvent()
+    control.finish()
+
+    await expect(subscriptionStream.state).toEventually(equal(.finished(.completed)))
+  }
+
+  func testSubscriptionState__shouldBeFinishedError__afterError() async throws {
+    let control = MultipartStreamControl()
+    let transport = await makeSubscriptionTransport(withStreamControl: control)
+
+    let subscriptionStream = try transport.send(
+      subscription: MockSubscription.mock(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    await expect(control.isReady).toEventually(beTrue())
+    control.yieldEvent()
+    await expect(subscriptionStream.state).toEventually(equal(.active))
+
+    control.yieldErrorEvent()
+
+    await expect(subscriptionStream.state).toEventually(equal(.finished(.error(URLError(.unknown)))))
+  }
+
+  func testSubscriptionState__shouldBeFinishedCancelled__whenTaskCancelled() async throws {
+    let control = MultipartStreamControl()
+    let transport = await makeSubscriptionTransport(withStreamControl: control)
+
+    let subscriptionStream = try transport.send(
+      subscription: MockSubscription.mock(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    await expect(control.isReady).toEventually(beTrue())
+    control.yieldEvent()
+    await expect(subscriptionStream.state).toEventually(equal(.active))
+
+    // Start consuming the stream, then cancel
+    let task = Task {
+      for try await _ in subscriptionStream {}
+    }
+
+    task.cancel()
+
+    await expect(subscriptionStream.state).toEventually(equal(.finished(.cancelled)))
   }
 
   // MARK: - Retrying tests

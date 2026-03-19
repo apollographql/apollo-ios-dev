@@ -16,6 +16,10 @@ public final class AsyncStreamMocker<T: Sendable>: Sendable {
     NonCopyableAsyncThrowingStream(stream: internalStream)
   }
 
+  public func makeAsyncIterator() -> AsyncThrowingStream<T, any Error>.Iterator {
+    internalStream.makeAsyncIterator()
+  }
+
   public func emit(_ element: T) {
     continuation.yield(element)
   }

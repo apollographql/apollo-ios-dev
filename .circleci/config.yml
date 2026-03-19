@@ -19,3 +19,4 @@ workflows:
             - github-orb
           git-base-revision: <<#pipeline.git.base_revision>><<pipeline.git.base_revision>><</pipeline.git.base_revision >>
           fail-on-findings: true
+          options: "--exclude Tests/"
