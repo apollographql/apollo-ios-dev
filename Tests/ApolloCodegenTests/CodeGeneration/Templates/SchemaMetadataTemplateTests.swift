@@ -273,16 +273,17 @@ class SchemaMetadataTemplateTests: XCTestCase {
     )
 
     let expected = """
+      private static let objectTypeMap: [String: ApolloAPI.Object] = [
+        "objA": ObjectSchema.Objects.ObjA,
+        "objB": ObjectSchema.Objects.ObjB,
+        "objC": ObjectSchema.Objects.ObjC
+      ]
+
       static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
-        switch typename {
-        case "objA": return ObjectSchema.Objects.ObjA
-        case "objB": return ObjectSchema.Objects.ObjB
-        case "objC": return ObjectSchema.Objects.ObjC
-        default: return nil
-        }
+        objectTypeMap[typename]
       }
     }
-    
+
     """
 
     // when
@@ -307,14 +308,15 @@ class SchemaMetadataTemplateTests: XCTestCase {
     )
 
     let expected = """
+      private static let objectTypeMap: [String: ApolloAPI.Object] = [
+        "ObjectA": ObjectSchema.Objects.ObjectA
+      ]
+
       static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
-        switch typename {
-        case "ObjectA": return ObjectSchema.Objects.ObjectA
-        default: return nil
-        }
+        objectTypeMap[typename]
       }
     }
-    
+
     """
 
     // when
@@ -336,16 +338,17 @@ class SchemaMetadataTemplateTests: XCTestCase {
     )
 
     let expected = """
+      private static let objectTypeMap: [String: ApolloAPI.Object] = [
+        "objA": ObjectSchema.Objects.ObjA,
+        "objB": ObjectSchema.Objects.ObjB,
+        "objC": ObjectSchema.Objects.ObjC
+      ]
+
       @_spi(Execution) public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
-        switch typename {
-        case "objA": return ObjectSchema.Objects.ObjA
-        case "objB": return ObjectSchema.Objects.ObjB
-        case "objC": return ObjectSchema.Objects.ObjC
-        default: return nil
-        }
+        objectTypeMap[typename]
       }
     }
-    
+
     """
 
     // when
@@ -383,7 +386,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     let actual = renderTemplate()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 20))
+    expect(actual).to(equalLineByLine(expected, atLine: 21))
   }
 
   func test__render__givenModuleEmbeddedInTarget_withPublicAccessModifier_rendersTypeNamespaceEnums_withPublicAccess() {
@@ -414,7 +417,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     let actual = renderTemplate()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 20))
+    expect(actual).to(equalLineByLine(expected, atLine: 21))
   }
 
   func test__render__givenModuleSwiftPackageManager_rendersTypeNamespaceEnums_withPublicAccess() {
@@ -445,7 +448,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     let actual = renderTemplate()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 24))
+    expect(actual).to(equalLineByLine(expected, atLine: 25))
   }
 
   func test__render__givenModuleOther_rendersTypeNamespaceEnums_withPublicAccess() {
@@ -476,7 +479,7 @@ class SchemaMetadataTemplateTests: XCTestCase {
     let actual = renderTemplate()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 24))
+    expect(actual).to(equalLineByLine(expected, atLine: 25))
   }
 
   // MARK: Documentation Tests
