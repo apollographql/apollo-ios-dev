@@ -45,7 +45,7 @@ extension Scheme {
         [
           ApolloTestPlan.performanceTest.path
         ],
-        configuration: .performanceTesting
+        configuration: .debug
       )
     )
   }

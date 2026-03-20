@@ -18,11 +18,12 @@ where Schema == SubscriptionAPI.SchemaMetadata {}
 public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
   public static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
 
+  private static let objectTypeMap: [String: ApolloAPI.Object] = [
+    "Subscription": SubscriptionAPI.Objects.Subscription
+  ]
+
   @_spi(Execution) public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
-    switch typename {
-    case "Subscription": return SubscriptionAPI.Objects.Subscription
-    default: return nil
-    }
+    objectTypeMap[typename]
   }
 }
 

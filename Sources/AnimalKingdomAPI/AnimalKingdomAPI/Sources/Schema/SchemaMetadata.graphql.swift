@@ -18,21 +18,22 @@ where Schema == AnimalKingdomAPI.SchemaMetadata {}
 public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
   public static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
 
+  private static let objectTypeMap: [String: ApolloAPI.Object] = [
+    "Bird": AnimalKingdomAPI.Objects.Bird,
+    "Cat": AnimalKingdomAPI.Objects.Cat,
+    "Crocodile": AnimalKingdomAPI.Objects.Crocodile,
+    "Dog": AnimalKingdomAPI.Objects.Dog,
+    "Fish": AnimalKingdomAPI.Objects.Fish,
+    "Height": AnimalKingdomAPI.Objects.Height,
+    "Human": AnimalKingdomAPI.Objects.Human,
+    "Mutation": AnimalKingdomAPI.Objects.Mutation,
+    "PetRock": AnimalKingdomAPI.Objects.PetRock,
+    "Query": AnimalKingdomAPI.Objects.Query,
+    "Rat": AnimalKingdomAPI.Objects.Rat
+  ]
+
   @_spi(Execution) public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
-    switch typename {
-    case "Bird": return AnimalKingdomAPI.Objects.Bird
-    case "Cat": return AnimalKingdomAPI.Objects.Cat
-    case "Crocodile": return AnimalKingdomAPI.Objects.Crocodile
-    case "Dog": return AnimalKingdomAPI.Objects.Dog
-    case "Fish": return AnimalKingdomAPI.Objects.Fish
-    case "Height": return AnimalKingdomAPI.Objects.Height
-    case "Human": return AnimalKingdomAPI.Objects.Human
-    case "Mutation": return AnimalKingdomAPI.Objects.Mutation
-    case "PetRock": return AnimalKingdomAPI.Objects.PetRock
-    case "Query": return AnimalKingdomAPI.Objects.Query
-    case "Rat": return AnimalKingdomAPI.Objects.Rat
-    default: return nil
-    }
+    objectTypeMap[typename]
   }
 }
 

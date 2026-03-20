@@ -10,6 +10,7 @@ public final class PetRock: MockObject {
   public typealias MockValueCollectionType = Array<Mock<PetRock>>
 
   public struct MockFields: Sendable {
+    @Field<AnimalKingdomAPI.CustomDate>("adoptionDate") public var adoptionDate
     @Field<String>("favoriteToy") public var favoriteToy
     @Field<String>("humanName") public var humanName
     @Field<AnimalKingdomAPI.ID>("id") public var id
@@ -19,12 +20,14 @@ public final class PetRock: MockObject {
 
 public extension Mock where O == PetRock {
   convenience init(
+    adoptionDate: AnimalKingdomAPI.CustomDate? = nil,
     favoriteToy: String = "",
     humanName: String? = nil,
     id: AnimalKingdomAPI.ID = "",
     owner: Mock<Human>? = nil
   ) {
     self.init()
+    _setScalar(adoptionDate, for: \.adoptionDate)
     _setScalar(favoriteToy, for: \.favoriteToy)
     _setScalar(humanName, for: \.humanName)
     _setScalar(id, for: \.id)

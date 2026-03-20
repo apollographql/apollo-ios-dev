@@ -51,15 +51,18 @@ struct SchemaMetadataTemplate: TemplateRenderer {
   }
 
   var objectTypeFunction: TemplateString {
+    let spiAccessLevel = accessControlRenderer(for: .member).render(withSPIs: [.Execution])
+
     return """
-    \(accessControlRenderer(for: .member).render(withSPIs: [.Execution]))\
-    static func objectType(forTypename typename: String) -> \(TemplateConstants.ApolloAPITargetName).Object? {
-      switch typename {
+    private static let objectTypeMap: [String: \(TemplateConstants.ApolloAPITargetName).Object] = [
       \(schema.referencedTypes.objects.map {
-        "case \"\($0.name.schemaName)\": return \(schemaNamespace).Objects.\($0.render(as: .typename()))"
-      }, separator: "\n")
-      default: return nil
-      }
+        "\"\($0.name.schemaName)\": \(schemaNamespace).Objects.\($0.render(as: .typename()))"
+      }, separator: ",\n")
+    ]
+
+    \(spiAccessLevel)\
+    static func objectType(forTypename typename: String) -> \(TemplateConstants.ApolloAPITargetName).Object? {
+      objectTypeMap[typename]
     }
     """
   }

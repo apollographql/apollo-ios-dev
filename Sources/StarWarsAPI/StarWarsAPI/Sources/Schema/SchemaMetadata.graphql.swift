@@ -18,17 +18,18 @@ where Schema == StarWarsAPI.SchemaMetadata {}
 public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
   public static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
 
+  private static let objectTypeMap: [String: ApolloAPI.Object] = [
+    "Droid": StarWarsAPI.Objects.Droid,
+    "Human": StarWarsAPI.Objects.Human,
+    "Mutation": StarWarsAPI.Objects.Mutation,
+    "Query": StarWarsAPI.Objects.Query,
+    "Review": StarWarsAPI.Objects.Review,
+    "Starship": StarWarsAPI.Objects.Starship,
+    "Subscription": StarWarsAPI.Objects.Subscription
+  ]
+
   @_spi(Execution) public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
-    switch typename {
-    case "Droid": return StarWarsAPI.Objects.Droid
-    case "Human": return StarWarsAPI.Objects.Human
-    case "Mutation": return StarWarsAPI.Objects.Mutation
-    case "Query": return StarWarsAPI.Objects.Query
-    case "Review": return StarWarsAPI.Objects.Review
-    case "Starship": return StarWarsAPI.Objects.Starship
-    case "Subscription": return StarWarsAPI.Objects.Subscription
-    default: return nil
-    }
+    objectTypeMap[typename]
   }
 }
 

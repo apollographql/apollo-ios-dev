@@ -1,107 +1,117 @@
 import XCTest
-import Apollo
+import ApolloAPI
 import ApolloInternalTestHelpers
 import GitHubAPI
 
+@testable @_spi(Execution) import Apollo
+
 class ParsingPerformanceTests: XCTestCase {
 
-  func testParseResult() throws {
-    let query = IssuesAndCommentsForRepositoryQuery()
+  func testParseSingleResponse() throws {
+    let body = try loadResponseBody(
+      for: IssuesAndCommentsForRepositoryQuery.self
+    )
 
-    let response = try loadResponse(for: query)
+    let parser = JSONResponseParser(
+      response: .mock(),
+      operationVariables: nil,
+      includeCacheRecords: false
+    )
 
     measure {
       whileRecordingErrors {
-        let (result, _) = try response.parseResult()
+        let result: ParsedResult<IssuesAndCommentsForRepositoryQuery> =
+          try awaitResult { try await parser.parseSingleResponse(body: body) }
 
-        let data = try XCTUnwrap(result.data)
+        let data = try XCTUnwrap(result.result.data)
         XCTAssertEqual(data.repository?.name, "apollo-ios")
       }
     }
   }
 
-  func testParseResultFast() throws {
-    let query = IssuesAndCommentsForRepositoryQuery()
+  func testParseSingleResponseWithCacheRecords() throws {
+    let body = try loadResponseBody(
+      for: IssuesAndCommentsForRepositoryQuery.self
+    )
 
-    let response = try loadResponse(for: query)
+    let parser = JSONResponseParser(
+      response: .mock(),
+      operationVariables: nil,
+      includeCacheRecords: true
+    )
 
     measure {
       whileRecordingErrors {
-        let result = try response.parseResultFast()
+        let result: ParsedResult<IssuesAndCommentsForRepositoryQuery> =
+          try awaitResult { try await parser.parseSingleResponse(body: body) }
 
-        let data = try XCTUnwrap(result.data)
+        let data = try XCTUnwrap(result.result.data)
         XCTAssertEqual(data.repository?.name, "apollo-ios")
+        XCTAssertNotNil(result.cacheRecords)
       }
     }
   }
 
-  func testMultipartResponseParsingInterceptor() throws {
-    var rawData: String = ""
-    for _ in 0..<1000 {
-      rawData.append("""
-        --graphql
-        content-type: application/json
+  func testMultipartSubscriptionChunkParsing() throws {
+    let chunk = """
+      content-type: application/json
 
-        {
-          "payload": {
-            "data": {
-              "ticker": 1
-            }
-          }
+      {"payload":{"data":{"ticker":1}}}
+      """.crlfFormattedData()
+
+    measure {
+      whileRecordingErrors {
+        for _ in 0..<1000 {
+          let result = try MultipartResponseSubscriptionParser.parse(
+            multipartChunk: chunk
+          )
+          XCTAssertNotNil(result)
         }
-        --graphql
-        """)
-    }
-
-    let request = JSONRequest(
-      operation: MockSubscription.mock(),
-      graphQLEndpoint: TestURL.mockServer.url,
-      clientName: "ApolloPerformanceTest",
-      clientVersion: "0",
-      additionalHeaders: [
-        "Accept" : "multipart/mixed;boundary=\"graphql\";subscriptionSpec=1.0,application/json",
-      ])
-    let response = HTTPResponse<MockSubscription<MockSelectionSet>>(
-      response: HTTPURLResponse(
-        url: TestURL.mockServer.url,
-        statusCode: 200,
-        httpVersion: nil,
-        headerFields: [
-          "Content-Type": "multipart/mixed;boundary=graphql;subscriptionSpec=1.0",
-        ])!,
-      rawData: rawData.crlfFormattedData(),
-      parsedResponse: nil)
-
-    let subject = InterceptorTester(interceptor: MultipartResponseParsingInterceptor())
-
-    let expectedData = "{\"data\":{\"ticker\":1}}".data(using: .utf8)
-
-    measure {
-      subject.intercept(request: request, response: response) { result in
-        XCTAssertSuccessResult(result)
-        XCTAssertEqual(try! result.get()?.rawData, expectedData)
       }
     }
   }
 
-  // MARK - Helpers
+  // MARK: - Helpers
 
-  func loadResponse<Query: GraphQLQuery>(
-    for query: Query,
-    file: StaticString = #file,
+  private func awaitResult<T: Sendable>(
+    _ work: @escaping @Sendable () async throws -> T
+  ) throws -> T {
+    let expectation = expectation(description: "Async work")
+    nonisolated(unsafe) var result: Result<T, any Error>!
+    let fulfill: @Sendable () -> Void = { [expectation] in expectation.fulfill() }
+    Task {
+      do {
+        let value = try await work()
+        result = .success(value)
+      } catch {
+        result = .failure(error)
+      }
+      fulfill()
+    }
+    wait(for: [expectation], timeout: 30.0)
+    return try result.get()
+  }
+
+  private func loadResponseBody<Query: GraphQLQuery>(
+    for queryType: Query.Type,
+    file: StaticString = #filePath,
     line: UInt = #line
-  ) throws -> ParsedResult<Query.Data> {
+  ) throws -> JSONObject {
     let bundle = Bundle(for: type(of: self))
 
-    guard let url = bundle.url(forResource: Query.operationName, withExtension: "json") else {
-      throw XCTFailure("Missing response file for query: \(Query.operationName)",
-                       file: file,
-                       line: line)
+    guard let url = bundle.url(
+      forResource: Query.operationName,
+      withExtension: "json"
+    ) else {
+      throw XCTFailure(
+        "Missing response file for query: \(Query.operationName)",
+        file: file,
+        line: line
+      )
     }
 
     let data = try Data(contentsOf: url)
     let body = try JSONSerialization.jsonObject(with: data, options: []) as! JSONObject
-
-    return ParsedResult(operation: query, body: body)
+    return body
   }
 }
