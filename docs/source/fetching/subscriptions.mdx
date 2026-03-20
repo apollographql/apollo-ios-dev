@@ -10,7 +10,7 @@ Apollo iOS supports subscriptions over:
 
 **You must use whichever protocol is supported by your GraphQL endpoint.**
 
-## Enabling WebSocket subscription support
+## Enable WebSocket subscription support
 
 The default `NetworkTransport` for Apollo iOS is `RequestChainNetworkTransport`, which supports subscriptions over HTTP with no additional configuration.
 
@@ -99,7 +99,7 @@ The possible states are:
 | `.reconnecting` | Connection lost; transport is reconnecting. WebSocket only. |
 | `.paused` | Connection intentionally paused. WebSocket only. |
 | `.finished(.completed)` | Server completed the subscription normally. |
-| `.finished(.cancelled)` | Cancelled by the client. |
+| `.finished(.cancelled)` | Canceled by the client. |
 | `.finished(.error(error))` | Terminated due to an error. |
 
 The `.reconnecting` and `.paused` states are specific to `WebSocketTransport`. When using HTTP-based subscriptions via `RequestChainNetworkTransport`, a subscription moves through `.pending` → `.active` → `.finished(…)` only.
@@ -108,7 +108,7 @@ The `.reconnecting` and `.paused` states are specific to `WebSocketTransport`. W
 
 Apollo iOS participates in Swift structured concurrency task cancellation for subscription cancellation. To cancel a subscription, cancel the `Task` that the subscription is being iterated in.
 
-When the task is cancelled, the subscription stream terminates gracefully and the operation is completed on the server.
+When you cancel the task, the subscription stream terminates gracefully and the operation is completed on the server.
 
 ### In SwiftUI
 
@@ -175,7 +175,7 @@ struct ReviewFeedView: View {
 }
 ```
 
-The `.task {}` modifier cancels its task when the view is removed from the hierarchy. Because the subscription's `for try await` loop is running inside that task, the subscription is automatically cancelled at the same time.
+The `.task {}` modifier cancels its task when the view is removed from the hierarchy. Because the subscription's `for try await` loop is running inside that task, the subscription is automatically canceled at the same time.
 
 ### In UIKit
 

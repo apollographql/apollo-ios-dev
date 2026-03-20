@@ -2,7 +2,7 @@
 title: WebSocket transport
 ---
 
-Apollo iOS supports executing GraphQL operations over [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) using the [`graphql-transport-ws`](https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md) protocol. This is the recommended approach for GraphQL subscriptions and is provided by the `ApolloWebSocket` library.
+Apollo iOS supports executing GraphQL operations over [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) using the [`graphql-transport-ws`](https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md) protocol. This is the recommended approach for GraphQL subscriptions and is provided by `ApolloWebSocket`.
 
 ## Installation
 
@@ -42,7 +42,7 @@ Then import where needed:
 import ApolloWebSocket
 ```
 
-## Creating a WebSocket client
+## Create a WebSocket client
 
 ### Subscriptions over WebSocket, queries and mutations over HTTP
 
@@ -123,7 +123,7 @@ let wsTransport = try WebSocketTransport(
 | `pingInterval` | `TimeInterval?` | `nil` (disabled) | Interval at which the client sends `ping` keepalive messages to the server. The transport will always respond to server initiated `ping` messages by sending a `pong` regardless of this setting. |
 | `requestBodyCreator` | `JSONRequestBodyCreator` | `DefaultRequestBodyCreator()` | Builds the JSON payload for `subscribe` messages. |
 | `operationMessageIdCreator` | `OperationMessageIdCreator` | `ApolloSequencedOperationMessageIdCreator()` | Generates unique IDs for each operation message. |
-| `clientAwarenessMetadata` | `ClientAwarenessMetadata` | `ClientAwarenessMetadata()` | Adds Apollo client name/version headers to the WebSocket handshake request. |
+| `clientAwarenessMetadata` | `ClientAwarenessMetadata` | `ClientAwarenessMetadata()` | Adds Apollo Client name/version headers to the WebSocket handshake request. |
 
 ## Authentication
 
@@ -223,12 +223,12 @@ Task {
 
 | State | Description |
 |-------|-------------|
-| `.pending` | Initiated but not yet active. The transport may be connecting or sending the subscribe message. |
+| `.pending` | Initiated but not yet active. The transport might be connecting or sending the subscribe message. |
 | `.active` | Active. The subscription can receive data from the server. |
 | `.reconnecting` | The connection was lost. The transport is attempting to reconnect. |
 | `.paused` | The connection was intentionally paused via `transport.pause()`. |
 | `.finished(.completed)` | Ended normally (server sent `complete`). |
-| `.finished(.cancelled)` | Cancelled by the client. |
+| `.finished(.cancelled)` | Canceled by the client. |
 | `.finished(.error(error))` | Terminated due to an error. |
 
 The `.reconnecting` and `.paused` states are specific to `WebSocketTransport`. They are never set by other transport implementations.
