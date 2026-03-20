@@ -10,6 +10,7 @@ public final class Dog: MockObject {
   public typealias MockValueCollectionType = Array<Mock<Dog>>
 
   public struct MockFields: Sendable {
+    @Field<AnimalKingdomAPI.CustomDate>("adoptionDate") public var adoptionDate
     @Field<AnimalKingdomAPI.CustomDate>("birthdate") public var birthdate
     @Field<Int>("bodyTemperature") public var bodyTemperature
     @Field<String>("favoriteToy") public var favoriteToy
@@ -27,7 +28,8 @@ public final class Dog: MockObject {
 
 public extension Mock where O == Dog {
   convenience init(
-    birthdate: AnimalKingdomAPI.CustomDate? = nil,
+    adoptionDate: AnimalKingdomAPI.CustomDate? = nil,
+    birthdate: AnimalKingdomAPI.CustomDate = .defaultMockValue,
     bodyTemperature: Int = 0,
     favoriteToy: String = "",
     height: Mock<Height> = Mock<Height>(),
@@ -41,6 +43,7 @@ public extension Mock where O == Dog {
     species: String = ""
   ) {
     self.init()
+    _setScalar(adoptionDate, for: \.adoptionDate)
     _setScalar(birthdate, for: \.birthdate)
     _setScalar(bodyTemperature, for: \.bodyTemperature)
     _setScalar(favoriteToy, for: \.favoriteToy)

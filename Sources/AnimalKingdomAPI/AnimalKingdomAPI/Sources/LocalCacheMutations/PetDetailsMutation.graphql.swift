@@ -6,7 +6,7 @@
 
 public struct PetDetailsMutation: AnimalKingdomAPI.MutableSelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
-    #"fragment PetDetailsMutation on Pet { __typename owner { __typename firstName } }"#
+    #"fragment PetDetailsMutation on Pet { __typename owner { __typename firstName } adoptionDate }"#
   }
 
   @_spi(Unsafe) public var __data: DataDict
@@ -16,6 +16,7 @@ public struct PetDetailsMutation: AnimalKingdomAPI.MutableSelectionSet, Fragment
   @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
     .field("__typename", String.self),
     .field("owner", Owner?.self),
+    .field("adoptionDate", AnimalKingdomAPI.CustomDate?.self),
   ] }
   @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
     PetDetailsMutation.self
@@ -25,14 +26,20 @@ public struct PetDetailsMutation: AnimalKingdomAPI.MutableSelectionSet, Fragment
     get { __data["owner"] }
     set { __data["owner"] = newValue }
   }
+  public var adoptionDate: AnimalKingdomAPI.CustomDate? {
+    get { __data["adoptionDate"] }
+    set { __data["adoptionDate"] = newValue }
+  }
 
   public init(
     __typename: String,
-    owner: Owner? = nil
+    owner: Owner? = nil,
+    adoptionDate: AnimalKingdomAPI.CustomDate? = nil
   ) {
     self.init(unsafelyWithData: [
       "__typename": __typename,
       "owner": owner._fieldData,
+      "adoptionDate": adoptionDate,
     ])
   }
 

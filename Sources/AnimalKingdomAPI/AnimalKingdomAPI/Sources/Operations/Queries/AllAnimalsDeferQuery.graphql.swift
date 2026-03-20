@@ -1178,7 +1178,7 @@ public struct AllAnimalsDeferQuery: GraphQLQuery {
           @_spi(Execution) public static var __parentType: any ApolloAPI.ParentType { AnimalKingdomAPI.Objects.Dog }
           @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
             .field("favoriteToy", String.self),
-            .field("birthdate", AnimalKingdomAPI.CustomDate?.self),
+            .field("birthdate", AnimalKingdomAPI.CustomDate.self),
           ] }
           @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AllAnimalsDeferQuery.Data.AllAnimal.self,
@@ -1193,7 +1193,7 @@ public struct AllAnimalsDeferQuery: GraphQLQuery {
           ] }
 
           public var favoriteToy: String { __data["favoriteToy"] }
-          public var birthdate: AnimalKingdomAPI.CustomDate? { __data["birthdate"] }
+          public var birthdate: AnimalKingdomAPI.CustomDate { __data["birthdate"] }
           public var id: AnimalKingdomAPI.ID { __data["id"] }
           public var height: Height { __data["height"] }
           public var species: String { __data["species"] }
@@ -1214,7 +1214,7 @@ public struct AllAnimalsDeferQuery: GraphQLQuery {
 
           public init(
             favoriteToy: String,
-            birthdate: AnimalKingdomAPI.CustomDate? = nil,
+            birthdate: AnimalKingdomAPI.CustomDate,
             id: AnimalKingdomAPI.ID,
             height: Height,
             species: String,

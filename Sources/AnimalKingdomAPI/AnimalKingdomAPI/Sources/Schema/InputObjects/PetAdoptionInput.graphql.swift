@@ -16,7 +16,8 @@ public struct PetAdoptionInput: InputObject {
     humanName: GraphQLNullable<String> = nil,
     favoriteToy: String,
     isSpayedOrNeutered: Bool? = nil,
-    measurements: GraphQLNullable<MeasurementsInput> = nil
+    measurements: GraphQLNullable<MeasurementsInput> = nil,
+    adoptionDate: GraphQLNullable<CustomDate> = nil
   ) {
     __data = InputDict([
       "ownerID": ownerID,
@@ -24,7 +25,8 @@ public struct PetAdoptionInput: InputObject {
       "humanName": humanName,
       "favoriteToy": favoriteToy,
       "isSpayedOrNeutered": isSpayedOrNeutered ?? GraphQLNullable.none,
-      "measurements": measurements
+      "measurements": measurements,
+      "adoptionDate": adoptionDate
     ])
   }
 
@@ -57,5 +59,10 @@ public struct PetAdoptionInput: InputObject {
   public var measurements: GraphQLNullable<MeasurementsInput> {
     get { __data["measurements"] }
     set { __data["measurements"] = newValue }
+  }
+
+  public var adoptionDate: GraphQLNullable<CustomDate> {
+    get { __data["adoptionDate"] }
+    set { __data["adoptionDate"] = newValue }
   }
 }
