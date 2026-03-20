@@ -108,22 +108,26 @@ export function compileToIR(
     schemaDocumentation: schema.description ?? undefined
   };
 
-  function addReferencedType(type: GraphQLNamedType) {
-    if (referencedTypes.has(type)) { return }
+  function addReferencedType(type: GraphQLNamedType, isTypeCondition: boolean = false) {
+    const alreadyAdded = referencedTypes.has(type);
 
-    referencedTypes.add(type)
-    
-    if (isInterfaceType(type)) {
+    if (!alreadyAdded) {
+      referencedTypes.add(type)
+    }
+
+    if (isInterfaceType(type) && (!alreadyAdded || isTypeCondition)) {
       const possibleTypes = schema.getPossibleTypes(type);
 
       (type as any)._implementingObjects = possibleTypes;
 
       for (const objectType of possibleTypes) {
-        if (!reduceSchemaTypes || hasTypePolicyDirective(objectType)) {
+        if (!reduceSchemaTypes || isTypeCondition || hasTypePolicyDirective(objectType)) {
           addReferencedType(getNamedType(objectType))
         }
       }
     }
+
+    if (alreadyAdded) { return }
 
     if (isUnionType(type)) {
       const unionReferencedTypes = type.getTypes()
@@ -269,7 +273,7 @@ export function compileToIR(
 
     const [directives,] = compileDirectives(fragmentDefinition.directives) ?? [undefined, undefined];
 
-    addReferencedType(getNamedType(typeCondition));
+    addReferencedType(getNamedType(typeCondition), true);
 
     const selectionSet = compileSelectionSet(fragmentDefinition.selectionSet, typeCondition, referencedFragments)
     const referencedFragmentsArray = Array.from(referencedFragments.values())
@@ -402,7 +406,7 @@ export function compileToIR(
           ? (typeFromAST(schema, typeNode) as GraphQLCompositeType)
           : parentType;
 
-        addReferencedType(typeCondition);
+        addReferencedType(typeCondition, true);
 
         return {
           kind: "InlineFragment",

@@ -127,3 +127,103 @@ describe("query with selections", () => {
     });
   });
 });
+
+describe("reduceGeneratedSchemaTypes with interface inline fragment", () => {
+  const schemaSDL: string = `
+    interface Node {
+      id: ID!
+    }
+
+    interface NamedNode implements Node {
+      id: ID!
+      name: String!
+    }
+
+    type ConcreteNamedNode implements Node & NamedNode {
+      id: ID!
+      name: String!
+    }
+
+    type ConcreteNode implements Node {
+      id: ID!
+    }
+
+    type Query {
+      node: Node!
+    }
+  `;
+
+  const schema: GraphQLSchema = loadSchemaFromSources([
+    new Source(schemaSDL, "Test Schema", { line: 1, column: 1 })
+  ]);
+
+  it("includes implementing objects of an interface used as a type condition", () => {
+    const documentString: string = `
+      query GetNode {
+        node {
+          id
+          ... on NamedNode {
+            name
+          }
+        }
+      }
+    `;
+    const document: DocumentNode = parseOperationDocument(
+      new Source(documentString, "Test Query", { line: 1, column: 1 })
+    );
+
+    const result: CompilationResult = compileDocument(
+      schema, document, false, true, emptyValidationOptions
+    );
+
+    const concreteNamedNode = result.referencedTypes.find(t => t.name === "ConcreteNamedNode");
+    expect(concreteNamedNode).not.toBeUndefined();
+  });
+
+  it("excludes implementing objects of an interface used only as a field return type", () => {
+    const documentString: string = `
+      query GetNode {
+        node {
+          id
+        }
+      }
+    `;
+    const document: DocumentNode = parseOperationDocument(
+      new Source(documentString, "Test Query", { line: 1, column: 1 })
+    );
+
+    const result: CompilationResult = compileDocument(
+      schema, document, false, true, emptyValidationOptions
+    );
+
+    const concreteNamedNode = result.referencedTypes.find(t => t.name === "ConcreteNamedNode");
+    const concreteNode = result.referencedTypes.find(t => t.name === "ConcreteNode");
+    expect(concreteNamedNode).toBeUndefined();
+    expect(concreteNode).toBeUndefined();
+  });
+
+  it("includes implementing objects when the same interface appears as both a field type and a type condition", () => {
+    const documentString: string = `
+      query GetNode {
+        node {
+          id
+          ... on Node {
+            id
+          }
+        }
+      }
+    `;
+    const document: DocumentNode = parseOperationDocument(
+      new Source(documentString, "Test Query", { line: 1, column: 1 })
+    );
+
+    const result: CompilationResult = compileDocument(
+      schema, document, false, true, emptyValidationOptions
+    );
+
+    const concreteNamedNode = result.referencedTypes.find(t => t.name === "ConcreteNamedNode");
+    const concreteNode = result.referencedTypes.find(t => t.name === "ConcreteNode");
+    expect(concreteNamedNode).not.toBeUndefined();
+    expect(concreteNode).not.toBeUndefined();
+  });
+});
