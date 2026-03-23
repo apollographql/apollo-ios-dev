@@ -41,6 +41,7 @@ jobs:
         git commit --allow-empty --amend -m "$PR_TITLE (apollographql/apollo-ios-dev#${{ github.event.pull_request.number }})"
         git push --force-with-lease
     - name: Subtree - Apollo iOS
+      id: split-ios
       uses: ./.github/actions/subtree-split-push
       with:
         subtree: apollo-ios
@@ -49,6 +50,7 @@ jobs:
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Subtree - Apollo iOS Codegen
+      id: split-codegen
       if: always()
       uses: ./.github/actions/subtree-split-push
       with:
@@ -58,6 +60,7 @@ jobs:
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Subtree - Apollo iOS Pagination
+      id: split-pagination
       if: always()
       uses: ./.github/actions/subtree-split-push
       with:
@@ -66,8 +69,21 @@ jobs:
         target-branch: ${{ github.event.pull_request.base.ref }}
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
+    - name: Push Subtrees
+      if: success()
+      shell: bash
+      run: |
+        if [ -n "${{ steps.split-ios.outputs.split-sha }}" ]; then
+          git push git@github.com:apollographql/apollo-ios.git ${{ steps.split-ios.outputs.split-sha }}:refs/heads/${{ github.event.pull_request.base.ref }}
+        fi
+        if [ -n "${{ steps.split-codegen.outputs.split-sha }}" ]; then
+          git push git@github.com:apollographql/apollo-ios-codegen.git ${{ steps.split-codegen.outputs.split-sha }}:refs/heads/${{ github.event.pull_request.base.ref }}
+        fi
+        if [ -n "${{ steps.split-pagination.outputs.split-sha }}" ]; then
+          git push git@github.com:apollographql/apollo-ios-pagination.git ${{ steps.split-pagination.outputs.split-sha }}:refs/heads/${{ github.event.pull_request.base.ref }}
+        fi
     - name: Push Updated History
-      if: always()
+      if: success()
       shell: bash
       run: |
         git fetch
