@@ -2,19 +2,21 @@
 
 ## How the subtree push workflow works
 
-On every PR merge, `.github/workflows/pr-subtree-push.yml` runs the `subtree-split-push` action for each of the three subtrees (`apollo-ios`, `apollo-ios-codegen`, `apollo-ios-pagination`). The action does three things in a single step:
+On every PR merge, `.github/workflows/pr-subtree-push.yml` runs the `subtree-split-push` action for each of the three subtrees (`apollo-ios`, `apollo-ios-codegen`, `apollo-ios-pagination`). The action splits each subtree and captures the resulting SHA as a step output. The workflow then has two gated steps:
 
-1. `git subtree pull --squash` — syncs the upstream subtree remote into the local history
-2. `git subtree split --squash --rejoin` — creates a synthetic split commit (containing only the subtree's content) and writes rejoin metadata back into the local history
-3. `git subtree push` — pushes the split commit to the upstream subtree repo
+1. **Split all three subtrees** (`if: always()` — all three are attempted regardless) — each runs `git subtree pull --squash` then `git subtree split --squash --rejoin`, writing rejoin metadata into local history and outputting the split SHA.
+2. **Push Subtrees** (`if: success()`) — only runs if all three splits succeeded. Pushes each split SHA directly to the upstream subtree repo.
+3. **Push Updated History** (`if: success()`) — only runs if all pushes succeeded. Pushes the dev repo history (including rejoin metadata) back to `apollo-ios-dev/main`.
 
-After all three subtrees are processed, the `Push Updated History` step (which has `if: always()`) pushes the updated dev repo history (including any rejoin metadata commits) back to `apollo-ios-dev/main`.
+If any step fails, the runner exits without ever pushing the broken rejoin metadata to `main`.
 
-## The broken metadata bug
+## The broken metadata bug (historical)
 
-**How it happens:** If step 3 (`git subtree push`) times out or fails, the synthetic split commit (e.g., `daa8849dd`) was only ever created on the ephemeral CI runner. It never made it to the upstream subtree remote. However, step 2 already wrote rejoin metadata commits into local history that reference that missing SHA. When `Push Updated History` then succeeds (because it's `if: always()`), those broken metadata commits get pushed to `apollo-ios-dev/main`.
+This was fixed in PR #924, but understanding it helps diagnose any future regressions.
 
-**Why subsequent CI runs fail:** CI uses git 2.53.0, which strictly validates `git-subtree-split:` hashes. When it encounters the broken hash, it tries to fetch it from the upstream remote, the remote returns `not our ref`, and it hard-fails. Every future PR that touches the affected subtree will fail until this is fixed.
+**How it happened:** In the old workflow, split and push were coupled in a single action step. `git subtree split --squash --rejoin` wrote rejoin metadata into local history (referencing the new split SHA) _before_ the push to the upstream subtree remote. If the push then timed out, the split SHA was lost with the ephemeral CI runner. `Push Updated History` (which had `if: always()`) would still commit the broken metadata to `main`.
+
+**Why subsequent CI runs failed:** CI uses git 2.53.0, which strictly validates `git-subtree-split:` hashes. When it encounters the broken hash, it tries to fetch it from the upstream remote, the remote returns `not our ref`, and it hard-fails. Every future PR that touched the affected subtree would fail.
 
 **Symptoms:**
 ```
@@ -22,7 +24,7 @@ fatal: remote error: upload-pack: not our ref <sha>
 fatal: could not rev-parse split hash <sha> from commit <sha>
 ```
 
-## How to fix it
+## How to fix broken metadata (if it ever recurs)
 
 The fix exploits the fact that the local Xcode-bundled git-subtree is more lenient than CI's git 2.53.0 — when it can't resolve a cached split hash, it silently skips it and reconstructs the split from scratch by walking all history. This is slower but succeeds.
 
@@ -30,13 +32,8 @@ The fix exploits the fact that the local Xcode-bundled git-subtree is more lenie
 
 Find the rejoin commit that references the missing split hash:
 ```bash
-git log --oneline --grep="git-subtree-split" --grep="<affected-subtree>" --all-match | head -5
-```
-
-Or search directly:
-```bash
-git log --oneline --all | head -20
-# Look for a "split: <subtree>" commit with no corresponding push on the upstream remote
+git log --oneline --grep="git-subtree-dir: <affected-subtree>" | head -5
+# Look for a "split: <subtree>" commit — check if its git-subtree-split SHA exists on the upstream remote
 ```
 
 **Step 2: Reset HEAD to the broken rejoin commit**
@@ -56,7 +53,7 @@ This is necessary so the local script operates from that point in history and th
 
 This will take significantly longer than normal (several minutes) because git-subtree is reconstructing the split from scratch rather than using a cached starting point. That's expected.
 
-**Step 4: Restore main to remote HEAD and force push**
+**Step 4: Restore main to remote HEAD**
 
 After the script completes, the upstream subtree repo now has the correct commits. Reset main back to match remote:
 ```bash
@@ -70,12 +67,4 @@ Trigger a re-run of the failing `PR Subtree Push` job from the GitHub Actions UI
 
 ## Which subtrees may need fixing
 
-If a CI run failed, check the logs to see which subtrees failed. The `apollo-ios` and `apollo-ios-pagination` steps also use `if: always()` so they run even if a prior step failed. Check each subtree's step in the logs for the same `not our ref` error.
-
-## Root cause and long-term fix
-
-The underlying bug is in `.github/actions/subtree-split-push/action.yml`: `--rejoin` writes metadata to local history before the push is confirmed. If the push fails, `Push Updated History` (which has `if: always()`) still commits the broken metadata to `main`.
-
-A proper fix would either:
-- Change `Push Updated History` to only run if all subtree steps succeeded (remove `if: always()`)
-- Or split the action into two steps: push first, then write rejoin metadata only on success
+Check the CI logs for the failing run. The three split steps use `if: always()` so all three are attempted — look for the `not our ref` error in each subtree's step output to identify which ones are affected.
