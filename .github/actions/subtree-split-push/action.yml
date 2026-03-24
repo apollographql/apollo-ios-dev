@@ -1,5 +1,5 @@
-name: "Subtree Split and Push"
-description: Attempts to split and rejoin the given subtree into the working history, if changes were found also pushes the changes to the subtree repo.
+name: "Subtree Split"
+description: Splits the given subtree into the working history and outputs the split SHA. Push is handled separately after all subtrees have been split successfully.
 inputs:
   subtree:
     description: "The prefix for the subtree being operated on."
@@ -13,13 +13,18 @@ inputs:
   pr-number:
     description: "The number of the PR that triggered this action."
     required: true
-  pr-title: 
+  pr-title:
     description: "The title of the PR that triggered this action."
     required: true
+outputs:
+  split-sha:
+    description: "The SHA of the split commit, empty if no changes were found."
+    value: ${{ steps.split.outputs.split_sha }}
 runs:
   using: "composite"
   steps:
-  - name: Split and Push ${{ inputs.subtree }}
+  - name: Split ${{ inputs.subtree }}
+    id: split
     shell: bash
     env:
       PR_TITLE: ${{ inputs.pr-title }}
@@ -28,7 +33,4 @@ runs:
       git fetch ${{ inputs.remote }} ${{ inputs.target-branch }}
       git subtree pull -P ${{ inputs.subtree }} --squash -m "pull: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - $PR_TITLE" ${{ inputs.remote }} ${{ inputs.target-branch }}
       splitResult=$(git subtree -P ${{ inputs.subtree }} split --squash --rejoin -m "split: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - $PR_TITLE")
-      if [ ! -z "$splitResult" ]
-      then
-        git subtree push -P ${{ inputs.subtree }} ${{ inputs.remote }} ${{ inputs.target-branch }}
-      fi
+      echo "split_sha=$splitResult" >> $GITHUB_OUTPUT
