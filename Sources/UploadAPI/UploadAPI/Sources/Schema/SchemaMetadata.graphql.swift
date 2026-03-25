@@ -18,12 +18,13 @@ where Schema == UploadAPI.SchemaMetadata {}
 public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
   public static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
 
+  private static let objectTypeMap: [String: ApolloAPI.Object] = [
+    "File": UploadAPI.Objects.File,
+    "Mutation": UploadAPI.Objects.Mutation
+  ]
+
   public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
-    switch typename {
-    case "File": return UploadAPI.Objects.File
-    case "Mutation": return UploadAPI.Objects.Mutation
-    default: return nil
-    }
+    objectTypeMap[typename]
   }
 }
 
