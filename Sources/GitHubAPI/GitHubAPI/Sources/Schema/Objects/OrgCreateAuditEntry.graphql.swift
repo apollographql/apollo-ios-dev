@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a org.create event.
-  static let OrgCreateAuditEntry = ApolloAPI.Object(
+  nonisolated static let OrgCreateAuditEntry = ApolloAPI.Object(
     typename: "OrgCreateAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

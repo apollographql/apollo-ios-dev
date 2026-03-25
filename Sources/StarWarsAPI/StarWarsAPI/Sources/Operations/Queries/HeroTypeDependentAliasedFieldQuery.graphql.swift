@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
+nonisolated public struct HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
   public static let operationName: String = "HeroTypeDependentAliasedField"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "5b1ed6a84e96a4e48a3cad675ebb46020bce176f47361d097d8a0a824b7b8452",
@@ -20,7 +20,7 @@ public struct HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
 
   @_spi(Unsafe) public var __variables: Variables? { ["episode": episode] }
 
-  public struct Data: StarWarsAPI.SelectionSet {
+  nonisolated public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -46,7 +46,7 @@ public struct HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
     /// Hero
     ///
     /// Parent Type: `Character`
-    public struct Hero: StarWarsAPI.SelectionSet {
+    nonisolated public struct Hero: StarWarsAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -74,7 +74,7 @@ public struct HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
       /// Hero.AsHuman
       ///
       /// Parent Type: `Human`
-      public struct AsHuman: StarWarsAPI.InlineFragment {
+      nonisolated public struct AsHuman: StarWarsAPI.InlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -104,7 +104,7 @@ public struct HeroTypeDependentAliasedFieldQuery: GraphQLQuery {
       /// Hero.AsDroid
       ///
       /// Parent Type: `Droid`
-      public struct AsDroid: StarWarsAPI.InlineFragment {
+      nonisolated public struct AsDroid: StarWarsAPI.InlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

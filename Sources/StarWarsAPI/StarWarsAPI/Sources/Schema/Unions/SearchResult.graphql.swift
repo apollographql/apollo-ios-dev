@@ -4,7 +4,7 @@
 import ApolloAPI
 
 public extension Unions {
-  static let SearchResult = Union(
+  nonisolated static let SearchResult = Union(
     name: "SearchResult",
     possibleTypes: [
       Objects.Human.self,

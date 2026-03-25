@@ -519,5 +519,43 @@ class EnumTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected))
   }
-  
+
+  // MARK: - Nonisolated Tests
+
+  func test_render_givenMarkTypesNonisolated_generatesNonisolatedEnum() {
+    // given
+    buildSubject(config: .mock(
+      .swiftPackage(),
+      options: .init(markTypesNonisolated: true)
+    ))
+
+    let expected = """
+    nonisolated public enum TestEnum: String, EnumType {
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test_render_givenMarkTypesNonisolatedFalse_generatesEnumWithoutNonisolated() {
+    // given
+    buildSubject(config: .mock(
+      .swiftPackage(),
+      options: .init(markTypesNonisolated: false)
+    ))
+
+    let expected = """
+    public enum TestEnum: String, EnumType {
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
 }

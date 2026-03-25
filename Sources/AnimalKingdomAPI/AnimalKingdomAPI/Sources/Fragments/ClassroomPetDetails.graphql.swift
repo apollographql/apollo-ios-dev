@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
+nonisolated public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment ClassroomPetDetails on ClassroomPet { __typename ... on Animal { species } ... on Pet { humanName } ... on WarmBlooded { laysEggs } ... on Cat { bodyTemperature isJellicle } ... on Bird { wingspan } ... on PetRock { favoriteToy } }"#
   }
@@ -44,7 +44,7 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   /// AsAnimal
   ///
   /// Parent Type: `Animal`
-  public struct AsAnimal: AnimalKingdomAPI.InlineFragment {
+  nonisolated public struct AsAnimal: AnimalKingdomAPI.InlineFragment {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -74,7 +74,7 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   /// AsPet
   ///
   /// Parent Type: `Pet`
-  public struct AsPet: AnimalKingdomAPI.InlineFragment {
+  nonisolated public struct AsPet: AnimalKingdomAPI.InlineFragment {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -104,7 +104,7 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   /// AsWarmBlooded
   ///
   /// Parent Type: `WarmBlooded`
-  public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment {
+  nonisolated public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -138,7 +138,7 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   /// AsCat
   ///
   /// Parent Type: `Cat`
-  public struct AsCat: AnimalKingdomAPI.InlineFragment {
+  nonisolated public struct AsCat: AnimalKingdomAPI.InlineFragment {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -183,7 +183,7 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   /// AsBird
   ///
   /// Parent Type: `Bird`
-  public struct AsBird: AnimalKingdomAPI.InlineFragment {
+  nonisolated public struct AsBird: AnimalKingdomAPI.InlineFragment {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -224,7 +224,7 @@ public struct ClassroomPetDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   /// AsPetRock
   ///
   /// Parent Type: `PetRock`
-  public struct AsPetRock: AnimalKingdomAPI.InlineFragment {
+  nonisolated public struct AsPetRock: AnimalKingdomAPI.InlineFragment {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

@@ -4,7 +4,7 @@
 @_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
 /// The input object sent when someone is creating a new review
-public struct ReviewInput: InputObject {
+nonisolated public struct ReviewInput: InputObject {
   @_spi(Unsafe) public private(set) var __data: InputDict
 
   @_spi(Unsafe) public init(_ data: InputDict) {

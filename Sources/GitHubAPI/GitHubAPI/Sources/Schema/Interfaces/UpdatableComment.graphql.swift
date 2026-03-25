@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Comments that can be updated.
-  static let UpdatableComment = ApolloAPI.Interface(
+  nonisolated static let UpdatableComment = ApolloAPI.Interface(
     name: "UpdatableComment",
     keyFields: nil,
     implementingObjects: [

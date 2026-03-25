@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
+nonisolated public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
   public static let operationName: String = "HeroDetailsWithFragment"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "ffe0a8189e4b2c1fa2c309e2c545cd49b61fd9428b64aa62582513d7413beb11",
@@ -21,7 +21,7 @@ public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
 
   @_spi(Unsafe) public var __variables: Variables? { ["episode": episode] }
 
-  public struct Data: StarWarsAPI.SelectionSet {
+  nonisolated public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -47,7 +47,7 @@ public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
     /// Hero
     ///
     /// Parent Type: `Character`
-    public struct Hero: StarWarsAPI.SelectionSet {
+    nonisolated public struct Hero: StarWarsAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -87,7 +87,7 @@ public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
       /// Hero.AsHuman
       ///
       /// Parent Type: `Human`
-      public struct AsHuman: StarWarsAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
+      nonisolated public struct AsHuman: StarWarsAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -132,7 +132,7 @@ public struct HeroDetailsWithFragmentQuery: GraphQLQuery {
       /// Hero.AsDroid
       ///
       /// Parent Type: `Droid`
-      public struct AsDroid: StarWarsAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
+      nonisolated public struct AsDroid: StarWarsAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

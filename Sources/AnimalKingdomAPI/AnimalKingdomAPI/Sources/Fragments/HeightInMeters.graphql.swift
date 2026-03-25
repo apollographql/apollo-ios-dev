@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct HeightInMeters: AnimalKingdomAPI.SelectionSet, Fragment {
+nonisolated public struct HeightInMeters: AnimalKingdomAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment HeightInMeters on Animal { __typename height { __typename meters } }"#
   }
@@ -36,7 +36,7 @@ public struct HeightInMeters: AnimalKingdomAPI.SelectionSet, Fragment {
   /// Height
   ///
   /// Parent Type: `Height`
-  public struct Height: AnimalKingdomAPI.SelectionSet {
+  nonisolated public struct Height: AnimalKingdomAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

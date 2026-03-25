@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct HeroAndFriendsNamesWithFragmentTwiceQuery: GraphQLQuery {
+nonisolated public struct HeroAndFriendsNamesWithFragmentTwiceQuery: GraphQLQuery {
   public static let operationName: String = "HeroAndFriendsNamesWithFragmentTwice"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "fb791b8d40d4a404b65a51886a29493d8e43053e14552d112f248565a11c893f",
@@ -21,7 +21,7 @@ public struct HeroAndFriendsNamesWithFragmentTwiceQuery: GraphQLQuery {
 
   @_spi(Unsafe) public var __variables: Variables? { ["episode": episode] }
 
-  public struct Data: StarWarsAPI.SelectionSet {
+  nonisolated public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -47,7 +47,7 @@ public struct HeroAndFriendsNamesWithFragmentTwiceQuery: GraphQLQuery {
     /// Hero
     ///
     /// Parent Type: `Character`
-    public struct Hero: StarWarsAPI.SelectionSet {
+    nonisolated public struct Hero: StarWarsAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -79,7 +79,7 @@ public struct HeroAndFriendsNamesWithFragmentTwiceQuery: GraphQLQuery {
       /// Hero.Friend
       ///
       /// Parent Type: `Character`
-      public struct Friend: StarWarsAPI.SelectionSet {
+      nonisolated public struct Friend: StarWarsAPI.SelectionSet {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -117,7 +117,7 @@ public struct HeroAndFriendsNamesWithFragmentTwiceQuery: GraphQLQuery {
       /// Hero.AsDroid
       ///
       /// Parent Type: `Droid`
-      public struct AsDroid: StarWarsAPI.InlineFragment {
+      nonisolated public struct AsDroid: StarWarsAPI.InlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -146,7 +146,7 @@ public struct HeroAndFriendsNamesWithFragmentTwiceQuery: GraphQLQuery {
         /// Hero.AsDroid.Friend
         ///
         /// Parent Type: `Character`
-        public struct Friend: StarWarsAPI.SelectionSet {
+        nonisolated public struct Friend: StarWarsAPI.SelectionSet {
           @_spi(Unsafe) public let __data: DataDict
           @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

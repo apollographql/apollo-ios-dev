@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A file in a package version.
-  static let PackageFile = ApolloAPI.Object(
+  nonisolated static let PackageFile = ApolloAPI.Object(
     typename: "PackageFile",
     implementedInterfaces: [Interfaces.Node.self],
     keyFields: nil

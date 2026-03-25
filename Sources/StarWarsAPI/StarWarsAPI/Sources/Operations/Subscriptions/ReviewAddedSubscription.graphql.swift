@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct ReviewAddedSubscription: GraphQLSubscription {
+nonisolated public struct ReviewAddedSubscription: GraphQLSubscription {
   public static let operationName: String = "ReviewAdded"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "2a05903b49a3b665eeb8f7a24240623aff77f1555e006f11bca604540c7cdba8",
@@ -20,7 +20,7 @@ public struct ReviewAddedSubscription: GraphQLSubscription {
 
   @_spi(Unsafe) public var __variables: Variables? { ["episode": episode] }
 
-  public struct Data: StarWarsAPI.SelectionSet {
+  nonisolated public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -46,7 +46,7 @@ public struct ReviewAddedSubscription: GraphQLSubscription {
     /// ReviewAdded
     ///
     /// Parent Type: `Review`
-    public struct ReviewAdded: StarWarsAPI.SelectionSet {
+    nonisolated public struct ReviewAdded: StarWarsAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

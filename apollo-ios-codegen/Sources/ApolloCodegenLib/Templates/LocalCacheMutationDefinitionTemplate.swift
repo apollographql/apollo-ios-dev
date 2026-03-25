@@ -20,7 +20,7 @@ struct LocalCacheMutationDefinitionTemplate: OperationTemplateRenderer {
 
     return TemplateString(
     """
-    \(accessControlRenderer(for: .parent).render())\
+    \(config.nonisolatedModifier)\(accessControlRenderer(for: .parent).render())\
     struct \(operation.generatedDefinitionName): LocalCacheMutation {
       \(memberAccessControl)static let operationType: GraphQLOperationType = .\(operation.definition.operationType.rawValue)
 
@@ -30,7 +30,7 @@ struct LocalCacheMutationDefinitionTemplate: OperationTemplateRenderer {
 
       \(section: VariableAccessors(operation.definition.variables, graphQLOperation: false))
 
-      \(memberAccessControl)struct Data: \(operation.renderedSelectionSetType(config)) {
+      \(config.nonisolatedModifier)\(memberAccessControl)struct Data: \(operation.renderedSelectionSetType(config)) {
         \(SelectionSetTemplate(
             definition: operation,
             generateInitializers: config.config.shouldGenerateSelectionSetInitializers(for: operation),

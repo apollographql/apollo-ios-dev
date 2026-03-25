@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct PetSearchLocalCacheMutation: LocalCacheMutation {
+nonisolated public struct PetSearchLocalCacheMutation: LocalCacheMutation {
   public static let operationType: GraphQLOperationType = .query
 
   public var filters: GraphQLNullable<PetSearchFilters>
@@ -27,7 +27,7 @@ public struct PetSearchLocalCacheMutation: LocalCacheMutation {
 
   @_spi(Unsafe) public var __variables: GraphQLOperation.Variables? { ["filters": filters] }
 
-  public struct Data: AnimalKingdomAPI.MutableSelectionSet {
+  nonisolated public struct Data: AnimalKingdomAPI.MutableSelectionSet {
     @_spi(Unsafe) public var __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -56,7 +56,7 @@ public struct PetSearchLocalCacheMutation: LocalCacheMutation {
     /// Pet
     ///
     /// Parent Type: `Pet`
-    public struct Pet: AnimalKingdomAPI.MutableSelectionSet, Identifiable {
+    nonisolated public struct Pet: AnimalKingdomAPI.MutableSelectionSet, Identifiable {
       @_spi(Unsafe) public var __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

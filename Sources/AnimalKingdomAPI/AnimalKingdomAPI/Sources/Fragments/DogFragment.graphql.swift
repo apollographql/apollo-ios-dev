@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct DogFragment: AnimalKingdomAPI.SelectionSet, Fragment {
+nonisolated public struct DogFragment: AnimalKingdomAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment DogFragment on Dog { __typename species }"#
   }

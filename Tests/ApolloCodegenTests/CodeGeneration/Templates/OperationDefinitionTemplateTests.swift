@@ -108,6 +108,43 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
+  func test__generate__givenQuery_whenMarkTypesNonisolated_generatesNonisolatedQueryOperation() async throws {
+    // given
+    config = .mock(options: .init(markTypesNonisolated: true))
+
+    let expected =
+      """
+      nonisolated struct TestOperationQuery: GraphQLQuery {
+        static let operationName: String = "TestOperation"
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test__generate__givenQuery_whenMarkTypesNonisolated_generatesNonisolatedDataStruct() async throws {
+    // given
+    config = .mock(options: .init(markTypesNonisolated: true))
+
+    let expected =
+      """
+        nonisolated struct Data: TestSchema.SelectionSet {
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
   func test__generate__givenQueryWithNameEndingInQuery_generatesQueryOperationWithoutDoubledTypeSuffix() async throws {
     // given
     document = """

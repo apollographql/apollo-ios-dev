@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct DroidDetails: StarWarsAPI.SelectionSet, Fragment {
+nonisolated public struct DroidDetails: StarWarsAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment DroidDetails on Droid { __typename name primaryFunction }"#
   }

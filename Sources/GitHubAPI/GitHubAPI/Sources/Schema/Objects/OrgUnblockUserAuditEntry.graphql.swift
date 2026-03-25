@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Audit log entry for a org.unblock_user
-  static let OrgUnblockUserAuditEntry = ApolloAPI.Object(
+  nonisolated static let OrgUnblockUserAuditEntry = ApolloAPI.Object(
     typename: "OrgUnblockUserAuditEntry",
     implementedInterfaces: [
       Interfaces.AuditEntry.self,

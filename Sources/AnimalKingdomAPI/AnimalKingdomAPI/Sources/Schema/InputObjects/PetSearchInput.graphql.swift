@@ -3,7 +3,7 @@
 
 @_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
-public enum PetSearchInput: OneOfInputObject {
+nonisolated public enum PetSearchInput: OneOfInputObject {
   case ownerID(ID)
   case petID(ID)
   case searchFilters(PetSearchFilters)

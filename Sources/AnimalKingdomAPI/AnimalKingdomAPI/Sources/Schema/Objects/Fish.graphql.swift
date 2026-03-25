@@ -4,7 +4,7 @@
 import ApolloAPI
 
 public extension Objects {
-  static let Fish = ApolloAPI.Object(
+  nonisolated static let Fish = ApolloAPI.Object(
     typename: "Fish",
     implementedInterfaces: [
       Interfaces.Animal.self,

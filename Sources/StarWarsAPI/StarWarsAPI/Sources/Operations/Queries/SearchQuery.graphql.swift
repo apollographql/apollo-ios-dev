@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct SearchQuery: GraphQLQuery {
+nonisolated public struct SearchQuery: GraphQLQuery {
   public static let operationName: String = "Search"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "29ecc9c7acac3eab2585d305aed9f8257b448bc7ea57341a135d1fa476973ecb",
@@ -20,7 +20,7 @@ public struct SearchQuery: GraphQLQuery {
 
   @_spi(Unsafe) public var __variables: Variables? { ["term": term] }
 
-  public struct Data: StarWarsAPI.SelectionSet {
+  nonisolated public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -46,7 +46,7 @@ public struct SearchQuery: GraphQLQuery {
     /// Search
     ///
     /// Parent Type: `SearchResult`
-    public struct Search: StarWarsAPI.SelectionSet {
+    nonisolated public struct Search: StarWarsAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -76,7 +76,7 @@ public struct SearchQuery: GraphQLQuery {
       /// Search.AsHuman
       ///
       /// Parent Type: `Human`
-      public struct AsHuman: StarWarsAPI.InlineFragment {
+      nonisolated public struct AsHuman: StarWarsAPI.InlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -111,7 +111,7 @@ public struct SearchQuery: GraphQLQuery {
       /// Search.AsDroid
       ///
       /// Parent Type: `Droid`
-      public struct AsDroid: StarWarsAPI.InlineFragment {
+      nonisolated public struct AsDroid: StarWarsAPI.InlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -146,7 +146,7 @@ public struct SearchQuery: GraphQLQuery {
       /// Search.AsStarship
       ///
       /// Parent Type: `Starship`
-      public struct AsStarship: StarWarsAPI.InlineFragment {
+      nonisolated public struct AsStarship: StarWarsAPI.InlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct RepoURLQuery: GraphQLQuery {
+nonisolated public struct RepoURLQuery: GraphQLQuery {
   public static let operationName: String = "RepoURL"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
@@ -13,7 +13,7 @@ public struct RepoURLQuery: GraphQLQuery {
 
   public init() {}
 
-  public struct Data: GitHubAPI.SelectionSet {
+  nonisolated public struct Data: GitHubAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -34,7 +34,7 @@ public struct RepoURLQuery: GraphQLQuery {
     /// Repository
     ///
     /// Parent Type: `Repository`
-    public struct Repository: GitHubAPI.SelectionSet {
+    nonisolated public struct Repository: GitHubAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

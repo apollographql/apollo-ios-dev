@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'comment_deleted' event on a given issue or pull request.
-  static let CommentDeletedEvent = ApolloAPI.Object(
+  nonisolated static let CommentDeletedEvent = ApolloAPI.Object(
     typename: "CommentDeletedEvent",
     implementedInterfaces: [Interfaces.Node.self],
     keyFields: nil

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Unions {
   /// Used for return value of Repository.issueOrPullRequest.
-  static let IssueOrPullRequest = Union(
+  nonisolated static let IssueOrPullRequest = Union(
     name: "IssueOrPullRequest",
     possibleTypes: [
       Objects.Issue.self,

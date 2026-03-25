@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Entities that have members who can set status messages.
-  static let MemberStatusable = ApolloAPI.Interface(
+  nonisolated static let MemberStatusable = ApolloAPI.Interface(
     name: "MemberStatusable",
     keyFields: nil,
     implementingObjects: [

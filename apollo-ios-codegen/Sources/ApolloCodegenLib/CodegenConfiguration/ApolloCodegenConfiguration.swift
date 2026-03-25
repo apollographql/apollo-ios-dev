@@ -690,6 +690,14 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     /// `true` will add a filename suffix matching the schema type, the default is `false`. This can be used to
     /// avoid filename conflicts when operation type names match schema type names.
     public let appendSchemaTypeFilenameSuffix: Bool
+    /// When `true`, generated types are marked `nonisolated` for compatibility with modules
+    /// that use Swift 6.2's default actor isolation (`@MainActor`).
+    ///
+    /// This option ensures that generated GraphQL models remain `Sendable`-compatible
+    /// regardless of the consuming module's default actor isolation setting.
+    ///
+    /// Defaults to `true` when compiled with Swift 6.2+, `false` otherwise.
+    public let markTypesNonisolated: Bool
 
     /// Default property values
     public struct Default {
@@ -705,6 +713,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       public static let conversionStrategies: ConversionStrategies = .init()
       public static let pruneGeneratedFiles: Bool = true
       public static let appendSchemaTypeFilenameSuffix: Bool = false
+      #if compiler(>=6.2)
+      public static let markTypesNonisolated: Bool = true
+      #else
+      public static let markTypesNonisolated: Bool = false
+      #endif
     }
 
     /// Designated initializer.
@@ -728,6 +741,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     ///   - appendSchemaTypeFilenameSuffix: `true` will add a filename suffix matching the schema type, the
     ///     default is `false`. This can be used to avoid filename conflicts when operation type names match
     ///     schema type names.
+    ///   - markTypesNonisolated: When `true`, generated types are marked `nonisolated` for
+    ///     compatibility with Swift 6.2's default actor isolation (`@MainActor`).
     public init(
       additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
       deprecatedEnumCases: Composition = Default.deprecatedEnumCases,
@@ -739,7 +754,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       warningsOnDeprecatedUsage: Composition = Default.warningsOnDeprecatedUsage,
       conversionStrategies: ConversionStrategies = Default.conversionStrategies,
       pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
-      appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix
+      appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix,
+      markTypesNonisolated: Bool = Default.markTypesNonisolated
     ) {
       self.additionalInflectionRules = additionalInflectionRules
       self.deprecatedEnumCases = deprecatedEnumCases
@@ -752,6 +768,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       self.conversionStrategies = conversionStrategies
       self.pruneGeneratedFiles = pruneGeneratedFiles
       self.appendSchemaTypeFilenameSuffix = appendSchemaTypeFilenameSuffix
+      self.markTypesNonisolated = markTypesNonisolated
     }
 
     // MARK: Codable
@@ -769,6 +786,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       case conversionStrategies
       case pruneGeneratedFiles
       case appendSchemaTypeFilenameSuffix
+      case markTypesNonisolated
     }
 
     public init(from decoder: any Decoder) throws {
@@ -840,6 +858,12 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
           Bool.self,
           forKey: .appendSchemaTypeFilenameSuffix
         ) ?? Default.appendSchemaTypeFilenameSuffix
+
+      markTypesNonisolated =
+        try values.decodeIfPresent(
+          Bool.self,
+          forKey: .markTypesNonisolated
+        ) ?? Default.markTypesNonisolated
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -856,6 +880,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       try container.encode(self.conversionStrategies, forKey: .conversionStrategies)
       try container.encode(self.pruneGeneratedFiles, forKey: .pruneGeneratedFiles)
       try container.encode(self.appendSchemaTypeFilenameSuffix, forKey: .appendSchemaTypeFilenameSuffix)
+      try container.encode(self.markTypesNonisolated, forKey: .markTypesNonisolated)
     }
   }
 

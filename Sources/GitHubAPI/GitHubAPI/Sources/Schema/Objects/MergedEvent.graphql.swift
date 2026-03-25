@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'merged' event on a given pull request.
-  static let MergedEvent = ApolloAPI.Object(
+  nonisolated static let MergedEvent = ApolloAPI.Object(
     typename: "MergedEvent",
     implementedInterfaces: [
       Interfaces.Node.self,

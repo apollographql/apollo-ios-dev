@@ -4,7 +4,7 @@
 import ApolloAPI
 
 public extension Objects {
-  static let File = ApolloAPI.Object(
+  nonisolated static let File = ApolloAPI.Object(
     typename: "File",
     implementedInterfaces: [],
     keyFields: nil

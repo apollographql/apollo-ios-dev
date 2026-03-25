@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A GitHub App.
-  static let App = ApolloAPI.Object(
+  nonisolated static let App = ApolloAPI.Object(
     typename: "App",
     implementedInterfaces: [Interfaces.Node.self],
     keyFields: nil

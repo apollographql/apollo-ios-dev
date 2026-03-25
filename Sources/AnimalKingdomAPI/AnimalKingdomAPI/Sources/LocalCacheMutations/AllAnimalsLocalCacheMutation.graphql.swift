@@ -4,12 +4,12 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
+nonisolated public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
   public static let operationType: GraphQLOperationType = .query
 
   public init() {}
 
-  public struct Data: AnimalKingdomAPI.MutableSelectionSet {
+  nonisolated public struct Data: AnimalKingdomAPI.MutableSelectionSet {
     @_spi(Unsafe) public var __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -38,7 +38,7 @@ public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
     /// AllAnimal
     ///
     /// Parent Type: `Animal`
-    public struct AllAnimal: AnimalKingdomAPI.MutableSelectionSet {
+    nonisolated public struct AllAnimal: AnimalKingdomAPI.MutableSelectionSet {
       @_spi(Unsafe) public var __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -79,7 +79,7 @@ public struct AllAnimalsLocalCacheMutation: LocalCacheMutation {
       /// AllAnimal.AsBird
       ///
       /// Parent Type: `Bird`
-      public struct AsBird: AnimalKingdomAPI.MutableInlineFragment {
+      nonisolated public struct AsBird: AnimalKingdomAPI.MutableInlineFragment {
         @_spi(Unsafe) public var __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

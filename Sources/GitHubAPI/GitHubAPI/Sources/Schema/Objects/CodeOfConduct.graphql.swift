@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// The Code of Conduct for a repository
-  static let CodeOfConduct = ApolloAPI.Object(
+  nonisolated static let CodeOfConduct = ApolloAPI.Object(
     typename: "CodeOfConduct",
     implementedInterfaces: [Interfaces.Node.self],
     keyFields: nil

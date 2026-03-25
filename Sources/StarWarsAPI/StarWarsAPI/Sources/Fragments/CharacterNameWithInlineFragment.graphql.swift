@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragment {
+nonisolated public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment CharacterNameWithInlineFragment on Character { __typename ... on Human { __typename friends { __typename appearsIn } } ... on Droid { __typename ...CharacterName ...FriendsNames } }"#
   }
@@ -36,7 +36,7 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
   /// AsHuman
   ///
   /// Parent Type: `Human`
-  public struct AsHuman: StarWarsAPI.InlineFragment {
+  nonisolated public struct AsHuman: StarWarsAPI.InlineFragment {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -65,7 +65,7 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
     /// AsHuman.Friend
     ///
     /// Parent Type: `Character`
-    public struct Friend: StarWarsAPI.SelectionSet {
+    nonisolated public struct Friend: StarWarsAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -96,7 +96,7 @@ public struct CharacterNameWithInlineFragment: StarWarsAPI.SelectionSet, Fragmen
   /// AsDroid
   ///
   /// Parent Type: `Droid`
-  public struct AsDroid: StarWarsAPI.InlineFragment {
+  nonisolated public struct AsDroid: StarWarsAPI.InlineFragment {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

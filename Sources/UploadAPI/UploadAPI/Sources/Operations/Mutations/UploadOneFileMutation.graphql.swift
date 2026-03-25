@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct UploadOneFileMutation: GraphQLMutation {
+nonisolated public struct UploadOneFileMutation: GraphQLMutation {
   public static let operationName: String = "UploadOneFile"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
@@ -19,7 +19,7 @@ public struct UploadOneFileMutation: GraphQLMutation {
 
   @_spi(Unsafe) public var __variables: Variables? { ["file": file] }
 
-  public struct Data: UploadAPI.SelectionSet {
+  nonisolated public struct Data: UploadAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -36,7 +36,7 @@ public struct UploadOneFileMutation: GraphQLMutation {
     /// SingleUpload
     ///
     /// Parent Type: `File`
-    public struct SingleUpload: UploadAPI.SelectionSet {
+    nonisolated public struct SingleUpload: UploadAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

@@ -4,7 +4,7 @@
 import ApolloAPI
 
 public extension Objects {
-  static let PetRock = ApolloAPI.Object(
+  nonisolated static let PetRock = ApolloAPI.Object(
     typename: "PetRock",
     implementedInterfaces: [Interfaces.Pet.self],
     keyFields: ["id"]

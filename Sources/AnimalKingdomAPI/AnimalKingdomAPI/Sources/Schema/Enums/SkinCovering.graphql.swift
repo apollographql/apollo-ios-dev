@@ -3,7 +3,7 @@
 
 @_spi(Internal) import ApolloAPI
 
-public enum SkinCovering: String, EnumType {
+nonisolated public enum SkinCovering: String, EnumType {
   case fur = "FUR"
   case hair = "HAIR"
   case feathers = "FEATHERS"

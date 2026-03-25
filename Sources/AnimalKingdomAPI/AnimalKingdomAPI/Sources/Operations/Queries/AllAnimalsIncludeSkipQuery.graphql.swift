@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
+nonisolated public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
   public static let operationName: String = "AllAnimalsIncludeSkipQuery"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
@@ -40,7 +40,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
     "varA": varA
   ] }
 
-  public struct Data: AnimalKingdomAPI.SelectionSet {
+  nonisolated public struct Data: AnimalKingdomAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -66,7 +66,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
     /// AllAnimal
     ///
     /// Parent Type: `Animal`
-    public struct AllAnimal: AnimalKingdomAPI.SelectionSet {
+    nonisolated public struct AllAnimal: AnimalKingdomAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -124,7 +124,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
       /// AllAnimal.Height
       ///
       /// Parent Type: `Height`
-      public struct Height: AnimalKingdomAPI.SelectionSet {
+      nonisolated public struct Height: AnimalKingdomAPI.SelectionSet {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -156,7 +156,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
       /// AllAnimal.Predator
       ///
       /// Parent Type: `Animal`
-      public struct Predator: AnimalKingdomAPI.SelectionSet {
+      nonisolated public struct Predator: AnimalKingdomAPI.SelectionSet {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -187,7 +187,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
         /// AllAnimal.Predator.AsWarmBloodedIfGetWarmBlooded
         ///
         /// Parent Type: `WarmBlooded`
-        public struct AsWarmBloodedIfGetWarmBlooded: AnimalKingdomAPI.InlineFragment {
+        nonisolated public struct AsWarmBloodedIfGetWarmBlooded: AnimalKingdomAPI.InlineFragment {
           @_spi(Unsafe) public let __data: DataDict
           @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -241,7 +241,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
       /// AllAnimal.IfNotSkipHeightInMeters
       ///
       /// Parent Type: `Animal`
-      public struct IfNotSkipHeightInMeters: AnimalKingdomAPI.InlineFragment {
+      nonisolated public struct IfNotSkipHeightInMeters: AnimalKingdomAPI.InlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -287,7 +287,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
         /// AllAnimal.IfNotSkipHeightInMeters.Height
         ///
         /// Parent Type: `Height`
-        public struct Height: AnimalKingdomAPI.SelectionSet {
+        nonisolated public struct Height: AnimalKingdomAPI.SelectionSet {
           @_spi(Unsafe) public let __data: DataDict
           @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -320,7 +320,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
       /// AllAnimal.AsWarmBloodedIfGetWarmBlooded
       ///
       /// Parent Type: `WarmBlooded`
-      public struct AsWarmBloodedIfGetWarmBlooded: AnimalKingdomAPI.InlineFragment {
+      nonisolated public struct AsWarmBloodedIfGetWarmBlooded: AnimalKingdomAPI.InlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -371,7 +371,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
         /// AllAnimal.AsWarmBloodedIfGetWarmBlooded.Height
         ///
         /// Parent Type: `Height`
-        public struct Height: AnimalKingdomAPI.SelectionSet {
+        nonisolated public struct Height: AnimalKingdomAPI.SelectionSet {
           @_spi(Unsafe) public let __data: DataDict
           @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -404,7 +404,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
       /// AllAnimal.AsPet
       ///
       /// Parent Type: `Pet`
-      public struct AsPet: AnimalKingdomAPI.InlineFragment, Identifiable {
+      nonisolated public struct AsPet: AnimalKingdomAPI.InlineFragment, Identifiable {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -467,7 +467,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
         /// AllAnimal.AsPet.Height
         ///
         /// Parent Type: `Height`
-        public struct Height: AnimalKingdomAPI.SelectionSet {
+        nonisolated public struct Height: AnimalKingdomAPI.SelectionSet {
           @_spi(Unsafe) public let __data: DataDict
           @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -510,7 +510,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
         /// AllAnimal.AsPet.AsWarmBlooded
         ///
         /// Parent Type: `WarmBlooded`
-        public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment, Identifiable {
+        nonisolated public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment, Identifiable {
           @_spi(Unsafe) public let __data: DataDict
           @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -576,7 +576,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
           /// AllAnimal.AsPet.AsWarmBlooded.Height
           ///
           /// Parent Type: `Height`
-          public struct Height: AnimalKingdomAPI.SelectionSet {
+          nonisolated public struct Height: AnimalKingdomAPI.SelectionSet {
             @_spi(Unsafe) public let __data: DataDict
             @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -619,7 +619,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
       /// AllAnimal.AsCatIfGetCat
       ///
       /// Parent Type: `Cat`
-      public struct AsCatIfGetCat: AnimalKingdomAPI.InlineFragment, Identifiable {
+      nonisolated public struct AsCatIfGetCat: AnimalKingdomAPI.InlineFragment, Identifiable {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -688,7 +688,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
         /// AllAnimal.AsCatIfGetCat.Height
         ///
         /// Parent Type: `Height`
-        public struct Height: AnimalKingdomAPI.SelectionSet {
+        nonisolated public struct Height: AnimalKingdomAPI.SelectionSet {
           @_spi(Unsafe) public let __data: DataDict
           @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -730,7 +730,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
       /// AllAnimal.AsClassroomPet
       ///
       /// Parent Type: `ClassroomPet`
-      public struct AsClassroomPet: AnimalKingdomAPI.InlineFragment {
+      nonisolated public struct AsClassroomPet: AnimalKingdomAPI.InlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -777,7 +777,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
         /// AllAnimal.AsClassroomPet.AsBird
         ///
         /// Parent Type: `Bird`
-        public struct AsBird: AnimalKingdomAPI.InlineFragment, Identifiable {
+        nonisolated public struct AsBird: AnimalKingdomAPI.InlineFragment, Identifiable {
           @_spi(Unsafe) public let __data: DataDict
           @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -847,7 +847,7 @@ public struct AllAnimalsIncludeSkipQuery: GraphQLQuery {
           /// AllAnimal.AsClassroomPet.AsBird.Height
           ///
           /// Parent Type: `Height`
-          public struct Height: AnimalKingdomAPI.SelectionSet {
+          nonisolated public struct Height: AnimalKingdomAPI.SelectionSet {
             @_spi(Unsafe) public let __data: DataDict
             @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

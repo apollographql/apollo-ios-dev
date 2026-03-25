@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct UploadMultipleFilesToTheSameParameterMutation: GraphQLMutation {
+nonisolated public struct UploadMultipleFilesToTheSameParameterMutation: GraphQLMutation {
   public static let operationName: String = "UploadMultipleFilesToTheSameParameter"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
@@ -19,7 +19,7 @@ public struct UploadMultipleFilesToTheSameParameterMutation: GraphQLMutation {
 
   @_spi(Unsafe) public var __variables: Variables? { ["files": files] }
 
-  public struct Data: UploadAPI.SelectionSet {
+  nonisolated public struct Data: UploadAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -36,7 +36,7 @@ public struct UploadMultipleFilesToTheSameParameterMutation: GraphQLMutation {
     /// MultipleUpload
     ///
     /// Parent Type: `File`
-    public struct MultipleUpload: UploadAPI.SelectionSet {
+    nonisolated public struct MultipleUpload: UploadAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

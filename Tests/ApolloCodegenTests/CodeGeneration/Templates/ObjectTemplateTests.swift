@@ -259,5 +259,43 @@ class ObjectTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
-  
+
+  // MARK: - Nonisolated Tests
+
+  func test_render_givenMarkTypesNonisolated_generatesNonisolatedStaticLet() {
+    // given
+    buildSubject(config: .mock(
+      .swiftPackage(),
+      options: .init(markTypesNonisolated: true)
+    ))
+
+    let expected = """
+    nonisolated static let Dog = ApolloAPI.Object(
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test_render_givenMarkTypesNonisolatedFalse_generatesStaticLetWithoutNonisolated() {
+    // given
+    buildSubject(config: .mock(
+      .swiftPackage(),
+      options: .init(markTypesNonisolated: false)
+    ))
+
+    let expected = """
+    static let Dog = ApolloAPI.Object(
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
 }

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a Milestone object on a given repository.
-  static let Milestone = ApolloAPI.Object(
+  nonisolated static let Milestone = ApolloAPI.Object(
     typename: "Milestone",
     implementedInterfaces: [
       Interfaces.Closable.self,

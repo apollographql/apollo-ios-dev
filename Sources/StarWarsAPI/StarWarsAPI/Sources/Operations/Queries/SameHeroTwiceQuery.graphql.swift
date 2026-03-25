@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct SameHeroTwiceQuery: GraphQLQuery {
+nonisolated public struct SameHeroTwiceQuery: GraphQLQuery {
   public static let operationName: String = "SameHeroTwice"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "3d960acb3caffc4e42701ccada8535b1a5640f0cc46966b6a12830c755ff46d8",
@@ -14,7 +14,7 @@ public struct SameHeroTwiceQuery: GraphQLQuery {
 
   public init() {}
 
-  public struct Data: StarWarsAPI.SelectionSet {
+  nonisolated public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -44,7 +44,7 @@ public struct SameHeroTwiceQuery: GraphQLQuery {
     /// Hero
     ///
     /// Parent Type: `Character`
-    public struct Hero: StarWarsAPI.SelectionSet {
+    nonisolated public struct Hero: StarWarsAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -74,7 +74,7 @@ public struct SameHeroTwiceQuery: GraphQLQuery {
     /// R2
     ///
     /// Parent Type: `Character`
-    public struct R2: StarWarsAPI.SelectionSet {
+    nonisolated public struct R2: StarWarsAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

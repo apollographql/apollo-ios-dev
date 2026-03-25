@@ -3,19 +3,19 @@
 
 import ApolloAPI
 
-public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet
+nonisolated public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet
 where Schema == GitHubAPI.SchemaMetadata {}
 
-public protocol InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment
+nonisolated public protocol InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment
 where Schema == GitHubAPI.SchemaMetadata {}
 
-public protocol MutableSelectionSet: ApolloAPI.MutableRootSelectionSet
+nonisolated public protocol MutableSelectionSet: ApolloAPI.MutableRootSelectionSet
 where Schema == GitHubAPI.SchemaMetadata {}
 
-public protocol MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment
+nonisolated public protocol MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment
 where Schema == GitHubAPI.SchemaMetadata {}
 
-public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
+nonisolated public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
   public static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
 
   private static let objectTypeMap: [String: ApolloAPI.Object] = [
@@ -217,6 +217,6 @@ public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
   }
 }
 
-public enum Objects {}
-public enum Interfaces {}
-public enum Unions {}
+nonisolated public enum Objects {}
+nonisolated public enum Interfaces {}
+nonisolated public enum Unions {}

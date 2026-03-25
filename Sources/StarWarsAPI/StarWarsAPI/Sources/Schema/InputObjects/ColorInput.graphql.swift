@@ -4,7 +4,7 @@
 @_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
 /// The input object sent when passing in a color
-public struct ColorInput: InputObject {
+nonisolated public struct ColorInput: InputObject {
   @_spi(Unsafe) public private(set) var __data: InputDict
 
   @_spi(Unsafe) public init(_ data: InputDict) {

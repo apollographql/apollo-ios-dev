@@ -35,16 +35,16 @@ struct SchemaMetadataTemplate: TemplateRenderer {
     else: protocolDefinition(prefix: nil, schemaNamespace: schemaNamespace))
 
     \(documentation: schema.documentation, config: config)
-    \(parentAccessLevel)enum SchemaMetadata: \(TemplateConstants.ApolloAPITargetName).SchemaMetadata {
+    \(config.nonisolatedModifier)\(parentAccessLevel)enum SchemaMetadata: \(TemplateConstants.ApolloAPITargetName).SchemaMetadata {
       \(accessControlRenderer(for: .member).render())\
     static let configuration: any \(TemplateConstants.ApolloAPITargetName).SchemaConfiguration.Type = SchemaConfiguration.self
 
       \(objectTypeFunction)
     }
 
-    \(parentAccessLevel)enum Objects {}
-    \(parentAccessLevel)enum Interfaces {}
-    \(parentAccessLevel)enum Unions {}
+    \(config.nonisolatedModifier)\(parentAccessLevel)enum Objects {}
+    \(config.nonisolatedModifier)\(parentAccessLevel)enum Interfaces {}
+    \(config.nonisolatedModifier)\(parentAccessLevel)enum Unions {}
 
     """
     )
@@ -84,17 +84,19 @@ struct SchemaMetadataTemplate: TemplateRenderer {
   private func protocolDefinition(prefix: String?, schemaNamespace: String) -> TemplateString {
     let accessLevel = accessControlRenderer(for: .member).render()
 
+    let nonisolated = config.nonisolatedModifier
+
     return TemplateString("""
-      \(accessLevel)protocol \(prefix ?? "")SelectionSet: \(TemplateConstants.ApolloAPITargetName).SelectionSet & \(TemplateConstants.ApolloAPITargetName).RootSelectionSet
+      \(nonisolated)\(accessLevel)protocol \(prefix ?? "")SelectionSet: \(TemplateConstants.ApolloAPITargetName).SelectionSet & \(TemplateConstants.ApolloAPITargetName).RootSelectionSet
       where Schema == \(schemaNamespace).SchemaMetadata {}
 
-      \(accessLevel)protocol \(prefix ?? "")InlineFragment: \(TemplateConstants.ApolloAPITargetName).SelectionSet & \(TemplateConstants.ApolloAPITargetName).InlineFragment
+      \(nonisolated)\(accessLevel)protocol \(prefix ?? "")InlineFragment: \(TemplateConstants.ApolloAPITargetName).SelectionSet & \(TemplateConstants.ApolloAPITargetName).InlineFragment
       where Schema == \(schemaNamespace).SchemaMetadata {}
 
-      \(accessLevel)protocol \(prefix ?? "")MutableSelectionSet: \(TemplateConstants.ApolloAPITargetName).MutableRootSelectionSet
+      \(nonisolated)\(accessLevel)protocol \(prefix ?? "")MutableSelectionSet: \(TemplateConstants.ApolloAPITargetName).MutableRootSelectionSet
       where Schema == \(schemaNamespace).SchemaMetadata {}
 
-      \(accessLevel)protocol \(prefix ?? "")MutableInlineFragment: \(TemplateConstants.ApolloAPITargetName).MutableSelectionSet & \(TemplateConstants.ApolloAPITargetName).InlineFragment
+      \(nonisolated)\(accessLevel)protocol \(prefix ?? "")MutableInlineFragment: \(TemplateConstants.ApolloAPITargetName).MutableSelectionSet & \(TemplateConstants.ApolloAPITargetName).InlineFragment
       where Schema == \(schemaNamespace).SchemaMetadata {}
       """
     )

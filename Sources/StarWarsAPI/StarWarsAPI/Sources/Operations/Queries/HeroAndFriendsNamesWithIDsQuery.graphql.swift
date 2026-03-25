@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct HeroAndFriendsNamesWithIDsQuery: GraphQLQuery {
+nonisolated public struct HeroAndFriendsNamesWithIDsQuery: GraphQLQuery {
   public static let operationName: String = "HeroAndFriendsNamesWithIDs"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "cdf121c8a2f2188bd1c4dcc04df6104e989164b27f1e7f13d27ccc9c03fbda0c",
@@ -20,7 +20,7 @@ public struct HeroAndFriendsNamesWithIDsQuery: GraphQLQuery {
 
   @_spi(Unsafe) public var __variables: Variables? { ["episode": episode] }
 
-  public struct Data: StarWarsAPI.SelectionSet {
+  nonisolated public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -46,7 +46,7 @@ public struct HeroAndFriendsNamesWithIDsQuery: GraphQLQuery {
     /// Hero
     ///
     /// Parent Type: `Character`
-    public struct Hero: StarWarsAPI.SelectionSet {
+    nonisolated public struct Hero: StarWarsAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -85,7 +85,7 @@ public struct HeroAndFriendsNamesWithIDsQuery: GraphQLQuery {
       /// Hero.Friend
       ///
       /// Parent Type: `Character`
-      public struct Friend: StarWarsAPI.SelectionSet {
+      nonisolated public struct Friend: StarWarsAPI.SelectionSet {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

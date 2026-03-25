@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct ClassroomPetsQuery: GraphQLQuery {
+nonisolated public struct ClassroomPetsQuery: GraphQLQuery {
   public static let operationName: String = "ClassroomPets"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
@@ -14,7 +14,7 @@ public struct ClassroomPetsQuery: GraphQLQuery {
 
   public init() {}
 
-  public struct Data: AnimalKingdomAPI.SelectionSet {
+  nonisolated public struct Data: AnimalKingdomAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -40,7 +40,7 @@ public struct ClassroomPetsQuery: GraphQLQuery {
     /// ClassroomPet
     ///
     /// Parent Type: `ClassroomPet`
-    public struct ClassroomPet: AnimalKingdomAPI.SelectionSet {
+    nonisolated public struct ClassroomPet: AnimalKingdomAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -78,7 +78,7 @@ public struct ClassroomPetsQuery: GraphQLQuery {
       /// ClassroomPet.AsAnimal
       ///
       /// Parent Type: `Animal`
-      public struct AsAnimal: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
+      nonisolated public struct AsAnimal: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -118,7 +118,7 @@ public struct ClassroomPetsQuery: GraphQLQuery {
       /// ClassroomPet.AsPet
       ///
       /// Parent Type: `Pet`
-      public struct AsPet: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
+      nonisolated public struct AsPet: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -158,7 +158,7 @@ public struct ClassroomPetsQuery: GraphQLQuery {
       /// ClassroomPet.AsWarmBlooded
       ///
       /// Parent Type: `WarmBlooded`
-      public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
+      nonisolated public struct AsWarmBlooded: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -203,7 +203,7 @@ public struct ClassroomPetsQuery: GraphQLQuery {
       /// ClassroomPet.AsCat
       ///
       /// Parent Type: `Cat`
-      public struct AsCat: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
+      nonisolated public struct AsCat: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -260,7 +260,7 @@ public struct ClassroomPetsQuery: GraphQLQuery {
       /// ClassroomPet.AsBird
       ///
       /// Parent Type: `Bird`
-      public struct AsBird: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
+      nonisolated public struct AsBird: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -314,7 +314,7 @@ public struct ClassroomPetsQuery: GraphQLQuery {
       /// ClassroomPet.AsPetRock
       ///
       /// Parent Type: `PetRock`
-      public struct AsPetRock: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
+      nonisolated public struct AsPetRock: AnimalKingdomAPI.InlineFragment, ApolloAPI.CompositeInlineFragment {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A Git push.
-  static let Push = ApolloAPI.Object(
+  nonisolated static let Push = ApolloAPI.Object(
     typename: "Push",
     implementedInterfaces: [Interfaces.Node.self],
     keyFields: nil

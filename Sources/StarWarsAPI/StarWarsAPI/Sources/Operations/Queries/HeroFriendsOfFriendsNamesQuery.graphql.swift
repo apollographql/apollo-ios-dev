@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct HeroFriendsOfFriendsNamesQuery: GraphQLQuery {
+nonisolated public struct HeroFriendsOfFriendsNamesQuery: GraphQLQuery {
   public static let operationName: String = "HeroFriendsOfFriendsNames"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "513b65fa459185f88540be8d60cdeefb69fd6c82a21b804214337558aa6ecb0b",
@@ -20,7 +20,7 @@ public struct HeroFriendsOfFriendsNamesQuery: GraphQLQuery {
 
   @_spi(Unsafe) public var __variables: Variables? { ["episode": episode] }
 
-  public struct Data: StarWarsAPI.SelectionSet {
+  nonisolated public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -46,7 +46,7 @@ public struct HeroFriendsOfFriendsNamesQuery: GraphQLQuery {
     /// Hero
     ///
     /// Parent Type: `Character`
-    public struct Hero: StarWarsAPI.SelectionSet {
+    nonisolated public struct Hero: StarWarsAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -75,7 +75,7 @@ public struct HeroFriendsOfFriendsNamesQuery: GraphQLQuery {
       /// Hero.Friend
       ///
       /// Parent Type: `Character`
-      public struct Friend: StarWarsAPI.SelectionSet {
+      nonisolated public struct Friend: StarWarsAPI.SelectionSet {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -109,7 +109,7 @@ public struct HeroFriendsOfFriendsNamesQuery: GraphQLQuery {
         /// Hero.Friend.Friend
         ///
         /// Parent Type: `Character`
-        public struct Friend: StarWarsAPI.SelectionSet {
+        nonisolated public struct Friend: StarWarsAPI.SelectionSet {
           @_spi(Unsafe) public let __data: DataDict
           @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
