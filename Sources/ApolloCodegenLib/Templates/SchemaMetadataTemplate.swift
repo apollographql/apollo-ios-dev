@@ -52,14 +52,15 @@ struct SchemaMetadataTemplate: TemplateRenderer {
 
   var objectTypeFunction: TemplateString {
     return """
+    private static let objectTypeMap: [String: \(config.ApolloAPITargetName).Object] = [
+      \(schema.referencedTypes.objects.map {
+        "\"\($0.name.schemaName)\": \(schemaNamespace).Objects.\($0.render(as: .typename))"
+      }, separator: ",\n")
+    ]
+
     \(accessControlModifier(for: .member))\
     static func objectType(forTypename typename: String) -> \(config.ApolloAPITargetName).Object? {
-      switch typename {
-      \(schema.referencedTypes.objects.map {
-        "case \"\($0.name.schemaName)\": return \(schemaNamespace).Objects.\($0.render(as: .typename))"
-      }, separator: "\n")
-      default: return nil
-      }
+      objectTypeMap[typename]
     }
     """
   }
