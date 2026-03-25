@@ -1,4 +1,4 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -24,7 +24,10 @@ let package = Package(
       dependencies: [
         .product(name: "ApolloAPI", package: "apollo-ios")
       ],
-      swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
+      swiftSettings: [
+        .enableUpcomingFeature("ExistentialAny"),
+        .defaultIsolation(MainActor.self),
+      ]
     ),
     .testTarget(
       name: "TestAppTests",
