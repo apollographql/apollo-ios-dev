@@ -63,7 +63,8 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             inputObjects: .none
           ),
           pruneGeneratedFiles: false,
-          appendSchemaTypeFilenameSuffix: true
+          appendSchemaTypeFilenameSuffix: true,
+          markTypesNonisolated: false
         ),
         experimentalFeatures: .init(
           fieldMerging: .all,

@@ -69,7 +69,7 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: "TestSchema",
       output: .mock(moduleType: .swiftPackage(), operations: .inSchemaModule),
-      options: .init()
+      options: .init(markTypesNonisolated: false)
     )
     let mockTemplateRenderer = MockTemplateRenderer(
       target: .operationFile(),

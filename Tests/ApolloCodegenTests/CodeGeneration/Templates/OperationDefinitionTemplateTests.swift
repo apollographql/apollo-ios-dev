@@ -397,7 +397,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
           }
       """
 
-    config = .mock(options: .init(selectionSetInitializers: [.operations]))
+    config = .mock(options: .init(selectionSetInitializers: [.operations], markTypesNonisolated: false))
 
     // when
     try await buildSubjectAndOperation()
@@ -443,7 +443,9 @@ class OperationDefinitionTemplateTests: XCTestCase {
     config = .mock(
       options: .init(selectionSetInitializers: [
         .operation(named: "TestOperation")
-      ])
+      ],
+        markTypesNonisolated: false
+      )
     )
 
     // when
@@ -475,7 +477,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
       }
       """
 
-    config = .mock(options: .init(selectionSetInitializers: [.namedFragments]))
+    config = .mock(options: .init(selectionSetInitializers: [.namedFragments], markTypesNonisolated: false))
 
     // when
     try await buildSubjectAndOperation()
@@ -517,7 +519,9 @@ class OperationDefinitionTemplateTests: XCTestCase {
     config = .mock(
       options: .init(selectionSetInitializers: [
         .operation(named: "OtherOperation")
-      ])
+      ],
+        markTypesNonisolated: false
+      )
     )
 
     // when
@@ -571,7 +575,8 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
       config = .mock(
         options: .init(
-          selectionSetInitializers: [.all]
+          selectionSetInitializers: [.all],
+          markTypesNonisolated: false
         ),
         experimentalFeatures: .init(fieldMerging: test)
       )

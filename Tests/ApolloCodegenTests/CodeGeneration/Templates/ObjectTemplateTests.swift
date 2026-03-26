@@ -173,7 +173,7 @@ class ObjectTemplateTests: XCTestCase {
     let documentation = "This is some great documentation!"
     buildSubject(
       documentation: documentation,
-      config: .mock(options: .init(schemaDocumentation: .include))
+      config: .mock(options: .init(schemaDocumentation: .include, markTypesNonisolated: false))
     )
 
     let expected = """
@@ -194,7 +194,7 @@ class ObjectTemplateTests: XCTestCase {
     let documentation = "This is some great documentation!"
     buildSubject(
       documentation: documentation,
-      config: .mock(options: .init(schemaDocumentation: .exclude))
+      config: .mock(options: .init(schemaDocumentation: .exclude, markTypesNonisolated: false))
     )
 
     let expected = """

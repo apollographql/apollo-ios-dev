@@ -40,7 +40,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
       output: .mock(moduleType: moduleType, operations: operations),
-      options: .init()
+      options: .init(markTypesNonisolated: false)
     )
     let mockTemplateRenderer = MockTemplateRenderer(
       target: .operationFile(),
@@ -68,7 +68,7 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
       output: .mock(moduleType: moduleType, operations: operations),
-      options: .init()
+      options: .init(markTypesNonisolated: false)
     )
     let mockTemplateRenderer = MockTemplateRenderer(
       target: .operationFile(),

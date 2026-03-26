@@ -183,7 +183,7 @@ class CustomScalarTemplateTests: XCTestCase {
         specifiedByURL: nil,
         documentation: documentation
       ),
-      config: .mock(options: .init(schemaDocumentation: .include))
+      config: .mock(options: .init(schemaDocumentation: .include, markTypesNonisolated: false))
     )
 
     let expected = """
@@ -208,7 +208,7 @@ class CustomScalarTemplateTests: XCTestCase {
         specifiedByURL: "http://www.apollographql.com/scalarSpec",
         documentation: documentation
       ),
-      config: .mock(options: .init(schemaDocumentation: .include))
+      config: .mock(options: .init(schemaDocumentation: .include, markTypesNonisolated: false))
     )
 
     let expected = """
@@ -235,7 +235,7 @@ class CustomScalarTemplateTests: XCTestCase {
         specifiedByURL: nil,
         documentation: documentation
       ),
-      config: .mock(options: .init(schemaDocumentation: .exclude))
+      config: .mock(options: .init(schemaDocumentation: .exclude, markTypesNonisolated: false))
     )
 
     let expected = """

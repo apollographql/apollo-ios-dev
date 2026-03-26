@@ -50,7 +50,8 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     config = .mock(
       output: .mock(moduleType: moduleType, operations: operations),
       options: .init(
-        operationDocumentFormat: operationDocumentFormat
+        operationDocumentFormat: operationDocumentFormat,
+        markTypesNonisolated: false
       )
     )
 
