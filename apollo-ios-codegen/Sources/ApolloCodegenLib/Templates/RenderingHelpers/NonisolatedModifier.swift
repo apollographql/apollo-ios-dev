@@ -7,7 +7,7 @@ extension ApolloCodegen.ConfigurationContext {
   /// so they opt out of the consuming module's default actor isolation. This ensures generated
   /// GraphQL models remain `Sendable`-compatible when the user enables Swift 6.2's
   /// `defaultIsolation = MainActor` (SE-0466).
-  var nonisolatedModifier: TemplateString {
+  var nonisolatedModifier: String {
     config.options.markTypesNonisolated ? "nonisolated " : ""
   }
 }

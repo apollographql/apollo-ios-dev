@@ -110,7 +110,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
   func test__generate__givenQuery_whenMarkTypesNonisolated_generatesNonisolatedQueryOperation() async throws {
     // given
-    config = .mock(options: .init(markTypesNonisolated: true))
+    config = .mock(options: .init(schemaDocumentation: .exclude, markTypesNonisolated: true))
 
     let expected =
       """
@@ -129,7 +129,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
   func test__generate__givenQuery_whenMarkTypesNonisolated_generatesNonisolatedDataStruct() async throws {
     // given
-    config = .mock(options: .init(markTypesNonisolated: true))
+    config = .mock(options: .init(schemaDocumentation: .exclude, markTypesNonisolated: true))
 
     let expected =
       """
@@ -142,7 +142,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
     let actual = renderSubject()
 
     // then
-    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+    expect(actual).to(equalLineByLine(expected, atLine: 10, ignoringExtraLines: true))
   }
 
   func test__generate__givenQueryWithNameEndingInQuery_generatesQueryOperationWithoutDoubledTypeSuffix() async throws {
