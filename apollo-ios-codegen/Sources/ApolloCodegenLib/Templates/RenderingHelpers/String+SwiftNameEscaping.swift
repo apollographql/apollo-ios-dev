@@ -86,7 +86,48 @@ extension String {
 
     return propertyName
   }
-  
+
+  // MARK: - ConfigurationContext overloads (with capitalization rules)
+
+  private func renderedAsPropertyName(config: ApolloCodegen.ConfigurationContext) -> String {
+    var propertyName = self
+
+    switch config.config.options.conversionStrategies.fieldAccessors {
+    case .camelCase:
+      propertyName = propertyName.convertToCamelCase()
+    case .idiomatic:
+      break
+    }
+
+    propertyName = config.capitalizer.apply(to: propertyName)
+    propertyName = propertyName.isAllUppercased ? propertyName.lowercased() : propertyName.firstLowercased
+    return propertyName
+  }
+
+  func renderAsFieldPropertyName(config: ApolloCodegen.ConfigurationContext) -> String {
+    renderedAsPropertyName(config: config)
+      .escapeIf(in: SwiftKeywords.FieldAccessorNamesToEscape)
+  }
+
+  func renderAsInitializerParameterName(config: ApolloCodegen.ConfigurationContext) -> String {
+    renderedAsPropertyName(config: config)
+      .escapeWithAliasIf(in: SwiftKeywords.FieldAccessorNamesToEscape)
+  }
+
+  func renderAsInitializerParameterAccessorName(config: ApolloCodegen.ConfigurationContext) -> String {
+    renderedAsPropertyName(config: config)
+      .aliasIf(in: SwiftKeywords.FieldAccessorNamesToEscape)
+  }
+
+  /// Renders the string as a test mock field property name, applying any configured
+  /// capitalization rules so the mock property matches the corresponding generated model
+  /// property (e.g. both render `userID` once an `id` → upper rule is configured). With no
+  /// rules configured this is identical to ``asTestMockFieldPropertyName``.
+  func renderAsTestMockFieldPropertyName(config: ApolloCodegen.ConfigurationContext) -> String {
+    config.capitalizer.apply(to: self)
+      .escapeIf(in: SwiftKeywords.TestMockFieldNamesToEscape)
+  }
+
   /// Convert to `camelCase` from a number of different `snake_case` variants.
   ///
   /// All inner `_` characters will be removed, each 'word' will be capitalized, returning a final

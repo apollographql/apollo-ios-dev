@@ -16,7 +16,7 @@ extension OperationTemplateRenderer {
     return """
     \(`init`)(\(list: variables.map(VariableParameter))) {
       \(variables.map {
-        let name = $0.name.renderAsFieldPropertyName(config: config.config)
+        let name = $0.name.renderAsFieldPropertyName(config: config)
         return "self.\(name) = \(name)"
       }, separator: "\n")
     }
@@ -27,7 +27,7 @@ extension OperationTemplateRenderer {
     _ variables: [CompilationResult.VariableDefinition]
   ) -> TemplateString {
     """
-    \(variables.map { "public var \($0.name.renderAsFieldPropertyName(config: config.config)): \($0.type.rendered(as: .inputValue, config: config.config))"}, separator: "\n")
+    \(variables.map { "public var \($0.name.renderAsFieldPropertyName(config: config)): \($0.type.rendered(as: .inputValue, config: config.config))"}, separator: "\n")
     """
   }
 
@@ -35,7 +35,7 @@ extension OperationTemplateRenderer {
     _ variable: CompilationResult.VariableDefinition
   ) -> TemplateString {
       """
-      \(variable.name.renderAsFieldPropertyName(config: config.config)): \(variable.type.rendered(as: .inputValue, config: config.config))\
+      \(variable.name.renderAsFieldPropertyName(config: config)): \(variable.type.rendered(as: .inputValue, config: config.config))\
       \(if: variable.defaultValue != nil, " = " + variable.renderVariableDefaultValue(config: config.config))
       """
   }
@@ -49,7 +49,7 @@ extension OperationTemplateRenderer {
     }
 
     return """
-      @_spi(Unsafe) public var __variables: \(if: !graphQLOperation, "GraphQLOperation.")Variables? { [\(list: variables.map { "\"\($0.name)\": \($0.name.renderAsFieldPropertyName(config: config.config))"})] }
+      @_spi(Unsafe) public var __variables: \(if: !graphQLOperation, "GraphQLOperation.")Variables? { [\(list: variables.map { "\"\($0.name)\": \($0.name.renderAsFieldPropertyName(config: config))"})] }
       """
   }
 
