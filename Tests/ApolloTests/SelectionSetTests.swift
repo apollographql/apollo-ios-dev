@@ -752,6 +752,60 @@ class SelectionSetTests: XCTestCase {
   }
 
   @MainActor
+  func test__asInlineFragment_givenInterfaceType_typeNotInSchemaMetadata_butListedInImplementingObjects_returnsType() async {
+    // given
+    // This simulates `reduceGeneratedSchemaTypes: true` where "CloudinaryImage" implements
+    // the interface but has no generated Object type in SchemaMetadata.
+    struct Types {
+      static let ImageInterface = Interface(
+        name: "UrlTemplateBackedImage_Interface",
+        implementingObjects: ["CloudinaryImage"]
+      )
+    }
+
+    MockSchemaMetadata.stub_objectTypeForTypeName({ _ in
+      // All types return nil — simulating reduceGeneratedSchemaTypes filtering them out
+      return nil
+    })
+
+    class Image: MockSelectionSet, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("url", String.self),
+        .inlineFragment(AsUrlTemplateBackedImage.self),
+      ]}
+
+      var asUrlTemplateBackedImage: AsUrlTemplateBackedImage? { _asInlineFragment() }
+
+      class AsUrlTemplateBackedImage: MockTypeCase, @unchecked Sendable {
+        typealias Schema = MockSchemaMetadata
+
+        override class var __parentType: any ParentType { Types.ImageInterface }
+        override class var __selections: [Selection] {[
+          .field("urlTemplate", String.self)
+        ]}
+      }
+    }
+
+    let object: JSONObject = [
+      "__typename": "CloudinaryImage",
+      "url": "https://example.com/image.jpg",
+      "urlTemplate": "https://example.com/{width}/{height}/image.jpg"
+    ]
+
+    // when
+    let actual = try! await Image(data: object)
+
+    // then
+    expect(actual.asUrlTemplateBackedImage).toNot(beNil())
+    expect(actual.asUrlTemplateBackedImage?.urlTemplate).to(equal(
+      "https://example.com/{width}/{height}/image.jpg"
+    ))
+  }
+
+  @MainActor
   func test__asInlineFragment_givenUnionType_typeNameIsTypeInUnionPossibleTypes_returnsType() async {
     // given
     enum Types {
