@@ -164,8 +164,11 @@ public class ApolloCodegen {
   /// Performs GraphQL source validation and compiles the schema and operation source documents.
   func compileGraphQLResult() async throws -> CompilationResult {
     let frontend = try await GraphQLJSFrontend()
-    async let graphQLSchema = try createSchema(frontend)
-    async let operationsDocument = try createOperationsDocument(frontend)
+    // `async let` here can trigger a Swift concurrency runtime crash on Swift 6.3/macOS 26.
+    // Keep the work serialized until the toolchain bug is fixed.
+    // See https://github.com/swiftlang/swift/pull/87665 for more information.
+    let graphQLSchema = try await createSchema(frontend)
+    let operationsDocument = try await createOperationsDocument(frontend)
     let validationOptions = ValidationOptions(config: config)
 
     let graphqlErrors = try await frontend.validateDocument(
