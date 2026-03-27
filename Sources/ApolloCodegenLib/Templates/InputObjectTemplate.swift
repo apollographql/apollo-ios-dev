@@ -22,7 +22,7 @@ struct InputObjectTemplate: TemplateRenderer {
     """
     \(documentation: graphqlInputObject.documentation, config: config)
     \(graphqlInputObject.name.typeNameDocumentation)
-    \(accessControlRenderer(for: .parent).render())\
+    \(config.nonisolatedModifier)\(accessControlRenderer(for: .parent).render())\
     struct \(graphqlInputObject.render(as: .typename())): InputObject {
       \(memberAccessControl.render(withSPIs: [.Unsafe]))private(set) var __data: InputDict
     

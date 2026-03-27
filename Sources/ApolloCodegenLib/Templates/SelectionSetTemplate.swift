@@ -101,7 +101,7 @@ struct SelectionSetTemplate {
     return TemplateString(
       """
       \(SelectionSetNameDocumentation(selectionSet))
-      \(accessControlRenderer.render())\
+      \(config.nonisolatedModifier)\(accessControlRenderer.render())\
       struct \(fieldSelectionSetName): \(SelectionSetType())\
       \(if: selectionSet.isIdentifiable, ", Identifiable")\
        {
@@ -117,7 +117,7 @@ struct SelectionSetTemplate {
     return TemplateString(
       """
       \(SelectionSetNameDocumentation(inlineFragment))
-      \(accessControlRenderer.render())\
+      \(config.nonisolatedModifier)\(accessControlRenderer.render())\
       struct \(inlineFragment.renderedTypeName): \(SelectionSetType(asInlineFragment: true))\
       \(if: inlineFragment.isCompositeInlineFragment, ", \(TemplateConstants.ApolloAPITargetName).CompositeInlineFragment")\
       \(if: inlineFragment.isIdentifiable, ", Identifiable")\

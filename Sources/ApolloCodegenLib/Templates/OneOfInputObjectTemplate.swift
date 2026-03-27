@@ -19,7 +19,7 @@ struct OneOfInputObjectTemplate: TemplateRenderer {
     """
     \(documentation: graphqlInputObject.documentation, config: config)
     \(graphqlInputObject.name.typeNameDocumentation)
-    \(accessControlRenderer(for: .parent).render())\
+    \(config.nonisolatedModifier)\(accessControlRenderer(for: .parent).render())\
     enum \(graphqlInputObject.render(as: .typename())): OneOfInputObject {
       \(graphqlInputObject.fields.map({ "\(FieldCaseTemplate($1))" }), separator: "\n")
     
