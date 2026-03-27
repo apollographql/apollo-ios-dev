@@ -4,7 +4,7 @@
 import ApolloAPI
 
 public extension Unions {
-  static let ClassroomPet = Union(
+  nonisolated static let ClassroomPet = Union(
     name: "ClassroomPet",
     possibleTypes: [
       Objects.Cat.self,

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Represents a object that belongs to a repository.
-  static let RepositoryNode = ApolloAPI.Interface(
+  nonisolated static let RepositoryNode = ApolloAPI.Interface(
     name: "RepositoryNode",
     keyFields: nil,
     implementingObjects: [

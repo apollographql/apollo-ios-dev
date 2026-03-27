@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct StarshipQuery: GraphQLQuery {
+nonisolated public struct StarshipQuery: GraphQLQuery {
   public static let operationName: String = "Starship"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "e42a9be2ae0f222985e3eacf8d8d513002954d5031dcf544bbb0d27b1089fc58",
@@ -14,7 +14,7 @@ public struct StarshipQuery: GraphQLQuery {
 
   public init() {}
 
-  public struct Data: StarWarsAPI.SelectionSet {
+  nonisolated public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -40,7 +40,7 @@ public struct StarshipQuery: GraphQLQuery {
     /// Starship
     ///
     /// Parent Type: `Starship`
-    public struct Starship: StarWarsAPI.SelectionSet {
+    nonisolated public struct Starship: StarWarsAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

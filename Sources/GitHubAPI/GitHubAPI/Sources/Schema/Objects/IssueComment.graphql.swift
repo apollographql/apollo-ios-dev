@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a comment on an Issue.
-  static let IssueComment = ApolloAPI.Object(
+  nonisolated static let IssueComment = ApolloAPI.Object(
     typename: "IssueComment",
     implementedInterfaces: [
       Interfaces.Comment.self,

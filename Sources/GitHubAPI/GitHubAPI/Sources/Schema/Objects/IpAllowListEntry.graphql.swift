@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// An IP address or range of addresses that is allowed to access an owner's resources.
-  static let IpAllowListEntry = ApolloAPI.Object(
+  nonisolated static let IpAllowListEntry = ApolloAPI.Object(
     typename: "IpAllowListEntry",
     implementedInterfaces: [Interfaces.Node.self],
     keyFields: nil

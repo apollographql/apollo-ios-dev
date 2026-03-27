@@ -323,7 +323,8 @@ class OneOfInputObjectTemplateTests: XCTestCase {
                       operations: .relative(subpath: nil)
                     ),
                     options: .init(
-                      conversionStrategies: .init(inputObjects: .none)
+                      conversionStrategies: .init(inputObjects: .none),
+                      markTypesNonisolated: false
                     )
                    )
     )
@@ -867,7 +868,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
                                documentation: "Field Documentation!")
       ],
       documentation: documentation,
-      config: .mock(.swiftPackage(apolloSDKDependency: .default), options: .init(schemaDocumentation: .include))
+      config: .mock(.swiftPackage(apolloSDKDependency: .default), options: .init(schemaDocumentation: .include, markTypesNonisolated: false))
     )
 
     let expected = """
@@ -895,7 +896,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
                                documentation: "Field Documentation!")
       ],
       documentation: documentation,
-      config: .mock(.swiftPackage(apolloSDKDependency: .default), options: .init(schemaDocumentation: .exclude))
+      config: .mock(.swiftPackage(apolloSDKDependency: .default), options: .init(schemaDocumentation: .exclude, markTypesNonisolated: false))
     )
 
     let expected = """
@@ -925,7 +926,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       ],
       config: .mock(
         .swiftPackage(apolloSDKDependency: .default),
-        options: .init(schemaDocumentation: .include, warningsOnDeprecatedUsage: .include)
+        options: .init(schemaDocumentation: .include, warningsOnDeprecatedUsage: .include, markTypesNonisolated: false)
       )
     )
 
@@ -955,7 +956,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       ],
       config: .mock(
         .swiftPackage(apolloSDKDependency: .default),
-        options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .exclude)
+        options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .exclude, markTypesNonisolated: false)
       )
     )
 
@@ -987,7 +988,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       documentation: documentation,
       config: .mock(
         .swiftPackage(apolloSDKDependency: .default),
-        options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .include)
+        options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .include, markTypesNonisolated: false)
       )
     )
 
@@ -1020,7 +1021,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       documentation: documentation,
       config: .mock(
         .swiftPackage(apolloSDKDependency: .default),
-        options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .exclude)
+        options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .exclude, markTypesNonisolated: false)
       )
     )
 
@@ -1067,7 +1068,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       ],
       config: .mock(
         .swiftPackage(apolloSDKDependency: .default),
-        options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .include)
+        options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .include, markTypesNonisolated: false)
       )
     )
 
@@ -1112,7 +1113,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       ],
       config: .mock(
         .swiftPackage(apolloSDKDependency: .default),
-        options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .exclude)
+        options: .init(schemaDocumentation: .include,warningsOnDeprecatedUsage: .exclude, markTypesNonisolated: false)
       )
     )
 
@@ -1401,7 +1402,8 @@ class OneOfInputObjectTemplateTests: XCTestCase {
       fields: fields,
       config: .mock(.swiftPackage(apolloSDKDependency: .default),
                     options: .init(
-                      conversionStrategies: .init(inputObjects: .none)
+                      conversionStrategies: .init(inputObjects: .none),
+                      markTypesNonisolated: false
                     ),
                     schemaNamespace: "TestSchema")
     )

@@ -45,7 +45,8 @@ class SelectionSetTemplateTests: XCTestCase {
         additionalInflectionRules: inflectionRules,
         schemaDocumentation: schemaDocumentation,
         warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
-        conversionStrategies: conversionStrategies
+        conversionStrategies: conversionStrategies,
+        markTypesNonisolated: false
       )
     ))
     let mockTemplateRenderer = MockTemplateRenderer(
@@ -80,7 +81,8 @@ class SelectionSetTemplateTests: XCTestCase {
         additionalInflectionRules: inflectionRules,
         schemaDocumentation: schemaDocumentation,
         warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
-        conversionStrategies: conversionStrategies
+        conversionStrategies: conversionStrategies,
+        markTypesNonisolated: false
       )
     ))
     

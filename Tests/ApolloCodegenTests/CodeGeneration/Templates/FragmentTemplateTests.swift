@@ -112,7 +112,8 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     let (_, template) = try await buildFragmentTemplate(
       config: .mock(
         options: .init(
-          operationDocumentFormat: .operationId
+          operationDocumentFormat: .operationId,
+          markTypesNonisolated: false
         )
       )
     )
@@ -481,7 +482,8 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     let (_, template) = try await buildFragmentTemplate(
       config: .mock(
         options: .init(
-          selectionSetInitializers: [.namedFragments]
+          selectionSetInitializers: [.namedFragments],
+          markTypesNonisolated: false
         )
       ),
       schemaSDL: schemaSDL,
@@ -528,7 +530,8 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     let (_, template) = try await buildFragmentTemplate(
       config: .mock(
         options: .init(
-          selectionSetInitializers: [.fragment(named: "TestFragment")]
+          selectionSetInitializers: [.fragment(named: "TestFragment")],
+          markTypesNonisolated: false
         )
       ),
       schemaSDL: schemaSDL,
@@ -563,7 +566,8 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     let (_, template) = try await buildFragmentTemplate(
       config: .mock(
         options: .init(
-          selectionSetInitializers: [.operations]
+          selectionSetInitializers: [.operations],
+          markTypesNonisolated: false
         )
       ),
       schemaSDL: schemaSDL,
@@ -606,7 +610,8 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     let (_, template) = try await buildFragmentTemplate(
       config: .mock(
         options: .init(
-          selectionSetInitializers: [.fragment(named: "OtherFragment")]
+          selectionSetInitializers: [.fragment(named: "OtherFragment")],
+          markTypesNonisolated: false
         )
       ),
       schemaSDL: schemaSDL,
@@ -659,7 +664,8 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     let (_, template) = try await buildFragmentTemplate(
       config: .mock(
         options: .init(
-          selectionSetInitializers: []
+          selectionSetInitializers: [],
+          markTypesNonisolated: false
         )
       ),
       schemaSDL: schemaSDL,
@@ -708,7 +714,8 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
       let (_, template) = try await buildFragmentTemplate(
         config: .mock(
           options: .init(
-            selectionSetInitializers: [.all]
+            selectionSetInitializers: [.all],
+            markTypesNonisolated: false
           ),
           experimentalFeatures: .init(fieldMerging: test)
         ),

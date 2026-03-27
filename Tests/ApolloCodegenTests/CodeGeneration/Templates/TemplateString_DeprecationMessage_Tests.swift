@@ -9,7 +9,8 @@ final class TemplateString_DeprecationMessage_Tests: XCTestCase {
 
   let config = ApolloCodegen.ConfigurationContext(config: .mock(
     options: .init(
-      warningsOnDeprecatedUsage: .include
+      warningsOnDeprecatedUsage: .include,
+      markTypesNonisolated: false
     )
   ))
 

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// An invitation for a user to be added to a repository.
-  static let RepositoryInvitation = ApolloAPI.Object(
+  nonisolated static let RepositoryInvitation = ApolloAPI.Object(
     typename: "RepositoryInvitation",
     implementedInterfaces: [Interfaces.Node.self],
     keyFields: nil

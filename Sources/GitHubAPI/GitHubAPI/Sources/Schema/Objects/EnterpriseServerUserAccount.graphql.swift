@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A user account on an Enterprise Server installation.
-  static let EnterpriseServerUserAccount = ApolloAPI.Object(
+  nonisolated static let EnterpriseServerUserAccount = ApolloAPI.Object(
     typename: "EnterpriseServerUserAccount",
     implementedInterfaces: [Interfaces.Node.self],
     keyFields: nil

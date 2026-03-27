@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct CharacterNameAndDroidAppearsIn: StarWarsAPI.SelectionSet, Fragment {
+nonisolated public struct CharacterNameAndDroidAppearsIn: StarWarsAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment CharacterNameAndDroidAppearsIn on Character { __typename name ... on Droid { __typename appearsIn } }"#
   }
@@ -40,7 +40,7 @@ public struct CharacterNameAndDroidAppearsIn: StarWarsAPI.SelectionSet, Fragment
   /// AsDroid
   ///
   /// Parent Type: `Droid`
-  public struct AsDroid: StarWarsAPI.InlineFragment {
+  nonisolated public struct AsDroid: StarWarsAPI.InlineFragment {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

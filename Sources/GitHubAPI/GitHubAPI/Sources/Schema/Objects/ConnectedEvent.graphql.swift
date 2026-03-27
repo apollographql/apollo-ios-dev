@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'connected' event on a given issue or pull request.
-  static let ConnectedEvent = ApolloAPI.Object(
+  nonisolated static let ConnectedEvent = ApolloAPI.Object(
     typename: "ConnectedEvent",
     implementedInterfaces: [Interfaces.Node.self],
     keyFields: nil

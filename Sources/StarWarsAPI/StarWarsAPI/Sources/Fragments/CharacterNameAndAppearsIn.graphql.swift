@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct CharacterNameAndAppearsIn: StarWarsAPI.SelectionSet, Fragment {
+nonisolated public struct CharacterNameAndAppearsIn: StarWarsAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment CharacterNameAndAppearsIn on Character { __typename name appearsIn }"#
   }

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'closed' event on any `Closable`.
-  static let ClosedEvent = ApolloAPI.Object(
+  nonisolated static let ClosedEvent = ApolloAPI.Object(
     typename: "ClosedEvent",
     implementedInterfaces: [
       Interfaces.Node.self,

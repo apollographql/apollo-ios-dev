@@ -53,7 +53,8 @@ class SelectionSetTemplate_FieldMerging_Tests: XCTestCase {
         additionalInflectionRules: inflectionRules,
         schemaDocumentation: schemaDocumentation,        
         warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
-        conversionStrategies: conversionStrategies
+        conversionStrategies: conversionStrategies,
+        markTypesNonisolated: false
       ),
       experimentalFeatures: .init(fieldMerging: fieldMerging)
     ))

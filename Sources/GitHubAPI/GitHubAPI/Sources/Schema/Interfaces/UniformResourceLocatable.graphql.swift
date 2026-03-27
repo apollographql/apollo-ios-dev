@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Represents a type that can be retrieved by a URL.
-  static let UniformResourceLocatable = ApolloAPI.Interface(
+  nonisolated static let UniformResourceLocatable = ApolloAPI.Interface(
     name: "UniformResourceLocatable",
     keyFields: nil,
     implementingObjects: [

@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct TwoHeroesQuery: GraphQLQuery {
+nonisolated public struct TwoHeroesQuery: GraphQLQuery {
   public static let operationName: String = "TwoHeroes"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "79c1cf70ead0fb9d7bb0811982560f1585b0b0a4ad7507c934b43a4482bb2097",
@@ -14,7 +14,7 @@ public struct TwoHeroesQuery: GraphQLQuery {
 
   public init() {}
 
-  public struct Data: StarWarsAPI.SelectionSet {
+  nonisolated public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -44,7 +44,7 @@ public struct TwoHeroesQuery: GraphQLQuery {
     /// R2
     ///
     /// Parent Type: `Character`
-    public struct R2: StarWarsAPI.SelectionSet {
+    nonisolated public struct R2: StarWarsAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -74,7 +74,7 @@ public struct TwoHeroesQuery: GraphQLQuery {
     /// Luke
     ///
     /// Parent Type: `Character`
-    public struct Luke: StarWarsAPI.SelectionSet {
+    nonisolated public struct Luke: StarWarsAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

@@ -3,7 +3,7 @@
 
 @_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
-public struct PetSearchFilters: InputObject {
+nonisolated public struct PetSearchFilters: InputObject {
   @_spi(Unsafe) public private(set) var __data: InputDict
 
   @_spi(Unsafe) public init(_ data: InputDict) {

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A release contains the content for a release.
-  static let Release = ApolloAPI.Object(
+  nonisolated static let Release = ApolloAPI.Object(
     typename: "Release",
     implementedInterfaces: [
       Interfaces.Node.self,

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Interfaces {
   /// A character from the Star Wars universe
-  static let Character = ApolloAPI.Interface(
+  nonisolated static let Character = ApolloAPI.Interface(
     name: "Character",
     keyFields: nil,
     implementingObjects: [

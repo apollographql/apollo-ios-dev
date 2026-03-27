@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// An account on GitHub, with one or more owners, that has repositories, members and teams.
-  static let Organization = ApolloAPI.Object(
+  nonisolated static let Organization = ApolloAPI.Object(
     typename: "Organization",
     implementedInterfaces: [
       Interfaces.Actor.self,

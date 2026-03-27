@@ -153,7 +153,7 @@ class EnumTemplateTests: XCTestCase {
         ("Protocol", nil, nil, nil),
       ],
       config: .mock(
-        options: .init(conversionStrategies: .init(enumCases: .camelCase))
+        options: .init(conversionStrategies: .init(enumCases: .camelCase), markTypesNonisolated: false)
       )
     )
 
@@ -204,7 +204,7 @@ class EnumTemplateTests: XCTestCase {
         ("Protocol", nil, nil, nil),
       ],
       config: .mock(
-        options: .init(conversionStrategies: .init(enumCases: .none))
+        options: .init(conversionStrategies: .init(enumCases: .none), markTypesNonisolated: false)
       )
     )
 
@@ -245,7 +245,8 @@ class EnumTemplateTests: XCTestCase {
       ],
       config: ApolloCodegenConfiguration.mock(options: .init(
         deprecatedEnumCases: .include,
-        warningsOnDeprecatedUsage: .exclude
+        warningsOnDeprecatedUsage: .exclude,
+        markTypesNonisolated: false
       ))
     )
 
@@ -276,7 +277,8 @@ class EnumTemplateTests: XCTestCase {
       ],
       config: ApolloCodegenConfiguration.mock(options: .init(
         deprecatedEnumCases: .include,
-        warningsOnDeprecatedUsage: .include
+        warningsOnDeprecatedUsage: .include,
+        markTypesNonisolated: false
       ))
     )
 
@@ -307,7 +309,8 @@ class EnumTemplateTests: XCTestCase {
       ],
       config: ApolloCodegenConfiguration.mock(options: .init(
         deprecatedEnumCases: .exclude,
-        warningsOnDeprecatedUsage: .include
+        warningsOnDeprecatedUsage: .include,
+        markTypesNonisolated: false
       ))
     )
 
@@ -335,7 +338,8 @@ class EnumTemplateTests: XCTestCase {
       ],
       config: ApolloCodegenConfiguration.mock(options: .init(
         deprecatedEnumCases: .exclude,
-        warningsOnDeprecatedUsage: .exclude
+        warningsOnDeprecatedUsage: .exclude,
+        markTypesNonisolated: false
       ))
     )
 
@@ -368,7 +372,8 @@ class EnumTemplateTests: XCTestCase {
       config: ApolloCodegenConfiguration.mock(options: .init(
         deprecatedEnumCases: .include,
         schemaDocumentation: .include,
-        warningsOnDeprecatedUsage: .include
+        warningsOnDeprecatedUsage: .include,
+        markTypesNonisolated: false
       ))
     )
 
@@ -407,7 +412,8 @@ class EnumTemplateTests: XCTestCase {
       config: ApolloCodegenConfiguration.mock(options: .init(
         deprecatedEnumCases: .include,
         schemaDocumentation: .include,
-        warningsOnDeprecatedUsage: .exclude
+        warningsOnDeprecatedUsage: .exclude,
+        markTypesNonisolated: false
       ))
     )
 
@@ -446,7 +452,8 @@ class EnumTemplateTests: XCTestCase {
       config: ApolloCodegenConfiguration.mock(options: .init(
         deprecatedEnumCases: .include,
         schemaDocumentation: .exclude,
-        warningsOnDeprecatedUsage: .exclude
+        warningsOnDeprecatedUsage: .exclude,
+        markTypesNonisolated: false
       ))
     )
 
@@ -519,5 +526,43 @@ class EnumTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected))
   }
-  
+
+  // MARK: - Nonisolated Tests
+
+  func test_render_givenMarkTypesNonisolated_generatesNonisolatedEnum() {
+    // given
+    buildSubject(config: .mock(
+      .swiftPackage(),
+      options: .init(markTypesNonisolated: true)
+    ))
+
+    let expected = """
+    nonisolated public enum TestEnum: String, EnumType {
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test_render_givenMarkTypesNonisolatedFalse_generatesEnumWithoutNonisolated() {
+    // given
+    buildSubject(config: .mock(
+      .swiftPackage(),
+      options: .init(markTypesNonisolated: false)
+    ))
+
+    let expected = """
+    public enum TestEnum: String, EnumType {
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
 }

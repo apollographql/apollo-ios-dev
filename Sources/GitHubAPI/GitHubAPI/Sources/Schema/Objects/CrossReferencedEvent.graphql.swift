@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a mention made by one issue or pull request to another.
-  static let CrossReferencedEvent = ApolloAPI.Object(
+  nonisolated static let CrossReferencedEvent = ApolloAPI.Object(
     typename: "CrossReferencedEvent",
     implementedInterfaces: [
       Interfaces.Node.self,

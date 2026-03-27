@@ -35,7 +35,8 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
           path: directoryURL.path
         ),
         options: .init(
-          reduceGeneratedSchemaTypes: reduceGeneratedSchemaTypes
+          reduceGeneratedSchemaTypes: reduceGeneratedSchemaTypes,
+          markTypesNonisolated: false
         )
       )
     )

@@ -7,7 +7,7 @@
 
 import ApolloAPI
 
-enum SchemaConfiguration: ApolloAPI.SchemaConfiguration {
+nonisolated enum SchemaConfiguration: ApolloAPI.SchemaConfiguration {
   public static func cacheKeyInfo(for type: ApolloAPI.Object, object: ObjectData) -> CacheKeyInfo? {
     // Implement this function to configure cache key resolution for your schema types.
     return nil

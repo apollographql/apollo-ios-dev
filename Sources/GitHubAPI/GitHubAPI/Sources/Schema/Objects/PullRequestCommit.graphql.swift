@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a Git commit part of a pull request.
-  static let PullRequestCommit = ApolloAPI.Object(
+  nonisolated static let PullRequestCommit = ApolloAPI.Object(
     typename: "PullRequestCommit",
     implementedInterfaces: [
       Interfaces.Node.self,

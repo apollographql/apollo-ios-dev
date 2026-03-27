@@ -858,7 +858,7 @@ class ApolloCodegenTests: XCTestCase {
         operations: .inSchemaModule,
         path: directoryURL.path
       ),
-      options: .init(appendSchemaTypeFilenameSuffix: true)
+      options: .init(appendSchemaTypeFilenameSuffix: true, markTypesNonisolated: false)
     ), rootURL: nil)
 
 
@@ -1270,7 +1270,7 @@ class ApolloCodegenTests: XCTestCase {
                            moduleType: .swiftPackage()),
         operations: .inSchemaModule
       ),
-      options: .init(pruneGeneratedFiles: false)
+      options: .init(pruneGeneratedFiles: false, markTypesNonisolated: false)
     )
 
     try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
@@ -1575,7 +1575,8 @@ class ApolloCodegenTests: XCTestCase {
         operations: .relative(subpath: relativeSubPath)
       ),
       options: .init(
-        pruneGeneratedFiles: true
+        pruneGeneratedFiles: true,
+        markTypesNonisolated: false
       )
     )
 
@@ -2154,7 +2155,8 @@ class ApolloCodegenTests: XCTestCase {
         operations: .inSchemaModule
       ),
       options: .init(
-        appendSchemaTypeFilenameSuffix: true
+        appendSchemaTypeFilenameSuffix: true,
+        markTypesNonisolated: false
       )
     ) 
 
@@ -2226,7 +2228,8 @@ class ApolloCodegenTests: XCTestCase {
         operations: .inSchemaModule
       ),
       options: .init(
-        appendSchemaTypeFilenameSuffix: false
+        appendSchemaTypeFilenameSuffix: false,
+        markTypesNonisolated: false
       )
     )
 
@@ -2641,7 +2644,8 @@ class ApolloCodegenTests: XCTestCase {
         let config = ApolloCodegenConfiguration.mock(
           .other,
           options: .init(
-            selectionSetInitializers: initializerOption
+            selectionSetInitializers: initializerOption,
+            markTypesNonisolated: false
           ),
           experimentalFeatures: .init(
             fieldMerging: fieldMergingOption
@@ -2762,7 +2766,8 @@ class ApolloCodegenTests: XCTestCase {
                       ]
                     )
                   ]
-                )
+                ),
+        markTypesNonisolated: false
       )
     ), rootURL: nil)
 
@@ -2894,7 +2899,7 @@ class ApolloCodegenTests: XCTestCase {
         ),
         // Apollo codegen should override the next two value to force the generation of selection set initializers
         // and perform all file merging for the local cache mutation.
-        options: .init(selectionSetInitializers: []),
+        options: .init(selectionSetInitializers: [], markTypesNonisolated: false),
         experimentalFeatures: .init(fieldMerging: .none)
       ),
       rootURL: nil
@@ -2978,7 +2983,7 @@ class ApolloCodegenTests: XCTestCase {
         ),
         // Apollo codegen should override the next two value to force the generation of selection set initializers
         // and perform all file merging for the local cache mutation.
-        options: .init(selectionSetInitializers: []),
+        options: .init(selectionSetInitializers: [], markTypesNonisolated: false),
         experimentalFeatures: .init(fieldMerging: .none)
       ),
       rootURL: nil

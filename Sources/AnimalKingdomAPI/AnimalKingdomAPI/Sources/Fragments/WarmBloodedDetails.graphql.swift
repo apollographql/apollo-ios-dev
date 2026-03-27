@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct WarmBloodedDetails: AnimalKingdomAPI.SelectionSet, Fragment {
+nonisolated public struct WarmBloodedDetails: AnimalKingdomAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment WarmBloodedDetails on WarmBlooded { __typename bodyTemperature ...HeightInMeters }"#
   }

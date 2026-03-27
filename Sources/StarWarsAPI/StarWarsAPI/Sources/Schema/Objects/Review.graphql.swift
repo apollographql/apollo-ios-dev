@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a review for a movie
-  static let Review = ApolloAPI.Object(
+  nonisolated static let Review = ApolloAPI.Object(
     typename: "Review",
     implementedInterfaces: [],
     keyFields: nil

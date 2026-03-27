@@ -48,7 +48,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
 
       \(section: VariableAccessors(operation.definition.variables))
 
-      \(accessControl.member.render())struct Data: \(operation.renderedSelectionSetType(config)) {
+      \(config.nonisolatedModifier)\(accessControl.member.render())struct Data: \(operation.renderedSelectionSetType(config)) {
         \(SelectionSetTemplate(
             definition: operation,
             generateInitializers: config.config.shouldGenerateSelectionSetInitializers(for: operation),
@@ -70,7 +70,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
     
   private func OperationDeclaration() -> TemplateString {
     return """
-    \(accessControl.parent.render())\
+    \(config.nonisolatedModifier)\(accessControl.parent.render())\
     struct \(operation.generatedDefinitionName): \
     \(operation.definition.operationType.renderedProtocolName) {
       \(accessControl.member.render())\

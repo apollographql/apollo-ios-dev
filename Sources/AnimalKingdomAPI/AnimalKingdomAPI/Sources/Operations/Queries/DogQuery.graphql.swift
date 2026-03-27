@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct DogQuery: GraphQLQuery {
+nonisolated public struct DogQuery: GraphQLQuery {
   public static let operationName: String = "DogQuery"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
@@ -14,7 +14,7 @@ public struct DogQuery: GraphQLQuery {
 
   public init() {}
 
-  public struct Data: AnimalKingdomAPI.SelectionSet {
+  nonisolated public struct Data: AnimalKingdomAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -40,7 +40,7 @@ public struct DogQuery: GraphQLQuery {
     /// AllAnimal
     ///
     /// Parent Type: `Animal`
-    public struct AllAnimal: AnimalKingdomAPI.SelectionSet, Identifiable {
+    nonisolated public struct AllAnimal: AnimalKingdomAPI.SelectionSet, Identifiable {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -75,7 +75,7 @@ public struct DogQuery: GraphQLQuery {
       /// AllAnimal.AsDog
       ///
       /// Parent Type: `Dog`
-      public struct AsDog: AnimalKingdomAPI.InlineFragment, Identifiable {
+      nonisolated public struct AsDog: AnimalKingdomAPI.InlineFragment, Identifiable {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct HumanHeightWithVariable: StarWarsAPI.SelectionSet, Fragment {
+nonisolated public struct HumanHeightWithVariable: StarWarsAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment HumanHeightWithVariable on Human { __typename height(unit: $heightUnit) }"#
   }

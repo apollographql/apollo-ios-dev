@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents a 'head_ref_restored' event on a given pull request.
-  static let HeadRefRestoredEvent = ApolloAPI.Object(
+  nonisolated static let HeadRefRestoredEvent = ApolloAPI.Object(
     typename: "HeadRefRestoredEvent",
     implementedInterfaces: [Interfaces.Node.self],
     keyFields: nil

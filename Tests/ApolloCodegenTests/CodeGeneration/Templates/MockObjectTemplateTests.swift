@@ -32,7 +32,7 @@ class MockObjectTemplateTests: XCTestCase {
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
       output: .mock(moduleType: moduleType, testMocks: testMocks),
-      options: .init(warningsOnDeprecatedUsage: warningsOnDeprecatedUsage)
+      options: .init(warningsOnDeprecatedUsage: warningsOnDeprecatedUsage, markTypesNonisolated: false)
     )
     ir = IRBuilder.mock(compilationResult: .mock())
 

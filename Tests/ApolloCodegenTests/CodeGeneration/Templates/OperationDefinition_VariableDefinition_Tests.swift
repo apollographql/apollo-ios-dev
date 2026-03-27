@@ -17,7 +17,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
 
   private func buildTemplate(
     configOutput: ApolloCodegenConfiguration.FileOutput = .mock(),
-    options: ApolloCodegenConfiguration.OutputOptions = .init()
+    options: ApolloCodegenConfiguration.OutputOptions = .init(markTypesNonisolated: false)
   ) {
     template = OperationDefinitionTemplate(
       operation: .mock(),
@@ -622,7 +622,7 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
 
     for test in tests {
       // when
-      buildTemplate(options: .init(conversionStrategies: .init(enumCases: .none)))
+      buildTemplate(options: .init(conversionStrategies: .init(enumCases: .none), markTypesNonisolated: false))
       let actual = template.VariableParameter(test.variable).description
 
       // then

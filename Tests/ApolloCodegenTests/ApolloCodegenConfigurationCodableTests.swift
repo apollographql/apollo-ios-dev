@@ -63,7 +63,8 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             inputObjects: .none
           ),
           pruneGeneratedFiles: false,
-          appendSchemaTypeFilenameSuffix: true
+          appendSchemaTypeFilenameSuffix: true,
+          markTypesNonisolated: false
         ),
         experimentalFeatures: .init(
           fieldMerging: .all,
@@ -115,6 +116,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "none"
           },
           "deprecatedEnumCases" : "exclude",
+          "markTypesNonisolated" : false,
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1231,6 +1233,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "camelCase"
           },
           "deprecatedEnumCases" : "include",
+          "markTypesNonisolated" : true,
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1418,6 +1421,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "camelCase"
           },
           "deprecatedEnumCases" : "include",
+          "markTypesNonisolated" : true,
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1607,6 +1611,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "camelCase"
           },
           "deprecatedEnumCases" : "include",
+          "markTypesNonisolated" : true,
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1709,6 +1714,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "camelCase"
           },
           "deprecatedEnumCases" : "include",
+          "markTypesNonisolated" : true,
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1815,6 +1821,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "camelCase"
           },
           "deprecatedEnumCases" : "include",
+          "markTypesNonisolated" : true,
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -1921,6 +1928,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "camelCase"
           },
           "deprecatedEnumCases" : "include",
+          "markTypesNonisolated" : true,
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -2027,6 +2035,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "camelCase"
           },
           "deprecatedEnumCases" : "include",
+          "markTypesNonisolated" : true,
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -2133,6 +2142,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "camelCase"
           },
           "deprecatedEnumCases" : "include",
+          "markTypesNonisolated" : true,
           "operationDocumentFormat" : [
             "definition"
           ],
@@ -2239,6 +2249,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
             "inputObjects" : "camelCase"
           },
           "deprecatedEnumCases" : "include",
+          "markTypesNonisolated" : true,
           "operationDocumentFormat" : [
             "definition"
           ],

@@ -21,7 +21,7 @@ struct FragmentTemplate: TemplateRenderer {
     let memberAccessControlRenderer = accessControlRenderer(for: .member)
     return TemplateString(
     """
-    \(accessControlRenderer(for: .parent).render())\
+    \(config.nonisolatedModifier)\(accessControlRenderer(for: .parent).render())\
     struct \(fragment.generatedDefinitionName.asFragmentName): \
     \(fragment.renderedSelectionSetType(config)), Fragment\
     \(if: fragment.isIdentifiable, ", Identifiable")\

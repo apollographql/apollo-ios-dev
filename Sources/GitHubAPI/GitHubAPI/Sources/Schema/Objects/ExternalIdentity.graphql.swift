@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// An external identity provisioned by SAML SSO or SCIM.
-  static let ExternalIdentity = ApolloAPI.Object(
+  nonisolated static let ExternalIdentity = ApolloAPI.Object(
     typename: "ExternalIdentity",
     implementedInterfaces: [Interfaces.Node.self],
     keyFields: nil

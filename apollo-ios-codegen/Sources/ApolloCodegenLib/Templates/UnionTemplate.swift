@@ -19,7 +19,7 @@ struct UnionTemplate: TemplateRenderer {
     """
     \(documentation: graphqlUnion.documentation, config: config)
     \(graphqlUnion.name.typeNameDocumentation)
-    static let \(graphqlUnion.render(as: .typename())) = Union(
+    \(config.nonisolatedModifier)static let \(graphqlUnion.render(as: .typename())) = Union(
       name: "\(graphqlUnion.name.schemaName)",
       possibleTypes: \(PossibleTypesTemplate())
     )

@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct HeroDetails: StarWarsAPI.SelectionSet, Fragment {
+nonisolated public struct HeroDetails: StarWarsAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment HeroDetails on Character { __typename name ... on Human { __typename height } ... on Droid { __typename primaryFunction } }"#
   }
@@ -42,7 +42,7 @@ public struct HeroDetails: StarWarsAPI.SelectionSet, Fragment {
   /// AsHuman
   ///
   /// Parent Type: `Human`
-  public struct AsHuman: StarWarsAPI.InlineFragment {
+  nonisolated public struct AsHuman: StarWarsAPI.InlineFragment {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -76,7 +76,7 @@ public struct HeroDetails: StarWarsAPI.SelectionSet, Fragment {
   /// AsDroid
   ///
   /// Parent Type: `Droid`
-  public struct AsDroid: StarWarsAPI.InlineFragment {
+  nonisolated public struct AsDroid: StarWarsAPI.InlineFragment {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

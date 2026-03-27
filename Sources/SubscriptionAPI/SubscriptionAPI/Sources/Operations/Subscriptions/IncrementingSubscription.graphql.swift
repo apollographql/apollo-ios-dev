@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct IncrementingSubscription: GraphQLSubscription {
+nonisolated public struct IncrementingSubscription: GraphQLSubscription {
   public static let operationName: String = "Incrementing"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     definition: .init(
@@ -13,7 +13,7 @@ public struct IncrementingSubscription: GraphQLSubscription {
 
   public init() {}
 
-  public struct Data: SubscriptionAPI.SelectionSet {
+  nonisolated public struct Data: SubscriptionAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

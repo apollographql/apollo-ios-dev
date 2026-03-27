@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A repository deploy key.
-  static let DeployKey = ApolloAPI.Object(
+  nonisolated static let DeployKey = ApolloAPI.Object(
     typename: "DeployKey",
     implementedInterfaces: [Interfaces.Node.self],
     keyFields: nil

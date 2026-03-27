@@ -818,7 +818,8 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     config = ApolloCodegenConfiguration.mock(
       schemaNamespace: "TestSchema",
       options: .init(
-        selectionSetInitializers: []
+        selectionSetInitializers: [],
+        markTypesNonisolated: false
       )
     )
 

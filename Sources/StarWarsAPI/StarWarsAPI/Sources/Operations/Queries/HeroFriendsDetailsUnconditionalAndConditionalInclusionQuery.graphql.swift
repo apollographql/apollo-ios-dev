@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: GraphQLQuery {
+nonisolated public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: GraphQLQuery {
   public static let operationName: String = "HeroFriendsDetailsUnconditionalAndConditionalInclusion"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "e36c8e5d752afda2a90fe44bcbfeb92de68f0da92b8390d626d3005cbad16dbe",
@@ -20,7 +20,7 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
 
   @_spi(Unsafe) public var __variables: Variables? { ["includeFriendsDetails": includeFriendsDetails] }
 
-  public struct Data: StarWarsAPI.SelectionSet {
+  nonisolated public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -46,7 +46,7 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
     /// Hero
     ///
     /// Parent Type: `Character`
-    public struct Hero: StarWarsAPI.SelectionSet {
+    nonisolated public struct Hero: StarWarsAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -75,7 +75,7 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
       /// Hero.Friend
       ///
       /// Parent Type: `Character`
-      public struct Friend: StarWarsAPI.SelectionSet {
+      nonisolated public struct Friend: StarWarsAPI.SelectionSet {
         @_spi(Unsafe) public let __data: DataDict
         @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -107,7 +107,7 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
         /// Hero.Friend.IfIncludeFriendsDetails
         ///
         /// Parent Type: `Character`
-        public struct IfIncludeFriendsDetails: StarWarsAPI.InlineFragment {
+        nonisolated public struct IfIncludeFriendsDetails: StarWarsAPI.InlineFragment {
           @_spi(Unsafe) public let __data: DataDict
           @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -140,7 +140,7 @@ public struct HeroFriendsDetailsUnconditionalAndConditionalInclusionQuery: Graph
           /// Hero.Friend.IfIncludeFriendsDetails.AsDroid
           ///
           /// Parent Type: `Droid`
-          public struct AsDroid: StarWarsAPI.InlineFragment {
+          nonisolated public struct AsDroid: StarWarsAPI.InlineFragment {
             @_spi(Unsafe) public let __data: DataDict
             @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

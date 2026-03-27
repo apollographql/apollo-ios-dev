@@ -3,7 +3,7 @@
 
 @_spi(Internal) import ApolloAPI
 
-public enum RelativeSize: String, EnumType {
+nonisolated public enum RelativeSize: String, EnumType {
   case large = "LARGE"
   case average = "AVERAGE"
   case small = "SMALL"

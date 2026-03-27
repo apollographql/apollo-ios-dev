@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct AuthorDetails: GitHubAPI.SelectionSet, Fragment {
+nonisolated public struct AuthorDetails: GitHubAPI.SelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment AuthorDetails on Actor { __typename login ... on User { __typename id name } }"#
   }
@@ -30,7 +30,7 @@ public struct AuthorDetails: GitHubAPI.SelectionSet, Fragment {
   /// AsUser
   ///
   /// Parent Type: `User`
-  public struct AsUser: GitHubAPI.InlineFragment {
+  nonisolated public struct AsUser: GitHubAPI.InlineFragment {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Represents any entity on GitHub that has a profile page.
-  static let ProfileOwner = ApolloAPI.Interface(
+  nonisolated static let ProfileOwner = ApolloAPI.Interface(
     name: "ProfileOwner",
     keyFields: nil,
     implementingObjects: [

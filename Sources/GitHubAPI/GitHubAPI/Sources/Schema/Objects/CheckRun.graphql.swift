@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// A check run.
-  static let CheckRun = ApolloAPI.Object(
+  nonisolated static let CheckRun = ApolloAPI.Object(
     typename: "CheckRun",
     implementedInterfaces: [
       Interfaces.Node.self,

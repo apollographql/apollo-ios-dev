@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct HeroNameConditionalBothQuery: GraphQLQuery {
+nonisolated public struct HeroNameConditionalBothQuery: GraphQLQuery {
   public static let operationName: String = "HeroNameConditionalBoth"
   public static let operationDocument: ApolloAPI.OperationDocument = .init(
     operationIdentifier: "e063fa4ab5493e9c67bfa96dfedfa8570475f6286f38c482f6e85ced4ea206af",
@@ -28,7 +28,7 @@ public struct HeroNameConditionalBothQuery: GraphQLQuery {
     "includeName": includeName
   ] }
 
-  public struct Data: StarWarsAPI.SelectionSet {
+  nonisolated public struct Data: StarWarsAPI.SelectionSet {
     @_spi(Unsafe) public let __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -54,7 +54,7 @@ public struct HeroNameConditionalBothQuery: GraphQLQuery {
     /// Hero
     ///
     /// Parent Type: `Character`
-    public struct Hero: StarWarsAPI.SelectionSet {
+    nonisolated public struct Hero: StarWarsAPI.SelectionSet {
       @_spi(Unsafe) public let __data: DataDict
       @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

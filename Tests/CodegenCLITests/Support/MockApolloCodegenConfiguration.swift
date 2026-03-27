@@ -12,7 +12,8 @@ extension ApolloCodegenConfiguration {
         schemaTypes: .init(path: ".", moduleType: .swiftPackage())
       ),
       options: .init(
-        operationDocumentFormat: [.definition, .operationId]
+        operationDocumentFormat: [.definition, .operationId],
+        markTypesNonisolated: false
       ),
       schemaDownload: .init(
         using: .introspection(endpointURL: URL(string: "http://some.server")!),

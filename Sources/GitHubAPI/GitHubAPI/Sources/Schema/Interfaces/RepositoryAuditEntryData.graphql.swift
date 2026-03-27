@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Interfaces {
   /// Metadata for an audit entry with action repo.*
-  static let RepositoryAuditEntryData = ApolloAPI.Interface(
+  nonisolated static let RepositoryAuditEntryData = ApolloAPI.Interface(
     name: "RepositoryAuditEntryData",
     keyFields: nil,
     implementingObjects: [

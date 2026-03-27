@@ -108,6 +108,43 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
+  func test__generate__givenQuery_whenMarkTypesNonisolated_generatesNonisolatedQueryOperation() async throws {
+    // given
+    config = .mock(options: .init(schemaDocumentation: .exclude, markTypesNonisolated: true))
+
+    let expected =
+      """
+      nonisolated struct TestOperationQuery: GraphQLQuery {
+        static let operationName: String = "TestOperation"
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test__generate__givenQuery_whenMarkTypesNonisolated_generatesNonisolatedDataStruct() async throws {
+    // given
+    config = .mock(options: .init(schemaDocumentation: .exclude, markTypesNonisolated: true))
+
+    let expected =
+      """
+        nonisolated struct Data: TestSchema.SelectionSet {
+      """
+
+    // when
+    try await buildSubjectAndOperation()
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 10, ignoringExtraLines: true))
+  }
+
   func test__generate__givenQueryWithNameEndingInQuery_generatesQueryOperationWithoutDoubledTypeSuffix() async throws {
     // given
     document = """
@@ -360,7 +397,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
           }
       """
 
-    config = .mock(options: .init(selectionSetInitializers: [.operations]))
+    config = .mock(options: .init(selectionSetInitializers: [.operations], markTypesNonisolated: false))
 
     // when
     try await buildSubjectAndOperation()
@@ -406,7 +443,9 @@ class OperationDefinitionTemplateTests: XCTestCase {
     config = .mock(
       options: .init(selectionSetInitializers: [
         .operation(named: "TestOperation")
-      ])
+      ],
+        markTypesNonisolated: false
+      )
     )
 
     // when
@@ -438,7 +477,7 @@ class OperationDefinitionTemplateTests: XCTestCase {
       }
       """
 
-    config = .mock(options: .init(selectionSetInitializers: [.namedFragments]))
+    config = .mock(options: .init(selectionSetInitializers: [.namedFragments], markTypesNonisolated: false))
 
     // when
     try await buildSubjectAndOperation()
@@ -480,7 +519,9 @@ class OperationDefinitionTemplateTests: XCTestCase {
     config = .mock(
       options: .init(selectionSetInitializers: [
         .operation(named: "OtherOperation")
-      ])
+      ],
+        markTypesNonisolated: false
+      )
     )
 
     // when
@@ -534,7 +575,8 @@ class OperationDefinitionTemplateTests: XCTestCase {
 
       config = .mock(
         options: .init(
-          selectionSetInitializers: [.all]
+          selectionSetInitializers: [.all],
+          markTypesNonisolated: false
         ),
         experimentalFeatures: .init(fieldMerging: test)
       )

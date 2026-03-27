@@ -4,7 +4,7 @@
 @_exported import ApolloAPI
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 
-public struct PetDetailsMutation: AnimalKingdomAPI.MutableSelectionSet, Fragment {
+nonisolated public struct PetDetailsMutation: AnimalKingdomAPI.MutableSelectionSet, Fragment {
   public static var fragmentDefinition: StaticString {
     #"fragment PetDetailsMutation on Pet { __typename owner { __typename firstName } adoptionDate }"#
   }
@@ -46,7 +46,7 @@ public struct PetDetailsMutation: AnimalKingdomAPI.MutableSelectionSet, Fragment
   /// Owner
   ///
   /// Parent Type: `Human`
-  public struct Owner: AnimalKingdomAPI.MutableSelectionSet {
+  nonisolated public struct Owner: AnimalKingdomAPI.MutableSelectionSet {
     @_spi(Unsafe) public var __data: DataDict
     @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
 

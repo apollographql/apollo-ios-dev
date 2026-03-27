@@ -3,7 +3,7 @@
 
 @_spi(Internal) @_spi(Unsafe) import ApolloAPI
 
-public struct MeasurementsInput: InputObject {
+nonisolated public struct MeasurementsInput: InputObject {
   @_spi(Unsafe) public private(set) var __data: InputDict
 
   @_spi(Unsafe) public init(_ data: InputDict) {

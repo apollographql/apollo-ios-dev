@@ -5,7 +5,7 @@ import ApolloAPI
 
 public extension Objects {
   /// Represents an 'review_requested' event on a given pull request.
-  static let ReviewRequestedEvent = ApolloAPI.Object(
+  nonisolated static let ReviewRequestedEvent = ApolloAPI.Object(
     typename: "ReviewRequestedEvent",
     implementedInterfaces: [Interfaces.Node.self],
     keyFields: nil
