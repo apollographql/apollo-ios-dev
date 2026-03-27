@@ -3,6 +3,10 @@ name: "PR Subtree Push"
 permissions:
   contents: write
 
+concurrency:
+  group: subtree-push-${{ github.event.pull_request.base.ref }}
+  cancel-in-progress: false
+
 on:
   pull_request_target:
     branches:
