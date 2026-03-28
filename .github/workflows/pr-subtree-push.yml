@@ -91,7 +91,11 @@ jobs:
       shell: bash
       run: |
         git fetch
-        git push
+        if [ "$(git rev-list origin/${{ github.event.pull_request.base.ref }}..HEAD --count)" -eq 0 ]; then
+          echo "No local commits to push, skipping."
+          exit 0
+        fi
+        git push || echo "::warning::Failed to push updated history. This is non-fatal — the next successful run will re-sync subtree metadata."
 
   publish-release:
     if: success('split-subtrees') && startsWith(github.ref, 'refs/heads/release/')
