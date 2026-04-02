@@ -720,4 +720,91 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     expect(allResults[1].source).to(equal(.server))
     expect(allResults[1].data?.hero?.name).to(equal("Server-R2"))
   }
+
+  func test__fetch__givenCacheAndNetwork_withNoCachedData__shouldReturnOnlyNetworkResult() async throws {
+    let (client, mockServer, _) = makeClientWithMockServer()
+
+    let serverExpectation = await mockServer.expect(MockQuery<CacheTestHeroSelectionSet>.self) { @Sendable _ in
+      Self.heroServerData
+    }
+
+    let results = try client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .cacheAndNetwork
+    )
+
+    var allResults: [GraphQLResponse<MockQuery<CacheTestHeroSelectionSet>>] = []
+    for try await result in results {
+      allResults.append(result)
+    }
+
+    await fulfillment(of: [serverExpectation])
+
+    // With an empty cache, only the network result should be yielded
+    expect(allResults).to(haveCount(1))
+    expect(allResults[0].source).to(equal(.server))
+    expect(allResults[0].data?.hero?.name).to(equal("R2-D2"))
+  }
+
+  func test__fetch__givenNetworkFirst_whenNetworkSucceeds__shouldReturnFromNetwork() async throws {
+    let (client, mockServer, store) = makeClientWithMockServer()
+
+    // Pre-populate cache with stale data to verify the network result is preferred
+    try await store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
+      "QUERY_ROOT.hero": ["__typename": "Droid", "name": "Stale-R2"],
+    ])
+
+    let serverExpectation = await mockServer.expect(MockQuery<CacheTestHeroSelectionSet>.self) { @Sendable _ in
+      Self.heroServerData
+    }
+
+    let result = try await client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .networkFirst
+    )
+
+    expect(result.source).to(equal(.server))
+    expect(result.data?.hero?.name).to(equal("R2-D2"))
+
+    await fulfillment(of: [serverExpectation])
+  }
+
+  func test__fetch__givenNetworkFirst_whenBothNetworkAndCacheFail__shouldThrowNoResults() async throws {
+    let (client, _, _) = makeClientWithMockServer()
+
+    // Empty cache + no server expectation registered.
+    // Network fails (unexpectedRequest), then cache fallback returns nil (empty cache).
+    // The chain has nothing to yield, so it throws noResults.
+    await expect {
+      _ = try await client.fetch(
+        query: MockQuery<CacheTestHeroSelectionSet>(),
+        cachePolicy: .networkFirst
+      )
+    }.to(throwError(ApolloClient.Error.noResults))
+  }
+
+  func test__fetch__givenWriteResultsToCacheFalse__shouldNotWriteToCache() async throws {
+    let (client, mockServer, _) = makeClientWithMockServer()
+
+    let serverExpectation = await mockServer.expect(MockQuery<CacheTestHeroSelectionSet>.self) { @Sendable _ in
+      Self.heroServerData
+    }
+
+    _ = try await client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .networkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    await fulfillment(of: [serverExpectation])
+
+    // Verify the cache is still empty — data was NOT written
+    let cachedResult = try await client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .cacheOnly
+    )
+
+    expect(cachedResult).to(beNil())
+  }
 }
