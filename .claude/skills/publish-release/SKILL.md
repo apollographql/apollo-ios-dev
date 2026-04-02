@@ -75,9 +75,12 @@ This phase requires user verification before pushing.
    git log origin/<branch> --oneline --no-merges <previous-tag>..origin/<branch>
    ```
 
-5. **STOP — Present the CHANGELOG diff to the user for review.** Use `AskUserQuestion`
-   to show the proposed changes and get explicit approval before continuing. Do not
-   push until the user confirms the CHANGELOG content is correct.
+5. **STOP — Open the CHANGELOG in Xcode for user review:**
+   ```
+   open -a Xcode apollo-ios/CHANGELOG.md
+   ```
+   Then use `AskUserQuestion` to ask if the user is ready to commit and push.
+   Do not push until the user confirms.
 
 6. After approval, commit and push:
    ```
@@ -142,9 +145,14 @@ This phase requires user verification before pushing.
    gh release view <version> --repo apollographql/apollo-ios-codegen
    ```
 
-2. **STOP — Present the draft release contents to the user.** Use `AskUserQuestion`
-   to get explicit confirmation before publishing. The user may want to edit the
-   release notes or add additional context.
+2. **STOP — Open the draft release pages in the browser for user review.** Extract
+   the URLs from `gh release view` output and open them:
+   ```
+   open "<apollo-ios draft release URL>"
+   open "<apollo-ios-codegen draft release URL>"
+   ```
+   Then use `AskUserQuestion` to ask if the user is ready to publish. The user may
+   want to edit the release notes directly on GitHub before publishing.
 
 3. After user approval, publish both releases:
    ```
