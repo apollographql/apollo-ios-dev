@@ -37,26 +37,30 @@ class ClientAwarenessMetadataTests: XCTestCase, MockResponseProvider {
     """.data(using: .utf8)!
   }
 
-  private func makeTransport() -> RequestChainNetworkTransport {
+  private func makeTransport(
+    apqConfig: AutoPersistedQueryConfiguration = .init()
+  ) -> RequestChainNetworkTransport {
     RequestChainNetworkTransport(
       urlSession: mockSession,
       interceptorProvider: DefaultInterceptorProvider.shared,
       store: store,
-      endpointURL: Self.endpoint
+      endpointURL: Self.endpoint,
+      apqConfig: apqConfig
     )
   }
 
   private func makeClient(
-    metadata: ClientAwarenessMetadata = ClientAwarenessMetadata()
+    metadata: ClientAwarenessMetadata = ClientAwarenessMetadata(),
+    apqConfig: AutoPersistedQueryConfiguration = .init()
   ) -> ApolloClient {
     ApolloClient(
-      networkTransport: makeTransport(),
+      networkTransport: makeTransport(apqConfig: apqConfig),
       store: store,
       clientAwarenessMetadata: metadata
     )
   }
 
-  /// Registers a mock handler that captures the URLRequest, then performs the given fetch.
+  /// Registers a mock handler that captures the URLRequest, then performs a fetch.
   /// Returns the captured URLRequest for inspection.
   private func captureRequest(
     client: ApolloClient
@@ -79,14 +83,51 @@ class ClientAwarenessMetadataTests: XCTestCase, MockResponseProvider {
   /// Extracts the JSON body from a captured URLRequest, handling both
   /// httpBody and httpBodyStream (used by upload requests).
   private func jsonBody(from request: URLRequest) throws -> JSONObject {
-    let httpBody: Data?
+    let httpBody: Data
     if let bodyStream = request.httpBodyStream {
       httpBody = try Data(reading: bodyStream)
     } else {
-      httpBody = request.httpBody
+      httpBody = try XCTUnwrap(request.httpBody)
     }
-    let body = try XCTUnwrap(httpBody)
-    return try JSONSerializationFormat.deserialize(data: body) as JSONObject
+    return try JSONSerializationFormat.deserialize(data: httpBody) as JSONObject
+  }
+
+  /// Extracts the "operations" JSON object from a multipart upload request body.
+  /// Multipart bodies contain a part named "operations" with the GraphQL JSON payload.
+  private func operationsJSON(from request: URLRequest) throws -> JSONObject {
+    let bodyData: Data
+    if let bodyStream = request.httpBodyStream {
+      bodyData = try Data(reading: bodyStream)
+    } else {
+      bodyData = try XCTUnwrap(request.httpBody)
+    }
+    let bodyString = try XCTUnwrap(String(data: bodyData, encoding: .utf8))
+
+    // Extract the operations part from multipart body.
+    // Format: Content-Disposition: form-data; name="operations"\r\n\r\n{...JSON...}\r\n--boundary
+    let parts = bodyString.components(separatedBy: "Content-Disposition: form-data; name=\"operations\"")
+    let operationsPart = try XCTUnwrap(parts.last, "Could not find operations part in multipart body")
+
+    // The JSON starts after the blank line following the Content-Disposition header
+    let lines = operationsPart.components(separatedBy: "\n")
+    // Find the first non-empty line after the header separator (blank line)
+    var foundBlankLine = false
+    var jsonString: String?
+    for line in lines {
+      let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+      if trimmed.isEmpty {
+        foundBlankLine = true
+        continue
+      }
+      if foundBlankLine {
+        jsonString = trimmed
+        break
+      }
+    }
+
+    let json = try XCTUnwrap(jsonString, "Could not find JSON in operations part")
+    let data = try XCTUnwrap(json.data(using: .utf8))
+    return try JSONSerializationFormat.deserialize(data: data) as JSONObject
   }
 
   // MARK: - JSON Request Tests
@@ -94,16 +135,12 @@ class ClientAwarenessMetadataTests: XCTestCase, MockResponseProvider {
   func test__fetch__usingDefaultMetadata__shouldAddClientLibraryExtensionToBody__shouldNotIncludeClientApplicationHeaders()
     async throws
   {
-    // Default ClientAwarenessMetadata has includeApolloLibraryAwareness: true,
-    // clientApplicationName: nil, clientApplicationVersion: nil
     let client = makeClient()
     let request = try await captureRequest(client: client)
 
-    // No application headers should be set
     expect(request.value(forHTTPHeaderField: "apollographql-client-name")).to(beNil())
     expect(request.value(forHTTPHeaderField: "apollographql-client-version")).to(beNil())
 
-    // Body should contain clientLibrary extension
     let body = try jsonBody(from: request)
     let extensions = try XCTUnwrap(body["extensions"] as? JSONObject)
     let clientLibrary = try XCTUnwrap(extensions["clientLibrary"] as? JSONObject)
@@ -119,11 +156,9 @@ class ClientAwarenessMetadataTests: XCTestCase, MockResponseProvider {
     )
     let request = try await captureRequest(client: client)
 
-    // No application headers
     expect(request.value(forHTTPHeaderField: "apollographql-client-name")).to(beNil())
     expect(request.value(forHTTPHeaderField: "apollographql-client-version")).to(beNil())
 
-    // Body should contain clientLibrary extension
     let body = try jsonBody(from: request)
     let extensions = try XCTUnwrap(body["extensions"] as? JSONObject)
     let clientLibrary = try XCTUnwrap(extensions["clientLibrary"] as? JSONObject)
@@ -143,13 +178,11 @@ class ClientAwarenessMetadataTests: XCTestCase, MockResponseProvider {
     )
     let request = try await captureRequest(client: client)
 
-    // Application headers should be set
     expect(request.value(forHTTPHeaderField: "apollographql-client-name"))
       .to(equal("test-client"))
     expect(request.value(forHTTPHeaderField: "apollographql-client-version"))
       .to(equal("test-client-version"))
 
-    // Body should NOT contain clientLibrary extension
     let body = try jsonBody(from: request)
     expect(body["extensions"] as? JSONObject).to(beNil())
   }
@@ -166,13 +199,11 @@ class ClientAwarenessMetadataTests: XCTestCase, MockResponseProvider {
     )
     let request = try await captureRequest(client: client)
 
-    // Application headers should be set
     expect(request.value(forHTTPHeaderField: "apollographql-client-name"))
       .to(equal("test-client"))
     expect(request.value(forHTTPHeaderField: "apollographql-client-version"))
       .to(equal("1.0.0"))
 
-    // Body should also contain clientLibrary extension
     let body = try jsonBody(from: request)
     let extensions = try XCTUnwrap(body["extensions"] as? JSONObject)
     let clientLibrary = try XCTUnwrap(extensions["clientLibrary"] as? JSONObject)
@@ -186,13 +217,48 @@ class ClientAwarenessMetadataTests: XCTestCase, MockResponseProvider {
     let client = makeClient(metadata: .none)
     let request = try await captureRequest(client: client)
 
-    // No application headers
     expect(request.value(forHTTPHeaderField: "apollographql-client-name")).to(beNil())
     expect(request.value(forHTTPHeaderField: "apollographql-client-version")).to(beNil())
 
-    // No clientLibrary extension in body
     let body = try jsonBody(from: request)
     expect(body["extensions"] as? JSONObject).to(beNil())
+  }
+
+  // MARK: - APQ + Library Awareness Coexistence Test
+
+  func test__fetch__givenAPQEnabledWithLibraryAwareness__extensionsShouldContainBothPersistedQueryAndClientLibrary()
+    async throws
+  {
+    let client = makeClient(
+      metadata: ClientAwarenessMetadata(includeApolloLibraryAwareness: true),
+      apqConfig: .init(autoPersistQueries: true)
+    )
+
+    nonisolated(unsafe) var capturedRequest: URLRequest?
+
+    await Self.registerRequestHandler(for: Self.endpoint) { request in
+      capturedRequest = request
+      return (HTTPURLResponse.mock(), Self.mockResponseData())
+    }
+
+    _ = try await client.fetch(
+      query: APQMockQuery(),
+      cachePolicy: .networkOnly
+    )
+
+    let request = try XCTUnwrap(capturedRequest)
+    let body = try jsonBody(from: request)
+    let extensions = try XCTUnwrap(body["extensions"] as? JSONObject)
+
+    // persistedQuery should be present from APQ
+    let persistedQuery = try XCTUnwrap(extensions["persistedQuery"] as? JSONObject)
+    expect(persistedQuery["version"] as? Int).to(equal(1))
+    expect(persistedQuery["sha256Hash"]).toNot(beNil())
+
+    // clientLibrary should also be present from library awareness
+    let clientLibrary = try XCTUnwrap(extensions["clientLibrary"] as? JSONObject)
+    expect(clientLibrary["name"] as? String).to(equal(Constants.ApolloClientName))
+    expect(clientLibrary["version"] as? String).to(equal(Constants.ApolloClientVersion))
   }
 
   // MARK: - Upload Request Tests
@@ -200,11 +266,7 @@ class ClientAwarenessMetadataTests: XCTestCase, MockResponseProvider {
   func test__upload__usingDefaultMetadata__shouldAddClientLibraryExtensionToBody__shouldNotIncludeClientApplicationHeaders()
     async throws
   {
-    let transport = makeTransport()
-    let client = ApolloClient(
-      networkTransport: transport,
-      store: store
-    )
+    let client = makeClient()
 
     nonisolated(unsafe) var capturedRequest: URLRequest?
 
@@ -226,32 +288,21 @@ class ClientAwarenessMetadataTests: XCTestCase, MockResponseProvider {
 
     let request = try XCTUnwrap(capturedRequest)
 
-    // No application headers
     expect(request.value(forHTTPHeaderField: "apollographql-client-name")).to(beNil())
     expect(request.value(forHTTPHeaderField: "apollographql-client-version")).to(beNil())
 
-    // Multipart body should contain clientLibrary extension in the operations part
-    let bodyData: Data
-    if let bodyStream = request.httpBodyStream {
-      bodyData = try Data(reading: bodyStream)
-    } else {
-      bodyData = try XCTUnwrap(request.httpBody)
-    }
-    let bodyString = try XCTUnwrap(String(data: bodyData, encoding: .utf8))
-
-    expect(bodyString).to(contain("\"clientLibrary\""))
-    expect(bodyString).to(contain(Constants.ApolloClientName))
-    expect(bodyString).to(contain(Constants.ApolloClientVersion))
+    let operations = try operationsJSON(from: request)
+    let extensions = try XCTUnwrap(operations["extensions"] as? JSONObject)
+    let clientLibrary = try XCTUnwrap(extensions["clientLibrary"] as? JSONObject)
+    expect(clientLibrary["name"] as? String).to(equal(Constants.ApolloClientName))
+    expect(clientLibrary["version"] as? String).to(equal(Constants.ApolloClientVersion))
   }
 
   func test__upload__givenApplicationNameAndVersion__shouldAddClientApplicationHeaders__shouldNotAddClientLibraryExtension()
     async throws
   {
-    let transport = makeTransport()
-    let client = ApolloClient(
-      networkTransport: transport,
-      store: store,
-      clientAwarenessMetadata: ClientAwarenessMetadata(
+    let client = makeClient(
+      metadata: ClientAwarenessMetadata(
         clientApplicationName: "test-client",
         clientApplicationVersion: "test-client-version",
         includeApolloLibraryAwareness: false
@@ -278,45 +329,54 @@ class ClientAwarenessMetadataTests: XCTestCase, MockResponseProvider {
 
     let request = try XCTUnwrap(capturedRequest)
 
-    // Application headers should be set
     expect(request.value(forHTTPHeaderField: "apollographql-client-name"))
       .to(equal("test-client"))
     expect(request.value(forHTTPHeaderField: "apollographql-client-version"))
       .to(equal("test-client-version"))
 
-    // Multipart body should NOT contain clientLibrary extension
-    let bodyData: Data
-    if let bodyStream = request.httpBodyStream {
-      bodyData = try Data(reading: bodyStream)
-    } else {
-      bodyData = try XCTUnwrap(request.httpBody)
-    }
-    let bodyString = try XCTUnwrap(String(data: bodyData, encoding: .utf8))
-
-    expect(bodyString).notTo(contain("\"clientLibrary\""))
+    let operations = try operationsJSON(from: request)
+    expect(operations["extensions"] as? JSONObject).to(beNil())
   }
-}
 
-// MARK: - Data InputStream Helper
+  // MARK: - Static Property Tests
 
-private extension Data {
-  init(reading input: InputStream) throws {
-    self.init()
-    input.open()
-    defer { input.close() }
+  func test__defaultClientName__shouldContainApolloSuffix() {
+    let name = ClientAwarenessMetadata.defaultClientName
+    // In a test host with a bundle identifier, the name is "<bundleID>-apollo-ios".
+    // Without a bundle identifier, the fallback is "apollo-ios-client".
+    // Both cases end with "apollo-ios" somewhere in the string.
+    expect(name).to(contain("apollo-ios"))
+    expect(name).toNot(beEmpty())
+  }
 
-    let bufferSize = 1024
-    let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
-    defer { buffer.deallocate() }
+  func test__defaultClientVersion__shouldReturnNonEmptyString() {
+    let version = ClientAwarenessMetadata.defaultClientVersion
+    expect(version).toNot(beEmpty())
+  }
 
-    while input.hasBytesAvailable {
-      let read = input.read(buffer, maxLength: bufferSize)
-      if read < 0 {
-        throw input.streamError!
-      } else if read == 0 {
-        break
-      }
-      self.append(buffer, count: read)
+  func test__enabledWithDefaults__shouldSetAllProperties() {
+    let metadata = ClientAwarenessMetadata.enabledWithDefaults
+    expect(metadata.clientApplicationName).to(equal(ClientAwarenessMetadata.defaultClientName))
+    expect(metadata.clientApplicationVersion).to(equal(ClientAwarenessMetadata.defaultClientVersion))
+    expect(metadata.includeApolloLibraryAwareness).to(beTrue())
+  }
+
+  func test__none__shouldDisableAllProperties() {
+    let metadata = ClientAwarenessMetadata.none
+    expect(metadata.clientApplicationName).to(beNil())
+    expect(metadata.clientApplicationVersion).to(beNil())
+    expect(metadata.includeApolloLibraryAwareness).to(beFalse())
+  }
+
+  // MARK: - Mock Helpers
+
+  /// A mock query with an operationIdentifier for APQ testing.
+  private final class APQMockQuery: MockQuery<MockSelectionSet>, @unchecked Sendable {
+    override class var operationDocument: OperationDocument {
+      .init(
+        operationIdentifier: "abc123def456",
+        definition: .init("APQMockQuery - Operation Definition")
+      )
     }
   }
 }

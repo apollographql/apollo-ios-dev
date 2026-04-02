@@ -7,6 +7,8 @@ import XCTest
 
 final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
 
+  typealias AnimalQuery = MockDeferredAnimalQuery
+
   var subject: JSONResponseParsingInterceptor!
 
   override func setUp() {
@@ -19,37 +21,75 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
     subject = nil
   }
 
+  // MARK: - Helpers
+
+  private static let initialPartialResponse = """
+    {
+      "data": {
+        "animal": {
+          "__typename": "Animal",
+          "species": "Canis Familiaris"
+        }
+      },
+      "hasNext": true
+    }
+    """.data(using: .utf8)!
+
+  /// Sets up the interceptor with a stream mocker, returns the iterator and mocker.
+  /// The initial partial response has NOT been emitted yet.
+  private func setUpIterator(
+    includeCacheRecords: Bool = false
+  ) async throws -> (
+    iterator: AsyncThrowingStream<ParsedResult<AnimalQuery>, any Error>.AsyncIterator,
+    mocker: AsyncStreamMocker<Data>
+  ) {
+    let operation = AnimalQuery()
+    let mocker = AsyncStreamMocker<Data>()
+    let urlResponse = HTTPURLResponse.deferResponseMock()
+
+    var iterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: mocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: includeCacheRecords
+    )
+    .getStream()
+    .makeAsyncIterator()
+
+    return (iterator, mocker)
+  }
+
+  /// Sets up the interceptor, emits the initial partial response, and consumes it.
+  /// Returns the iterator (ready for incremental chunks) and mocker.
+  private func setUpIteratorWithInitialResponse(
+    includeCacheRecords: Bool = false
+  ) async throws -> (
+    iterator: AsyncThrowingStream<ParsedResult<AnimalQuery>, any Error>.AsyncIterator,
+    mocker: AsyncStreamMocker<Data>
+  ) {
+    var (iterator, mocker) = try await setUpIterator(includeCacheRecords: includeCacheRecords)
+
+    mocker.emit(Self.initialPartialResponse)
+    _ = try await iterator.next()
+
+    return (iterator, mocker)
+  }
+
   // MARK: - Error Handling Tests
 
   func test__parsing__givenIncrementalChunkWithoutPriorPartialResponse__shouldThrowMissingExistingData()
     async throws
   {
-    // given
-    let operation = AnimalQuery()
-    let streamMocker = AsyncStreamMocker<Data>()
-    let urlResponse = HTTPURLResponse.deferResponseMock()
+    var (iterator, mocker) = try await setUpIterator()
 
-    // when
-    var iterator = try await subject.parse(
-      response: HTTPResponse(
-        response: urlResponse,
-        chunks: streamMocker.getStream()
-      ),
-      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
-      includeCacheRecords: false
-    )
-    .getStream()
-    .makeAsyncIterator()
-
-    // Send an incremental chunk without sending an initial partial response first
-    streamMocker.emit(
+    mocker.emit(
       """
       {
         "incremental": [{
           "label": "deferredGenus",
-          "data": {
-            "genus": "Canis"
-          },
+          "data": { "genus": "Canis" },
           "path": ["animal"]
         }],
         "hasNext": false
@@ -57,7 +97,6 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
       """.data(using: .utf8)!
     )
 
-    // then
     do {
       _ = try await iterator.next()
       fail("Expected IncrementalResponseError.missingExistingData to be thrown")
@@ -69,55 +108,20 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
   func test__parsing__givenIncrementalItemMissingPath__shouldThrowMissingPath()
     async throws
   {
-    // given
-    let operation = AnimalQuery()
-    let streamMocker = AsyncStreamMocker<Data>()
-    let urlResponse = HTTPURLResponse.deferResponseMock()
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
 
-    var iterator = try await subject.parse(
-      response: HTTPResponse(
-        response: urlResponse,
-        chunks: streamMocker.getStream()
-      ),
-      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
-      includeCacheRecords: false
-    )
-    .getStream()
-    .makeAsyncIterator()
-
-    // Send initial partial response
-    streamMocker.emit(
-      """
-      {
-        "data": {
-          "animal": {
-            "__typename": "Animal",
-            "species": "Canis Familiaris"
-          }
-        },
-        "hasNext": true
-      }
-      """.data(using: .utf8)!
-    )
-
-    _ = try await iterator.next()
-
-    // when - send incremental item without "path"
-    streamMocker.emit(
+    mocker.emit(
       """
       {
         "incremental": [{
           "label": "deferredGenus",
-          "data": {
-            "genus": "Canis"
-          }
+          "data": { "genus": "Canis" }
         }],
         "hasNext": false
       }
       """.data(using: .utf8)!
     )
 
-    // then
     do {
       _ = try await iterator.next()
       fail("Expected IncrementalResponseError.missingPath to be thrown")
@@ -129,55 +133,20 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
   func test__parsing__givenIncrementalItemMissingLabel__shouldThrowMissingLabel()
     async throws
   {
-    // given
-    let operation = AnimalQuery()
-    let streamMocker = AsyncStreamMocker<Data>()
-    let urlResponse = HTTPURLResponse.deferResponseMock()
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
 
-    var iterator = try await subject.parse(
-      response: HTTPResponse(
-        response: urlResponse,
-        chunks: streamMocker.getStream()
-      ),
-      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
-      includeCacheRecords: false
-    )
-    .getStream()
-    .makeAsyncIterator()
-
-    // Send initial partial response
-    streamMocker.emit(
-      """
-      {
-        "data": {
-          "animal": {
-            "__typename": "Animal",
-            "species": "Canis Familiaris"
-          }
-        },
-        "hasNext": true
-      }
-      """.data(using: .utf8)!
-    )
-
-    _ = try await iterator.next()
-
-    // when - send incremental item without "label"
-    streamMocker.emit(
+    mocker.emit(
       """
       {
         "incremental": [{
           "path": ["animal"],
-          "data": {
-            "genus": "Canis"
-          }
+          "data": { "genus": "Canis" }
         }],
         "hasNext": false
       }
       """.data(using: .utf8)!
     )
 
-    // then
     do {
       _ = try await iterator.next()
       fail("Expected IncrementalResponseError.missingLabel to be thrown")
@@ -189,56 +158,21 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
   func test__parsing__givenIncrementalItemWithUnrecognizedLabel__shouldThrowMissingDeferredSelectionSetType()
     async throws
   {
-    // given
-    let operation = AnimalQuery()
-    let streamMocker = AsyncStreamMocker<Data>()
-    let urlResponse = HTTPURLResponse.deferResponseMock()
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
 
-    var iterator = try await subject.parse(
-      response: HTTPResponse(
-        response: urlResponse,
-        chunks: streamMocker.getStream()
-      ),
-      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
-      includeCacheRecords: false
-    )
-    .getStream()
-    .makeAsyncIterator()
-
-    // Send initial partial response
-    streamMocker.emit(
-      """
-      {
-        "data": {
-          "animal": {
-            "__typename": "Animal",
-            "species": "Canis Familiaris"
-          }
-        },
-        "hasNext": true
-      }
-      """.data(using: .utf8)!
-    )
-
-    _ = try await iterator.next()
-
-    // when - send incremental item with a label not registered in responseFormat
-    streamMocker.emit(
+    mocker.emit(
       """
       {
         "incremental": [{
           "label": "unknownFragment",
           "path": ["animal"],
-          "data": {
-            "key": "value"
-          }
+          "data": { "key": "value" }
         }],
         "hasNext": false
       }
       """.data(using: .utf8)!
     )
 
-    // then
     do {
       _ = try await iterator.next()
       fail("Expected IncrementalResponseError.missingDeferredSelectionSetType to be thrown")
@@ -253,48 +187,15 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
   func test__parsing__givenIncrementalItemWithEmptyExtensions__extensionsShouldNotBeNil()
     async throws
   {
-    // given
-    let operation = AnimalQuery()
-    let streamMocker = AsyncStreamMocker<Data>()
-    let urlResponse = HTTPURLResponse.deferResponseMock()
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
 
-    var iterator = try await subject.parse(
-      response: HTTPResponse(
-        response: urlResponse,
-        chunks: streamMocker.getStream()
-      ),
-      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
-      includeCacheRecords: false
-    )
-    .getStream()
-    .makeAsyncIterator()
-
-    streamMocker.emit(
-      """
-      {
-        "data": {
-          "animal": {
-            "__typename": "Animal",
-            "species": "Canis Familiaris"
-          }
-        },
-        "hasNext": true
-      }
-      """.data(using: .utf8)!
-    )
-
-    _ = try await iterator.next()
-
-    // when
-    streamMocker.emit(
+    mocker.emit(
       """
       {
         "incremental": [{
           "label": "deferredGenus",
           "path": ["animal"],
-          "data": {
-            "genus": "Canis"
-          },
+          "data": { "genus": "Canis" },
           "extensions": {}
         }],
         "hasNext": false
@@ -302,7 +203,6 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
       """.data(using: .utf8)!
     )
 
-    // then
     let result = try await iterator.next()
     expect(result?.result.extensions).toNot(beNil())
     expect(result?.result.extensions).to(equal([:]))
@@ -311,48 +211,15 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
   func test__parsing__givenIncrementalItemWithNestedExtensions__extensionsShouldContainNestedValues()
     async throws
   {
-    // given
-    let operation = AnimalQuery()
-    let streamMocker = AsyncStreamMocker<Data>()
-    let urlResponse = HTTPURLResponse.deferResponseMock()
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
 
-    var iterator = try await subject.parse(
-      response: HTTPResponse(
-        response: urlResponse,
-        chunks: streamMocker.getStream()
-      ),
-      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
-      includeCacheRecords: false
-    )
-    .getStream()
-    .makeAsyncIterator()
-
-    streamMocker.emit(
-      """
-      {
-        "data": {
-          "animal": {
-            "__typename": "Animal",
-            "species": "Canis Familiaris"
-          }
-        },
-        "hasNext": true
-      }
-      """.data(using: .utf8)!
-    )
-
-    _ = try await iterator.next()
-
-    // when
-    streamMocker.emit(
+    mocker.emit(
       """
       {
         "incremental": [{
           "label": "deferredGenus",
           "path": ["animal"],
-          "data": {
-            "genus": "Canis"
-          },
+          "data": { "genus": "Canis" },
           "extensions": {
             "parentKey": {
               "childKey": "someValue"
@@ -364,7 +231,6 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
       """.data(using: .utf8)!
     )
 
-    // then
     let result = try await iterator.next()
     expect(result?.result.extensions).toNot(beNil())
     expect(result?.result.extensions?["parentKey"] as? [String: String])
@@ -374,55 +240,21 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
   func test__parsing__givenIncrementalItemWithMissingExtensions__extensionsShouldBeNil()
     async throws
   {
-    // given
-    let operation = AnimalQuery()
-    let streamMocker = AsyncStreamMocker<Data>()
-    let urlResponse = HTTPURLResponse.deferResponseMock()
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
 
-    var iterator = try await subject.parse(
-      response: HTTPResponse(
-        response: urlResponse,
-        chunks: streamMocker.getStream()
-      ),
-      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
-      includeCacheRecords: false
-    )
-    .getStream()
-    .makeAsyncIterator()
-
-    streamMocker.emit(
-      """
-      {
-        "data": {
-          "animal": {
-            "__typename": "Animal",
-            "species": "Canis Familiaris"
-          }
-        },
-        "hasNext": true
-      }
-      """.data(using: .utf8)!
-    )
-
-    _ = try await iterator.next()
-
-    // when
-    streamMocker.emit(
+    mocker.emit(
       """
       {
         "incremental": [{
           "label": "deferredGenus",
           "path": ["animal"],
-          "data": {
-            "genus": "Canis"
-          }
+          "data": { "genus": "Canis" }
         }],
         "hasNext": false
       }
       """.data(using: .utf8)!
     )
 
-    // then
     let result = try await iterator.next()
     expect(result?.result.extensions).to(beNil())
   }
@@ -432,124 +264,50 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
   func test__parsing__givenIncrementalItemWithError__errorMessageShouldBePresent()
     async throws
   {
-    // given
-    let operation = AnimalQuery()
-    let streamMocker = AsyncStreamMocker<Data>()
-    let urlResponse = HTTPURLResponse.deferResponseMock()
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
 
-    var iterator = try await subject.parse(
-      response: HTTPResponse(
-        response: urlResponse,
-        chunks: streamMocker.getStream()
-      ),
-      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
-      includeCacheRecords: false
-    )
-    .getStream()
-    .makeAsyncIterator()
-
-    streamMocker.emit(
-      """
-      {
-        "data": {
-          "animal": {
-            "__typename": "Animal",
-            "species": "Canis Familiaris"
-          }
-        },
-        "hasNext": true
-      }
-      """.data(using: .utf8)!
-    )
-
-    _ = try await iterator.next()
-
-    // when
-    streamMocker.emit(
+    mocker.emit(
       """
       {
         "incremental": [{
           "label": "deferredGenus",
           "path": ["animal"],
-          "data": {
-            "genus": "Canis"
-          },
-          "errors": [
-            {
-              "message": "Some error"
-            }
-          ]
+          "data": { "genus": "Canis" },
+          "errors": [{ "message": "Some error" }]
         }],
         "hasNext": false
       }
       """.data(using: .utf8)!
     )
 
-    // then
     let result = try await iterator.next()
     expect(result?.result.errors?.first?.message).to(equal("Some error"))
+    // Data should also be merged despite the error
+    expect(result?.result.data?.animal.fragments.deferredGenus?.genus).to(equal("Canis"))
   }
 
   func test__parsing__givenIncrementalItemWithErrorLocation__errorLocationShouldBePresent()
     async throws
   {
-    // given
-    let operation = AnimalQuery()
-    let streamMocker = AsyncStreamMocker<Data>()
-    let urlResponse = HTTPURLResponse.deferResponseMock()
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
 
-    var iterator = try await subject.parse(
-      response: HTTPResponse(
-        response: urlResponse,
-        chunks: streamMocker.getStream()
-      ),
-      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
-      includeCacheRecords: false
-    )
-    .getStream()
-    .makeAsyncIterator()
-
-    streamMocker.emit(
-      """
-      {
-        "data": {
-          "animal": {
-            "__typename": "Animal",
-            "species": "Canis Familiaris"
-          }
-        },
-        "hasNext": true
-      }
-      """.data(using: .utf8)!
-    )
-
-    _ = try await iterator.next()
-
-    // when
-    streamMocker.emit(
+    mocker.emit(
       """
       {
         "incremental": [{
           "label": "deferredGenus",
           "path": ["animal"],
-          "data": {
-            "genus": "Canis"
-          },
-          "errors": [
-            {
-              "message": "Some error",
-              "locations": [
-                {"line": 1, "column": 2}
-              ]
-            }
-          ]
+          "data": { "genus": "Canis" },
+          "errors": [{
+            "message": "Some error",
+            "locations": [{"line": 1, "column": 2}]
+          }]
         }],
         "hasNext": false
       }
       """.data(using: .utf8)!
     )
 
-    // then
     let result = try await iterator.next()
     let error = result?.result.errors?.first
     expect(error?.message).to(equal("Some error"))
@@ -560,61 +318,25 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
   func test__parsing__givenIncrementalItemWithErrorPath__errorPathShouldBePresent()
     async throws
   {
-    // given
-    let operation = AnimalQuery()
-    let streamMocker = AsyncStreamMocker<Data>()
-    let urlResponse = HTTPURLResponse.deferResponseMock()
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
 
-    var iterator = try await subject.parse(
-      response: HTTPResponse(
-        response: urlResponse,
-        chunks: streamMocker.getStream()
-      ),
-      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
-      includeCacheRecords: false
-    )
-    .getStream()
-    .makeAsyncIterator()
-
-    streamMocker.emit(
-      """
-      {
-        "data": {
-          "animal": {
-            "__typename": "Animal",
-            "species": "Canis Familiaris"
-          }
-        },
-        "hasNext": true
-      }
-      """.data(using: .utf8)!
-    )
-
-    _ = try await iterator.next()
-
-    // when
-    streamMocker.emit(
+    mocker.emit(
       """
       {
         "incremental": [{
           "label": "deferredGenus",
           "path": ["animal"],
-          "data": {
-            "genus": "Canis"
-          },
-          "errors": [
-            {
-              "message": "Some error",
-              "path": ["Some field", 1]
-            }
-          ]
+          "data": { "genus": "Canis" },
+          "errors": [{
+            "message": "Some error",
+            "path": ["Some field", 1]
+          }]
         }],
         "hasNext": false
       }
       """.data(using: .utf8)!
     )
 
-    // then
     let result = try await iterator.next()
     let error = result?.result.errors?.first
     expect(error?.message).to(equal("Some error"))
@@ -625,61 +347,25 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
   func test__parsing__givenIncrementalItemWithErrorCustomKey__errorCustomKeyShouldBePresent()
     async throws
   {
-    // given
-    let operation = AnimalQuery()
-    let streamMocker = AsyncStreamMocker<Data>()
-    let urlResponse = HTTPURLResponse.deferResponseMock()
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
 
-    var iterator = try await subject.parse(
-      response: HTTPResponse(
-        response: urlResponse,
-        chunks: streamMocker.getStream()
-      ),
-      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
-      includeCacheRecords: false
-    )
-    .getStream()
-    .makeAsyncIterator()
-
-    streamMocker.emit(
-      """
-      {
-        "data": {
-          "animal": {
-            "__typename": "Animal",
-            "species": "Canis Familiaris"
-          }
-        },
-        "hasNext": true
-      }
-      """.data(using: .utf8)!
-    )
-
-    _ = try await iterator.next()
-
-    // when
-    streamMocker.emit(
+    mocker.emit(
       """
       {
         "incremental": [{
           "label": "deferredGenus",
           "path": ["animal"],
-          "data": {
-            "genus": "Canis"
-          },
-          "errors": [
-            {
-              "message": "Some error",
-              "userMessage": "Some message"
-            }
-          ]
+          "data": { "genus": "Canis" },
+          "errors": [{
+            "message": "Some error",
+            "userMessage": "Some message"
+          }]
         }],
         "hasNext": false
       }
       """.data(using: .utf8)!
     )
 
-    // then
     let result = try await iterator.next()
     let error = result?.result.errors?.first
     expect(error?.message).to(equal("Some error"))
@@ -689,55 +375,18 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
   func test__parsing__givenIncrementalItemWithMultipleErrors__shouldReturnAllErrors()
     async throws
   {
-    // given
-    let operation = AnimalQuery()
-    let streamMocker = AsyncStreamMocker<Data>()
-    let urlResponse = HTTPURLResponse.deferResponseMock()
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
 
-    var iterator = try await subject.parse(
-      response: HTTPResponse(
-        response: urlResponse,
-        chunks: streamMocker.getStream()
-      ),
-      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
-      includeCacheRecords: false
-    )
-    .getStream()
-    .makeAsyncIterator()
-
-    streamMocker.emit(
-      """
-      {
-        "data": {
-          "animal": {
-            "__typename": "Animal",
-            "species": "Canis Familiaris"
-          }
-        },
-        "hasNext": true
-      }
-      """.data(using: .utf8)!
-    )
-
-    _ = try await iterator.next()
-
-    // when
-    streamMocker.emit(
+    mocker.emit(
       """
       {
         "incremental": [{
           "label": "deferredGenus",
           "path": ["animal"],
-          "data": {
-            "genus": "Canis"
-          },
+          "data": { "genus": "Canis" },
           "errors": [
-            {
-              "message": "Some error"
-            },
-            {
-              "message": "Another error"
-            }
+            { "message": "Some error" },
+            { "message": "Another error" }
           ]
         }],
         "hasNext": false
@@ -745,11 +394,32 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
       """.data(using: .utf8)!
     )
 
-    // then
     let result = try await iterator.next()
     expect(result?.result.errors).to(haveCount(2))
     expect(result?.result.errors?[0].message).to(equal("Some error"))
     expect(result?.result.errors?[1].message).to(equal("Another error"))
+  }
+
+  // MARK: - Edge Case Tests
+
+  func test__parsing__givenEmptyIncrementalArray__shouldReturnUnchangedResult()
+    async throws
+  {
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
+
+    mocker.emit(
+      """
+      {
+        "incremental": [],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    let result = try await iterator.next()
+    expect(result?.result.data?.animal.species).to(equal("Canis Familiaris"))
+    expect(result?.result.data?.animal.fragments.deferredGenus?.genus).to(beNil())
+    expect(result?.result.data?.animal.fragments.deferredFriend?.friend).to(beNil())
   }
 
   // MARK: - Cache Reference Tests
@@ -757,47 +427,14 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
   func test__parsing__givenIncrementalItem__dependentKeysShouldIncludeIncrementalPath()
     async throws
   {
-    // given
-    let operation = AnimalQuery()
-    let streamMocker = AsyncStreamMocker<Data>()
-    let urlResponse = HTTPURLResponse.deferResponseMock()
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse(includeCacheRecords: true)
 
-    var iterator = try await subject.parse(
-      response: HTTPResponse(
-        response: urlResponse,
-        chunks: streamMocker.getStream()
-      ),
-      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
-      includeCacheRecords: true
-    )
-    .getStream()
-    .makeAsyncIterator()
-
-    streamMocker.emit(
-      """
-      {
-        "data": {
-          "animal": {
-            "__typename": "Animal",
-            "species": "Canis Familiaris"
-          }
-        },
-        "hasNext": true
-      }
-      """.data(using: .utf8)!
-    )
-
-    _ = try await iterator.next()
-
-    // when
-    streamMocker.emit(
+    mocker.emit(
       """
       {
         "incremental": [{
           "label": "deferredGenus",
-          "data": {
-            "genus": "Canis"
-          },
+          "data": { "genus": "Canis" },
           "path": ["animal"]
         }],
         "hasNext": false
@@ -805,95 +442,9 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
       """.data(using: .utf8)!
     )
 
-    // then
     let result = try await iterator.next()
     let dependentKeys = result?.result.dependentKeys
     expect(dependentKeys).toNot(beNil())
     expect(dependentKeys).to(contain(CacheKey("QUERY_ROOT.animal.genus")))
-  }
-
-  // MARK: - Mock Query Helpers
-
-  struct AnimalQuery: GraphQLQuery, @unchecked Sendable {
-    static var operationName: String { "AnimalQuery" }
-
-    static var operationDocument: OperationDocument {
-      .init(definition: .init("Mock Operation Definition"))
-    }
-
-    static var responseFormat: IncrementalDeferredResponseFormat {
-      IncrementalDeferredResponseFormat(deferredFragments: [
-        DeferredFragmentIdentifier(label: "deferredGenus", fieldPath: ["animal"]): AnAnimal.Animal.DeferredGenus.self,
-        DeferredFragmentIdentifier(label: "deferredFriend", fieldPath: ["animal"]): AnAnimal.Animal.DeferredFriend.self,
-      ])
-    }
-
-    typealias Data = AnAnimal
-    final class AnAnimal: MockSelectionSet, @unchecked Sendable {
-      typealias Schema = MockSchemaMetadata
-
-      override class var __selections: [Selection] {
-        [
-          .field("animal", Animal.self)
-        ]
-      }
-
-      var animal: Animal { __data["animal"] }
-
-      final class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata>, @unchecked Sendable {
-        override class var __selections: [Selection] {
-          [
-            .field("__typename", String.self),
-            .field("species", String.self),
-            .deferred(DeferredGenus.self, label: "deferredGenus"),
-            .deferred(DeferredFriend.self, label: "deferredFriend"),
-          ]
-        }
-
-        var species: String { __data["species"] }
-
-        struct Fragments: FragmentContainer {
-          public let __data: DataDict
-          public init(_dataDict: DataDict) {
-            __data = _dataDict
-            _deferredGenus = Deferred(_dataDict: _dataDict)
-            _deferredFriend = Deferred(_dataDict: _dataDict)
-          }
-
-          @Deferred var deferredGenus: DeferredGenus?
-          @Deferred var deferredFriend: DeferredFriend?
-        }
-
-        final class DeferredGenus: MockTypeCase, @unchecked Sendable {
-          override class var __selections: [Selection] {
-            [
-              .field("genus", String.self)
-            ]
-          }
-
-          var genus: String { __data["genus"] }
-        }
-
-        final class DeferredFriend: MockTypeCase, @unchecked Sendable {
-          override class var __selections: [Selection] {
-            [
-              .field("friend", Friend.self)
-            ]
-          }
-
-          var friend: Friend { __data["friend"] }
-
-          final class Friend: MockSelectionSet, @unchecked Sendable {
-            override class var __selections: [Selection] {
-              [
-                .field("name", String.self)
-              ]
-            }
-
-            var name: String { __data["name"] }
-          }
-        }
-      }
-    }
   }
 }
