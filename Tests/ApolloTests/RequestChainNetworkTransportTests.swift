@@ -3,12 +3,8 @@
 import Nimble
 import XCTest
 
-@testable import Apollo
+@testable @_spi(Execution) import Apollo
 
-// TODO: Additional tests still needed:
-// - Cache reads and writes based on cache policy (and if source is cache)
-// - Cache only request gets sent through interceptors still
-// - Cache read after failed network fetch
 class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
 
   var session: MockURLSession!
@@ -503,5 +499,181 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
 
     expect(results).to(haveCount(1))
     expect(results.first?.data?.name).to(equal("R2-D2"))
+  }
+
+  // MARK: - Cache Policy Tests
+
+  private final class HeroSelectionSet: MockSelectionSet, @unchecked Sendable {
+    override class var __selections: [Selection] {
+      [
+        .field("hero", HeroField.self)
+      ]
+    }
+
+    var hero: HeroField? { __data["hero"] }
+
+    final class HeroField: MockSelectionSet, @unchecked Sendable {
+      override class var __selections: [Selection] {
+        [
+          .field("__typename", String.self),
+          .field("name", String.self),
+        ]
+      }
+
+      var name: String { __data["name"] }
+    }
+  }
+
+  private static let heroServerData: JSONObject = [
+    "data": [
+      "hero": [
+        "name": "R2-D2",
+        "__typename": "Droid",
+      ]
+    ]
+  ]
+
+  /// Creates a MockNetworkTransport + ApolloClient backed by a MockGraphQLServer.
+  private func makeClientWithMockServer() -> (ApolloClient, MockGraphQLServer, ApolloStore) {
+    let mockServer = MockGraphQLServer()
+    let store = ApolloStore()
+    let transport = MockNetworkTransport(mockServer: mockServer, store: store)
+    let client = ApolloClient(networkTransport: transport, store: store)
+    return (client, mockServer, store)
+  }
+
+  func test__fetch__givenCacheFirst_withCachedData__shouldReturnFromCache() async throws {
+    let (client, _, store) = makeClientWithMockServer()
+
+    // Pre-populate cache
+    try await store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
+      "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2"],
+    ])
+
+    // No server expectation — if the network is hit, it will throw unexpectedRequest
+    let result = try await client.fetch(
+      query: MockQuery<HeroSelectionSet>(),
+      cachePolicy: .cacheFirst
+    )
+
+    expect(result.source).to(equal(.cache))
+    expect(result.data?.hero?.name).to(equal("R2-D2"))
+  }
+
+  func test__fetch__givenCacheFirst_withNoCachedData__shouldFetchFromNetwork() async throws {
+    let (client, mockServer, _) = makeClientWithMockServer()
+
+    let serverExpectation = await mockServer.expect(MockQuery<HeroSelectionSet>.self) { @Sendable _ in
+      Self.heroServerData
+    }
+
+    let result = try await client.fetch(
+      query: MockQuery<HeroSelectionSet>(),
+      cachePolicy: .cacheFirst
+    )
+
+    expect(result.source).to(equal(.server))
+    expect(result.data?.hero?.name).to(equal("R2-D2"))
+
+    await fulfillment(of: [serverExpectation])
+  }
+
+  func test__fetch__givenNetworkOnly_withCachedData__shouldFetchFromNetwork() async throws {
+    let (client, mockServer, store) = makeClientWithMockServer()
+
+    // Pre-populate cache with different data
+    try await store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
+      "QUERY_ROOT.hero": ["__typename": "Droid", "name": "C-3PO"],
+    ])
+
+    let serverExpectation = await mockServer.expect(MockQuery<HeroSelectionSet>.self) { @Sendable _ in
+      Self.heroServerData
+    }
+
+    let result = try await client.fetch(
+      query: MockQuery<HeroSelectionSet>(),
+      cachePolicy: .networkOnly
+    )
+
+    expect(result.source).to(equal(.server))
+    expect(result.data?.hero?.name).to(equal("R2-D2"))
+
+    await fulfillment(of: [serverExpectation])
+  }
+
+  func test__fetch__givenCacheOnly_withCachedData__shouldReturnFromCache() async throws {
+    let (client, _, store) = makeClientWithMockServer()
+
+    try await store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
+      "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2"],
+    ])
+
+    let result = try await client.fetch(
+      query: MockQuery<HeroSelectionSet>(),
+      cachePolicy: .cacheOnly
+    )
+
+    expect(result).toNot(beNil())
+    expect(result?.source).to(equal(.cache))
+    expect(result?.data?.hero?.name).to(equal("R2-D2"))
+  }
+
+  func test__fetch__givenCacheOnly_withNoCachedData__shouldReturnNil() async throws {
+    let (client, _, _) = makeClientWithMockServer()
+
+    let result = try await client.fetch(
+      query: MockQuery<HeroSelectionSet>(),
+      cachePolicy: .cacheOnly
+    )
+
+    expect(result).to(beNil())
+  }
+
+  func test__fetch__givenNetworkOnly__shouldWriteResultToCache() async throws {
+    let (client, mockServer, store) = makeClientWithMockServer()
+
+    let serverExpectation = await mockServer.expect(MockQuery<HeroSelectionSet>.self) { @Sendable _ in
+      Self.heroServerData
+    }
+
+    _ = try await client.fetch(
+      query: MockQuery<HeroSelectionSet>(),
+      cachePolicy: .networkOnly
+    )
+
+    await fulfillment(of: [serverExpectation])
+
+    // Verify data was written to cache by reading it back
+    let cachedResult = try await client.fetch(
+      query: MockQuery<HeroSelectionSet>(),
+      cachePolicy: .cacheOnly
+    )
+
+    expect(cachedResult).toNot(beNil())
+    expect(cachedResult?.source).to(equal(.cache))
+    expect(cachedResult?.data?.hero?.name).to(equal("R2-D2"))
+  }
+
+  func test__fetch__givenNetworkFirst_whenNetworkFails__shouldFallBackToCache() async throws {
+    let (client, _, store) = makeClientWithMockServer()
+
+    // Pre-populate cache
+    try await store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
+      "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2"],
+    ])
+
+    // No server expectation registered — network request will throw unexpectedRequest error
+    // networkFirst should catch this and fall back to cache
+    let result = try await client.fetch(
+      query: MockQuery<HeroSelectionSet>(),
+      cachePolicy: .networkFirst
+    )
+
+    expect(result.source).to(equal(.cache))
+    expect(result.data?.hero?.name).to(equal("R2-D2"))
   }
 }
