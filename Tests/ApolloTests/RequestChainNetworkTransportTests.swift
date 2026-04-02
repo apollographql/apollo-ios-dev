@@ -503,7 +503,9 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
 
   // MARK: - Cache Policy Tests
 
-  private final class HeroSelectionSet: MockSelectionSet, @unchecked Sendable {
+  /// Selection set with a nested `hero` field for cache policy tests.
+  /// Distinct from the flat `Hero` selection set used by content-type tests.
+  private final class CacheTestHeroSelectionSet: MockSelectionSet, @unchecked Sendable {
     override class var __selections: [Selection] {
       [
         .field("hero", HeroField.self)
@@ -553,7 +555,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
 
     // No server expectation — if the network is hit, it will throw unexpectedRequest
     let result = try await client.fetch(
-      query: MockQuery<HeroSelectionSet>(),
+      query: MockQuery<CacheTestHeroSelectionSet>(),
       cachePolicy: .cacheFirst
     )
 
@@ -564,12 +566,12 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
   func test__fetch__givenCacheFirst_withNoCachedData__shouldFetchFromNetwork() async throws {
     let (client, mockServer, _) = makeClientWithMockServer()
 
-    let serverExpectation = await mockServer.expect(MockQuery<HeroSelectionSet>.self) { @Sendable _ in
+    let serverExpectation = await mockServer.expect(MockQuery<CacheTestHeroSelectionSet>.self) { @Sendable _ in
       Self.heroServerData
     }
 
     let result = try await client.fetch(
-      query: MockQuery<HeroSelectionSet>(),
+      query: MockQuery<CacheTestHeroSelectionSet>(),
       cachePolicy: .cacheFirst
     )
 
@@ -588,12 +590,12 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
       "QUERY_ROOT.hero": ["__typename": "Droid", "name": "C-3PO"],
     ])
 
-    let serverExpectation = await mockServer.expect(MockQuery<HeroSelectionSet>.self) { @Sendable _ in
+    let serverExpectation = await mockServer.expect(MockQuery<CacheTestHeroSelectionSet>.self) { @Sendable _ in
       Self.heroServerData
     }
 
     let result = try await client.fetch(
-      query: MockQuery<HeroSelectionSet>(),
+      query: MockQuery<CacheTestHeroSelectionSet>(),
       cachePolicy: .networkOnly
     )
 
@@ -612,7 +614,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     ])
 
     let result = try await client.fetch(
-      query: MockQuery<HeroSelectionSet>(),
+      query: MockQuery<CacheTestHeroSelectionSet>(),
       cachePolicy: .cacheOnly
     )
 
@@ -625,7 +627,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     let (client, _, _) = makeClientWithMockServer()
 
     let result = try await client.fetch(
-      query: MockQuery<HeroSelectionSet>(),
+      query: MockQuery<CacheTestHeroSelectionSet>(),
       cachePolicy: .cacheOnly
     )
 
@@ -635,12 +637,12 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
   func test__fetch__givenNetworkOnly__shouldWriteResultToCache() async throws {
     let (client, mockServer, store) = makeClientWithMockServer()
 
-    let serverExpectation = await mockServer.expect(MockQuery<HeroSelectionSet>.self) { @Sendable _ in
+    let serverExpectation = await mockServer.expect(MockQuery<CacheTestHeroSelectionSet>.self) { @Sendable _ in
       Self.heroServerData
     }
 
     _ = try await client.fetch(
-      query: MockQuery<HeroSelectionSet>(),
+      query: MockQuery<CacheTestHeroSelectionSet>(),
       cachePolicy: .networkOnly
     )
 
@@ -648,7 +650,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
 
     // Verify data was written to cache by reading it back
     let cachedResult = try await client.fetch(
-      query: MockQuery<HeroSelectionSet>(),
+      query: MockQuery<CacheTestHeroSelectionSet>(),
       cachePolicy: .cacheOnly
     )
 
@@ -666,14 +668,56 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
       "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2"],
     ])
 
-    // No server expectation registered — network request will throw unexpectedRequest error
-    // networkFirst should catch this and fall back to cache
+    // No server expectation registered — MockGraphQLServer.serve() will throw
+    // ServerError.unexpectedRequest, which propagates as a network failure.
+    // The networkFirst policy catches network errors and falls back to cache
+    // (FetchBehavior.NetworkFirst has cacheRead: .onNetworkFailure).
     let result = try await client.fetch(
-      query: MockQuery<HeroSelectionSet>(),
+      query: MockQuery<CacheTestHeroSelectionSet>(),
       cachePolicy: .networkFirst
     )
 
     expect(result.source).to(equal(.cache))
     expect(result.data?.hero?.name).to(equal("R2-D2"))
+  }
+
+  func test__fetch__givenCacheAndNetwork_withCachedData__shouldReturnCacheThenNetwork() async throws {
+    let (client, mockServer, store) = makeClientWithMockServer()
+
+    // Pre-populate cache
+    try await store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
+      "QUERY_ROOT.hero": ["__typename": "Droid", "name": "Cached-R2"],
+    ])
+
+    let serverExpectation = await mockServer.expect(MockQuery<CacheTestHeroSelectionSet>.self) { @Sendable _ in
+      [
+        "data": [
+          "hero": [
+            "name": "Server-R2",
+            "__typename": "Droid",
+          ]
+        ]
+      ]
+    }
+
+    // cacheAndNetwork returns a stream with two results: cache first, then network
+    let results = try client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .cacheAndNetwork
+    )
+
+    var allResults: [GraphQLResponse<MockQuery<CacheTestHeroSelectionSet>>] = []
+    for try await result in results {
+      allResults.append(result)
+    }
+
+    await fulfillment(of: [serverExpectation])
+
+    expect(allResults).to(haveCount(2))
+    expect(allResults[0].source).to(equal(.cache))
+    expect(allResults[0].data?.hero?.name).to(equal("Cached-R2"))
+    expect(allResults[1].source).to(equal(.server))
+    expect(allResults[1].data?.hero?.name).to(equal("Server-R2"))
   }
 }
