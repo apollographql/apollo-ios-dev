@@ -5,6 +5,10 @@ import XCTest
 
 @testable import Apollo
 
+// TODO: Additional tests still needed:
+// - Cache reads and writes based on cache policy (and if source is cache)
+// - Cache only request gets sent through interceptors still
+// - Cache read after failed network fetch
 class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
 
   var session: MockURLSession!
@@ -53,23 +57,6 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     }
 
     var name: String { __data["name"] }
-  }
-
-  struct DelayInterceptor: GraphQLInterceptor {
-    let nanoseconds: UInt64
-
-    init(_ nanoseconds: UInt64) {
-      self.nanoseconds = nanoseconds
-    }
-
-    func intercept<Request: GraphQLRequest>(
-      request: Request,
-      next: NextInterceptorFunction<Request>
-    ) async throws -> InterceptorResultStream<Request> {
-      try await Task.sleep(nanoseconds: nanoseconds)
-      return await next(request)
-    }
-
   }
 
   /// A control object that allows tests to yield multipart subscription events
