@@ -3,19 +3,8 @@
 import Nimble
 import XCTest
 
-@testable import Apollo
+@testable @_spi(Execution) import Apollo
 
-#warning(
-  """
-  TODO: Write new tests. This has changed so much, tests need to be completely new.
-  To test:
-  - Retrying
-  - Cache reads and writes based on cache policy (and if source is cache)
-  - cache only request gets sent through interceptors still
-  - cache read after failed network fetch
-  - Tests for subscriptions over HTTP
-  """
-)
 class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
 
   var session: MockURLSession!
@@ -64,23 +53,6 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     }
 
     var name: String { __data["name"] }
-  }
-
-  struct DelayInterceptor: GraphQLInterceptor {
-    let nanoseconds: UInt64
-
-    init(_ nanoseconds: UInt64) {
-      self.nanoseconds = nanoseconds
-    }
-
-    func intercept<Request: GraphQLRequest>(
-      request: Request,
-      next: NextInterceptorFunction<Request>
-    ) async throws -> InterceptorResultStream<Request> {
-      try await Task.sleep(nanoseconds: nanoseconds)
-      return await next(request)
-    }
-
   }
 
   /// A control object that allows tests to yield multipart subscription events
@@ -371,328 +343,468 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     expect(actual.count).to(equal(1))
   }  
 
-  //
-  //  // MARK: `proceedAsync` Tests
-  //
-  //  @available(*, deprecated)
-  //  struct SimpleForwardingInterceptor_deprecated: ApolloInterceptor {
-  //    var id: String = UUID().uuidString
-  //
-  //    let expectation: XCTestExpectation
-  //
-  //    func interceptAsync<Operation>(
-  //      chain: any Apollo.RequestChain,
-  //      request: Apollo.HTTPRequest<Operation>,
-  //      response: Apollo.HTTPResponse<Operation>?,
-  //      completion: @Sendable @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
-  //    ) {
-  //      expectation.fulfill()
-  //
-  //      chain.proceedAsync(request: request, response: response, completion: completion)
-  //    }
-  //  }
-  //
-  //  struct SimpleForwardingInterceptor: ApolloInterceptor {
-  //    var id: String = UUID().uuidString
-  //
-  //    let expectation: XCTestExpectation
-  //
-  //    func interceptAsync<Operation>(
-  //      chain: any Apollo.RequestChain,
-  //      request: Apollo.HTTPRequest<Operation>,
-  //      response: Apollo.HTTPResponse<Operation>?,
-  //      completion: @Sendable @escaping (Result<Apollo.GraphQLResult<Operation.Data>, any Error>) -> Void
-  //    ) {
-  //      expectation.fulfill()
-  //
-  //      chain.proceedAsync(
-  //        request: request,
-  //        response: response,
-  //        interceptor: self,
-  //        completion: completion
-  //      )
-  //    }
-  //  }
-  //
-  //  @available(*, deprecated, message: "Testing deprecated function")
-  //  func test__proceedAsync__givenInterceptors_usingDeprecatedFunction_shouldCallAllInterceptors() throws {
-  //    let expectations = [
-  //      expectation(description: "Interceptor 1 executed"),
-  //      expectation(description: "Interceptor 2 executed"),
-  //      expectation(description: "Interceptor 3 executed")
-  //    ]
-  //
-  //    let requestChain = InterceptorRequestChain(interceptors: [
-  //      SimpleForwardingInterceptor_deprecated(expectation: expectations[0]),
-  //      SimpleForwardingInterceptor_deprecated(expectation: expectations[1]),
-  //      SimpleForwardingInterceptor_deprecated(expectation: expectations[2])
-  //    ])
-  //
-  //    let request = JSONRequest(
-  //      operation: MockQuery<Hero>(),
-  //      graphQLEndpoint: TestURL.mockServer.url,
-  //      clientName: "test-client",
-  //      clientVersion: "test-client-version"
-  //    )
-  //
-  //    // when
-  //    requestChain.kickoff(request: request) { result in }
-  //
-  //    // then
-  //    wait(for: expectations, timeout: 1, enforceOrder: true)
-  //  }
-  //
-  //  func test__proceedAsync__givenInterceptors_usingNewFunction_shouldCallAllInterceptors() throws {
-  //    let expectations = [
-  //      expectation(description: "Interceptor 1 executed"),
-  //      expectation(description: "Interceptor 2 executed"),
-  //      expectation(description: "Interceptor 3 executed")
-  //    ]
-  //
-  //    let requestChain = InterceptorRequestChain(interceptors: [
-  //      SimpleForwardingInterceptor(expectation: expectations[0]),
-  //      SimpleForwardingInterceptor(expectation: expectations[1]),
-  //      SimpleForwardingInterceptor(expectation: expectations[2])
-  //    ])
-  //
-  //    let request = JSONRequest(
-  //      operation: MockQuery<Hero>(),
-  //      graphQLEndpoint: TestURL.mockServer.url,
-  //      clientName: "test-client",
-  //      clientVersion: "test-client-version"
-  //    )
-  //
-  //    // when
-  //    requestChain.kickoff(request: request) { result in }
-  //
-  //    // then
-  //    wait(for: expectations, timeout: 1, enforceOrder: true)
-  //  }
-  //
-  //  @available(*, deprecated, message: "Testing deprecated function")
-  //  func test__proceedAsync__givenInterceptors_usingBothFunctions_shouldCallAllInterceptors() throws {
-  //    let expectations = [
-  //      expectation(description: "Interceptor 1 executed"),
-  //      expectation(description: "Interceptor 2 executed"),
-  //      expectation(description: "Interceptor 3 executed"),
-  //      expectation(description: "Interceptor 4 executed"),
-  //      expectation(description: "Interceptor 5 executed"),
-  //      expectation(description: "Interceptor 6 executed"),
-  //      expectation(description: "Interceptor 7 executed"),
-  //      expectation(description: "Interceptor 8 executed")
-  //    ]
-  //
-  //    let requestChain = InterceptorRequestChain(interceptors: [
-  //      SimpleForwardingInterceptor(expectation: expectations[0]),
-  //      SimpleForwardingInterceptor_deprecated(expectation: expectations[1]),
-  //      SimpleForwardingInterceptor(expectation: expectations[2]),
-  //      SimpleForwardingInterceptor_deprecated(expectation: expectations[3]),
-  //      SimpleForwardingInterceptor_deprecated(expectation: expectations[4]),
-  //      SimpleForwardingInterceptor(expectation: expectations[5]),
-  //      SimpleForwardingInterceptor(expectation: expectations[6]),
-  //      SimpleForwardingInterceptor_deprecated(expectation: expectations[7])
-  //    ])
-  //
-  //    let request = JSONRequest(
-  //      operation: MockQuery<Hero>(),
-  //      graphQLEndpoint: TestURL.mockServer.url,
-  //      clientName: "test-client",
-  //      clientVersion: "test-client-version"
-  //    )
-  //
-  //    // when
-  //    requestChain.kickoff(request: request) { result in }
-  //
-  //    // then
-  //    wait(for: expectations, timeout: 1, enforceOrder: true)
-  //  }
-  //
-  //  // MARK: Response Tests
-  //
-  //  func test__response__givenUnsuccessfulStatusCode_shouldFail() throws {
-  //    // given
-  //    let client = MockURLSessionClient(
-  //      response: .mock(
-  //        url: TestURL.mockServer.url,
-  //        statusCode: 500,
-  //        httpVersion: nil,
-  //        headerFields: nil
-  //      ),
-  //      data: """
-  //      {
-  //        "data": {
-  //          "__typename": "Hero",
-  //          "name": "R2-D2"
-  //        }
-  //      }
-  //      """.data(using: .utf8)
-  //    )
-  //
-  //    let provider = DefaultInterceptorProvider(
-  //      client: client,
-  //      store: ApolloStore()
-  //    )
-  //
-  //    let transport = RequestChainNetworkTransport(
-  //      interceptorProvider: provider,
-  //      endpointURL: TestURL.mockServer.url
-  //    )
-  //
-  //    let expectation = expectation(description: "Response received")
-  //
-  //    _ = transport.send(operation: MockQuery<Hero>()) { result in
-  //      switch result {
-  //      case .success:
-  //        XCTFail("Unexpected response: \(result)")
-  //
-  //      case .failure:
-  //        expectation.fulfill()
-  //      }
-  //    }
-  //
-  //    wait(for: [expectation], timeout: 1)
-  //  }
-  //
-  //  // This test is odd because you might assume it would fail but there is no content-type checking on standard
-  //  // GraphQL response parsing. So this test is here to ensure that existing behaviour does not change.
-  //  func test__response__givenUnknownContentType_shouldNotFail() throws {
-  //    // given
-  //    let client = MockURLSessionClient(
-  //      response: .mock(
-  //        url: TestURL.mockServer.url,
-  //        statusCode: 200,
-  //        httpVersion: nil,
-  //        headerFields: ["content-type": "unknown/type"]
-  //      ),
-  //      data: """
-  //      {
-  //        "data": {
-  //          "__typename": "Hero",
-  //          "name": "R2-D2"
-  //        }
-  //      }
-  //      """.data(using: .utf8)
-  //    )
-  //
-  //    let provider = DefaultInterceptorProvider(
-  //      client: client,
-  //      store: ApolloStore()
-  //    )
-  //
-  //    let transport = RequestChainNetworkTransport(
-  //      interceptorProvider: provider,
-  //      endpointURL: TestURL.mockServer.url
-  //    )
-  //
-  //    let expectation = expectation(description: "Response received")
-  //
-  //    _ = transport.send(operation: MockQuery<Hero>()) { result in
-  //      switch result {
-  //      case let .success(responseData):
-  //        XCTAssertEqual(responseData.data?.__typename, "Hero")
-  //        XCTAssertEqual(responseData.data?.name, "R2-D2")
-  //
-  //        expectation.fulfill()
-  //
-  //      case .failure:
-  //        XCTFail("Unexpected response: \(result)")
-  //      }
-  //    }
-  //
-  //    wait(for: [expectation], timeout: 1)
-  //  }
-  //
-  //  func test__response__givenJSONContentType_shouldSucceed() throws {
-  //    // given
-  //    let client = MockURLSessionClient(
-  //      response: .mock(
-  //        url: TestURL.mockServer.url,
-  //        statusCode: 200,
-  //        httpVersion: nil,
-  //        headerFields: ["content-type": "application/json"]
-  //      ),
-  //      data: """
-  //      {
-  //        "data": {
-  //          "__typename": "Hero",
-  //          "name": "R2-D2"
-  //        }
-  //      }
-  //      """.data(using: .utf8)
-  //    )
-  //
-  //    let provider = DefaultInterceptorProvider(
-  //      client: client,
-  //      store: ApolloStore()
-  //    )
-  //
-  //    let transport = RequestChainNetworkTransport(
-  //      interceptorProvider: provider,
-  //      endpointURL: TestURL.mockServer.url
-  //    )
-  //
-  //    let expectation = expectation(description: "Response received")
-  //
-  //    _ = transport.send(operation: MockQuery<Hero>()) { result in
-  //      switch result {
-  //      case let .success(responseData):
-  //        XCTAssertEqual(responseData.data?.__typename, "Hero")
-  //        XCTAssertEqual(responseData.data?.name, "R2-D2")
-  //
-  //        expectation.fulfill()
-  //
-  //      case .failure:
-  //        XCTFail("Unexpected response: \(result)")
-  //      }
-  //    }
-  //
-  //    wait(for: [expectation], timeout: 1)
-  //  }
-  //
-  //  func test__response__givenGraphQLOverHTTPContentType_shouldSucceed() throws {
-  //    // given
-  //    let client = MockURLSessionClient(
-  //      response: .mock(
-  //        url: TestURL.mockServer.url,
-  //        statusCode: 200,
-  //        httpVersion: nil,
-  //        headerFields: ["content-type": "application/graphql-response+json"]
-  //      ),
-  //      data: """
-  //      {
-  //        "data": {
-  //          "__typename": "Hero",
-  //          "name": "R2-D2"
-  //        }
-  //      }
-  //      """.data(using: .utf8)
-  //    )
-  //
-  //    let provider = DefaultInterceptorProvider(
-  //      client: client,
-  //      store: ApolloStore()
-  //    )
-  //
-  //    let transport = RequestChainNetworkTransport(
-  //      interceptorProvider: provider,
-  //      endpointURL: TestURL.mockServer.url
-  //    )
-  //
-  //    let expectation = expectation(description: "Response received")
-  //
-  //    _ = transport.send(operation: MockQuery<Hero>()) { result in
-  //      switch result {
-  //      case let .success(responseData):
-  //        XCTAssertEqual(responseData.data?.__typename, "Hero")
-  //        XCTAssertEqual(responseData.data?.name, "R2-D2")
-  //
-  //        expectation.fulfill()
-  //
-  //      case .failure:
-  //        XCTFail("Unexpected response: \(result)")
-  //      }
-  //    }
-  //
-  //    wait(for: [expectation], timeout: 1)
-  //  }
+  // MARK: - Interceptor Chain Ordering Tests
+
+  /// An interceptor that records when it is called, then forwards to the next interceptor.
+  struct OrderTrackingInterceptor: GraphQLInterceptor, @unchecked Sendable {
+    let index: Int
+    let callOrder: CallOrderTracker
+
+    func intercept<Request: GraphQLRequest>(
+      request: Request,
+      next: NextInterceptorFunction<Request>
+    ) async throws -> InterceptorResultStream<Request> {
+      callOrder.record(index)
+      return await next(request)
+    }
+  }
+
+  /// Thread-safe tracker for interceptor call order.
+  final class CallOrderTracker: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _order: [Int] = []
+
+    func record(_ index: Int) {
+      lock.withLock { _order.append(index) }
+    }
+
+    var order: [Int] {
+      lock.withLock { _order }
+    }
+  }
+
+  func test__interceptorChain__givenMultipleInterceptors__shouldCallAllInOrder() async throws {
+    await Self.registerRequestHandler(for: serverUrl) { _ in
+      (.mock(), Self.emptyResponseData())
+    }
+
+    let tracker = CallOrderTracker()
+
+    let transport = RequestChainNetworkTransport(
+      urlSession: session,
+      interceptorProvider: MockProvider(interceptors: [
+        OrderTrackingInterceptor(index: 0, callOrder: tracker),
+        OrderTrackingInterceptor(index: 1, callOrder: tracker),
+        OrderTrackingInterceptor(index: 2, callOrder: tracker),
+      ]),
+      store: .mock(),
+      endpointURL: serverUrl
+    )
+
+    let responseStream = try transport.send(
+      query: MockQuery.mock(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    _ = try await responseStream.getAllValues()
+
+    expect(tracker.order).to(equal([0, 1, 2]))
+  }
+
+  func test__interceptorChain__givenSingleInterceptor__shouldCallIt() async throws {
+    await Self.registerRequestHandler(for: serverUrl) { _ in
+      (.mock(), Self.emptyResponseData())
+    }
+
+    let tracker = CallOrderTracker()
+
+    let transport = RequestChainNetworkTransport(
+      urlSession: session,
+      interceptorProvider: MockProvider(interceptors: [
+        OrderTrackingInterceptor(index: 0, callOrder: tracker),
+      ]),
+      store: .mock(),
+      endpointURL: serverUrl
+    )
+
+    let responseStream = try transport.send(
+      query: MockQuery.mock(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    _ = try await responseStream.getAllValues()
+
+    expect(tracker.order).to(equal([0]))
+  }
+
+  // MARK: - Content-Type Response Tests
+
+  /// Helper that sends a query through a full transport with the given response headers
+  /// and returns the parsed result.
+  private func sendQueryWithResponseHeaders(
+    _ headerFields: [String: String]?,
+    responseData: Data? = nil
+  ) async throws -> [GraphQLResponse<MockQuery<Hero>>] {
+    let data = responseData ?? """
+      {
+        "data": {
+          "__typename": "Hero",
+          "name": "R2-D2"
+        }
+      }
+      """.data(using: .utf8)!
+
+    await Self.registerRequestHandler(for: serverUrl) { _ in
+      (.mock(headerFields: headerFields), data)
+    }
+
+    let transport = RequestChainNetworkTransport(
+      urlSession: session,
+      interceptorProvider: DefaultInterceptorProvider.shared,
+      store: .mock(),
+      endpointURL: serverUrl
+    )
+
+    return try await transport.send(
+      query: MockQuery<Hero>(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    ).getAllValues()
+  }
+
+  // This test verifies that unknown content-types do not cause failures for standard
+  // (non-multipart) GraphQL responses. There is no content-type checking on single-response
+  // parsing, and this test ensures that existing behaviour does not change.
+  func test__response__givenUnknownContentType__shouldNotFail() async throws {
+    let results = try await sendQueryWithResponseHeaders(
+      ["content-type": "unknown/type"]
+    )
+
+    expect(results).to(haveCount(1))
+    expect(results.first?.data?.name).to(equal("R2-D2"))
+  }
+
+  func test__response__givenJSONContentType__shouldSucceed() async throws {
+    let results = try await sendQueryWithResponseHeaders(
+      ["content-type": "application/json"]
+    )
+
+    expect(results).to(haveCount(1))
+    expect(results.first?.data?.name).to(equal("R2-D2"))
+  }
+
+  func test__response__givenGraphQLOverHTTPContentType__shouldSucceed() async throws {
+    let results = try await sendQueryWithResponseHeaders(
+      ["content-type": "application/graphql-response+json"]
+    )
+
+    expect(results).to(haveCount(1))
+    expect(results.first?.data?.name).to(equal("R2-D2"))
+  }
+
+  func test__response__givenNoContentTypeHeader__shouldSucceed() async throws {
+    let results = try await sendQueryWithResponseHeaders(nil)
+
+    expect(results).to(haveCount(1))
+    expect(results.first?.data?.name).to(equal("R2-D2"))
+  }
+
+  // MARK: - Cache Policy Tests
+
+  /// Selection set with a nested `hero` field for cache policy tests.
+  /// Distinct from the flat `Hero` selection set used by content-type tests.
+  private final class CacheTestHeroSelectionSet: MockSelectionSet, @unchecked Sendable {
+    override class var __selections: [Selection] {
+      [
+        .field("hero", HeroField.self)
+      ]
+    }
+
+    var hero: HeroField? { __data["hero"] }
+
+    final class HeroField: MockSelectionSet, @unchecked Sendable {
+      override class var __selections: [Selection] {
+        [
+          .field("__typename", String.self),
+          .field("name", String.self),
+        ]
+      }
+
+      var name: String { __data["name"] }
+    }
+  }
+
+  private static let heroServerData: JSONObject = [
+    "data": [
+      "hero": [
+        "name": "R2-D2",
+        "__typename": "Droid",
+      ]
+    ]
+  ]
+
+  /// Creates a MockNetworkTransport + ApolloClient backed by a MockGraphQLServer.
+  private func makeClientWithMockServer() -> (ApolloClient, MockGraphQLServer, ApolloStore) {
+    let mockServer = MockGraphQLServer()
+    let store = ApolloStore()
+    let transport = MockNetworkTransport(mockServer: mockServer, store: store)
+    let client = ApolloClient(networkTransport: transport, store: store)
+    return (client, mockServer, store)
+  }
+
+  func test__fetch__givenCacheFirst_withCachedData__shouldReturnFromCache() async throws {
+    let (client, _, store) = makeClientWithMockServer()
+
+    // Pre-populate cache
+    try await store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
+      "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2"],
+    ])
+
+    // No server expectation — if the network is hit, it will throw unexpectedRequest
+    let result = try await client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .cacheFirst
+    )
+
+    expect(result.source).to(equal(.cache))
+    expect(result.data?.hero?.name).to(equal("R2-D2"))
+  }
+
+  func test__fetch__givenCacheFirst_withNoCachedData__shouldFetchFromNetwork() async throws {
+    let (client, mockServer, _) = makeClientWithMockServer()
+
+    let serverExpectation = await mockServer.expect(MockQuery<CacheTestHeroSelectionSet>.self) { @Sendable _ in
+      Self.heroServerData
+    }
+
+    let result = try await client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .cacheFirst
+    )
+
+    expect(result.source).to(equal(.server))
+    expect(result.data?.hero?.name).to(equal("R2-D2"))
+
+    await fulfillment(of: [serverExpectation])
+  }
+
+  func test__fetch__givenNetworkOnly_withCachedData__shouldFetchFromNetwork() async throws {
+    let (client, mockServer, store) = makeClientWithMockServer()
+
+    // Pre-populate cache with different data
+    try await store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
+      "QUERY_ROOT.hero": ["__typename": "Droid", "name": "C-3PO"],
+    ])
+
+    let serverExpectation = await mockServer.expect(MockQuery<CacheTestHeroSelectionSet>.self) { @Sendable _ in
+      Self.heroServerData
+    }
+
+    let result = try await client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .networkOnly
+    )
+
+    expect(result.source).to(equal(.server))
+    expect(result.data?.hero?.name).to(equal("R2-D2"))
+
+    await fulfillment(of: [serverExpectation])
+  }
+
+  func test__fetch__givenCacheOnly_withCachedData__shouldReturnFromCache() async throws {
+    let (client, _, store) = makeClientWithMockServer()
+
+    try await store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
+      "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2"],
+    ])
+
+    let result = try await client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .cacheOnly
+    )
+
+    expect(result).toNot(beNil())
+    expect(result?.source).to(equal(.cache))
+    expect(result?.data?.hero?.name).to(equal("R2-D2"))
+  }
+
+  func test__fetch__givenCacheOnly_withNoCachedData__shouldReturnNil() async throws {
+    let (client, _, _) = makeClientWithMockServer()
+
+    let result = try await client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .cacheOnly
+    )
+
+    expect(result).to(beNil())
+  }
+
+  func test__fetch__givenNetworkOnly__shouldWriteResultToCache() async throws {
+    let (client, mockServer, store) = makeClientWithMockServer()
+
+    let serverExpectation = await mockServer.expect(MockQuery<CacheTestHeroSelectionSet>.self) { @Sendable _ in
+      Self.heroServerData
+    }
+
+    _ = try await client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .networkOnly
+    )
+
+    await fulfillment(of: [serverExpectation])
+
+    // Verify data was written to cache by reading it back
+    let cachedResult = try await client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .cacheOnly
+    )
+
+    expect(cachedResult).toNot(beNil())
+    expect(cachedResult?.source).to(equal(.cache))
+    expect(cachedResult?.data?.hero?.name).to(equal("R2-D2"))
+  }
+
+  func test__fetch__givenNetworkFirst_whenNetworkFails__shouldFallBackToCache() async throws {
+    let (client, _, store) = makeClientWithMockServer()
+
+    // Pre-populate cache
+    try await store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
+      "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2"],
+    ])
+
+    // No server expectation registered — MockGraphQLServer.serve() will throw
+    // ServerError.unexpectedRequest, which propagates as a network failure.
+    // The networkFirst policy catches network errors and falls back to cache
+    // (FetchBehavior.NetworkFirst has cacheRead: .onNetworkFailure).
+    let result = try await client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .networkFirst
+    )
+
+    expect(result.source).to(equal(.cache))
+    expect(result.data?.hero?.name).to(equal("R2-D2"))
+  }
+
+  func test__fetch__givenCacheAndNetwork_withCachedData__shouldReturnCacheThenNetwork() async throws {
+    let (client, mockServer, store) = makeClientWithMockServer()
+
+    // Pre-populate cache
+    try await store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
+      "QUERY_ROOT.hero": ["__typename": "Droid", "name": "Cached-R2"],
+    ])
+
+    let serverExpectation = await mockServer.expect(MockQuery<CacheTestHeroSelectionSet>.self) { @Sendable _ in
+      [
+        "data": [
+          "hero": [
+            "name": "Server-R2",
+            "__typename": "Droid",
+          ]
+        ]
+      ]
+    }
+
+    // cacheAndNetwork returns a stream with two results: cache first, then network
+    let results = try client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .cacheAndNetwork
+    )
+
+    var allResults: [GraphQLResponse<MockQuery<CacheTestHeroSelectionSet>>] = []
+    for try await result in results {
+      allResults.append(result)
+    }
+
+    await fulfillment(of: [serverExpectation])
+
+    expect(allResults).to(haveCount(2))
+    expect(allResults[0].source).to(equal(.cache))
+    expect(allResults[0].data?.hero?.name).to(equal("Cached-R2"))
+    expect(allResults[1].source).to(equal(.server))
+    expect(allResults[1].data?.hero?.name).to(equal("Server-R2"))
+  }
+
+  func test__fetch__givenCacheAndNetwork_withNoCachedData__shouldReturnOnlyNetworkResult() async throws {
+    let (client, mockServer, _) = makeClientWithMockServer()
+
+    let serverExpectation = await mockServer.expect(MockQuery<CacheTestHeroSelectionSet>.self) { @Sendable _ in
+      Self.heroServerData
+    }
+
+    let results = try client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .cacheAndNetwork
+    )
+
+    var allResults: [GraphQLResponse<MockQuery<CacheTestHeroSelectionSet>>] = []
+    for try await result in results {
+      allResults.append(result)
+    }
+
+    await fulfillment(of: [serverExpectation])
+
+    // With an empty cache, only the network result should be yielded
+    expect(allResults).to(haveCount(1))
+    expect(allResults[0].source).to(equal(.server))
+    expect(allResults[0].data?.hero?.name).to(equal("R2-D2"))
+  }
+
+  func test__fetch__givenNetworkFirst_whenNetworkSucceeds__shouldReturnFromNetwork() async throws {
+    let (client, mockServer, store) = makeClientWithMockServer()
+
+    // Pre-populate cache with stale data to verify the network result is preferred
+    try await store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
+      "QUERY_ROOT.hero": ["__typename": "Droid", "name": "Stale-R2"],
+    ])
+
+    let serverExpectation = await mockServer.expect(MockQuery<CacheTestHeroSelectionSet>.self) { @Sendable _ in
+      Self.heroServerData
+    }
+
+    let result = try await client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .networkFirst
+    )
+
+    expect(result.source).to(equal(.server))
+    expect(result.data?.hero?.name).to(equal("R2-D2"))
+
+    await fulfillment(of: [serverExpectation])
+  }
+
+  func test__fetch__givenNetworkFirst_whenBothNetworkAndCacheFail__shouldThrowNoResults() async throws {
+    let (client, _, _) = makeClientWithMockServer()
+
+    // Empty cache + no server expectation registered.
+    // Network fails (unexpectedRequest), then cache fallback returns nil (empty cache).
+    // The chain has nothing to yield, so it throws noResults.
+    await expect {
+      _ = try await client.fetch(
+        query: MockQuery<CacheTestHeroSelectionSet>(),
+        cachePolicy: .networkFirst
+      )
+    }.to(throwError(ApolloClient.Error.noResults))
+  }
+
+  func test__fetch__givenWriteResultsToCacheFalse__shouldNotWriteToCache() async throws {
+    let (client, mockServer, _) = makeClientWithMockServer()
+
+    let serverExpectation = await mockServer.expect(MockQuery<CacheTestHeroSelectionSet>.self) { @Sendable _ in
+      Self.heroServerData
+    }
+
+    _ = try await client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .networkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    await fulfillment(of: [serverExpectation])
+
+    // Verify the cache is still empty — data was NOT written
+    let cachedResult = try await client.fetch(
+      query: MockQuery<CacheTestHeroSelectionSet>(),
+      cachePolicy: .cacheOnly
+    )
+
+    expect(cachedResult).to(beNil())
+  }
 }
