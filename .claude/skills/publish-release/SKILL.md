@@ -154,10 +154,17 @@ This phase requires user verification before pushing.
    Then use `AskUserQuestion` to ask if the user is ready to publish. The user may
    want to edit the release notes directly on GitHub before publishing.
 
-3. After user approval, publish both releases:
+3. After user approval, publish both releases. **Important:** For releases on the
+   `v1` branch, use `--latest=false` so they are not marked as the latest release
+   (the `main` branch carries the current major version):
    ```
+   # For main branch:
    gh release edit <version> --draft=false --repo apollographql/apollo-ios
    gh release edit <version> --draft=false --repo apollographql/apollo-ios-codegen
+
+   # For v1 branch:
+   gh release edit <version> --draft=false --latest=false --repo apollographql/apollo-ios
+   gh release edit <version> --draft=false --latest=false --repo apollographql/apollo-ios-codegen
    ```
 
 4. Confirm publication and provide links to the published releases.
