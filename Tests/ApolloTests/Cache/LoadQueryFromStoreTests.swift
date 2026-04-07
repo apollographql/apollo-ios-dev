@@ -562,6 +562,160 @@ class LoadQueryFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading, 
     XCTAssertEqual(coordinateData?.coordinates, coordinates)
   }
 
+  // Reproduction test for https://github.com/apollographql/apollo-ios/issues/3609
+  // 2D array of objects fails when reading from cache
+  func testLoadingQueryWith2DArrayOfObjects() async throws {
+    // given
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
+      override class var __selections: [Selection] {
+        [
+          .field("match", Match.self)
+        ]
+      }
+      var match: Match { __data["match"] }
+
+      class Match: MockSelectionSet, @unchecked Sendable {
+        override class var __selections: [Selection] {
+          [
+            .field("__typename", String.self),
+            .field("name", String.self),
+            .field("scores", [[Score]].self),
+          ]
+        }
+        var name: String { __data["name"] }
+        var scores: [[Score]] { __data["scores"] }
+
+        class Score: MockSelectionSet, @unchecked Sendable {
+          override class var __selections: [Selection] {
+            [
+              .field("__typename", String.self),
+              .field("value", Int.self),
+            ]
+          }
+          var value: Int { __data["value"] }
+        }
+      }
+    }
+
+    try await store.publish(records: [
+      "QUERY_ROOT": ["match": CacheReference("match")],
+      "match": [
+        "__typename": "Match",
+        "name": "Finals",
+        "scores": [
+          [
+            CacheReference("match.scores.0.0"),
+            CacheReference("match.scores.0.1"),
+          ],
+          [
+            CacheReference("match.scores.1.0"),
+            CacheReference("match.scores.1.1"),
+          ],
+        ],
+      ],
+      "match.scores.0.0": ["__typename": "Score", "value": 6],
+      "match.scores.0.1": ["__typename": "Score", "value": 4],
+      "match.scores.1.0": ["__typename": "Score", "value": 7],
+      "match.scores.1.1": ["__typename": "Score", "value": 5],
+    ])
+
+    // when
+    let query = MockQuery<GivenSelectionSet>()
+    let response = try await store.load(query)
+    let data = try XCTUnwrap(response?.data)
+
+    // then
+    XCTAssertEqual(data.match.name, "Finals")
+    XCTAssertEqual(data.match.scores.count, 2)
+    XCTAssertEqual(data.match.scores[0].count, 2)
+    XCTAssertEqual(data.match.scores[0][0].value, 6)
+    XCTAssertEqual(data.match.scores[0][1].value, 4)
+    XCTAssertEqual(data.match.scores[1][0].value, 7)
+    XCTAssertEqual(data.match.scores[1][1].value, 5)
+  }
+
+  // Reproduction test for https://github.com/apollographql/apollo-ios/issues/3609
+  // 3D array of objects fails when reading from cache
+  func testLoadingQueryWith3DArrayOfObjects() async throws {
+    // given
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
+      override class var __selections: [Selection] {
+        [
+          .field("tournament", Tournament.self)
+        ]
+      }
+      var tournament: Tournament { __data["tournament"] }
+
+      class Tournament: MockSelectionSet, @unchecked Sendable {
+        override class var __selections: [Selection] {
+          [
+            .field("__typename", String.self),
+            .field("name", String.self),
+            .field("rounds", [[[Score]]].self),
+          ]
+        }
+        var name: String { __data["name"] }
+        var rounds: [[[Score]]] { __data["rounds"] }
+
+        class Score: MockSelectionSet, @unchecked Sendable {
+          override class var __selections: [Selection] {
+            [
+              .field("__typename", String.self),
+              .field("value", Int.self),
+            ]
+          }
+          var value: Int { __data["value"] }
+        }
+      }
+    }
+
+    // Structure: rounds[round][match][score]
+    // Round 0: [[score00_0, score00_1], [score01_0]]
+    // Round 1: [[score10_0]]
+    try await store.publish(records: [
+      "QUERY_ROOT": ["tournament": CacheReference("tournament")],
+      "tournament": [
+        "__typename": "Tournament",
+        "name": "Grand Slam",
+        "rounds": [
+          [
+            [
+              CacheReference("tournament.rounds.0.0.0"),
+              CacheReference("tournament.rounds.0.0.1"),
+            ],
+            [
+              CacheReference("tournament.rounds.0.1.0"),
+            ],
+          ],
+          [
+            [
+              CacheReference("tournament.rounds.1.0.0"),
+            ],
+          ],
+        ],
+      ],
+      "tournament.rounds.0.0.0": ["__typename": "Score", "value": 6],
+      "tournament.rounds.0.0.1": ["__typename": "Score", "value": 4],
+      "tournament.rounds.0.1.0": ["__typename": "Score", "value": 7],
+      "tournament.rounds.1.0.0": ["__typename": "Score", "value": 3],
+    ])
+
+    // when
+    let query = MockQuery<GivenSelectionSet>()
+    let response = try await store.load(query)
+    let data = try XCTUnwrap(response?.data)
+
+    // then
+    XCTAssertEqual(data.tournament.name, "Grand Slam")
+    XCTAssertEqual(data.tournament.rounds.count, 2)
+    XCTAssertEqual(data.tournament.rounds[0].count, 2)
+    XCTAssertEqual(data.tournament.rounds[0][0].count, 2)
+    XCTAssertEqual(data.tournament.rounds[0][0][0].value, 6)
+    XCTAssertEqual(data.tournament.rounds[0][0][1].value, 4)
+    XCTAssertEqual(data.tournament.rounds[0][1][0].value, 7)
+    XCTAssertEqual(data.tournament.rounds[1][0][0].value, 3)
+  }
+
   @MainActor
   func
     testLoadingHeroAndFriendsNamesQuery_withOptionalFriendsSelection_withNullFriendListItem_usingRequestChain_loadsDataFromNetworkAndWritesToStore()
