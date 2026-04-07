@@ -1,840 +1,450 @@
-import ApolloAPI
-import ApolloInternalTestHelpers
+@_spi(Execution) @_spi(Unsafe) import ApolloAPI
+@_spi(Execution) import ApolloInternalTestHelpers
 import Nimble
 import XCTest
 
-@testable import Apollo
+@testable @_spi(Execution) import Apollo
 
-#warning(
-"""
-TODO: These tests need to be rewritten but the parser will likely change when implementing websockets.
-Fix these tests when that is done.
-
-Tests were testing a IncrementalGraphResponse before, but that is private implementation details of 
-JSONResponseParser now. Instead, we need to test that the incremental items merge into an existing result properly.
-Make mock results with manual DataDict on DeferredQuery and pass it to parser, then verify merging is correct.
-""")
 final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
-//
-//  class DeferredQuery: GraphQLQuery, @unchecked Sendable {
-//    static var operationName: String { "DeferredQuery" }
-//
-//    static var operationDocument: ApolloAPI.OperationDocument { .init(definition: .init("Mock Operation Definition")) }
-//
-//    static var responseFormat: IncrementalDeferredResponseFormat {
-//      IncrementalDeferredResponseFormat(deferredFragments: [
-//        DeferredFragmentIdentifier(label: "deferredFriend", fieldPath: ["animal"]): Data.Animal.DeferredFriend.self
-//          // Data.Animal.DeliberatelyMissing is intentionally not here for error testing
-//      ])
-//    }
-//
-//    class Data: MockSelectionSet, @unchecked Sendable {
-//      override class var __selections: [Selection] {
-//        [
-//          .field("animal", Animal.self)
-//        ]
-//      }
-//
-//      class Animal: AbstractMockSelectionSet<Animal.Fragments, MockSchemaMetadata>, @unchecked Sendable {
-//        override class var __selections: [Selection] {
-//          [
-//            .field("__typename", String.self),
-//            .field("name", String.self),
-//            .field("species", String.self),
-//            .deferred(DeferredFriend.self, label: "deferredFriend"),
-//            .deferred(DeliberatelyMissing.self, label: "deliberatelyMissing"),
-//          ]
-//        }
-//
-//        struct Fragments: FragmentContainer {
-//          public let __data: DataDict
-//          public init(_dataDict: DataDict) {
-//            __data = _dataDict
-//            _deferredFriend = Deferred(_dataDict: _dataDict)
-//            _deliberatelyMissing = Deferred(_dataDict: _dataDict)
-//          }
-//
-//          @Deferred var deferredFriend: DeferredFriend?
-//          @Deferred var deliberatelyMissing: DeliberatelyMissing?
-//        }
-//
-//        class DeferredFriend: MockTypeCase, @unchecked Sendable {
-//          override class var __selections: [Selection] {
-//            [
-//              .field("friend", String.self)
-//            ]
-//          }
-//        }
-//
-//        class DeliberatelyMissing: MockTypeCase, @unchecked Sendable {
-//          override class var __selections: [Selection] {
-//            [
-//              .field("key", String.self)
-//            ]
-//          }
-//        }
-//      }
-//    }
-//  }
-//
-//  // MARK: - Parsing Tests
-//
-//  func test__parsing__givenBodyWithMissingIncrementalItems_shouldThrow() async throws {
-//    // given
-//    let parser = JSONResponseParser(
-//      response: .deferResponseMock(),
-//      operationVariables: nil,
-//      includeCacheRecords: false
-//    )
-//
-//    let body: JSONObject = [:]
-//    let bodyData = try JSONSerializationFormat.serialize(value: body)
-//
-//    await expect {
-//      try await parser.parse(dataChunk: bodyData, mergingIncrementalItemsInto: nil) as GraphQLResponse<DeferredQuery>?
-//    }.to(
-//      throwError(IncrementalResponseError.missingExistingData)
-//    )
-//  }
-//
-//  func test__parsing__givenBodyWithMissingPath_shouldThrow() async throws {
-//    // given
-//    let parser = JSONResponseParser(
-//      response: .deferResponseMock(),
-//      operationVariables: nil,
-//      includeCacheRecords: false
-//    )
-//
-//    let body: JSONObject = [
-//      "incremental": [:] as JSONValue
-//    ]
-//    let bodyData = try JSONSerializationFormat.serialize(value: body)
-//
-//    await expect {
-//      try await parser.parse(dataChunk: bodyData, mergingIncrementalItemsInto: nil) as GraphQLResponse<DeferredQuery>?
-//    }.to(
-//      throwError(IncrementalResponseError.missingPath)
-//    )
-//  }
-//
-//  func test__parsing__givenBodyWithMissingLabel_shouldThrow() async throws {
-//    // given
-//    let parser = JSONResponseParser(
-//      response: .deferResponseMock(),
-//      operationVariables: nil,
-//      includeCacheRecords: false
-//    )
-//
-//    let body: JSONObject = [
-//      "incremental": [
-//        "path": ["something"]
-//      ]
-//    ]
-//    let bodyData = try JSONSerializationFormat.serialize(value: body)
-//
-//    await expect {
-//      try await parser.parse(dataChunk: bodyData, mergingIncrementalItemsInto: nil) as GraphQLResponse<DeferredQuery>?
-//    }.to(
-//      throwError(IncrementalResponseError.missingLabel)
-//    )
-//  }
-//
-//  func test__parsing__givenValidIncrementalBody_withMissingDeferredSelectionSet_shouldThrow() async throws {
-//    // given
-//    let parser = JSONResponseParser(
-//      response: .deferResponseMock(),
-//      operationVariables: nil,
-//      includeCacheRecords: false
-//    )
-//
-//    let body: JSONObject = [
-//      "incremental": [
-//        "label": "deliberatelyMissing",
-//        "path": ["one", "two", "three"],
-//        "data": [
-//          "key": "value"
-//        ],
-//      ] as JSONValue
-//    ]
-//    let bodyData = try JSONSerializationFormat.serialize(value: body)
-//
-//    await expect {
-//      try await parser.parse(dataChunk: bodyData, mergingIncrementalItemsInto: nil) as GraphQLResponse<DeferredQuery>?
-//    }.to(
-//      throwError(
-//        IncrementalResponseError.missingDeferredSelectionSetType(
-//          "deliberatelyMissing",
-//          "one.two.three"
-//        )
-//      )
-//    )
-//  }
-//
-//  func test__parsing__givenIncrementalBody_shouldSucceed() async throws {
-//    // given
-//    let parser = JSONResponseParser(
-//      response: .deferResponseMock(),
-//      operationVariables: nil,
-//      includeCacheRecords: false
-//    )
-//
-//    let body: JSONObject = [
-//      "incremental": [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "data": [
-//          "friend": "Buster"
-//        ],
-//      ] as JSONValue
-//    ]
-//    let bodyData = try JSONSerializationFormat.serialize(value: body)
-//
-//    let response: GraphQLResponse<DeferredQuery>? = try await parser.parse(
-//      dataChunk: bodyData,
-//      mergingIncrementalItemsInto: nil
-//    )
-//    let result = response!.result
-//
-//    // then
-//    expect(result.label).to(equal("deferredFriend"))
-//    expect(result.path).to(equal([PathComponent("animal")]))
-//    expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
-//      equal(try DeferredQuery.Data.Animal.DeferredFriend(data: ["friend": "Buster"]))
-//    )
-//  }
-//
-//  // MARK: Parsing Tests - (Extensions)
-//
-//  func
-//    test__parsing__givenExtensionWithEmptyValue_usingCachePolicyFetchIgnoringCacheCompletely_extensionShouldNotBeNil()
-//    async throws
-//  {
-//    // given
-//    let parser = JSONResponseParser(
-//      response: .deferResponseMock(),
-//      operationVariables: nil,
-//      includeCacheRecords: false
-//    )
-//
-//    let body: JSONObject = [
-//      "incremental": [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "extensions": [:] as JSONValue,
-//      ] as JSONValue
-//    ]
-//    let bodyData = try JSONSerializationFormat.serialize(value: body)
-//
-//    let response: GraphQLResponse<DeferredQuery>? = try await parser.parse(
-//      dataChunk: bodyData,
-//      mergingIncrementalItemsInto: nil
-//    )
-//    let result = response?.result
-//
-//    // then
-//    expect(result.extensions).to(equal([:]))
-//  }
-//
-//  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyFetchIgnoringCacheData_extensionShouldNotBeNil()
-//    async throws
-//  {
-//    // given
-//    let parser = JSONResponseParser(
-//      response: .deferResponseMock(),
-//      operationVariables: nil,
-//      includeCacheRecords: false
-//    )
-//
-//    let body: JSONObject = [
-//      "incremental": [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "extensions": [:] as JSONValue,
-//      ] as JSONValue
-//    ]
-//    let bodyData = try JSONSerializationFormat.serialize(value: body)
-//
-//    let response: GraphQLResponse<DeferredQuery>? = try await parser.parse(
-//      dataChunk: bodyData,
-//      mergingIncrementalItemsInto: nil
-//    )
-//    let result = response?.result.data
-//
-//    // then
-//    expect(result.extensions).to(equal([:]))
-//  }
-//
-//  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataAndFetch_extensionShouldNotBeNil()
-//    async throws
-//  {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "extensions": [:] as JSONValue,
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataAndFetch)
-//
-//    // then
-//    expect(result.extensions).to(equal([:]))
-//  }
-//
-//  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataDontFetch_extensionShouldNotBeNil()
-//    async throws
-//  {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "extensions": [:] as JSONValue,
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataDontFetch)
-//
-//    // then
-//    expect(result.extensions).to(equal([:]))
-//  }
-//
-//  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyReturnCacheDataElseFetch_extensionShouldNotBeNil()
-//    async throws
-//  {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "extensions": [:] as JSONValue,
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataElseFetch)
-//
-//    // then
-//    expect(result.extensions).to(equal([:]))
-//  }
-//
-//  func test__parsing__givenExtensionWithEmptyValue_usingCachePolicyDefault_extensionShouldNotBeNil() async throws {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "extensions": [:] as JSONValue,
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
-//
-//    // then
-//    expect(result.extensions).to(equal([:]))
-//  }
-//
-//  func test__parsing__givenExtensionWithChildValue_extensionShouldNotBeNil() async throws {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "extensions": ["parentKey": ["childKey": "someValue"]],
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
-//
-//    // then
-//    expect(result.extensions?["parentKey"]).to(equal(["childKey": "someValue"]))
-//  }
-//
-//  func test__parsing__givenMissingExtensions_extensionShouldBeNil() async throws {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
-//
-//    // then
-//    expect(result.extensions).to(beNil())
-//  }
-//
-//  // MARK: Parsing Tests (Errors)
-//
-//  func test__parsing__givenErrorWithMessage_usingCachePolicyFetchIgnoringCacheCompletely_errorMessageShouldNotBeNil()
-//    async throws
-//  {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "errors": [
-//          [
-//            "message": "Some error"
-//          ]
-//        ],
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheCompletely)
-//
-//    // then
-//    expect(result.errors?.first?.message).to(equal("Some error"))
-//  }
-//
-//  func test__parsing__givenErrorWithMessage_usingCachePolicyFetchIgnoringCacheData_errorMessageShouldNotBeNil()
-//    async throws
-//  {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "errors": [
-//          [
-//            "message": "Some error"
-//          ]
-//        ],
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheData)
-//
-//    // then
-//    expect(result.errors?.first?.message).to(equal("Some error"))
-//  }
-//
-//  func test__parsing__givenErrorWithMessage_usingCachePolicyReturnCacheDataAndFetch_errorMessageShouldNotBeNil()
-//    async throws
-//  {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "errors": [
-//          [
-//            "message": "Some error"
-//          ]
-//        ],
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataAndFetch)
-//
-//    // then
-//    expect(result.errors?.first?.message).to(equal("Some error"))
-//  }
-//
-//  func test__parsing__givenErrorWithMessage_usingCachePolicyReturnCacheDataDontFetch_errorMessageShouldNotBeNil()
-//    async throws
-//  {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "errors": [
-//          [
-//            "message": "Some error"
-//          ]
-//        ],
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataDontFetch)
-//
-//    // then
-//    expect(result.errors?.first?.message).to(equal("Some error"))
-//  }
-//
-//  func test__parsing__givenErrorWithMessage_usingCachePolicyReturnCacheDataElseFetch_errorMessageShouldNotBeNil()
-//    async throws
-//  {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "errors": [
-//          [
-//            "message": "Some error"
-//          ]
-//        ],
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataElseFetch)
-//
-//    // then
-//    expect(result.errors?.first?.message).to(equal("Some error"))
-//  }
-//
-//  func test__parsing__givenErrorWithMessage_usingCachePolicyDefault_errorMessageShouldNotBeNil() async throws {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "errors": [
-//          [
-//            "message": "Some error"
-//          ]
-//        ],
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
-//
-//    // then
-//    expect(result.errors?.first?.message).to(equal("Some error"))
-//  }
-//
-//  func test__parsing__givenErrorWithLocation_usingCachePolicyDefault_errorLocationShouldNotBeNil() async throws {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "errors": [
-//          [
-//            "message": "Some error",
-//            "locations": [
-//              ["line": 1, "column": 2]
-//            ],
-//          ]
-//        ] as JSONValue,
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
-//
-//    // then
-//    expect(result.errors?.first?.message).to(equal("Some error"))
-//    expect(result.errors?.first?.locations?.first?.line).to(equal(1))
-//    expect(result.errors?.first?.locations?.first?.column).to(equal(2))
-//  }
-//
-//  func test__parsing__givenErrorWithPath_usingCachePolicyDefault_errorPathShouldNotBeNil() async throws {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "errors": [
-//          [
-//            "message": "Some error",
-//            "path": ["Some field", 1],
-//          ]
-//        ] as JSONValue,
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
-//
-//    // then
-//    expect(result.errors?.first?.message).to(equal("Some error"))
-//    expect(result.errors?.first?.path?[0]).to(equal(.field("Some field")))
-//    expect(result.errors?.first?.path?[1]).to(equal(.index(1)))
-//  }
-//
-//  func test__parsing__givenErrorWithCustomKey_usingCachePolicyDefault_errorCustomKeyShouldNotBeNil() async throws {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "errors": [
-//          [
-//            "message": "Some error",
-//            "userMessage": "Some message",
-//          ]
-//        ] as JSONValue,
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
-//
-//    // then
-//    expect(result.errors?.first?.message).to(equal("Some error"))
-//    expect(result.errors?.first?["userMessage"] as? String).to(equal("Some message"))
-//  }
-//
-//  func test__parsing__givenMultipleErrors_shouldReturnAllErrors() async throws {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "errors": [
-//          [
-//            "message": "Some error"
-//          ],
-//          [
-//            "message": "Another error"
-//          ],
-//        ],
-//      ]
-//    )
-//
-//    // when
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
-//
-//    // then
-//    expect(result.errors?[0].message).to(equal("Some error"))
-//    expect(result.errors?[1].message).to(equal("Another error"))
-//  }
-//
-//  // MARK: - Cache RecordSet Tests
-//
-//  func test__parsing__givenCachePolicyFetchIgnoringCacheCompletely_cacheRecordSetShouldBeNil() async throws {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "data": [
-//          "friend": "Buster"
-//        ],
-//      ]
-//    )
-//
-//    // when
-//    let (result, recordSet) = try await subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheCompletely)
-//
-//    // then
-//    await expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
-//      equal(try DeferredQuery.Data.Animal.DeferredFriend(data: ["friend": "Buster"]))
-//    )
-//    expect(recordSet).to(beNil())
-//  }
-//
-//  func test__parsing__givenCachePolicyFetchIgnoringCacheData_cacheRecordSetShouldNotBeNil() async throws {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "data": [
-//          "friend": "Buster"
-//        ],
-//      ]
-//    )
-//
-//    // when
-//    let (result, recordSet) = try await subject.parseIncrementalResult(withCachePolicy: .fetchIgnoringCacheData)
-//
-//    // then
-//    await expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
-//      equal(try DeferredQuery.Data.Animal.DeferredFriend(data: ["friend": "Buster"]))
-//    )
-//    expect(recordSet).to(
-//      equal(
-//        RecordSet(records: [
-//          Record(
-//            key: "QUERY_ROOT.animal",
-//            [
-//              "friend": "Buster"
-//            ]
-//          )
-//        ])
-//      )
-//    )
-//  }
-//
-//  func test__parsing__givenCachePolicyReturnCacheDataAndFetch_cacheRecordSetShouldNotBeNil() async throws {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "data": [
-//          "friend": "Buster"
-//        ],
-//      ]
-//    )
-//
-//    // when
-//    let (result, recordSet) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataAndFetch)
-//
-//    // then
-//    await expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
-//      equal(try DeferredQuery.Data.Animal.DeferredFriend(data: ["friend": "Buster"]))
-//    )
-//    expect(recordSet).to(
-//      equal(
-//        RecordSet(records: [
-//          Record(
-//            key: "QUERY_ROOT.animal",
-//            [
-//              "friend": "Buster"
-//            ]
-//          )
-//        ])
-//      )
-//    )
-//  }
-//
-//  func test__parsing__givenCachePolicyReturnCacheDataDontFetch_cacheRecordSetShouldNotBeNil() async throws {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "data": [
-//          "friend": "Buster"
-//        ],
-//      ]
-//    )
-//
-//    // when
-//    let (result, recordSet) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataDontFetch)
-//
-//    // then
-//    await expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
-//      equal(try DeferredQuery.Data.Animal.DeferredFriend(data: ["friend": "Buster"]))
-//    )
-//    expect(recordSet).to(
-//      equal(
-//        RecordSet(records: [
-//          Record(
-//            key: "QUERY_ROOT.animal",
-//            [
-//              "friend": "Buster"
-//            ]
-//          )
-//        ])
-//      )
-//    )
-//  }
-//
-//  func test__parsing__givenCachePolicyReturnCacheDataElseFetch_cacheRecordSetShouldNotBeNil() async throws {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "data": [
-//          "friend": "Buster"
-//        ],
-//      ]
-//    )
-//
-//    // when
-//    let (result, recordSet) = try await subject.parseIncrementalResult(withCachePolicy: .returnCacheDataElseFetch)
-//
-//    // then
-//    await expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
-//      equal(try DeferredQuery.Data.Animal.DeferredFriend(data: ["friend": "Buster"]))
-//    )
-//    expect(recordSet).to(
-//      equal(
-//        RecordSet(records: [
-//          Record(
-//            key: "QUERY_ROOT.animal",
-//            [
-//              "friend": "Buster"
-//            ]
-//          )
-//        ])
-//      )
-//    )
-//  }
-//
-//  func test__parsing__givenCachePolicyDefault_cacheRecordSetShouldNotBeNil() async throws {
-//    // given
-//    let subject = try IncrementalGraphQLResponse(
-//      operation: DeferredQuery(),
-//      body: [
-//        "label": "deferredFriend",
-//        "path": ["animal"],
-//        "data": [
-//          "friend": "Buster"
-//        ],
-//      ]
-//    )
-//
-//    // when
-//    let (result, recordSet) = try await subject.parseIncrementalResult(withCachePolicy: .default)
-//
-//    // then
-//    await expect(result.data as? DeferredQuery.Data.Animal.DeferredFriend).to(
-//      equal(try DeferredQuery.Data.Animal.DeferredFriend(data: ["friend": "Buster"]))
-//    )
-//    expect(recordSet).to(
-//      equal(
-//        RecordSet(records: [
-//          Record(
-//            key: "QUERY_ROOT.animal",
-//            [
-//              "friend": "Buster"
-//            ]
-//          )
-//        ])
-//      )
-//    )
-//  }
-//
-//  // MARK: Cache Reference Tests
-//
-//  func test__cacheReference__givenIncrementalBody_whenParsed_shouldAppendPathToRootCacheReference() async throws {
-//    // given
-//    let jsonObject: JSONObject = [
-//      "label": "deferredFriend",
-//      "path": ["animal"],
-//      "data": [
-//        "friend": "Buster"
-//      ],
-//    ]
-//
-//    let subject = try IncrementalGraphQLResponse(operation: DeferredQuery(), body: jsonObject)
-//
-//    // when + then
-//    let (result, _) = try await subject.parseIncrementalResult(withCachePolicy: .default)
-//
-//    expect(result.dependentKeys).to(equal([CacheKey("QUERY_ROOT.animal.friend")]))
-//  }
+
+  typealias AnimalQuery = MockDeferredAnimalQuery
+
+  var subject: JSONResponseParsingInterceptor!
+
+  override func setUp() {
+    super.setUp()
+    subject = JSONResponseParsingInterceptor()
+  }
+
+  override func tearDown() {
+    super.tearDown()
+    subject = nil
+  }
+
+  // MARK: - Helpers
+
+  private static let initialPartialResponse = """
+    {
+      "data": {
+        "animal": {
+          "__typename": "Animal",
+          "species": "Canis Familiaris"
+        }
+      },
+      "hasNext": true
+    }
+    """.data(using: .utf8)!
+
+  /// Sets up the interceptor with a stream mocker, returns the iterator and mocker.
+  /// The initial partial response has NOT been emitted yet.
+  private func setUpIterator(
+    includeCacheRecords: Bool = false
+  ) async throws -> (
+    iterator: AsyncThrowingStream<ParsedResult<AnimalQuery>, any Error>.AsyncIterator,
+    mocker: AsyncStreamMocker<Data>
+  ) {
+    let operation = AnimalQuery()
+    let mocker = AsyncStreamMocker<Data>()
+    let urlResponse = HTTPURLResponse.deferResponseMock()
+
+    var iterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: mocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: includeCacheRecords
+    )
+    .getStream()
+    .makeAsyncIterator()
+
+    return (iterator, mocker)
+  }
+
+  /// Sets up the interceptor, emits the initial partial response, and consumes it.
+  /// Returns the iterator (ready for incremental chunks) and mocker.
+  private func setUpIteratorWithInitialResponse(
+    includeCacheRecords: Bool = false
+  ) async throws -> (
+    iterator: AsyncThrowingStream<ParsedResult<AnimalQuery>, any Error>.AsyncIterator,
+    mocker: AsyncStreamMocker<Data>
+  ) {
+    var (iterator, mocker) = try await setUpIterator(includeCacheRecords: includeCacheRecords)
+
+    mocker.emit(Self.initialPartialResponse)
+    _ = try await iterator.next()
+
+    return (iterator, mocker)
+  }
+
+  // MARK: - Error Handling Tests
+
+  func test__parsing__givenIncrementalChunkWithoutPriorPartialResponse__shouldThrowMissingExistingData()
+    async throws
+  {
+    var (iterator, mocker) = try await setUpIterator()
+
+    mocker.emit(
+      """
+      {
+        "incremental": [{
+          "label": "deferredGenus",
+          "data": { "genus": "Canis" },
+          "path": ["animal"]
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    do {
+      _ = try await iterator.next()
+      fail("Expected IncrementalResponseError.missingExistingData to be thrown")
+    } catch {
+      expect(error as? IncrementalResponseError).to(equal(.missingExistingData))
+    }
+  }
+
+  func test__parsing__givenIncrementalItemMissingPath__shouldThrowMissingPath()
+    async throws
+  {
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
+
+    mocker.emit(
+      """
+      {
+        "incremental": [{
+          "label": "deferredGenus",
+          "data": { "genus": "Canis" }
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    do {
+      _ = try await iterator.next()
+      fail("Expected IncrementalResponseError.missingPath to be thrown")
+    } catch {
+      expect(error as? IncrementalResponseError).to(equal(.missingPath))
+    }
+  }
+
+  func test__parsing__givenIncrementalItemMissingLabel__shouldThrowMissingLabel()
+    async throws
+  {
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
+
+    mocker.emit(
+      """
+      {
+        "incremental": [{
+          "path": ["animal"],
+          "data": { "genus": "Canis" }
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    do {
+      _ = try await iterator.next()
+      fail("Expected IncrementalResponseError.missingLabel to be thrown")
+    } catch {
+      expect(error as? IncrementalResponseError).to(equal(.missingLabel))
+    }
+  }
+
+  func test__parsing__givenIncrementalItemWithUnrecognizedLabel__shouldThrowMissingDeferredSelectionSetType()
+    async throws
+  {
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
+
+    mocker.emit(
+      """
+      {
+        "incremental": [{
+          "label": "unknownFragment",
+          "path": ["animal"],
+          "data": { "key": "value" }
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    do {
+      _ = try await iterator.next()
+      fail("Expected IncrementalResponseError.missingDeferredSelectionSetType to be thrown")
+    } catch {
+      expect(error as? IncrementalResponseError)
+        .to(equal(.missingDeferredSelectionSetType("unknownFragment", "animal")))
+    }
+  }
+
+  // MARK: - Extensions Tests
+
+  func test__parsing__givenIncrementalItemWithEmptyExtensions__extensionsShouldNotBeNil()
+    async throws
+  {
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
+
+    mocker.emit(
+      """
+      {
+        "incremental": [{
+          "label": "deferredGenus",
+          "path": ["animal"],
+          "data": { "genus": "Canis" },
+          "extensions": {}
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    let result = try await iterator.next()
+    expect(result?.result.extensions).toNot(beNil())
+    expect(result?.result.extensions).to(equal([:]))
+  }
+
+  func test__parsing__givenIncrementalItemWithNestedExtensions__extensionsShouldContainNestedValues()
+    async throws
+  {
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
+
+    mocker.emit(
+      """
+      {
+        "incremental": [{
+          "label": "deferredGenus",
+          "path": ["animal"],
+          "data": { "genus": "Canis" },
+          "extensions": {
+            "parentKey": {
+              "childKey": "someValue"
+            }
+          }
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    let result = try await iterator.next()
+    expect(result?.result.extensions).toNot(beNil())
+    expect(result?.result.extensions?["parentKey"] as? [String: String])
+      .to(equal(["childKey": "someValue"]))
+  }
+
+  func test__parsing__givenIncrementalItemWithMissingExtensions__extensionsShouldBeNil()
+    async throws
+  {
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
+
+    mocker.emit(
+      """
+      {
+        "incremental": [{
+          "label": "deferredGenus",
+          "path": ["animal"],
+          "data": { "genus": "Canis" }
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    let result = try await iterator.next()
+    expect(result?.result.extensions).to(beNil())
+  }
+
+  // MARK: - Error Field Parsing Tests
+
+  func test__parsing__givenIncrementalItemWithError__errorMessageShouldBePresent()
+    async throws
+  {
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
+
+    mocker.emit(
+      """
+      {
+        "incremental": [{
+          "label": "deferredGenus",
+          "path": ["animal"],
+          "data": { "genus": "Canis" },
+          "errors": [{ "message": "Some error" }]
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    let result = try await iterator.next()
+    expect(result?.result.errors?.first?.message).to(equal("Some error"))
+    // Data should also be merged despite the error
+    expect(result?.result.data?.animal.fragments.deferredGenus?.genus).to(equal("Canis"))
+  }
+
+  func test__parsing__givenIncrementalItemWithErrorLocation__errorLocationShouldBePresent()
+    async throws
+  {
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
+
+    mocker.emit(
+      """
+      {
+        "incremental": [{
+          "label": "deferredGenus",
+          "path": ["animal"],
+          "data": { "genus": "Canis" },
+          "errors": [{
+            "message": "Some error",
+            "locations": [{"line": 1, "column": 2}]
+          }]
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    let result = try await iterator.next()
+    let error = result?.result.errors?.first
+    expect(error?.message).to(equal("Some error"))
+    expect(error?.locations?.first?.line).to(equal(1))
+    expect(error?.locations?.first?.column).to(equal(2))
+  }
+
+  func test__parsing__givenIncrementalItemWithErrorPath__errorPathShouldBePresent()
+    async throws
+  {
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
+
+    mocker.emit(
+      """
+      {
+        "incremental": [{
+          "label": "deferredGenus",
+          "path": ["animal"],
+          "data": { "genus": "Canis" },
+          "errors": [{
+            "message": "Some error",
+            "path": ["Some field", 1]
+          }]
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    let result = try await iterator.next()
+    let error = result?.result.errors?.first
+    expect(error?.message).to(equal("Some error"))
+    expect(error?.path?[0]).to(equal(.field("Some field")))
+    expect(error?.path?[1]).to(equal(.index(1)))
+  }
+
+  func test__parsing__givenIncrementalItemWithErrorCustomKey__errorCustomKeyShouldBePresent()
+    async throws
+  {
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
+
+    mocker.emit(
+      """
+      {
+        "incremental": [{
+          "label": "deferredGenus",
+          "path": ["animal"],
+          "data": { "genus": "Canis" },
+          "errors": [{
+            "message": "Some error",
+            "userMessage": "Some message"
+          }]
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    let result = try await iterator.next()
+    let error = result?.result.errors?.first
+    expect(error?.message).to(equal("Some error"))
+    expect(error?["userMessage"] as? String).to(equal("Some message"))
+  }
+
+  func test__parsing__givenIncrementalItemWithMultipleErrors__shouldReturnAllErrors()
+    async throws
+  {
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
+
+    mocker.emit(
+      """
+      {
+        "incremental": [{
+          "label": "deferredGenus",
+          "path": ["animal"],
+          "data": { "genus": "Canis" },
+          "errors": [
+            { "message": "Some error" },
+            { "message": "Another error" }
+          ]
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    let result = try await iterator.next()
+    expect(result?.result.errors).to(haveCount(2))
+    expect(result?.result.errors?[0].message).to(equal("Some error"))
+    expect(result?.result.errors?[1].message).to(equal("Another error"))
+  }
+
+  // MARK: - Edge Case Tests
+
+  func test__parsing__givenEmptyIncrementalArray__shouldReturnUnchangedResult()
+    async throws
+  {
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse()
+
+    mocker.emit(
+      """
+      {
+        "incremental": [],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    let result = try await iterator.next()
+    expect(result?.result.data?.animal.species).to(equal("Canis Familiaris"))
+    expect(result?.result.data?.animal.fragments.deferredGenus?.genus).to(beNil())
+    expect(result?.result.data?.animal.fragments.deferredFriend?.friend).to(beNil())
+  }
+
+  // MARK: - Cache Reference Tests
+
+  func test__parsing__givenIncrementalItem__dependentKeysShouldIncludeIncrementalPath()
+    async throws
+  {
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse(includeCacheRecords: true)
+
+    mocker.emit(
+      """
+      {
+        "incremental": [{
+          "label": "deferredGenus",
+          "data": { "genus": "Canis" },
+          "path": ["animal"]
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    let result = try await iterator.next()
+    let dependentKeys = result?.result.dependentKeys
+    expect(dependentKeys).toNot(beNil())
+    expect(dependentKeys).to(contain(CacheKey("QUERY_ROOT.animal.genus")))
+  }
 }
