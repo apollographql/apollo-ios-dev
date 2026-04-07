@@ -37,13 +37,6 @@ jobs:
           ${{ secrets.APOLLO_IOS_PAGINATION_DEPLOY_KEY }}
     - name: Configure Git
       uses: ./.github/actions/configure-git
-    - name: Update Merge Commit Message
-      shell: bash
-      env:
-        PR_TITLE: ${{ github.event.pull_request.title }}
-      run: |
-        git commit --allow-empty --amend -m "$PR_TITLE (apollographql/apollo-ios-dev#${{ github.event.pull_request.number }})"
-        git push --force-with-lease
     - name: Subtree - Apollo iOS
       id: split-ios
       uses: ./.github/actions/subtree-split-push
