@@ -27,12 +27,17 @@ class MockObjectTemplateTests: XCTestCase {
     schemaNamespace: String = "TestSchema",
     moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackage(),
     testMocks: ApolloCodegenConfiguration.TestMockFileOutput = .swiftPackage(),
+    deprecatedEnumCases: ApolloCodegenConfiguration.Composition = .include,
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude
   ) {
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
       output: .mock(moduleType: moduleType, testMocks: testMocks),
-      options: .init(warningsOnDeprecatedUsage: warningsOnDeprecatedUsage, markTypesNonisolated: false)
+      options: .init(
+        deprecatedEnumCases: deprecatedEnumCases,
+        warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
+        markTypesNonisolated: false
+      )
     )
     ir = IRBuilder.mock(compilationResult: .mock())
 
@@ -1053,6 +1058,45 @@ class MockObjectTemplateTests: XCTestCase {
 
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  // MARK: - Deprecated Enum Cases in Default Mock Values
+
+  func test__render_convenienceInitializer__givenDeprecatedEnumCases_exclude_firstCaseDeprecated_shouldUseFirstNonDeprecatedCase() throws {
+    // given
+    let enumType = GraphQLEnumType.mock(
+      name: "Priority",
+      values: [
+        .mock(name: "critical", deprecationReason: "No longer supported"),
+        .mock(name: "high"),
+        .mock(name: "low"),
+      ]
+    )
+
+    buildSubject(
+      fields: [
+        "priority": .mock("priority", type: .nonNull(.enum(enumType))),
+      ],
+      moduleType: .swiftPackage(),
+      deprecatedEnumCases: .exclude
+    )
+
+    let expected = """
+    public extension Mock where O == Dog {
+      convenience init(
+        priority: GraphQLEnum<TestSchema.Priority> = .case(.high)
+      ) {
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(
+      expected,
+      atLine: 10 + self.subject.fields.count,
+      ignoringExtraLines: true)
+    )
   }
 
 }
