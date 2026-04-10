@@ -45,7 +45,13 @@ extension GraphQLScalarType: DefaultMockValueProviding {
 
 extension GraphQLEnumType: DefaultMockValueProviding {
   func defaultMockValue(config: ApolloCodegen.ConfigurationContext) -> String {
-    guard let first = values.first else {
+    let filteredValues: [GraphQLEnumValue]
+    if config.options.deprecatedEnumCases == .exclude {
+      filteredValues = values.filter { !$0.isDeprecated }
+    } else {
+      filteredValues = values
+    }
+    guard let first = filteredValues.first else {
       fatalError("Cannot provide a default value for caseless enum \(name)")
     }
     return ".case(.\(first.render(as: .enumCase, config: config)))"
