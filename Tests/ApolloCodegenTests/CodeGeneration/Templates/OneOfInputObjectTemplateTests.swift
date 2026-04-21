@@ -1,8 +1,9 @@
 import XCTest
 import Nimble
+import OrderedCollections
 @testable import ApolloCodegenLib
 import Apollo
-import GraphQLCompiler
+@_spi(Testing) import GraphQLCompiler
 
 class OneOfInputObjectTemplateTests: XCTestCase {
   var subject: OneOfInputObjectTemplate!
@@ -1650,5 +1651,150 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     // then
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
-  
+
+  // MARK: Recursive Input Object Tests
+
+  /// Builds a recursive input object whose fields reference the object itself,
+  /// then configures `subject` with it.
+  private func buildRecursiveSubject(
+    name: String = "MockOneOfInput",
+    fieldBuilder: (GraphQLInputObjectType) -> [GraphQLInputField],
+    config: ApolloCodegenConfiguration = .mock(.swiftPackage(apolloSDKDependency: .default))
+  ) {
+    let inputObject = GraphQLInputObjectType.mock(name, fields: [], config: config, isOneOf: true)
+    let fields = fieldBuilder(inputObject)
+    inputObject._testing_setFields(
+      OrderedDictionary(uniqueKeysWithValues: fields.map({ ($0.render(config: config), $0) }))
+    )
+
+    subject = OneOfInputObjectTemplate(
+      graphqlInputObject: inputObject,
+      config: ApolloCodegen.ConfigurationContext(config: config)
+    )
+  }
+
+  func test_render_givenOneOfInputObjectWithDirectSelfReference_generatesIndirectCase() throws {
+    // given
+    buildRecursiveSubject(fieldBuilder: { object in
+      [
+        GraphQLInputField.mock("name", type: .string(), defaultValue: nil),
+        GraphQLInputField.mock("not", type: .inputObject(object), defaultValue: nil),
+      ]
+    })
+
+    let expected = """
+    public enum MockOneOfInput: OneOfInputObject {
+      case name(String)
+      indirect case not(MockOneOfInput)
+
+      @_spi(Unsafe) public var __data: InputDict {
+        switch self {
+        case .name(let value):
+          return InputDict(["name": value])
+        case .not(let value):
+          return InputDict(["not": value])
+        }
+      }
+    }
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test_render_givenOneOfInputObjectWithNonNullSelfReference_generatesIndirectCase() throws {
+    // given
+    buildRecursiveSubject(fieldBuilder: { object in
+      [
+        GraphQLInputField.mock("not", type: .nonNull(.inputObject(object)), defaultValue: nil),
+      ]
+    })
+
+    let expected = """
+    public enum MockOneOfInput: OneOfInputObject {
+      indirect case not(MockOneOfInput)
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test_render_givenOneOfInputObjectWithListOfSelfReferences_doesNotGenerateIndirectCase() throws {
+    // given
+    buildRecursiveSubject(fieldBuilder: { object in
+      [
+        GraphQLInputField.mock(
+          "and",
+          type: .list(.nonNull(.inputObject(object))),
+          defaultValue: nil
+        ),
+      ]
+    })
+
+    let expected = """
+    public enum MockOneOfInput: OneOfInputObject {
+      case and([MockOneOfInput])
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test_render_givenOneOfInputObjectWithMixedRecursiveCases_generatesIndirectOnlyOnDirectReferences() throws {
+    // given
+    buildRecursiveSubject(fieldBuilder: { object in
+      [
+        GraphQLInputField.mock("name", type: .string(), defaultValue: nil),
+        GraphQLInputField.mock(
+          "and",
+          type: .list(.nonNull(.inputObject(object))),
+          defaultValue: nil
+        ),
+        GraphQLInputField.mock(
+          "or",
+          type: .list(.nonNull(.inputObject(object))),
+          defaultValue: nil
+        ),
+        GraphQLInputField.mock("not", type: .inputObject(object), defaultValue: nil),
+      ]
+    })
+
+    let expected = """
+    public enum MockOneOfInput: OneOfInputObject {
+      case name(String)
+      case and([MockOneOfInput])
+      case or([MockOneOfInput])
+      indirect case not(MockOneOfInput)
+
+      @_spi(Unsafe) public var __data: InputDict {
+        switch self {
+        case .name(let value):
+          return InputDict(["name": value])
+        case .and(let value):
+          return InputDict(["and": value])
+        case .or(let value):
+          return InputDict(["or": value])
+        case .not(let value):
+          return InputDict(["not": value])
+        }
+      }
+    }
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
 }

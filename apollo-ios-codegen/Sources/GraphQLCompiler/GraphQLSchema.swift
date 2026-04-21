@@ -178,6 +178,14 @@ public final class GraphQLInputObjectType: GraphQLNamedType, @unchecked Sendable
     self.isOneOf = isOneOf
     super.init(name: name, documentation: documentation)
   }
+
+  /// Replaces the fields on this input object. Intended for tests that need
+  /// to construct recursive input objects whose fields reference the type
+  /// being built.
+  @_spi(Testing)
+  public func _testing_setFields(_ fields: GraphQLInputFieldDictionary) {
+    self.fields = fields
+  }
 }
 
 public class GraphQLInputField: JavaScriptObjectDecodable, GraphQLNamedItem {
