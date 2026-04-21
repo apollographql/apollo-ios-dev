@@ -154,7 +154,7 @@ public struct GraphQLEnumValue: JavaScriptObjectDecodable, GraphQLNamedItem {
 public typealias GraphQLInputFieldDictionary = OrderedDictionary<String, GraphQLInputField>
 
 public final class GraphQLInputObjectType: GraphQLNamedType, @unchecked Sendable {
-  public private(set) var fields: GraphQLInputFieldDictionary!
+  public internal(set) var fields: GraphQLInputFieldDictionary!
   
   public let isOneOf: Bool
 
@@ -177,14 +177,6 @@ public final class GraphQLInputObjectType: GraphQLNamedType, @unchecked Sendable
     self.fields = fields
     self.isOneOf = isOneOf
     super.init(name: name, documentation: documentation)
-  }
-
-  /// Replaces the fields on this input object. Intended for tests that need
-  /// to construct recursive input objects whose fields reference the type
-  /// being built.
-  @_spi(Testing)
-  public func _testing_setFields(_ fields: GraphQLInputFieldDictionary) {
-    self.fields = fields
   }
 }
 

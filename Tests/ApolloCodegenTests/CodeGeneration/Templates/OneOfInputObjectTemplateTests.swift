@@ -1,9 +1,8 @@
 import XCTest
 import Nimble
-import OrderedCollections
 @testable import ApolloCodegenLib
 import Apollo
-@_spi(Testing) import GraphQLCompiler
+import GraphQLCompiler
 
 class OneOfInputObjectTemplateTests: XCTestCase {
   var subject: OneOfInputObjectTemplate!
@@ -1662,10 +1661,7 @@ class OneOfInputObjectTemplateTests: XCTestCase {
     config: ApolloCodegenConfiguration = .mock(.swiftPackage(apolloSDKDependency: .default))
   ) {
     let inputObject = GraphQLInputObjectType.mock(name, fields: [], config: config, isOneOf: true)
-    let fields = fieldBuilder(inputObject)
-    inputObject._testing_setFields(
-      OrderedDictionary(uniqueKeysWithValues: fields.map({ ($0.render(config: config), $0) }))
-    )
+    inputObject.setFields(fieldBuilder(inputObject), config: config)
 
     subject = OneOfInputObjectTemplate(
       graphqlInputObject: inputObject,
