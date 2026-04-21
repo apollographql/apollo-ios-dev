@@ -154,7 +154,7 @@ public struct GraphQLEnumValue: JavaScriptObjectDecodable, GraphQLNamedItem {
 public typealias GraphQLInputFieldDictionary = OrderedDictionary<String, GraphQLInputField>
 
 public final class GraphQLInputObjectType: GraphQLNamedType, @unchecked Sendable {
-  public private(set) var fields: GraphQLInputFieldDictionary!
+  public internal(set) var fields: GraphQLInputFieldDictionary!
   
   public let isOneOf: Bool
 

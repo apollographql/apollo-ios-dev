@@ -154,6 +154,18 @@ public extension GraphQLInputObjectType {
       isOneOf: isOneOf
     )
   }
+
+  /// Replaces the fields on this input object. Intended for tests that need
+  /// to construct recursive input objects whose fields reference the type
+  /// being built.
+  func setFields(
+    _ fields: [GraphQLInputField],
+    config: ApolloCodegenConfiguration = .mock()
+  ) {
+    self.fields = OrderedDictionary(
+      uniqueKeysWithValues: fields.map({ ($0.render(config: config), $0) })
+    )
+  }
 }
 
 public extension GraphQLInputField {
