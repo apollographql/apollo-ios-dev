@@ -1,23 +1,29 @@
 ---
 name: apollo-ios-feature-analysis
 description: >
-  Run a full Apollo iOS feature request analysis for roadmap planning. Use this skill
-  whenever someone asks to: analyze Apollo iOS feature requests, build a roadmap for Apollo
-  iOS, research what customers are asking for in Apollo iOS, prioritize Apollo iOS
-  work, create a stakeholder document about Apollo iOS priorities, or run the feature request
-  workflow. Trigger on any mention of "Apollo iOS roadmap", "feature requests", "roadmap
-  document", "stakeholder analysis", or "what should we build next in Apollo iOS".
+  Run an Apollo iOS feature request analysis for roadmap planning, or add a single new feature
+  request to the existing analysis. Use this skill whenever someone asks to: analyze Apollo iOS
+  feature requests, build a roadmap for Apollo iOS, research what customers are asking for in
+  Apollo iOS, prioritize Apollo iOS work, create a stakeholder document about Apollo iOS
+  priorities, add a new feature request to the roadmap analysis, score a specific Apollo iOS
+  issue, or run the feature request workflow. Trigger on any mention of "Apollo iOS roadmap",
+  "feature requests", "roadmap document", "stakeholder analysis", "what should we build next in
+  Apollo iOS", or "add [issue #N] to the feature analysis".
 ---
 
 # Apollo iOS Feature Request Analysis
 
-This skill automates the full workflow for gathering, scoring, and ranking Apollo iOS
-feature requests into a stakeholder-ready roadmap document. It covers research across multiple
-sources, a 6-dimension scoring system (with two dimensions gathered interactively from the team),
-and a structured markdown output.
+This skill automates the workflow for gathering, scoring, and ranking Apollo iOS feature
+requests. It has two modes:
 
-The output is designed to be run periodically (e.g., quarterly or pre-planning cycle) to keep
-the roadmap current.
+- **Full analysis** (Steps 1–5 below) — periodic (quarterly / pre-planning cycle) sweep
+  across all sources. Produces the complete roadmap document.
+- **Single-feature update** (see "Single-Feature Update Mode" at the end) — add one new
+  feature request to the existing analysis. Scoped research, interactive scoring, and
+  surgical insertion into the existing Confluence page without re-running the full sweep.
+
+When the user names a specific issue number or says "add this to the analysis", use
+single-feature mode. Otherwise, run the full analysis.
 
 ---
 
@@ -346,11 +352,90 @@ The inaugural analysis produced these results for context and comparison in futu
 | 7   | Dynamic Codegen Config Values         | 14    |
 | 8   | Watch Fragments API                   | 14    |
 | 9   | Query Batching                        | 12    |
-| 10  | Operations Without Response Models    | 11    |
-| 11  | NumberOfFiles Output                  | 10    |
-| 12  | Semantic Nullability                  | 10    |
+| 10  | Generate All Schema Types             | 12    |
+| 11  | Operations Without Response Models    | 11    |
+| 12  | NumberOfFiles Output                  | 10    |
+| 13  | Semantic Nullability                  | 10    |
 
 Not roadmapped: SPM Build Plugin (score 9), Linux/Android Support (score 8), @stream (score 7).
 
 Use this as a baseline when running future analyses. Features that appeared in the original list
 and are still open represent sustained demand. New entries show emerging needs.
+
+---
+
+## Single-Feature Update Mode
+
+Use this mode when the user asks to add **one specific feature** (usually by issue number)
+to the existing analysis rather than re-running the full sweep. This is the common
+operating mode between quarterly refreshes.
+
+**Triggers:** "Add issue #N to the feature analysis", "Score issue #N and add it",
+"Run an analysis for #N and add it to the doc", any single-issue reference in context
+of the roadmap document.
+
+### When NOT to use single-feature mode
+
+- User asks to "refresh" or "rerun" the analysis → full analysis mode
+- User lists multiple issues at once → full analysis mode (or prompt them to pick one)
+- Current analysis is older than ~6 months → suggest a full refresh first, since
+  existing scores may be stale
+
+### Workflow
+
+**Step A: Scoped research for the single issue.** Do not re-scan Slack/forum/other issues.
+Gather only:
+
+1. The issue body, reaction count, reactors, commenters. Use:
+   ```
+   gh issue view <N> --repo apollographql/apollo-ios --json reactionGroups,comments,createdAt,author,state
+   gh api "repos/apollographql/apollo-ios/issues/<N>/reactions" --jq '.[] | {user: .user.login, content}'
+   gh api "repos/apollographql/apollo-ios/issues/<N>/comments" --jq '.[].user.login'
+   ```
+2. Company affiliations for each reactor/commenter — check the **Apollo iOS GitHub User
+   Company Directory** Confluence page first (space `ClientDev`, page `2464579597`); for
+   users not already in the directory, use `gh api users/<login>` and LinkedIn search.
+   Mark new users for directory update.
+3. Cross-platform parity check — does Apollo Kotlin or Apollo Client web have this feature?
+   This informs Strategic Value.
+4. Quick changelog check — confirm the issue isn't already resolved by a shipped release.
+
+**Step B: Score the 4 research dimensions** per the standard scoring matrix. Present them
+in a compact table to the user.
+
+**Step C: Interactive scoring for the remaining 2 dimensions.** Ask the user for Team
+Priority (High/Medium/Low) and Difficulty (Easy/Medium/Difficult). If the user has already
+stated these in the conversation (e.g., during an issue response), propose them as defaults
+and confirm rather than asking again.
+
+**Step D: Determine sort position.** Compute the composite score, then find where this
+feature slots into the current ranking using the standard tiebreaker (strategic value →
+customer signals → team priority). Renumber any Priority entries that shift.
+
+**Step E: Update the Confluence page.** Fetch the current page body with `getConfluencePage`,
+then submit the full updated body via `updateConfluencePage`:
+
+1. Append the new `FR-NN` entry to the end of Section 1 (Raw Feature Request List).
+   Use the next available FR number — do not renumber existing FR entries, since
+   Section 1 is discovery order, not priority order.
+2. Insert a new Priority entry in Section 2 at the correct sorted position, and renumber
+   any subsequent Priority headings.
+3. Add a new row to the Summary Scorecard at the correct sorted position and update the
+   `#` column for any rows that shifted down.
+4. Append a bullet to the **Changelog** section at the end of the page (add the Changelog
+   section if it doesn't exist) describing the update. Format: `- **YYYY-MM-DD** — Added
+   FR-NN <Name> (issue #N). Score X/39 places it at Priority P.`
+5. Update the `Last updated:` date in the header.
+
+Use `versionMessage` that identifies the addition, e.g., `"Add FR-16 Generate All Schema
+Types (#3635); renumber Priorities 10–13"`.
+
+**Step F: Update the companion user directory.** If new reactors/commenters were discovered
+that aren't in the GitHub User Company Directory, update that Confluence page (page
+`2464579597`) with the new rows and, if this feature introduces a new entry to the
+"Companies by Feature Request" table, add that row too.
+
+**Critical — do not send placeholder bodies.** When calling `updateConfluencePage`, the
+`body` parameter always writes to the page. Never submit a placeholder value with the
+intent to "fix it next call" — a broken intermediate version will be published. Compose
+the complete final body before the first call.
