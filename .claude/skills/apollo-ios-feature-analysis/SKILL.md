@@ -113,7 +113,7 @@ For users without a company in their GitHub profile, cross-reference using:
 3. **LinkedIn/web search** — search `site:linkedin.com "{name}" iOS developer {location}` to find current employers
 4. **GitHub contributions** — check if they contribute to company-owned repos (e.g., a user contributing to `RevenueCat/purchases-ios` likely works at RevenueCat)
 
-Maintain a persistent directory of GitHub users → companies in `apollo-ios-github-user-directory.html` in the repo root. Update it each time the analysis runs.
+Maintain a persistent directory of GitHub users → companies on the **Apollo iOS GitHub User Company Directory** Confluence page in the Client Development space (space key `ClientDev`, page ID `2464579597`, cloud ID `b8116c26-1732-446c-9a3b-e138b1e55296`). Update it each time the analysis runs using the Atlassian `updateConfluencePage` tool — fetch the current page with `getConfluencePage`, merge new rows into the Full User Directory table and any new features into the Companies by Feature Request table, and submit the full updated body. If the page ID has changed, look it up via `getPagesInConfluenceSpace` filtered by title.
 
 ### 1f. Enterprise Customer Data (Optional)
 
@@ -197,7 +197,17 @@ After collecting all scores:
 
 ## Step 5: Write the Document
 
-Save the output to a date-stamped file like `apollo-ios-feature-request-analysis-YYYY-MM-DD.md`
+Publish the output as an update to the **Apollo iOS Feature Request Analysis** Confluence page in the Client Development space (space key `ClientDev`, page ID `2463760410`, cloud ID `b8116c26-1732-446c-9a3b-e138b1e55296`).
+
+Use the Atlassian `updateConfluencePage` tool with `contentFormat: "markdown"`. The update fully replaces the page body, so always send the complete document (not a diff). Before updating:
+
+1. Call `getConfluencePage` to confirm the page still exists and capture the current version number.
+2. Compose the full new document body per the structure below.
+3. Include a `versionMessage` identifying the run (e.g., `"Quarterly refresh 2026-Q3"` or `"Ad-hoc update: added Generate All Schema Types (#3635)"`).
+
+If the page ID has changed, look it up via `getPagesInConfluenceSpace` filtered by title `"Apollo iOS Feature Request Analysis"`. If the page is missing entirely, fall back to `createConfluencePage` in the `ClientDev` space and save the new page ID in memory.
+
+Also save a local markdown copy to `apollo-ios-feature-request-analysis-YYYY-MM-DD.md` for the git history only when the user explicitly asks for a file artifact — the Confluence page is the canonical location.
 
 ### Document Structure
 
@@ -312,8 +322,7 @@ Don't let these inflate the active roadmap.
 shipped recently. Check the Apollo iOS changelog (`apollo-ios/CHANGELOG.md` in the dev repo)
 and the latest major/minor release notes.
 
-**Update the GitHub user directory.** After each analysis run, update the
-`apollo-ios-github-user-directory.html` file with any new users and companies discovered.
+**Update the GitHub user directory.** After each analysis run, update the **Apollo iOS GitHub User Company Directory** Confluence page (space `ClientDev`, page ID `2464579597`) with any new users and companies discovered. Read the page first to preserve existing rows, then send a merged body via `updateConfluencePage`.
 
 **The Summary Scorecard uses emoji indicators:**
 
