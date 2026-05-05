@@ -73,8 +73,9 @@ Any targets in your application that will use `ApolloClient` need to have a depe
 | ----- | ----- | ----- |
 | **Getting Started Guide** | Complete setup and first query | [Start Here →](https://www.apollographql.com/docs/ios/get-started?utm_source=github&utm_medium=apollographql_apollo-client&utm_campaign=readme) |
 | **Full Documentation** | Comprehensive guides and examples | [Read Docs →](https://www.apollographql.com/docs/ios?utm_source=github&utm_medium=apollographql_apollo-client&utm_campaign=readme) |
-| **API Reference** | Complete API documentation | [Browse API →](https://www.apollographql.com/docs/react/api/apollo-client?utm_source=github&utm_medium=apollographql_apollo-client&utm_campaign=readme) |
+| **API Reference** | Complete API documentation | [Browse API →](https://www.apollographql.com/docs/ios/docc/documentation) |
 | **VS Code Extension** | Enhanced development experience | [Install Extension →](https://marketplace.visualstudio.com/items?itemName=apollographql.vscode-apollo) |
+| **AI Skill** | Apollo iOS agent skill for AI assistants | [View Skill →](https://github.com/apollographql/skills/tree/main#apollo-ios) |
 | **DevTools** | Debug your GraphQL apps | [Chrome](https://chrome.google.com/webstore/detail/apollo-client-devtools/jdkknkkbebbapilgoeccciglkfbmbnfm) \| [Firefox](https://addons.mozilla.org/en-US/firefox/addon/apollo-developer-tools/) |
 | **Free Course** | Apollo iOS and Swift: Codegen and Queries | [Take Course →](https://www.apollographql.com/tutorials/apollo-ios-swift-part1?utm_source=github&utm_medium=apollographql_apollo-client&utm_campaign=readme) |
 
