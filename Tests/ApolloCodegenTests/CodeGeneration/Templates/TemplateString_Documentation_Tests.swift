@@ -176,4 +176,110 @@ class TemplateString_Documentation_Tests: XCTestCase {
     expect(actual).to(equalLineByLine(expected))
   }
 
+  func test__appendInterpolation_documentation__givenStringWithWindowsCRLF_returnsStringInMultilineDocComment() throws {
+    // given
+    let documentation = "Line1\r\nLine2\r\nLine3"
+
+    let expected = """
+    /// Line1
+    /// Line2
+    /// Line3
+    var test: String = "Test"
+    """
+
+    // when
+    let actual = TemplateString("""
+    \(documentation: documentation)
+    var test: String = "Test"
+    """).description
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+
+  func test__appendInterpolation_documentation__givenStringWithBareCR_returnsStringInMultilineDocComment() throws {
+    // given
+    let documentation = "Line1\rLine2\rLine3"
+
+    let expected = """
+    /// Line1
+    /// Line2
+    /// Line3
+    var test: String = "Test"
+    """
+
+    // when
+    let actual = TemplateString("""
+    \(documentation: documentation)
+    var test: String = "Test"
+    """).description
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+
+  func test__appendInterpolation_documentation__givenStringWithMixedLineEndings_returnsStringInMultilineDocComment() throws {
+    // given
+    let documentation = "Line1\r\nLine2\nLine3\rLine4"
+
+    let expected = """
+    /// Line1
+    /// Line2
+    /// Line3
+    /// Line4
+    var test: String = "Test"
+    """
+
+    // when
+    let actual = TemplateString("""
+    \(documentation: documentation)
+    var test: String = "Test"
+    """).description
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+
+  func test__appendInterpolation_documentation__givenStringWithWindowsCRLFAndIndentation_returnsStringInMultilineDocComment() throws {
+    // given
+    let documentation = "Line1\r\nLine2\r\nLine3"
+
+    let expected = """
+      /// Line1
+      /// Line2
+      /// Line3
+    var test: String = "Test"
+    """
+
+    // when
+    let actual = TemplateString("""
+      \(documentation: documentation)
+    var test: String = "Test"
+    """).description
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+
+  func test__appendInterpolation_documentation__givenStringWithWindowsCRLFAndEmptyLine_returnsStringInMultilineDocComment() throws {
+    // given
+    let documentation = "Line1\r\n\r\nLine3"
+
+    let expected = """
+    /// Line1
+    ///
+    /// Line3
+    var test: String = "Test"
+    """
+
+    // when
+    let actual = TemplateString("""
+    \(documentation: documentation)
+    var test: String = "Test"
+    """).description
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+
 }
