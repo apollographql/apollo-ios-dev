@@ -325,7 +325,7 @@ public struct TemplateString: ExpressibleByStringInterpolation, CustomStringConv
       }
 
       let components = comment
-        .split(separator: "\n", omittingEmptySubsequences: false)
+        .splitLines()
         .joinedAsCommentLines(withLinePrefix: prefix)
 
       appendInterpolation(components)
@@ -369,6 +369,40 @@ public func +(lhs: String, rhs: TemplateString) -> TemplateString {
 
 // MARK: - Extensions
 
+extension String {
+  /// Splits the string into lines, treating `\r\n`, `\r`, and all other
+  /// Unicode newline characters as single line separators. This ensures
+  /// correct behaviour regardless of the line-ending convention used in
+  /// GraphQL schema descriptions (e.g. Windows CRLF, legacy Mac CR, Unix LF).
+  fileprivate func splitLines() -> [Substring] {
+    var lines: [Substring] = []
+    var lineStart = startIndex
+    var index = startIndex
+
+    while index < endIndex {
+      let char = self[index]
+      let next = self.index(after: index)
+
+      if char == "\r" && next < endIndex && self[next] == "\n" {
+        // \r\n — treat as a single separator
+        lines.append(self[lineStart..<index])
+        index = self.index(after: next)
+        lineStart = index
+      } else if char.isNewline {
+        // \n, \r, \u{0085}, \u{2028}, \u{2029}, etc.
+        lines.append(self[lineStart..<index])
+        index = next
+        lineStart = index
+      } else {
+        index = next
+      }
+    }
+
+    lines.append(self[lineStart...])
+    return lines
+  }
+}
+
 extension Array where Element == Substring {
   func joinedAsLines(withIndent indent: String) -> String {
     var iterator = self.makeIterator()
@@ -383,11 +417,13 @@ extension Array where Element == Substring {
 
     return string
   }
+}
 
+extension Array where Element: StringProtocol {
   fileprivate func joinedAsCommentLines(withLinePrefix prefix: String) -> String {
     var string = ""
 
-    func add(line: Substring) {
+    func add(line: Element) {
       string += prefix
       if !line.isEmpty {
         string += " "
