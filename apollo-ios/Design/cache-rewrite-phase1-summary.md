@@ -1,7 +1,10 @@
 # Cache Rewrite — Phase 1 Summary
 
 **Audience:** Engineering management.
-**Companion document:** [cache-rewrite-phase1-plan.md](./cache-rewrite-phase1-plan.md) — engineering design and implementation detail.
+**Companion documents:**
+- [cache-rewrite-phase1-plan.md](./cache-rewrite-phase1-plan.md) — engineering design and implementation detail.
+- [cache-rewrite-phase1-perf.md](./cache-rewrite-phase1-perf.md) — performance measurement plan and published dataset specification.
+
 **Source RFC:** [rfc-caching-rewrite.md](./rfc-caching-rewrite.md).
 
 ## TL;DR
@@ -31,18 +34,18 @@ Phase 2 is unestimated and outside the scope of this plan.
 
 | Phase | Focus | Engineer-weeks | Calendar weeks |
 |---|---|---|---|
-| **0** | Design lock + two de-risking spikes (SQLite, codegen) | 2 | 2 |
-| **1A** | SQLite schema rewrite + field-aware `Record` (**3.0-alpha** ships from this milestone) | 4 | 6–7 |
+| **0** | Design lock + two de-risking spikes + 2.x perf baseline capture | 3 | 3 |
+| **1A** | SQLite schema rewrite + field-aware `Record` + alpha perf dataset (**3.0-alpha** ships from this milestone) | 5 | 7–8 |
 | **1B** | `@cacheControl` codegen end-to-end | 4 | 5–6 |
 | **1C** | TTL evaluation + read-mode split | 3 | 4 |
 | **1D** | Opt-in watcher refresh + hardening + **3.0-beta** | 4 | 4–5 |
-| **Total effort** | | ~17 | |
-| **Calendar (with reviews and interruptions)** | | | **21–24 (≈ 5–6 months)** |
-| **Calendar with 25% contingency** | | | **27–30 (≈ 6–7 months)** |
+| **Total effort** | | ~19 | |
+| **Calendar (with reviews and interruptions)** | | | **23–26 (≈ 5.5–6 months)** |
+| **Calendar with 25% contingency** | | | **29–33 (≈ 6.5–7.5 months)** |
 
 The 25% contingency is the number to plan against. This subsystem has deep coupling between the runtime, the codegen frontend, and roughly 8,400 lines of cache-related test code; estimates without contingency consistently underrun in projects of this shape.
 
-**Two release tags ship from the plan.** A 3.0-alpha lands at the end of Phase 1A — storage refactor only, no behavior change for end users. This validates the riskiest piece of the project (new SQLite schema, drop-and-rebuild migration, public `Record` type change) in production-like conditions before TTL behavior is layered on top. A 3.0-beta lands at the end of Phase 1D with the full `@cacheControl` feature.
+**Two release tags ship from the plan.** A 3.0-alpha lands at the end of Phase 1A — storage refactor only, no behavior change for end users — accompanied by a published performance comparison dataset against 2.x covering cache I/O, in-memory serialization, and GraphQL execution (see [cache-rewrite-phase1-perf.md](./cache-rewrite-phase1-perf.md)). This validates the riskiest piece of the project (new SQLite schema, drop-and-rebuild migration, public `Record` type change) in production-like conditions before TTL behavior is layered on top, and gives customers concrete numbers to evaluate at upgrade time. A 3.0-beta lands at the end of Phase 1D with the full `@cacheControl` feature.
 
 ## Top risks
 

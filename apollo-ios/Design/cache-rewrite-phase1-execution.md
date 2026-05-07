@@ -4,6 +4,7 @@
 **Companion documents:**
 - [cache-rewrite-phase1-summary.md](./cache-rewrite-phase1-summary.md) — manager-facing summary.
 - [cache-rewrite-phase1-plan.md](./cache-rewrite-phase1-plan.md) — engineering design (the **authoritative** spec for what is being built).
+- [cache-rewrite-phase1-perf.md](./cache-rewrite-phase1-perf.md) — performance measurement plan.
 
 This document describes **how** the Phase 1 work is executed by an AI agent, broken into small reviewable PRs stacked on each other. The engineering plan describes what to build; this plan describes the workflow for shipping it.
 
@@ -31,7 +32,7 @@ This is the operating manual for an AI agent (Claude Code) executing the Phase 1
 
 ### Branch naming
 
-- **Long-lived plan branch:** `cache-rewrite/phase-1-plan` — holds the three Phase 1 design docs (summary, plan, execution). **Not merged into `main` until every PR in the stack has been merged into it.** Treated as a long-running feature branch; serves as the base for the entire Phase 1 stack.
+- **Long-lived plan branch:** `cache-rewrite/phase-1-plan` — holds the four Phase 1 design docs (summary, plan, execution, perf). **Not merged into `main` until every PR in the stack has been merged into it.** Treated as a long-running feature branch; serves as the base for the entire Phase 1 stack.
 - **Implementation PRs:** `cache-rewrite/phase-1<letter>-<NN>-<short-slug>`, where `<letter>` is the phase (`a`, `b`, `c`, `d`) and `<NN>` is the two-digit PR sequence within that phase.
   - Examples: `cache-rewrite/phase-1a-01-cached-field-type`, `cache-rewrite/phase-1b-03-bridge-max-age`, `cache-rewrite/phase-1c-07-ttl-tests`.
 - **ADR PRs (Phase 0):** `cache-rewrite/phase-0-adr-<slug>`. Example: `cache-rewrite/phase-0-adr-record-abstraction`.
@@ -199,7 +200,7 @@ The base for the entire stack is the long-lived `cache-rewrite/phase-1-plan` bra
 
 **Status legend.** ⬜ not started · 🟦 in progress · 🟨 PR open · 🟩 merged.
 
-### Phase 0 — Design lock and ADRs (4 PRs + 2 spike branches)
+### Phase 0 — Design lock, ADRs, and performance baseline (5 PRs + 2 spike branches)
 
 | ID | Title | Status | Base | Est. LoC | Tests required |
 |---|---|---|---|---|---|
@@ -207,6 +208,7 @@ The base for the entire stack is the long-lived `cache-rewrite/phase-1-plan` bra
 | PR-002 | docs(cache): ADR — Record abstraction (field-aware via `CachedField`) | ⬜ | PR-001 | ~250 | None (docs) |
 | PR-003 | docs(cache): ADR — TTL semantics (tri-state, selection-set scoped, read-mode split) | ⬜ | PR-002 | ~300 | None (docs) |
 | PR-004 | docs(cache): ADR — Watcher × TTL (opt-in auto-refresh, permissive propagating reads) | ⬜ | PR-003 | ~250 | None (docs) |
+| PR-004a | chore(cache): capture 2.x performance baseline dataset | ⬜ | PR-004 | ~600 | Unit: harness scenarios run cleanly against 2.x; baseline JSON produced and committed |
 
 Phase 0 also produces two spike branches that are **not merged**:
 - `cache-rewrite/phase-0-spike-sqlite-bench` — micro-benchmark of the new schema on iPhone 16 Pro hardware, validates the §7.4 performance gates from the engineering plan.
@@ -214,20 +216,22 @@ Phase 0 also produces two spike branches that are **not merged**:
 
 Findings from each spike are captured in their respective Phase 0 ADRs (PR-003 references the SQLite spike; the cachecontrol-jsdirective spike findings become a `cache-rewrite/phase-0-adr-cachecontrol-spike` PR if material surprises surface — otherwise findings live as a comment thread on the existing ADR).
 
-### Phase 1A — SQLite schema rewrite + field-aware `Record` (8 PRs)
+### Phase 1A — SQLite schema rewrite + field-aware `Record` (10 PRs)
 
-Goal: ship 3.0-alpha at end of this phase. No behavior change for end users.
+Goal: ship 3.0-alpha at end of this phase. No behavior change for end users. Published performance dataset accompanies the alpha tag.
 
 | ID | Title | Status | Base | Est. LoC | Tests required |
 |---|---|---|---|---|---|
-| PR-005 | feat(cache): introduce `CachedField` type (no consumers yet) | ⬜ | PR-004 | ~80 | Unit: `CachedField` Hashable/Sendable/Equatable; round-trip with sample values |
+| PR-005 | feat(cache): introduce `CachedField` type (no consumers yet) | ⬜ | PR-004a | ~80 | Unit: `CachedField` Hashable/Sendable/Equatable; round-trip with sample values |
 | PR-006 | refactor(cache): change `Record.fields` type to `[CacheKey: CachedField]` | ⬜ | PR-005 | ~400 | Update existing Record/RecordSet tests; verify `record[key]` subscript still returns `Value?` for all existing call sites |
 | PR-007 | feat(sqlite): add `schema_metadata` table and version detection | ⬜ | PR-006 | ~150 | Unit: schema-version read/write, missing-row defaults to 0, version stamping on init |
 | PR-008 | feat(sqlite): new schema DDL — records table with composite PK + typed columns | ⬜ | PR-007 | ~200 | Unit: table creation idempotent, `WITHOUT ROWID` preserved, schema_metadata version=3 stamped |
 | PR-009 | feat(sqlite): implement insert/select/update/delete on new table (feature-flagged) | ⬜ | PR-008 | ~600 | Unit: each operation against new schema; round-trip Record↔rows; transactional behavior on failure; performance smoke test |
 | PR-010 | feat(sqlite): switch `SQLiteNormalizedCache` to new schema; drop-and-rebuild migration | ⬜ | PR-009 | ~400 | Unit: migration on detected old schema; integration: existing cache tests pass on new schema; CachePersistenceTests updated |
 | PR-011 | test(cache): SQLite performance-gate harness on iPhone 16 Pro | ⬜ | PR-010 | ~200 | Performance test asserting all §7.4 gates within 25% margin |
-| PR-012 | chore: tag 3.0-alpha; release notes; changelog | ⬜ | PR-011 | ~100 | Smoke test: clean install + first launch reads/writes a record |
+| PR-011a | feat(cache): comprehensive performance measurement harness (Tier 1 + Tier 2) | ⬜ | PR-011 | ~700 | Unit: each Tier 1 and Tier 2 scenario runs cleanly; JSON exporter produces well-formed output; harness is re-runnable across versions |
+| PR-011b | chore(cache): alpha-vs-2.x comparison reporter + published dataset | ⬜ | PR-011a | ~400 | Unit: reporter generates `cache-rewrite-phase1-perf-dataset.json` and `cache-rewrite-phase1-perf-report.md` from harness JSON inputs; verdict thresholds applied per perf plan §5.1 |
+| PR-012 | chore: tag 3.0-alpha; release notes; changelog | ⬜ | PR-011b | ~100 | Smoke test: clean install + first launch reads/writes a record. **Tag is gated on:** SQLite performance gates green AND no `regressed` verdict in the published dataset (or all such regressions explicitly accepted by the reviewer with documented rationale). |
 
 ### Phase 1B — `@cacheControl` codegen end-to-end (7 PRs)
 
@@ -271,8 +275,8 @@ Goal: ship 3.0-beta. Full feature visible to consumers.
 
 ### Total
 
-- **31 PRs** across 4 phases.
-- **~7,250 meaningful LoC** of change at midpoint estimates.
+- **34 PRs** across 4 phases (Phase 0: 5; Phase 1A: 10; Phase 1B: 7; Phase 1C: 7; Phase 1D: 5).
+- **~8,950 meaningful LoC** of change at midpoint estimates.
 - The estimates are guidance, not contracts. Splitting a PR is preferred to overrunning the §2 cap.
 
 ## 9. Session bootstrap
@@ -296,8 +300,8 @@ All "merged" references below mean **merged into `cache-rewrite/phase-1-plan`**,
 
 ### Per-phase done
 
-- **Phase 0 done:** PR-001 through PR-004 merged into `cache-rewrite/phase-1-plan`; both spike branches' findings captured in ADRs.
-- **Phase 1A done:** PR-005 through PR-012 merged; 3.0-alpha tag pushed from `cache-rewrite/phase-1-plan`; performance gates green in CI.
+- **Phase 0 done:** PR-001 through PR-004a merged into `cache-rewrite/phase-1-plan`; both spike branches' findings captured in ADRs; 2.x baseline performance dataset checked in.
+- **Phase 1A done:** PR-005 through PR-012 merged; 3.0-alpha tag pushed from `cache-rewrite/phase-1-plan`; SQLite performance gates green in CI; published comparison dataset (`cache-rewrite-phase1-perf-dataset.json`) shows no `regressed` verdict for any Tier 1 or Tier 2 scenario, or all such regressions explicitly accepted with documented rationale.
 - **Phase 1B done:** PR-013 through PR-019 merged; codegen produces `cacheControl:` on `Selection.Field`; all `TestCodeGenConfigurations` regenerated and pass.
 - **Phase 1C done:** PR-020 through PR-026 merged; TTL is enforced on strict reads; watcher uses permissive reads; `TTLTests.swift` covers every documented scenario.
 - **Phase 1D done:** PR-027 through PR-031 merged; opt-in watcher refresh works; `InMemoryNormalizedCache` has TTL parity; migration guide live; 3.0-beta tag pushed from `cache-rewrite/phase-1-plan`; 1-week internal beta complete with zero P0/P1 issues.

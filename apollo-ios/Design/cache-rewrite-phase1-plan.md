@@ -321,7 +321,7 @@ The implementation must hit the following on iPhone 16 Pro hardware (drawn from 
 | Sort by field (CTE join) | < 250 ms |
 | Insert one record (single field) | < 1 ms |
 
-These are 25% looser than the benchmark's measured numbers, allowing for production-environment variability while still detecting regression.
+These are 25% looser than the benchmark's measured numbers, allowing for production-environment variability while still detecting regression. They are pass/fail gates for SQLite operations only; the broader performance measurement and reporting work — covering in-memory cache I/O, `CachedField` serialization, GraphQL execution, and the alpha-vs-2.x comparison dataset — is specified in [cache-rewrite-phase1-perf.md](./cache-rewrite-phase1-perf.md). The 3.0-alpha tag (Phase 1A exit) is gated on both: SQLite gates green AND no regression verdict in the broader dataset.
 
 ## 8. Phased implementation
 
@@ -432,15 +432,15 @@ Exit criteria:
 
 | Phase | Focus | Engineer-weeks | Calendar weeks |
 |---|---|---|---|
-| 0 | Design lock + two de-risking spikes | 2 | 2 |
-| 1A | SQLite schema rewrite + field-aware `Record` (3.0-alpha) | 4 | 6–7 |
+| 0 | Design lock + de-risking spikes + 2.x perf baseline capture | 3 | 3 |
+| 1A | SQLite schema rewrite + field-aware `Record` + alpha perf dataset (3.0-alpha) | 5 | 7–8 |
 | 1B | `@cacheControl` codegen end-to-end | 4 | 5–6 |
 | 1C | TTL evaluation + read-mode split | 3 | 4 |
 | 1D | Opt-in watcher refresh + hardening + 3.0-beta | 4 | 4–5 |
-| **Total** | | **17** | **21–24 (≈ 5–6 months)** |
-| **With 25% contingency** | | | **27–30 (≈ 6–7 months)** |
+| **Total** | | **19** | **23–26 (≈ 5.5–6 months)** |
+| **With 25% contingency** | | | **29–33 (≈ 6.5–7.5 months)** |
 
-Plan against 6–7 months calendar. Two release tags ship from the plan: a 3.0-alpha at end of Phase 1A (storage refactor only, no behavioral change) and 3.0-beta at end of Phase 1D (full TTL feature).
+Plan against 6.5–7.5 months calendar. Two release tags ship from the plan: a 3.0-alpha at end of Phase 1A (storage refactor only, no behavioral change, accompanied by the performance comparison dataset per [cache-rewrite-phase1-perf.md](./cache-rewrite-phase1-perf.md)) and 3.0-beta at end of Phase 1D (full TTL feature).
 
 ## 10. Risk register
 
