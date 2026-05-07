@@ -31,7 +31,7 @@ This is the operating manual for an AI agent (Claude Code) executing the Phase 1
 
 ### Branch naming
 
-- **Stack root:** `cache-rewrite/phase-1-plan` (this branch; contains the three Phase 1 design docs).
+- **Long-lived plan branch:** `cache-rewrite/phase-1-plan` — holds the three Phase 1 design docs (summary, plan, execution). **Not merged into `main` until every PR in the stack has been merged into it.** Treated as a long-running feature branch; serves as the base for the entire Phase 1 stack.
 - **Implementation PRs:** `cache-rewrite/phase-1<letter>-<NN>-<short-slug>`, where `<letter>` is the phase (`a`, `b`, `c`, `d`) and `<NN>` is the two-digit PR sequence within that phase.
   - Examples: `cache-rewrite/phase-1a-01-cached-field-type`, `cache-rewrite/phase-1b-03-bridge-max-age`, `cache-rewrite/phase-1c-07-ttl-tests`.
 - **ADR PRs (Phase 0):** `cache-rewrite/phase-0-adr-<slug>`. Example: `cache-rewrite/phase-0-adr-record-abstraction`.
@@ -39,9 +39,12 @@ This is the operating manual for an AI agent (Claude Code) executing the Phase 1
 
 ### PR base
 
-- Stacked PRs base on the previous PR's branch, **not** `main`.
+- **PR-001 (the first PR in the stack) bases on `cache-rewrite/phase-1-plan`**, not `main`. Every PR in the stack ultimately resolves to a merge into `cache-rewrite/phase-1-plan` (directly, or transitively through prior stacked PRs).
+- Subsequent PRs base on the previous PR's branch (stacked).
 - The PR description's *Stacks on* field names the base branch explicitly.
-- After the prior PR merges, the next PR is rebased to land on `main` (or the new tip of the merged stack).
+- When the prior PR in the stack merges into `cache-rewrite/phase-1-plan`, the next PR is rebased onto the new tip of `cache-rewrite/phase-1-plan` (which now contains the merged predecessor) and its `--base` is updated.
+- **Plan revisions propagate.** If `cache-rewrite/phase-1-plan` is updated directly (a commit landing on it that revises any of the three design docs), every open stacked PR is rebased onto the new tip in stack order at the start of the next session.
+- **`cache-rewrite/phase-1-plan` itself is only merged into `main` once all 31 implementation PRs are merged into it** — see §10 done conditions.
 
 ### Commit message convention
 
@@ -183,8 +186,11 @@ The agent **stops and asks the reviewer** under any of the following conditions.
 
 ### Re-stack policy
 
-- When PR-N merges, PR-(N+1) is rebased onto the new base. If conflicts are mechanical, resolve and force-push (this is acceptable for stacked PRs that have not yet received reviewer comments). If the rebased PR has reviewer comments, **do not force-push** without confirming with the reviewer.
-- When `main` moves forward (unrelated changes from other contributors), the bottom of the stack is rebased and propagated up at the start of every session.
+The base for the entire stack is the long-lived `cache-rewrite/phase-1-plan` branch. The stack rebases whenever its tip advances:
+
+- **When PR-N merges into `cache-rewrite/phase-1-plan`,** PR-(N+1) is rebased onto the new tip and its `--base` is updated to `cache-rewrite/phase-1-plan`. If conflicts are mechanical, resolve and force-push (this is acceptable for stacked PRs that have not yet received reviewer comments). If the rebased PR has reviewer comments, **do not force-push** without confirming with the reviewer.
+- **When the plan branch itself is updated** (a commit landing directly on `cache-rewrite/phase-1-plan` to revise one of the three design docs), every open stacked PR is rebased onto the new tip in stack order at the start of the next session.
+- **When `main` moves forward,** the plan branch is rebased onto `main` (since the plan branch is the long-lived feature base, it tracks `main`), and that rebase propagates up through every open stacked PR.
 - Stack health check at session start: any open PR more than 7 days old, or with merge conflicts, is flagged to the reviewer for triage.
 
 ## 8. The PR list
@@ -197,7 +203,7 @@ The agent **stops and asks the reviewer** under any of the following conditions.
 
 | ID | Title | Status | Base | Est. LoC | Tests required |
 |---|---|---|---|---|---|
-| PR-001 | docs(cache): ADR — major version bump rationale | ⬜ | `main` | ~150 | None (docs) |
+| PR-001 | docs(cache): ADR — major version bump rationale | ⬜ | `cache-rewrite/phase-1-plan` | ~150 | None (docs) |
 | PR-002 | docs(cache): ADR — Record abstraction (field-aware via `CachedField`) | ⬜ | PR-001 | ~250 | None (docs) |
 | PR-003 | docs(cache): ADR — TTL semantics (tri-state, selection-set scoped, read-mode split) | ⬜ | PR-002 | ~300 | None (docs) |
 | PR-004 | docs(cache): ADR — Watcher × TTL (opt-in auto-refresh, permissive propagating reads) | ⬜ | PR-003 | ~250 | None (docs) |
@@ -286,17 +292,19 @@ If any step reveals state that doesn't match the expected workflow (rogue branch
 
 ## 10. Done conditions
 
+All "merged" references below mean **merged into `cache-rewrite/phase-1-plan`**, not into `main`. The plan branch itself is merged into `main` only after Phase 1 is fully complete (see "Phase 1 done" below).
+
 ### Per-phase done
 
-- **Phase 0 done:** PR-001 through PR-004 merged; both spike branches' findings captured in ADRs.
-- **Phase 1A done:** PR-005 through PR-012 merged; 3.0-alpha tag pushed; performance gates green in CI.
+- **Phase 0 done:** PR-001 through PR-004 merged into `cache-rewrite/phase-1-plan`; both spike branches' findings captured in ADRs.
+- **Phase 1A done:** PR-005 through PR-012 merged; 3.0-alpha tag pushed from `cache-rewrite/phase-1-plan`; performance gates green in CI.
 - **Phase 1B done:** PR-013 through PR-019 merged; codegen produces `cacheControl:` on `Selection.Field`; all `TestCodeGenConfigurations` regenerated and pass.
 - **Phase 1C done:** PR-020 through PR-026 merged; TTL is enforced on strict reads; watcher uses permissive reads; `TTLTests.swift` covers every documented scenario.
-- **Phase 1D done:** PR-027 through PR-031 merged; opt-in watcher refresh works; `InMemoryNormalizedCache` has TTL parity; migration guide live; 3.0-beta tag pushed; 1-week internal beta complete with zero P0/P1 issues.
+- **Phase 1D done:** PR-027 through PR-031 merged; opt-in watcher refresh works; `InMemoryNormalizedCache` has TTL parity; migration guide live; 3.0-beta tag pushed from `cache-rewrite/phase-1-plan`; 1-week internal beta complete with zero P0/P1 issues.
 
 ### Phase 1 done
 
-All 31 PRs merged. 3.0-beta tagged and announced. Migration guide validated by at least one external user. Engineering-plan §10 risks reviewed and either retired or escalated to Phase 2 planning.
+All 31 PRs merged into `cache-rewrite/phase-1-plan`. Migration guide validated by at least one external user. Engineering-plan §10 risks reviewed and either retired or escalated to Phase 2 planning. **Then, and only then,** `cache-rewrite/phase-1-plan` is merged into `main`. The 3.0-beta tag is republished from `main` if needed; the 3.0 final tag is cut from `main` when the public beta cycle completes.
 
 ## 11. Living document
 
