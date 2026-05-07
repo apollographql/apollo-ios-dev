@@ -251,19 +251,20 @@ Goal: codegen emits `cacheControl` metadata on `Selection.Field`. Runtime stores
 | PR-018 | feat(codegen): `SelectionSetTemplate` emits `cacheControl:` parameter when non-nil | ⬜ | PR-017 | ~250 | Snapshot tests: generated code with/without directive; minimal output for nil case |
 | PR-019 | test(codegen): regenerate `TestCodeGenConfigurations`; snapshot tests for all 9 sample scenarios | ⬜ | PR-018 | ~600 | Snapshot tests; existing CodegenTests pass against regenerated APIs |
 
-### Phase 1C — TTL evaluation and read-mode split (7 PRs)
+### Phase 1C — TTL evaluation, read-mode split, and stale-tolerance API (8 PRs)
 
-Goal: `cacheControl` metadata is now consulted at read time; the `written_at` column populated since Phase 1A becomes load-bearing; watcher behavior splits into strict/permissive read modes.
+Goal: `cacheControl` metadata is now consulted at read time; the `written_at` column populated since Phase 1A becomes load-bearing; watcher behavior splits into strict/permissive read modes; consumer-facing stale-tolerance API lands.
 
 | ID | Title | Status | Base | Est. LoC | Tests required |
 |---|---|---|---|---|---|
 | PR-020 | feat(cache): `TimeProvider` protocol + `SystemTimeProvider`; threaded into `ApolloStore` | ⬜ | PR-019 | ~150 | Unit: protocol conformance; mockable `TimeProvider` for tests |
 | PR-021 | feat(cache): `TTLEnforcement` enum + `ApolloStore.load(_:ttlEnforcement:)` overload | ⬜ | PR-020 | ~150 | Unit: enum cases; load with both modes returns correct results when no TTL applies |
-| PR-022 | feat(cache): TTL check in `CacheDataExecutionSource.resolveField` gated by enforcement | ⬜ | PR-021 | ~250 | Unit: strict path throws `missingValue` on expired field; permissive path returns value; `maxAge=0` always missing on strict; nil never missing |
-| PR-023 | feat(cache): `GraphQLResultNormalizer` injects `writtenAt` on cache writes | ⬜ | PR-022 | ~180 | Unit: normalized records carry `writtenAt`; `TimeProvider` injection works |
-| PR-024 | feat(cache): `GraphQLDependencyTracker` computes `earliestExpiry`; `GraphQLResponse.earliestExpiry` exposed | ⬜ | PR-023 | ~250 | Unit: nil when no field has finite TTL; correct minimum across mixed-TTL queries; excludes `maxAge=0` from the calc |
-| PR-025 | feat(cache): watcher uses `.permissive` on `didChangeKeys` re-read | ⬜ | PR-024 | ~150 | Unit: watcher delivers cached value through TTL boundary on unrelated write; no automatic network refetch from time-based expiry |
-| PR-026 | test(cache): `TTLTests.swift` covering all 9 sample scenarios + boundary cases | ⬜ | PR-025 | ~700 | Integration tests for every `cache-control-samples.md` scenario; boundary cases for `maxAge=0`, scalar inheritance, operation overrides, interface propagation, strict vs permissive |
+| PR-022 | feat(cache): TTL check in `CacheDataExecutionSource.resolveField` gated by enforcement | ⬜ | PR-021 | ~280 | Unit: strict path throws `missingValue(reason:)` with appropriate reason on expired field and on absent field; permissive path returns value AND sets `Source.cache(containsStaleFields: true)`; `maxAge=0` always missing on strict; nil never missing |
+| PR-022a | feat(api): stale-tolerance API surface — `RequestConfiguration.ttlEnforcement` + `Source.cache(containsStaleFields:)` + `JSONDecodingError.MissingValueReason` + `.revalidateCache` cache policy | ⬜ | PR-022 | ~450 | Unit: round-trip RequestConfiguration through fetch→load→cache; pattern-matching on Source.cache associated value; MissingValueReason carries field metadata; `.revalidateCache` yields stream of (stale, fresh) on stale cache hit and single response on fresh hit; `.revalidateCache + ttlEnforcement = .strict` documented as redundant with `.cacheFirst + ttlEnforcement = .strict` |
+| PR-023 | feat(cache): `GraphQLResultNormalizer` injects `writtenAt` on cache writes | ⬜ | PR-022a | ~180 | Unit: normalized records carry `writtenAt`; `TimeProvider` injection works |
+| PR-024 | feat(cache): `GraphQLDependencyTracker` computes `earliestExpiry` and `containsStaleFields`; surfaced on `GraphQLResponse.earliestExpiry` and `GraphQLResponse.source.cache(containsStaleFields:)` | ⬜ | PR-023 | ~280 | Unit: `earliestExpiry` nil when no field has finite TTL; correct minimum across mixed-TTL queries; excludes `maxAge=0` from the calc; `containsStaleFields` true if any selected field returned was expired in permissive mode; false on fresh cache hit |
+| PR-025 | feat(cache): watcher uses `.permissive` on `didChangeKeys` re-read | ⬜ | PR-024 | ~150 | Unit: watcher delivers cached value through TTL boundary on unrelated write; no automatic network refetch from time-based expiry; staleness flag passed through to consumer |
+| PR-026 | test(cache): `TTLTests.swift` covering all 9 sample scenarios + boundary cases | ⬜ | PR-025 | ~750 | Integration tests for every `cache-control-samples.md` scenario; boundary cases for `maxAge=0`, scalar inheritance, operation overrides, interface propagation, strict vs permissive, RequestConfiguration override, `.revalidateCache` stream behavior |
 
 ### Phase 1D — Opt-in watcher refresh, hardening, beta (5 PRs)
 
@@ -279,8 +280,8 @@ Goal: ship 3.0-beta. Full feature visible to consumers.
 
 ### Total
 
-- **34 PRs** across 4 phases (Phase 0: 5; Phase 1A: 10; Phase 1B: 7; Phase 1C: 7; Phase 1D: 5).
-- **~8,950 meaningful LoC** of change at midpoint estimates.
+- **36 PRs** across 4 phases (Phase 0: 6; Phase 1A: 10; Phase 1B: 7; Phase 1C: 8; Phase 1D: 5).
+- **~9,500 meaningful LoC** of change at midpoint estimates.
 - The estimates are guidance, not contracts. Splitting a PR is preferred to overrunning the §2 cap.
 
 ## 9. Session bootstrap

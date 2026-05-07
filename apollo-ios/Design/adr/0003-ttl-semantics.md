@@ -73,8 +73,8 @@ Two read modes exist on `ApolloStore.load`:
 
 | Mode | TTL behavior | Used by |
 |---|---|---|
-| `.strict` (default) | TTL enforced; expired fields throw `missingValue`; query becomes a cache miss | `client.fetch(query:)`, `watcher.fetch(...)` (any explicit fetch by the consumer), watcher auto-refresh timer firing (Phase 1D) |
-| `.permissive` | TTL ignored; deliver whatever the cache currently contains. **Genuine missing-value errors still throw** (see §2.4) | Watcher re-read on `didChangeKeys` |
+| `.strict` (default) | TTL enforced; expired fields throw `missingValue` with reason `.expired` (see §2.4); query becomes a cache miss | `client.fetch(query:)`, `watcher.fetch(...)` (any explicit fetch by the consumer with `RequestConfiguration.ttlEnforcement = .strict`), watcher auto-refresh timer firing (Phase 1D) |
+| `.permissive` | Expired fields are returned as values; the response's `source` is set to `.cache(containsStaleFields: true)` to mark the staleness for callers that branch on it. **Genuine missing-value errors still throw** (see §2.4) | Watcher re-read on `didChangeKeys`; consumer fetches with `RequestConfiguration.ttlEnforcement = .permissive`; the `.revalidateCache` cache policy as part of its SWR semantics |
 
 API:
 
@@ -87,27 +87,39 @@ public func load<Operation: GraphQLOperation>(
 ) async throws -> GraphQLResponse<Operation>?
 ```
 
+Configuration of the read mode at the consumer-facing layer is via [ADR 0005](./0005-stale-tolerance.md): `RequestConfiguration.ttlEnforcement: TTLEnforcement = .strict` for explicit fetches, plus the `.revalidateCache` cache policy which always reads permissively as part of its SWR contract. The watcher's `didChangeKeys` re-read uses `.permissive` directly (per [ADR 0004](./0004-watcher-ttl.md)) and ignores the consumer's `RequestConfiguration` for that internal read.
+
 ### 2.4 What permissive mode does and does not bypass
 
-The permissive mode bypasses **only** TTL-induced misses. The pseudocode in `CacheDataExecutionSource.resolveField` makes this explicit:
+The permissive mode bypasses **only** TTL-induced misses. Genuine missing fields still throw, and the resolver tracks staleness on the execution context so that the assembled response's `source` can be set to `.cache(containsStaleFields: true)` when permissive mode returns any expired values. The pseudocode in `CacheDataExecutionSource.resolveField` makes this explicit:
 
 ```swift
 // Genuine missing field — throws unconditionally, regardless of mode:
 guard let cachedField = record.cachedField(for: cacheKeyForField) else {
-  throw JSONDecodingError.missingValue
+  throw JSONDecodingError.missingValue(reason: .absent)
 }
 
 // TTL checks — only these are gated by enforcement mode:
 if let maxAge = field.cacheControl?.maxAge {
-  if maxAge == 0 {
-    if ttlEnforcement == .strict { throw JSONDecodingError.missingValue }
-  } else if cachedField.writtenAt + Int64(maxAge) < now {
-    if ttlEnforcement == .strict { throw JSONDecodingError.missingValue }
+  let isExpired = (maxAge == 0) || (cachedField.writtenAt + Int64(maxAge) < now)
+  if isExpired {
+    if ttlEnforcement == .strict {
+      throw JSONDecodingError.missingValue(
+        reason: .expired(writtenAt: Date(timeIntervalSince1970: TimeInterval(cachedField.writtenAt)),
+                         maxAge: maxAge)
+      )
+    }
+    // Permissive: continue with the value, but mark that the response
+    // was sourced from cache containing stale fields. The flag is read
+    // by the result accumulator and set on response.source.
+    executionContext.markCacheContainsStaleFields()
   }
 }
 
 return cachedField.value
 ```
+
+Two related pieces of public API are introduced alongside this: a richer `JSONDecodingError.missingValue(reason:)` distinguishing absent from expired (for diagnostics), and `Source.cache(containsStaleFields:)` as the staleness signal on the response. Both are designed and rationalized in [ADR 0005](./0005-stale-tolerance.md).
 
 Genuine missing-value errors still propagate under permissive, which means the existing watcher revalidation-on-actual-cache-miss behavior from 2.x is fully preserved (see [ADR 0001](./0001-major-version-bump.md) §Context item 4 for context).
 
@@ -180,4 +192,5 @@ Have only one read mode: TTL is never enforced at the cache layer. The TTL check
 - [Apollo cache spec v0.2](https://specs.apollo.dev/cache/v0.2/) — silent on `maxAge: 0` and the no-directive default
 - [ADR 0001 — Major version bump](./0001-major-version-bump.md) — context for why these new TTL semantics ship as 3.0
 - [ADR 0002 — Record abstraction](./0002-record-abstraction.md) — `CachedField.writtenAt` is the timestamp consulted by §2.4's pseudocode
-- ADR 0004 — Watcher × TTL (forthcoming, PR-004): the `automaticallyRefreshOnExpiry` opt-in design that builds on this ADR's read-mode split
+- [ADR 0004 — Watcher × TTL](./0004-watcher-ttl.md) — the `automaticallyRefreshOnExpiry` opt-in design that builds on this ADR's read-mode split
+- ADR 0005 — Stale tolerance via `RequestConfiguration` and `.revalidateCache` (forthcoming, PR-004b): the consumer-facing API for choosing read mode, the `Source.cache(containsStaleFields:)` signal, and the `MissingValueReason` diagnostic distinction

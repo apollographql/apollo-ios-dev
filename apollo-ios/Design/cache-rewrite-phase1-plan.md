@@ -151,26 +151,28 @@ All scenarios in [Samples/cache-control-samples.md](./Samples/cache-control-samp
 ```swift
 // Pseudocode inside CacheDataExecutionSource.resolveField
 guard let cachedField = record.cachedField(for: cacheKeyForField) else {
-  throw JSONDecodingError.missingValue
+  throw JSONDecodingError.missingValue(reason: .absent)
 }
 
 if let maxAge = field.cacheControl?.maxAge {
-  if maxAge == 0 {
-    // Always treated as cache miss on initiating reads.
+  let isExpired = (maxAge == 0) || (cachedField.writtenAt + Int64(maxAge) < now)
+  if isExpired {
     if ttlEnforcement == .strict {
-      throw JSONDecodingError.missingValue
+      throw JSONDecodingError.missingValue(
+        reason: .expired(writtenAt: Date(timeIntervalSince1970: TimeInterval(cachedField.writtenAt)),
+                         maxAge: maxAge)
+      )
     }
-  } else if cachedField.writtenAt + Int64(maxAge) < now {
-    if ttlEnforcement == .strict {
-      throw JSONDecodingError.missingValue
-    }
+    // Permissive: continue with the value, but mark the read so the assembled
+    // response's source becomes .cache(containsStaleFields: true).
+    executionContext.markCacheContainsStaleFields()
   }
 }
 
 return cachedField.value
 ```
 
-The `ttlEnforcement` parameter is propagated from the call site. See section 5 for the read-mode split.
+The `ttlEnforcement` parameter is propagated from the call site. See section 5 for the read-mode split. The `MissingValueReason` enum and the `Source.cache(containsStaleFields:)` design are specified in ADR 0005.
 
 ### 4.3 Write-path timestamp injection
 
@@ -250,16 +252,26 @@ Resolved by combining the two preceding rules:
 
 ### 6.4 Required additions to `GraphQLResponse`
 
-The earliest-expiry calculation requires per-field `writtenAt` data and per-field `maxAge` metadata, both available at normalization time. Rather than have the watcher walk the response after the fact, the response carries the precomputed value:
+Two pieces of metadata, both computed during the cache read pass and surfaced on `GraphQLResponse`:
 
 ```swift
 public struct GraphQLResponse<Operation: GraphQLOperation> {
-  // existing fields unchanged
-  public let earliestExpiry: Date?    // nil if no field has finite TTL
+  // existing fields preserved
+  public let source: Source                  // shape changes; see below
+  public let earliestExpiry: Date?           // nil if no field has finite TTL
+}
+
+// Source.cache gains an associated value to carry the staleness signal.
+public enum Source: Sendable {
+  case cache(containsStaleFields: Bool)
+  case network
 }
 ```
 
-`GraphQLDependencyTracker` is extended to compute this in the same pass that produces `dependentKeys`.
+- `earliestExpiry: Date?` is the minimum of `writtenAt + maxAge` across fields with finite TTL. Used by the watcher's auto-refresh timer (§6.2). Excludes `maxAge: 0` fields (they have no schedulable expiry).
+- `Source.cache(containsStaleFields:)` is set during cache reads in permissive mode: `true` if any selected field had a finite TTL or `maxAge: 0` and was returned despite being expired; `false` for fully-fresh cache hits. It is structurally inapplicable to network-sourced responses, hence the associated value lives on the `.cache` case rather than at the top level of `GraphQLResponse`. ADR 0005 is the design reference.
+
+`GraphQLDependencyTracker` is extended to compute both in the same pass that produces `dependentKeys`.
 
 ## 7. SQLite schema
 
