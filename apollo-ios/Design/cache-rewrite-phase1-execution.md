@@ -20,7 +20,11 @@ This is the operating manual for an AI agent (Claude Code) executing the Phase 1
 
 ## 2. Operating principles
 
-1. **One PR at a time per active task.** Maximum **2 stacked unmerged PRs** in flight at once. If the reviewer falls behind, queue work — do not pile on more open PRs.
+1. **Merge cadence depends on PR type.**
+   - **ADR PRs (Phase 0 documentation work)** merge into `cache-rewrite/phase-1-plan` as they are approved. Reviewer typically approves and merges in the same session; only one or two sit in active review at any time.
+   - **Code PRs (Phase 1A through 1D implementation work)** stay open as a long-running stack. The reviewer batches them — typically merging at end-of-phase boundaries or as convenient. There is no preset cap on the number of open code PRs; the agent does not pause work on PR-N because PR-(N-1) is unmerged. The reviewer signals when to slow down or pause if the stack grows beyond comfortable review capacity.
+
+   The agent does pause when the reviewer explicitly says so, when one of the §6 escalation triggers fires, or when work on the next PR would require state from a still-changing earlier PR (in practice rare, since PRs are designed to be independent within their stacking constraints).
 2. **Target diff size: ~300–500 LoC of meaningful change.** Generated code, snapshot data, and trivial test boilerplate don't count toward this. PRs over 600 meaningful LoC must be split unless explicitly approved by the reviewer.
 3. **Each PR is self-contained.** It builds, all tests pass, and it is mergeable in isolation against its base branch (which may be `main` or a prior PR's branch in the stack).
 4. **No scope creep.** A PR does exactly what its title and acceptance criteria say. Anything else — even an obvious cleanup or fix — is escalated as a follow-up task; do not silently include it.
@@ -181,8 +185,8 @@ The agent **stops and asks the reviewer** under any of the following conditions.
 
 ### Cadence expectations
 
-- The agent does not block on review beyond the §2 stacked-PR limit. If 2 PRs are open and unmerged, the agent waits.
-- The agent does not work ahead of the reviewer's pace by more than 2 PRs.
+- The agent does not block on review except when the reviewer explicitly says to pause, when a §6 escalation trigger fires, or when work on the next PR genuinely depends on the state of a still-in-review earlier PR (rare).
+- ADR PRs merge into the plan branch promptly per §2. Code PRs accumulate as a stack until the reviewer chooses to merge them in batch. The agent does not unilaterally merge any PR.
 - If review feedback is requested on an earlier PR while a later PR is open, the earlier PR is addressed first.
 
 ### Re-stack policy
