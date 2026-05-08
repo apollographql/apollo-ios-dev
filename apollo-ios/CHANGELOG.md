@@ -1,5 +1,10 @@
 # Change Log
 
+## v1.25.6
+
+### Fixed
+- **Fix `\r\n` in GraphQL descriptions generating invalid Swift comments ([#965](https://github.com/apollographql/apollo-ios-dev/pull/965)):** GraphQL field descriptions containing `\r\n` (Windows CRLF) line endings caused codegen to emit invalid Swift — only the first line received the `///` doc comment prefix and subsequent lines were emitted as uncommented text, breaking compilation. Backport of [#961](https://github.com/apollographql/apollo-ios-dev/pull/961). Fixes [#3553](https://github.com/apollographql/apollo-ios/issues/3553). _Thank you to [@iPhoneNoobDeveloper](https://github.com/iPhoneNoobDeveloper) for the contribution._
+
 ## v1.25.5
 
 ### Fixed
