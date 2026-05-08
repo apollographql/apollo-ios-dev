@@ -54,7 +54,7 @@ public struct SubscriptionStream<Element: Sendable>: AsyncSequence, Sendable {
   /// - Parameters:
   ///   - stream: The underlying stream of elements.
   ///   - stateProvider: A closure that returns the current subscription state.
-  package init(
+  public init(
     stream: AsyncThrowingStream<Element, any Error>,
     stateProvider: @escaping @Sendable () -> SubscriptionState
   ) {
