@@ -23,6 +23,7 @@ extension Target {
         .target(name: ApolloTarget.animalKingdomAPI.name),
         .target(name: ApolloTarget.gitHubAPI.name),
         .package(product: "Apollo"),
+        .package(product: "ApolloSQLite"),
         .package(product: "Nimble"),
       ],
       settings: .forTarget(target)
@@ -43,7 +44,8 @@ extension Scheme {
       ]),
       testAction: .testPlans(
         [
-          ApolloTestPlan.performanceTest.path
+          ApolloTestPlan.performanceTest.path,
+          ApolloTestPlan.cacheBenchmarkTest.path,
         ],
         configuration: .debug
       )
