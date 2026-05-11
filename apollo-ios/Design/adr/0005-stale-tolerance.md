@@ -59,7 +59,7 @@ case .network:                           /* by definition fresh */
 }
 ```
 
-The signal is what `.revalidateCache` (§2.4) consults internally to decide whether to fire the network fetch.
+Under `ttlEnforcement = .permissive`, the signal is what `.revalidateCache` (§2.4) consults internally to decide whether to fire the network fetch.
 
 ### 2.3 `JSONDecodingError.MissingValueReason`
 
@@ -90,7 +90,9 @@ public enum CachePolicy.Query.CacheAndNetwork: Sendable, Hashable {
 }
 ```
 
-`.revalidateCache` packages the SWR pattern:
+`.revalidateCache` packages the SWR pattern. Its behavior depends on the consumer's `RequestConfiguration.ttlEnforcement` — the two configuration axes compose orthogonally rather than `.revalidateCache` overriding the enforcement mode.
+
+**Under `ttlEnforcement = .permissive`** (the SWR-meaningful combination):
 
 | Cache state | Stream yields |
 |---|---|
@@ -98,9 +100,17 @@ public enum CachePolicy.Query.CacheAndNetwork: Sendable, Hashable {
 | Stale cache hit (all selected fields present, any stale) | Two responses: stale `source = .cache(containsStaleFields: true)` first, then fresh `source = .network` after refresh. |
 | Genuine miss (any selected field absent) | One response: from network. |
 
-Internally, `.revalidateCache` reads the cache permissively (as part of its contract — it must be able to detect stale fields to know whether to revalidate) and consults the `Source.cache(containsStaleFields:)` flag to decide whether to fire the network fetch. The consumer doesn't need to write the branch themselves.
+**Under `ttlEnforcement = .strict`** (the redundant intersection — see §3.2):
 
-The redundant intersection `.revalidateCache + ttlEnforcement = .strict` is *equivalent* to `.cacheFirst + ttlEnforcement = .strict` and is documented as such in §3.2 below; we accept the redundancy as a small cost of preserving full orthogonality between the two configuration axes.
+| Cache state | Stream yields |
+|---|---|
+| Fresh cache hit | One response: from cache. No network call. |
+| Stale "hit" (any field expired) | Strict mode turns this into a `missingValue(.expired)` miss per [ADR 0003](./0003-ttl-semantics.md). One response: from network. |
+| Genuine miss | One response: from network. |
+
+Internally, `.revalidateCache` reads the cache using the consumer's `ttlEnforcement` setting. Under permissive, it consults the `Source.cache(containsStaleFields:)` flag to decide whether to fire the network fetch — the consumer doesn't need to write the branch themselves. Under strict, stale fields fail the read like any other miss and the policy falls back to network exactly as `.cacheFirst + .strict` would; there is nothing to revalidate when stale data is unobservable. The redundancy is mechanical (same code path), not merely behavioral; see §3.2.
+
+Consumers who want SWR semantics must explicitly opt into stale tolerance via `ttlEnforcement: .permissive`. This is intentional: the schema author's `@cacheControl(maxAge:)` directive is honored by default, and stale tolerance is a separate axis from cache-policy choice. A consumer dynamically wiring `ttlEnforcement` (for example, a wrapper that honors a user preference for strict freshness across all queries) gets consistent behavior across cache policies — `.cacheFirst` and `.revalidateCache` both respect the setting.
 
 ## Alternatives considered
 
@@ -153,12 +163,12 @@ Drop `.revalidateCache` and have consumers implement the SWR pattern themselves:
 - **Composable axes.** `RequestConfiguration.ttlEnforcement` and `cachePolicy` compose freely: any of the existing cache policies plus either enforcement mode produces a sensible behavior. Offline-first apps use `.cacheOnly + ttlEnforcement = .permissive`; freshness-strict apps use `.cacheFirst + ttlEnforcement = .strict` (default); SWR apps use `.revalidateCache`. No combinatorial explosion of named cache policies.
 - **Type-safe staleness signal.** `Source.cache(containsStaleFields:)` makes "network response with staleness flag" unrepresentable in the type system. Pattern matching is natural.
 - **Diagnostic distinction without control-flow cost.** `MissingValueReason` lets logs and telemetry distinguish absent from expired cache misses without changing how callers handle the error. Existing `case .missingValue` catch sites continue to compile and behave as before.
-- **`.revalidateCache` ergonomics.** The most common stale-tolerant pattern is one cache-policy choice; consumers don't write the SWR branching themselves.
+- **`.revalidateCache` ergonomics.** The SWR pattern is one cache-policy choice plus `ttlEnforcement: .permissive`; consumers don't write the cache-read-then-conditionally-fetch-network branching themselves.
 - **Default behavior preserves existing intent.** `RequestConfiguration.ttlEnforcement = .strict` by default means a schema author writing `@cacheControl(maxAge: N)` sees their directive honored automatically; consumers who want stale tolerance opt in.
 
 ### Negative
 
-- **`.revalidateCache + ttlEnforcement = .strict` is redundant with `.cacheFirst + ttlEnforcement = .strict`.** A consumer writing `.revalidateCache, ttlEnforcement: .strict` will see the same behavior as `.cacheFirst, ttlEnforcement: .strict` — strict TTL means stale fields become misses, so there is nothing to revalidate. Mitigation: the redundancy is documented in the API surface comments and in the migration guide. A category-error combination is an acceptable cost of preserving the orthogonal axes; consumers who write configurable code (where `ttlEnforcement` and `cachePolicy` come from different sources) get predictable behavior in every combination.
+- **`.revalidateCache + ttlEnforcement = .strict` is mechanically redundant with `.cacheFirst + ttlEnforcement = .strict`.** Both configurations execute the same read path: strict TTL turns stale fields into `missingValue(.expired)` cache misses, which trigger network fallback. A consumer writing `.revalidateCache, ttlEnforcement: .strict` gets exactly the behavior of `.cacheFirst, ttlEnforcement: .strict` — there is nothing to revalidate when stale data is unobservable. Mitigation: the redundancy is documented in the API surface comments and in the migration guide. A category-error combination is an acceptable cost of preserving the orthogonal axes; consumers who write configurable code (where `ttlEnforcement` and `cachePolicy` come from different sources) get predictable behavior in every combination.
 - **Existing pattern matches on `Source` need updating.** Code that pattern-matches `case .cache:` without the associated value will fail to compile in 3.0 (`.cache` no longer exists as a case without an associated value). Mitigation: this is a 3.0 breaking change called out in the migration guide; the typical fix is `case .cache(_):` or `case .cache(containsStaleFields: _):`. Trivial mechanical update.
 - **`JSONDecodingError.missingValue` constructor signature changes.** Code that constructs `JSONDecodingError.missingValue` directly must now write `.missingValue(reason: nil)`. Internal call sites are the only known constructors; third-party code that catches the case is unaffected. Mitigation: 3.0 breaking change called out in the migration guide.
 - **Three new public API surfaces in 3.0.** `RequestConfiguration.ttlEnforcement`, `Source.cache(containsStaleFields:)`, `MissingValueReason`, and `.revalidateCache` are all new public API. Each adds a small amount of conceptual surface area for new users. Mitigation: documentation comments on each; migration guide section explaining when to use which; the default behavior matches the most common intent so the new API surface is opt-in for the common case.
