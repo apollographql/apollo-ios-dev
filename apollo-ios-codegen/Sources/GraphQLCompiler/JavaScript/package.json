@@ -24,7 +24,7 @@
     "@types/common-tags": "1.8.4",
     "@types/jest": "30.0.0",
     "common-tags": "1.8.2",
-    "jest": "30.3.0",
+    "jest": "30.4.2",
     "rollup": "4.60.3",
     "ts-jest": "29.4.9",
     "typescript": "6.0.3"
