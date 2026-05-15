@@ -109,10 +109,7 @@ class Tier2CacheBenchmarksBase: XCTestCase {
   func runManyRecordMerge() async throws {
     let harness = BenchmarkHarness(
       scenario: "tier2.\(Self.backendLabel.lowercased()).many_record_merge_1000_records",
-      tier: 2,
-      // 1000-record merges are heavier; reduce iterations to keep wall-clock
-      // sane while preserving enough samples for stable percentiles.
-      measuredIterations: 20
+      tier: 2
     )
     let holder = CacheHolder()
     addTeardownBlock { try? holder.tearDownIfNeeded() }
@@ -134,9 +131,7 @@ class Tier2CacheBenchmarksBase: XCTestCase {
   func runPatternDelete() async throws {
     let harness = BenchmarkHarness(
       scenario: "tier2.\(Self.backendLabel.lowercased()).pattern_delete_10k_records",
-      tier: 2,
-      // Setup re-seeds 10k records each iteration; bound to 10 measured runs.
-      measuredIterations: 10
+      tier: 2
     )
     let holder = CacheHolder()
     addTeardownBlock { try? holder.tearDownIfNeeded() }
