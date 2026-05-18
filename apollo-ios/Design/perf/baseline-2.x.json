@@ -1,0 +1,148 @@
+{
+  "version": "2.x",
+  "captured_at": "2026-05-18T18:06:00Z",
+  "git_sha": "0604223abf29b21c98999b2dc33d9412be19a4e4",
+  "device": "iPhone 16 Pro Simulator (iOS 26.5)",
+  "results": [
+    {
+      "iterations": 50,
+      "mean_ms": 0.34382162,
+      "p50_ms": 0.3349995,
+      "p95_ms": 0.4380919999999999,
+      "p99_ms": 0.48082150999999995,
+      "scenario": "tier1.cache_and_network",
+      "std_ms": 0.049293887637763864,
+      "tier": 1
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.29108924,
+      "p50_ms": 0.27972949999999996,
+      "p95_ms": 0.36876495,
+      "p99_ms": 0.42128165999999995,
+      "scenario": "tier1.cache_first_miss_network_fallback",
+      "std_ms": 0.0447426150306166,
+      "tier": 1
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.21678423999999996,
+      "p50_ms": 0.218146,
+      "p95_ms": 0.24651889999999999,
+      "p99_ms": 0.25821242,
+      "scenario": "tier1.cold_cache_network_only",
+      "std_ms": 0.022810844422952944,
+      "tier": 1
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.09777662,
+      "p50_ms": 0.0940625,
+      "p95_ms": 0.12413124999999998,
+      "p99_ms": 0.14577266999999997,
+      "scenario": "tier1.warm_cache_first_hit",
+      "std_ms": 0.018085870816169834,
+      "tier": 1
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.028197540000000007,
+      "p50_ms": 0.0279165,
+      "p95_ms": 0.0298538,
+      "p99_ms": 0.030464329999999998,
+      "scenario": "tier2.inmemory.batch_load_100_records",
+      "std_ms": 0.0009090303694888643,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 6.732181660000002,
+      "p50_ms": 6.74775,
+      "p95_ms": 7.36769795,
+      "p99_ms": 7.50521524,
+      "scenario": "tier2.inmemory.many_record_merge_1000_records",
+      "std_ms": 0.38225179965111317,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 5.522345879999998,
+      "p50_ms": 5.4036665,
+      "p95_ms": 6.1762253000000005,
+      "p99_ms": 6.24968058,
+      "scenario": "tier2.inmemory.pattern_delete_10k_records",
+      "std_ms": 0.38188509595814923,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.0005425200000000001,
+      "p50_ms": 0.000542,
+      "p95_ms": 0.000584,
+      "p99_ms": 0.00060491,
+      "scenario": "tier2.inmemory.single_key_load_10_fields",
+      "std_ms": 0.00002853657874606926,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.011789180000000003,
+      "p50_ms": 0.0115,
+      "p95_ms": 0.014196199999999999,
+      "p99_ms": 0.016229329999999997,
+      "scenario": "tier2.inmemory.single_record_merge_10_fields",
+      "std_ms": 0.0011347571652479806,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 2.9280066600000003,
+      "p50_ms": 2.9171875,
+      "p95_ms": 3.10344185,
+      "p99_ms": 3.2036005,
+      "scenario": "tier2.sqlite.batch_load_100_records",
+      "std_ms": 0.09901524949664085,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 57.66600668,
+      "p50_ms": 53.6561875,
+      "p95_ms": 73.52693925,
+      "p99_ms": 103.09745398999998,
+      "scenario": "tier2.sqlite.many_record_merge_1000_records",
+      "std_ms": 10.692162720695917,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 22.4920517,
+      "p50_ms": 20.809146,
+      "p95_ms": 29.204506399999993,
+      "p99_ms": 46.28985398999995,
+      "scenario": "tier2.sqlite.pattern_delete_10k_records",
+      "std_ms": 6.387727637407367,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.05660009999999999,
+      "p50_ms": 0.052771,
+      "p95_ms": 0.06302064999999998,
+      "p99_ms": 0.12777883999999995,
+      "scenario": "tier2.sqlite.single_key_load_10_fields",
+      "std_ms": 0.014968127481282298,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.8215841599999998,
+      "p50_ms": 0.77575,
+      "p95_ms": 1.0904854499999996,
+      "p99_ms": 1.2806644999999999,
+      "scenario": "tier2.sqlite.single_record_merge_10_fields",
+      "std_ms": 0.1435116490697134,
+      "tier": 2
+    }
+  ]
+}
