@@ -9,7 +9,7 @@
 #   scripts/capture-perf-baseline.sh                         # macOS run (dev iteration)
 #   scripts/capture-perf-baseline.sh -d "platform=iOS,name=My iPhone" \
 #                                    -l "iPhone 16 Pro (physical)" \
-#                                    -o apollo-ios/Design/perf/baseline-2.x.json
+#                                    -o Tests/ApolloPerformanceTests/CacheBenchmarks/baseline-2.x.json
 #
 # The script does not commit; it writes the JSON to -o and exits.
 set -euo pipefail

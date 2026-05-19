@@ -39,8 +39,8 @@ public struct BenchmarkHarness: Sendable {
     setup: ((Int) async throws -> Void)? = nil,
     body: (Int) async throws -> Void
   ) async throws -> BenchmarkResult {
-    var samplesNs: [UInt64] = []
-    samplesNs.reserveCapacity(measuredIterations)
+    var iterationDurationsNs: [UInt64] = []
+    iterationDurationsNs.reserveCapacity(measuredIterations)
 
     for i in 0..<(warmupIterations + measuredIterations) {
       try await setup?(i)
@@ -50,14 +50,14 @@ public struct BenchmarkHarness: Sendable {
       let end = DispatchTime.now().uptimeNanoseconds
 
       if i >= warmupIterations {
-        samplesNs.append(end &- start)
+        iterationDurationsNs.append(end &- start)
       }
     }
 
     let result = BenchmarkResult(
       scenario: scenario,
       tier: tier,
-      samplesNs: samplesNs,
+      iterationDurationsNs: iterationDurationsNs,
       iterations: measuredIterations
     )
     BenchmarkOutput.emit(result)

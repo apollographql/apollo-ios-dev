@@ -15,17 +15,17 @@ public struct BenchmarkResult: Codable, Sendable {
   public let p95_ms: Double
   public let p99_ms: Double
 
-  public init(scenario: String, tier: Int, samplesNs: [UInt64], iterations: Int) {
+  public init(scenario: String, tier: Int, iterationDurationsNs: [UInt64], iterations: Int) {
     self.scenario = scenario
     self.tier = tier
     self.iterations = iterations
 
-    let samplesMs = samplesNs.map { Double($0) / 1_000_000.0 }
-    let sorted = samplesMs.sorted()
+    let iterationDurationsMs = iterationDurationsNs.map { Double($0) / 1_000_000.0 }
+    let sorted = iterationDurationsMs.sorted()
 
-    let mean = samplesMs.reduce(0, +) / Double(max(samplesMs.count, 1))
-    let variance = samplesMs.reduce(0.0) { $0 + ($1 - mean) * ($1 - mean) }
-      / Double(max(samplesMs.count - 1, 1))
+    let mean = iterationDurationsMs.reduce(0, +) / Double(max(iterationDurationsMs.count, 1))
+    let variance = iterationDurationsMs.reduce(0.0) { $0 + ($1 - mean) * ($1 - mean) }
+      / Double(max(iterationDurationsMs.count - 1, 1))
 
     self.mean_ms = mean
     self.std_ms = variance.squareRoot()

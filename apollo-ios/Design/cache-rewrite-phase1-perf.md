@@ -115,26 +115,13 @@ Stress workloads are not part of the per-PR gate; they run once at end of Phase 
 - **Cold and warm cache states** measured separately. A cold scenario is preceded by `cache.clear()` and a fresh database file; a warm scenario is preceded by populating the cache to the workload's required state.
 - **Test isolation.** Each scenario runs in a fresh test fixture; no cross-scenario state.
 
-### 4.2 Device matrix
-
-> **Phase 1 simplification (2026-05):** macOS is the only active baseline destination for the 2.x → 3.0-alpha comparison. The iOS rows below remain documented as the eventual goal but are deferred — `ApolloPerformanceTests` is configured as a host-app-less unit-test target, which means iOS device and Simulator destinations reject the test bundle (*"Tool-hosted testing is unavailable on device destinations"*). Reviving the iOS rows requires adding a host-app target for `ApolloPerformanceTests`; that work is a candidate follow-up but is not blocking Phase 1.
-
-| Device | Purpose | Phase 1 status |
-|---|---|---|
-| **macOS (Apple Silicon)** | Phase 1 primary gate. Runs the harness via the existing host-less unit-test target — no project structural changes required. Reference numbers come from an `arm64` developer host (e.g., MacBook Pro M-series). | **Active gate** |
-| **iPhone 16 Pro (physical)** | Matches Zach's original benchmark methodology; the eventual real-world gate. Requires a host-app target for `ApolloPerformanceTests`. | Deferred |
-| **iPhone 16 Pro Simulator** | CI-runnable approximate tracking of device numbers. Also requires a host-app target. | Deferred |
-| **iPhone SE (3rd gen) Simulator** | Older-device regression catch. Requires a host-app target. | Deferred |
-
-The published dataset for the 3.0-alpha tag captures the macOS row. iOS rows are restored to the dataset shape when their gate is reactivated.
-
-### 4.3 Tooling
+### 4.2 Tooling
 
 - **XCTest performance tests (`measure { … }`)** for Tier 1, 2, and 3 latency captures. Built-in, integrates with the test runners. Statistical reporting limited to mean and standard deviation; we extract richer percentiles by inspecting the iteration array directly via the `XCTPerformanceMetric` API.
 - **`xctrace record`** for Tier 4 profiling. Captures `.trace` files; exported via `xctrace export`.
 - **Custom JSON exporter** for cross-version comparison. Each test produces a JSON line with `{scenario, tier, device, version, mean_ms, std_ms, p50_ms, p95_ms, p99_ms, iteration_count, timestamp}`. The reporter aggregates lines into the published dataset.
 
-### 4.4 What we explicitly do not measure in Phase 1
+### 4.3 What we explicitly do not measure in Phase 1
 
 - **Cold-launch cache initialization.** The drop-and-rebuild migration adds startup latency on the first 3.0 launch (one extra network round trip). This is documented behavior, not a regression to detect; not measured in this dataset.
 - **Database file size on disk.** Zach's benchmark measured this; the 7% size delta between single-col and multi-col layouts is settled. Re-measurement is not informative.
@@ -198,7 +185,7 @@ Both the JSON and the markdown are checked into the repo so reviewers can see ex
 
 A new PR in Phase 0 captures the 2.x baseline:
 
-- **PR-004a** (new): `chore(cache): capture 2.x performance baseline dataset`. Builds the harness against the 2.x codebase, runs against `main` on the gate device, produces `apollo-ios/Design/perf/baseline-2.x.json`. Stacks on PR-004 (the last ADR).
+- **PR-004a** (new): `chore(cache): capture 2.x performance baseline dataset`. Builds the harness against the 2.x codebase, runs against `main` on the gate destination, produces `Tests/ApolloPerformanceTests/CacheBenchmarks/baseline-2.x.json`. Stacks on PR-004 (the last ADR).
 
 The harness code lives in a new directory `Tests/PerformanceBenchmarks/` outside the subtree directories so it is visible to dev-repo CI but not pushed upstream.
 
