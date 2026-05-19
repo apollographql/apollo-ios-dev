@@ -168,5 +168,217 @@ final class Tier1FetchBenchmarks: XCTestCase {
       XCTAssertEqual(deliveries, 2, "cacheAndNetwork must yield exactly two responses")
     }
   }
+
+  // MARK: - Scenario 5: warm cache, single ref hop (nested object)
+  //
+  // Exercises CacheReference resolution: QUERY_ROOT → hero → bestFriend.
+  // Two cache records resolved across two batched loads (one for hero,
+  // one for the single bestFriend reference). Compares against the flat
+  // `warm_cache_first_hit` scenario to surface the cost of one ref hop.
+
+  final class NestedHeroSelectionSet: MockSelectionSet, @unchecked Sendable {
+    override class var __selections: [Selection] {
+      [.field("hero", Hero.self)]
+    }
+
+    final class Hero: MockSelectionSet, @unchecked Sendable {
+      override class var __selections: [Selection] {
+        [
+          .field("__typename", String.self),
+          .field("name", String.self),
+          .field("bestFriend", BestFriend.self),
+        ]
+      }
+
+      final class BestFriend: MockSelectionSet, @unchecked Sendable {
+        override class var __selections: [Selection] {
+          [
+            .field("__typename", String.self),
+            .field("name", String.self),
+          ]
+        }
+      }
+    }
+  }
+
+  private static let nestedFixtureRecords: RecordSet = [
+    "QUERY_ROOT": ["hero": CacheReference("hero")],
+    "hero": [
+      "__typename": "Droid",
+      "name": "R2-D2",
+      "bestFriend": CacheReference("bestFriend"),
+    ],
+    "bestFriend": [
+      "__typename": "Human",
+      "name": "Luke Skywalker",
+    ],
+  ]
+
+  func test__tier1__warm_cache_first_hit_nested_object() async throws {
+    let (store, _, client) = await makeTestRig()
+    try await store.publish(records: Self.nestedFixtureRecords)
+
+    let harness = BenchmarkHarness(
+      scenario: "tier1.warm_cache_first_hit_nested_object",
+      tier: 1,
+      measuredIterations: Self.measuredIterations
+    )
+    _ = try await harness.measure { _ in
+      let query = MockQuery<NestedHeroSelectionSet>()
+      _ = try await client.fetch(query: query, cachePolicy: .cacheFirst)
+    }
+  }
+
+  // MARK: - Scenario 6: warm cache, 1:N array of refs
+  //
+  // Exercises the batched-load path: hero.friends is an array of 20
+  // CacheReferences, all resolved in a single batched loadRecords call.
+  // Realistic shape for paginated list queries.
+
+  static let friendsCount = 20
+
+  final class HeroWithFriendsSelectionSet: MockSelectionSet, @unchecked Sendable {
+    override class var __selections: [Selection] {
+      [.field("hero", Hero.self)]
+    }
+
+    final class Hero: MockSelectionSet, @unchecked Sendable {
+      override class var __selections: [Selection] {
+        [
+          .field("__typename", String.self),
+          .field("name", String.self),
+          .field("friends", [Friend]?.self),
+        ]
+      }
+
+      final class Friend: MockSelectionSet, @unchecked Sendable {
+        override class var __selections: [Selection] {
+          [
+            .field("__typename", String.self),
+            .field("name", String.self),
+          ]
+        }
+      }
+    }
+  }
+
+  private static func arrayOfRefsFixture() -> RecordSet {
+    var records: RecordSet = [
+      "QUERY_ROOT": ["hero": CacheReference("hero")],
+      "hero": [
+        "__typename": "Droid",
+        "name": "R2-D2",
+        "friends": (0..<friendsCount).map { CacheReference("friend_\($0)") },
+      ],
+    ]
+    for i in 0..<friendsCount {
+      records.insert(Record(key: "friend_\(i)", [
+        "__typename": "Human",
+        "name": "Friend \(i)",
+      ]))
+    }
+    return records
+  }
+
+  func test__tier1__warm_cache_first_hit_array_of_refs() async throws {
+    let (store, _, client) = await makeTestRig()
+    try await store.publish(records: Self.arrayOfRefsFixture())
+
+    let harness = BenchmarkHarness(
+      scenario: "tier1.warm_cache_first_hit_array_of_refs_20",
+      tier: 1,
+      measuredIterations: Self.measuredIterations
+    )
+    _ = try await harness.measure { _ in
+      let query = MockQuery<HeroWithFriendsSelectionSet>()
+      _ = try await client.fetch(query: query, cachePolicy: .cacheFirst)
+    }
+  }
+
+  // MARK: - Scenario 7: warm cache, N:M shared records (dedup payoff)
+  //
+  // 20 friends each reference one of 3 shared homeworlds. The executor's
+  // ref-resolution dedup should batch-load 3 unique homeworld records
+  // rather than 20 — this is THE normalization payoff Apollo's cache
+  // exists for, and it's worth measuring against a 3.0 baseline.
+
+  static let homeworldKeys = ["tatooine", "alderaan", "naboo"]
+
+  final class HeroWithFriendsAndHomeworldSelectionSet: MockSelectionSet, @unchecked Sendable {
+    override class var __selections: [Selection] {
+      [.field("hero", Hero.self)]
+    }
+
+    final class Hero: MockSelectionSet, @unchecked Sendable {
+      override class var __selections: [Selection] {
+        [
+          .field("__typename", String.self),
+          .field("name", String.self),
+          .field("friends", [Friend]?.self),
+        ]
+      }
+
+      final class Friend: MockSelectionSet, @unchecked Sendable {
+        override class var __selections: [Selection] {
+          [
+            .field("__typename", String.self),
+            .field("name", String.self),
+            .field("homeworld", Homeworld.self),
+          ]
+        }
+
+        final class Homeworld: MockSelectionSet, @unchecked Sendable {
+          override class var __selections: [Selection] {
+            [
+              .field("__typename", String.self),
+              .field("name", String.self),
+            ]
+          }
+        }
+      }
+    }
+  }
+
+  private static func sharedRecordsFixture() -> RecordSet {
+    var records: RecordSet = [
+      "QUERY_ROOT": ["hero": CacheReference("hero")],
+      "hero": [
+        "__typename": "Droid",
+        "name": "R2-D2",
+        "friends": (0..<friendsCount).map { CacheReference("friend_\($0)") },
+      ],
+    ]
+    for i in 0..<friendsCount {
+      let homeworldKey = "homeworld_\(homeworldKeys[i % homeworldKeys.count])"
+      records.insert(Record(key: "friend_\(i)", [
+        "__typename": "Human",
+        "name": "Friend \(i)",
+        "homeworld": CacheReference(homeworldKey),
+      ]))
+    }
+    let planetNames = ["Tatooine", "Alderaan", "Naboo"]
+    for (i, key) in homeworldKeys.enumerated() {
+      records.insert(Record(key: "homeworld_\(key)", [
+        "__typename": "Planet",
+        "name": planetNames[i],
+      ]))
+    }
+    return records
+  }
+
+  func test__tier1__warm_cache_first_hit_shared_records() async throws {
+    let (store, _, client) = await makeTestRig()
+    try await store.publish(records: Self.sharedRecordsFixture())
+
+    let harness = BenchmarkHarness(
+      scenario: "tier1.warm_cache_first_hit_shared_records_20_friends_3_homeworlds",
+      tier: 1,
+      measuredIterations: Self.measuredIterations
+    )
+    _ = try await harness.measure { _ in
+      let query = MockQuery<HeroWithFriendsAndHomeworldSelectionSet>()
+      _ = try await client.fetch(query: query, cachePolicy: .cacheFirst)
+    }
+  }
 }
 
