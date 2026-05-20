@@ -3,29 +3,22 @@ import Foundation
 
 /// A single cached field's value alongside its write metadata.
 ///
-/// In 3.0, `Record.fields` changes from `[CacheKey: Value]` to
-/// `[CacheKey: CachedField]` (see [ADR 0002](../../Design/adr/0002-record-abstraction.md)).
-/// Each field carries its own `writtenAt` timestamp so TTL evaluation under
-/// `@cacheControl(maxAge:)` is local to the field — no parallel metadata
-/// side-channel is required.
-///
-/// PR-005 introduces the type with no consumers; PR-006 changes `Record.fields`
-/// to use it. Phase 2 metadata (`lastAccessedAt` for LRU, parent references
-/// for `@onDelete`, etc.) will land as additional stored properties on this
-/// struct as those features ship.
+/// Each field in a `Record` carries its own `writtenAt` timestamp so TTL
+/// evaluation under `@cacheControl(maxAge:)` is local to the field rather
+/// than stored in a parallel side-channel.
 public struct CachedField: Sendable, Hashable {
 
-  /// The value stored at this field. Matches `Record.Value`'s constraint —
-  /// any value that is both `Hashable` (for record-set deduplication) and
-  /// `Sendable` (for cross-actor cache traversal).
+  /// The value stored at this field. Any value that is both `Hashable`
+  /// (for record-set deduplication) and `Sendable` (for cross-actor cache
+  /// traversal).
   public typealias Value = any Hashable & Sendable
 
   /// The field's value.
   public let value: Value
 
-  /// Epoch seconds at which this field was last written to the cache. TTL
-  /// evaluation reads `writtenAt + maxAge < now` to decide if the field is
-  /// stale (ADR 0003 §2).
+  /// Epoch seconds at which this field was last written to the cache.
+  /// TTL evaluation reads `writtenAt + maxAge < now` to decide if the
+  /// field is stale.
   public let writtenAt: Int64
 
   public init(value: Value, writtenAt: Int64) {
@@ -34,8 +27,8 @@ public struct CachedField: Sendable, Hashable {
   }
 
   /// Convenience: accept a `Date` and truncate to epoch seconds.
-  /// `Date.timeIntervalSince1970` is a fractional `Double`; we drop the
-  /// sub-second portion because TTL semantics in 3.0 are second-precision.
+  /// `Date.timeIntervalSince1970` is a fractional `Double`; the sub-second
+  /// portion is dropped because `writtenAt` is second-precision.
   public init(value: Value, writtenAt: Date) {
     self.init(value: value, writtenAt: Int64(writtenAt.timeIntervalSince1970))
   }
