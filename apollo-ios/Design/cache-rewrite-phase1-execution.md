@@ -51,6 +51,26 @@ This is the operating manual for an AI agent (Claude Code) executing the Phase 1
 - **Plan revisions propagate.** If `cache-rewrite/phase-1-plan` is updated directly (a commit landing on it that revises any of the three design docs), every open stacked PR is rebased onto the new tip in stack order at the start of the next session.
 - **`cache-rewrite/phase-1-plan` itself is only merged into `main` once all 31 implementation PRs are merged into it** — see §10 done conditions.
 
+### Inline documentation conventions
+
+Inline comments and doc comments in source files describe what the code *is* and what it *does* at the current revision. They are read by future maintainers and by anyone reading the code in the upstream repos that the subtree directories are pushed to (`apollo-ios`, `apollo-ios-codegen`, `apollo-ios-pagination`). Several things that belong in PR descriptions or in the design docs do **not** belong in inline comments.
+
+**Do not reference in code comments:**
+
+- **ADRs.** ADR files live in `apollo-ios/Design/adr/` and are dev-repo-only design documentation. Upstream readers don't have access to them, and even dev-repo readers shouldn't need to chase a link to understand the code at hand. If a design decision is necessary to understand the code, paraphrase the *reason* inline; don't link to the ADR.
+- **PR identifiers.** `PR-NNN` numbers are dev-repo workflow concepts. They mean nothing in the upstream repo and become stale even in the dev repo once the work has merged.
+- **Phase identifiers.** "Phase 1," "Phase 2," etc. are execution-plan workflow terms. They don't belong in source code.
+- **Forward-looking roadmap commentary.** Phrases like "will land in a later PR" or "Phase 2 will add X" describe planning intent, not the current code. They belong in PR descriptions or in the design docs.
+
+**Do include inline:**
+
+- What the type or function *is* and what it does.
+- Why a non-obvious behavior choice was made (e.g., "drops sub-second precision because the timestamp is second-resolution").
+- Non-obvious invariants the code depends on.
+- API contract notes for public symbols.
+
+The rule applies most strictly to code in subtree directories (`apollo-ios/Sources/`, `apollo-ios-codegen/Sources/`, `apollo-ios-pagination/Sources/`) which get pushed upstream. Files outside subtree directories (`Tests/`, `Sources/` test APIs, `scripts/`) are dev-repo-only and can reference ADRs / PRs / phases where genuinely useful — but the same principle of preferring inline explanation over external reference still produces clearer code.
+
 ### Commit message convention
 
 Follow the repo's existing conventional-commits style observed in `git log` (e.g., `chore(deps): …`, `docs: …`, `feat: …`, `fix: …`, `feature: …`). Commit messages end with the `Co-Authored-By` line per `CLAUDE.md`. Use HEREDOC for multi-line messages.
