@@ -9,7 +9,7 @@ public struct RecordSet: Sendable, Hashable {
   public mutating func insert(_ record: Record) {
     storage[record.key] = record
   }
-  
+
   public mutating func removeRecord(for key: CacheKey) {
     storage.removeValue(forKey: key)
   }
@@ -58,12 +58,18 @@ public struct RecordSet: Sendable, Hashable {
     if let oldRecord = storage[record.key] {
       var changedKeys: Set<CacheKey> = Set()
       var updatedRecord = oldRecord
-      
-      for (key, value) in record.fields {
-        if let oldValue = oldRecord.fields[key], AnyHashable(oldValue) == AnyHashable(value) {
+
+      for (key, newField) in record.fields {
+        if let oldField = oldRecord.fields[key],
+           AnyHashable(oldField.value) == AnyHashable(newField.value) {
+          // Value unchanged. Still take the new `CachedField` so the
+          // stored timestamp advances to the latest write — TTL
+          // evaluation reads the freshest timestamp — but don't notify
+          // watchers, since the observable value hasn't changed.
+          updatedRecord.fields[key] = newField
           continue
         }
-        updatedRecord[key] = value
+        updatedRecord.fields[key] = newField
         changedKeys.insert([record.key, key].joined(separator: "."))
       }
 
@@ -77,7 +83,11 @@ public struct RecordSet: Sendable, Hashable {
 }
 
 extension RecordSet: ExpressibleByDictionaryLiteral {
-  public init(dictionaryLiteral elements: (CacheKey, Record.Fields)...) {
+  /// Convenience for building a `RecordSet` from a literal. Values are
+  /// raw field maps (`[CacheKey: any Hashable & Sendable]`) — each is
+  /// wrapped into `CachedField`s with `writtenAt = 0` via `Record`'s
+  /// convenience initializer.
+  public init(dictionaryLiteral elements: (CacheKey, [CacheKey: Record.Value])...) {
     self.init(records: elements.map { Record(key: $0.0, $0.1) })
   }
 }
