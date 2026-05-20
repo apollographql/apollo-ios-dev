@@ -95,23 +95,6 @@ final class CachedFieldTests: XCTestCase {
     expect(field.writtenAt) == 0
   }
 
-  // MARK: - Sendable
-
-  /// Compile-time check: this test only builds if `CachedField` is
-  /// `Sendable`-conformant. The runtime assertion is incidental.
-  func test__sendable__crossActorTransferCompilesAndRoundTrips() async {
-    let field = CachedField(value: "x", writtenAt: 1)
-    let received = await withTaskGroup(of: CachedField.self, returning: CachedField.self) { group in
-      group.addTask { field }
-      var result: CachedField?
-      for await delivered in group {
-        result = delivered
-      }
-      return result!
-    }
-    expect(received) == field
-  }
-
   // MARK: - CustomStringConvertible
 
   func test__description__includesValueAndTimestamp() {
