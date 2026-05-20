@@ -1,11 +1,7 @@
 @_spi(Internal) import ApolloAPI
 import Foundation
 
-/// A single cached field's value alongside its write metadata.
-///
-/// Each field in a `Record` carries its own `writtenAt` timestamp so TTL
-/// evaluation under `@cacheControl(maxAge:)` is local to the field rather
-/// than stored in a parallel side-channel.
+/// A single cached field's value alongside its written metadata.
 public struct CachedField: Sendable, Hashable {
 
   /// The value stored at this field. Any value that is both `Hashable`
@@ -17,6 +13,8 @@ public struct CachedField: Sendable, Hashable {
   public let value: Value
 
   /// Epoch seconds at which this field was last written to the cache.
+  ///
+  /// This is used for TTL evaluation under `@cacheControl(maxAge:)`.
   /// TTL evaluation reads `writtenAt + maxAge < now` to decide if the
   /// field is stale.
   public let writtenAt: Int64
