@@ -4,10 +4,20 @@ import Foundation
 ///
 /// This is used to help handle nested optional values in dyanmic JSON data.
 @_spi(Internal)
-public protocol AnyOptional {}
+public protocol AnyOptional {
+  /// `true` iff the underlying optional is `.none`. Allows code that has already type-erased
+  /// an optional to `any AnyOptional` to distinguish `.none` from `.some` without a `Mirror`
+  /// or knowledge of the wrapped type.
+  var _isNone: Bool { get }
+}
 
 @_spi(Internal)
-extension Optional: AnyOptional { }
+extension Optional: AnyOptional {
+  public var _isNone: Bool {
+    if case .none = self { return true }
+    return false
+  }
+}
 
 extension Optional where Wrapped: Sendable {
 

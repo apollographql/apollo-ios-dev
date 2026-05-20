@@ -138,19 +138,31 @@ extension SelectionSet {
     }
   }
 
+  /// Convert elements of a list to the expected `SelectionSet` type.
+  /// 
+  /// At any depth, an element is one of:
+  ///   - `DataDict`: a leaf object — convert to a typed `SelectionSet`.
+  ///   - `[DataDict.FieldValue]`: a sub-list — recurse so deeper levels classify the same way.
+  ///   - A null marker: a propagated GraphQL null in an object or sub-list position. Represented by `NSNull()`.
   private func convertElements(
     of list: [DataDict.FieldValue],
     to selectionSetType: any RootSelectionSet.Type
   ) -> [DataDict.FieldValue] {
-    if let dataDictList = list as? [DataDict] {
-      return dataDictList.map { selectionSetType.init(_dataDict: $0) }
+    return list.map { element -> DataDict.FieldValue in
+      if let dataDict = element as? DataDict {
+        return selectionSetType.init(_dataDict: dataDict)
+      }
+      if let nestedList = element as? [DataDict.FieldValue] {
+        return convertElements(of: nestedList, to: selectionSetType) as DataDict.FieldValue
+      }
+      if element is NSNull {
+        return NSNull()
+      }
+      if let optional = element as? any AnyOptional, optional._isNone {
+        return NSNull()
+      }
+      preconditionFailure("Expected list element to be an object, a sub-list, or null.")
     }
-
-    if let nestedList = list as? [[DataDict.FieldValue]] {
-      return nestedList.map { self.convertElements(of: $0, to: selectionSetType) as DataDict.FieldValue }
-    }
-
-    preconditionFailure("Expected list data to contain objects.")
   }
 
 }
