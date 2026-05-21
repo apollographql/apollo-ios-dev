@@ -87,7 +87,7 @@ public final class SQLiteNormalizedCache {
     }
 
     let fields = try SQLiteSerialization.deserialize(data: recordData)
-    return Record(key: row.cacheKey, fields)
+    return Record(key: row.cacheKey, fields: fields)
   }
 }
 

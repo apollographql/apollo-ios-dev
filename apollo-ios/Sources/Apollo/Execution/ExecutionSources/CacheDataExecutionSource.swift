@@ -175,10 +175,14 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
       for object: Record,
       info: ObjectExecutionInfo
     ) throws {
+      // The default collector expects a `JSONObject` of raw field values
+      // (e.g. to read `__typename` for inline-fragment typecase resolution).
+      // `Record.fields` stores values wrapped in `CachedField`, so unwrap
+      // before handing the object's data to the collector.
       return try DefaultFieldSelectionCollector.collectFields(
         from: selections,
         into: &groupedFields,
-        for: object.fields,
+        for: object.fields.mapValues(\.value),
         info: info
       )
     }
