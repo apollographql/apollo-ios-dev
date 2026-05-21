@@ -119,6 +119,20 @@ extension SQLiteNormalizedCache: NormalizedCache {
   }
 }
 
+// MARK: - SPI (Testing)
+
+extension SQLiteNormalizedCache {
+  /// Closes the underlying SQLite connection. After calling this, the cache
+  /// must not be used for further operations. Intended for test teardown
+  /// scenarios where the backing database file is about to be unlinked —
+  /// closing the connection before unlink avoids libsqlite3's "vnode unlinked
+  /// while in use" diagnostic when caches are recreated in tight loops.
+  @_spi(Testing)
+  public func close() {
+    (database as? ApolloSQLiteDatabase)?.close()
+  }
+}
+
 extension String {
   private var isBalanced: Bool {
     guard contains("(") || contains(")") else { return true }
