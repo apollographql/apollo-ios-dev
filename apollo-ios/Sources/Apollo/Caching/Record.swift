@@ -34,20 +34,9 @@ public struct Record: Sendable, Hashable {
     self.fields = values.mapValues { CachedField(value: $0, writtenAt: writtenAt) }
   }
 
-  /// Value-only access to a field. The setter wraps the new value in a
-  /// `CachedField` with `writtenAt = 0`; use `fields` directly (within
-  /// the module) when an explicit timestamp must be preserved.
+  /// Value-only read access to a field.
   public subscript(key: CacheKey) -> Value? {
-    get {
-      return fields[key]?.value
-    }
-    set {
-      if let newValue {
-        fields[key] = CachedField(value: newValue, writtenAt: 0)
-      } else {
-        fields[key] = nil
-      }
-    }
+    return fields[key]?.value
   }
 
   /// Metadata-aware accessor for callers that need the field's

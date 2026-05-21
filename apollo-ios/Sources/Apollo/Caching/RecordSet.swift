@@ -59,17 +59,15 @@ public struct RecordSet: Sendable, Hashable {
       var changedKeys: Set<CacheKey> = Set()
       var updatedRecord = oldRecord
 
+      // Always take the new `CachedField` so the stored timestamp advances
+      // to the latest write. Only notify watchers (via `changedKeys`) when
+      // the observable value actually differs from what was stored.
       for (key, newField) in record.fields {
+        updatedRecord.fields[key] = newField
         if let oldField = oldRecord.fields[key],
            AnyHashable(oldField.value) == AnyHashable(newField.value) {
-          // Value unchanged. Still take the new `CachedField` so the
-          // stored timestamp advances to the latest write — TTL
-          // evaluation reads the freshest timestamp — but don't notify
-          // watchers, since the observable value hasn't changed.
-          updatedRecord.fields[key] = newField
           continue
         }
-        updatedRecord.fields[key] = newField
         changedKeys.insert([record.key, key].joined(separator: "."))
       }
 
