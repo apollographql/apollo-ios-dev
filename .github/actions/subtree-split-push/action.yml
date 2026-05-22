@@ -30,7 +30,12 @@ runs:
       PR_TITLE: ${{ inputs.pr-title }}
     run: |
       echo "git: $(git --version)"
+      # Fetch upstream for diagnostic visibility in logs. We do NOT pull —
+      # the dev repo is the only writer to upstream subtree repos, so a pull
+      # would only ever do work in degenerate cases (and historically caused
+      # self-perpetuating merge conflicts on noisy files like package-lock.json).
+      # See claude/ci-subtree-troubleshooting.md for the "stale upstream" incident
+      # that motivated removing the pull.
       git fetch ${{ inputs.remote }} ${{ inputs.target-branch }}
-      git subtree pull -P ${{ inputs.subtree }} --squash -m "pull: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - $PR_TITLE" ${{ inputs.remote }} ${{ inputs.target-branch }}
       splitResult=$(git subtree -P ${{ inputs.subtree }} split --squash --rejoin -m "split: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - $PR_TITLE")
       echo "split_sha=$splitResult" >> $GITHUB_OUTPUT
