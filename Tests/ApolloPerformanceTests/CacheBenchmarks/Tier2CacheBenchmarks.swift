@@ -95,11 +95,11 @@ class Tier2CacheBenchmarksBase: XCTestCase {
     _ = try await harness.measure { iteration in
       // Use a distinct key per iteration so each merge is a write, not a no-op
       // upsert; otherwise the cache could optimize the second-onwards writes.
-      var fields: Record.Fields = [:]
+      var values: [CacheKey: Record.Value] = [:]
       for f in 0..<BenchmarkWorkloads.fieldsPerRecord {
-        fields["field_\(f)"] = "value_\(iteration)_\(f)"
+        values["field_\(f)"] = "value_\(iteration)_\(f)"
       }
-      let record = Record(key: "merge_iter_\(iteration)", fields)
+      let record = Record(key: "merge_iter_\(iteration)", values)
       _ = try await cache.merge(records: RecordSet(records: [record]))
     }
   }
@@ -142,11 +142,11 @@ class Tier2CacheBenchmarksBase: XCTestCase {
     let userPrefixCount = 10_000
     let otherPrefixCount = 1_000
     let seedRecords: [Record] = (0..<userPrefixCount).map { i in
-      var fields: Record.Fields = [:]
+      var values: [CacheKey: Record.Value] = [:]
       for f in 0..<BenchmarkWorkloads.fieldsPerRecord {
-        fields["field_\(f)"] = "value_\(i)_\(f)"
+        values["field_\(f)"] = "value_\(i)_\(f)"
       }
-      return Record(key: "User_\(i)", fields)
+      return Record(key: "User_\(i)", values)
     } + (0..<otherPrefixCount).map { i in
       Record(key: "Other_\(i)", ["field_0": "value_\(i)"])
     }

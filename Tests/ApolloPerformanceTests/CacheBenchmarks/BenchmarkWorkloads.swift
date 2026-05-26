@@ -15,16 +15,16 @@ public enum BenchmarkWorkloads {
   /// scalar paths during serialization.
   public static func syntheticRecords(count: Int) -> [Record] {
     (0..<count).map { i in
-      var fields: Record.Fields = [:]
+      var values: [CacheKey: Record.Value] = [:]
       for f in 0..<fieldsPerRecord {
         let key: CacheKey = "field_\(f)"
         if f % 2 == 0 {
-          fields[key] = "value_\(i)_\(f)"
+          values[key] = "value_\(i)_\(f)"
         } else {
-          fields[key] = i * 100 + f
+          values[key] = i * 100 + f
         }
       }
-      return Record(key: "record_\(i)", fields)
+      return Record(key: "record_\(i)", values)
     }
   }
 
