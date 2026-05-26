@@ -115,24 +115,13 @@ Stress workloads are not part of the per-PR gate; they run once at end of Phase 
 - **Cold and warm cache states** measured separately. A cold scenario is preceded by `cache.clear()` and a fresh database file; a warm scenario is preceded by populating the cache to the workload's required state.
 - **Test isolation.** Each scenario runs in a fresh test fixture; no cross-scenario state.
 
-### 4.2 Device matrix
-
-| Device | Purpose |
-|---|---|
-| **iPhone 16 Pro (physical)** | Primary gate device; matches Zach's benchmark. All performance gates assert against this device. |
-| **iPhone 16 Pro Simulator** | CI-runnable; tracks device numbers approximately. Used in PR-merge gating where physical devices aren't available. |
-| **iPhone SE (3rd gen) Simulator** | Older-device baseline. Catches regressions that only appear on slower hardware. |
-| **macOS CLI (Mac mini M2 or equivalent)** | Fastest reference numbers; useful for development iteration. Not a gate. |
-
-The published dataset includes numbers from at least the first three.
-
-### 4.3 Tooling
+### 4.2 Tooling
 
 - **XCTest performance tests (`measure { … }`)** for Tier 1, 2, and 3 latency captures. Built-in, integrates with the test runners. Statistical reporting limited to mean and standard deviation; we extract richer percentiles by inspecting the iteration array directly via the `XCTPerformanceMetric` API.
 - **`xctrace record`** for Tier 4 profiling. Captures `.trace` files; exported via `xctrace export`.
 - **Custom JSON exporter** for cross-version comparison. Each test produces a JSON line with `{scenario, tier, device, version, mean_ms, std_ms, p50_ms, p95_ms, p99_ms, iteration_count, timestamp}`. The reporter aggregates lines into the published dataset.
 
-### 4.4 What we explicitly do not measure in Phase 1
+### 4.3 What we explicitly do not measure in Phase 1
 
 - **Cold-launch cache initialization.** The drop-and-rebuild migration adds startup latency on the first 3.0 launch (one extra network round trip). This is documented behavior, not a regression to detect; not measured in this dataset.
 - **Database file size on disk.** Zach's benchmark measured this; the 7% size delta between single-col and multi-col layouts is settled. Re-measurement is not informative.
@@ -196,7 +185,7 @@ Both the JSON and the markdown are checked into the repo so reviewers can see ex
 
 A new PR in Phase 0 captures the 2.x baseline:
 
-- **PR-004a** (new): `chore(cache): capture 2.x performance baseline dataset`. Builds the harness against the 2.x codebase, runs against `main` on the gate device, produces `apollo-ios/Design/perf/baseline-2.x.json`. Stacks on PR-004 (the last ADR).
+- **PR-004a** (new): `chore(cache): capture 2.x performance baseline dataset`. Builds the harness against the 2.x codebase, runs against `main` on the gate destination, produces `Tests/ApolloPerformanceTests/CacheBenchmarks/baseline-2.x.json`. Stacks on PR-004 (the last ADR).
 
 The harness code lives in a new directory `Tests/PerformanceBenchmarks/` outside the subtree directories so it is visible to dev-repo CI but not pushed upstream.
 
