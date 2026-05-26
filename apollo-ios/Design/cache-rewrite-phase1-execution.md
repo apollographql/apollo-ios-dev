@@ -169,7 +169,8 @@ Quality gates per §5 must all be green before opening the PR. If any gate fails
 1. Pull the merged change into local `main` (or the merged base).
 2. Rebase the next stacked PR onto the new base; resolve any conflicts.
 3. Re-verify the next PR's quality gates after rebase.
-4. Continue with the next PR.
+4. Update the progress tracker in the plan-branch PR's description (the long-lived PR with base `main` and head `cache-rewrite/phase-1-plan`): flip the merged PR's row from 🟡 to ✅, fill in the merge date, and adjust per-phase / overall percentages. Done via `gh api repos/.../pulls/{plan-PR-number} -X PATCH -F body=@…` per the dev-repo's GitHub-CLI workaround in `CLAUDE.md`.
+5. Continue with the next PR.
 
 ## 5. Quality gates
 
