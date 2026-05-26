@@ -37,6 +37,16 @@ public protocol SQLiteDatabase {
 
   func createRecordsTableIfNeeded() throws
 
+  /// Creates the row-per-field records table if it doesn't exist, and
+  /// stamps `schema_metadata.version` with `currentSchemaVersion`. The
+  /// table uses a composite `(cache_key, field_name)` primary key and is
+  /// declared `WITHOUT ROWID` so rows for one record cluster on disk in
+  /// primary-key order, which keeps batched reads sequential.
+  ///
+  /// The caller must ensure the schema-metadata table already exists
+  /// (call `createSchemaMetadataTableIfNeeded()` first).
+  func createNewRecordsTableIfNeeded() throws
+
   /// Creates the schema-metadata table if it doesn't exist. The table is a
   /// key/value store keyed on `String`; the only reserved key currently
   /// recognized is `version`, holding the integer schema version of the
@@ -110,4 +120,27 @@ public extension SQLiteDatabase {
   static var schemaVersionMetadataKey: String {
     "version"
   }
+
+  /// The schema version that the row-per-field records table layout
+  /// corresponds to. `createNewRecordsTableIfNeeded()` stamps this value
+  /// into `schema_metadata` so older databases can be detected by reading
+  /// `readSchemaVersion()` and comparing.
+  static var currentSchemaVersion: Int {
+    3
+  }
+
+  // Column names for the row-per-field `records` table created by
+  // `createNewRecordsTableIfNeeded()`. The legacy single-row table
+  // continues to use `idColumnName`/`keyColumnName`/`recordColumName`.
+
+  static var cacheKeyColumnName: String { "cache_key" }
+  static var fieldNameColumnName: String { "field_name" }
+  static var intValueColumnName: String { "int_value" }
+  static var stringValueColumnName: String { "string_value" }
+  static var floatValueColumnName: String { "float_value" }
+  static var boolValueColumnName: String { "bool_value" }
+  static var listValueColumnName: String { "list_value" }
+  static var childKeyValueColumnName: String { "child_key_value" }
+  static var customScalarValueColumnName: String { "custom_scalar_value" }
+  static var writtenAtColumnName: String { "written_at" }
 }

@@ -83,6 +83,109 @@ class ApolloSQLiteDatabaseBehaviorTests: XCTestCase {
     let probe = try ApolloSQLiteDatabase(fileURL: url)
     XCTAssertEqual(try probe.readSchemaVersion(), 0)
   }
+
+  // MARK: - createNewRecordsTableIfNeeded
+
+  func test__createNewRecordsTableIfNeeded__createsRecordsTable() throws {
+    let url = SQLiteTestCacheProvider.temporarySQLiteFileURL()
+    let db = try ApolloSQLiteDatabase(fileURL: url)
+    try db.createSchemaMetadataTableIfNeeded()
+
+    try db.createNewRecordsTableIfNeeded()
+
+    // Verify the table exists by reading its CREATE statement from
+    // sqlite_master. Returning a non-empty SQL string confirms creation.
+    let createSQL = try readTableSQL(dbURL: url, tableName: ApolloSQLiteDatabase.tableName)
+    XCTAssertFalse(createSQL.isEmpty)
+  }
+
+  func test__createNewRecordsTableIfNeeded__stampsSchemaVersionThree() throws {
+    let db = try ApolloSQLiteDatabase(fileURL: SQLiteTestCacheProvider.temporarySQLiteFileURL())
+    try db.createSchemaMetadataTableIfNeeded()
+
+    try db.createNewRecordsTableIfNeeded()
+
+    XCTAssertEqual(try db.readSchemaVersion(), 3)
+    XCTAssertEqual(ApolloSQLiteDatabase.currentSchemaVersion, 3)
+  }
+
+  func test__createNewRecordsTableIfNeeded__isIdempotent() throws {
+    let url = SQLiteTestCacheProvider.temporarySQLiteFileURL()
+    let db = try ApolloSQLiteDatabase(fileURL: url)
+    try db.createSchemaMetadataTableIfNeeded()
+
+    try db.createNewRecordsTableIfNeeded()
+    try db.createNewRecordsTableIfNeeded()
+    try db.createNewRecordsTableIfNeeded()
+
+    XCTAssertEqual(try db.readSchemaVersion(), 3)
+    // No throw from any of the three calls; same CREATE statement persists.
+    let createSQL = try readTableSQL(dbURL: url, tableName: ApolloSQLiteDatabase.tableName)
+    XCTAssertTrue(createSQL.contains(ApolloSQLiteDatabase.cacheKeyColumnName))
+  }
+
+  func test__createNewRecordsTableIfNeeded__preservesWithoutRowID() throws {
+    let url = SQLiteTestCacheProvider.temporarySQLiteFileURL()
+    let db = try ApolloSQLiteDatabase(fileURL: url)
+    try db.createSchemaMetadataTableIfNeeded()
+
+    try db.createNewRecordsTableIfNeeded()
+
+    let createSQL = try readTableSQL(dbURL: url, tableName: ApolloSQLiteDatabase.tableName)
+    XCTAssertTrue(
+      createSQL.range(of: "WITHOUT ROWID", options: .caseInsensitive) != nil,
+      "Expected CREATE statement to retain WITHOUT ROWID, got: \(createSQL)"
+    )
+  }
+
+  func test__createNewRecordsTableIfNeeded__hasCompositePrimaryKey() throws {
+    let url = SQLiteTestCacheProvider.temporarySQLiteFileURL()
+    let db = try ApolloSQLiteDatabase(fileURL: url)
+    try db.createSchemaMetadataTableIfNeeded()
+
+    try db.createNewRecordsTableIfNeeded()
+
+    let createSQL = try readTableSQL(dbURL: url, tableName: ApolloSQLiteDatabase.tableName)
+    // The PRIMARY KEY clause must mention both composite columns; verifying
+    // both names appear together in the SQL is sufficient to catch a regression
+    // that dropped or reordered the composite key.
+    let normalized = createSQL.replacingOccurrences(of: "\"", with: "")
+    XCTAssertTrue(
+      normalized.contains("PRIMARY KEY"),
+      "Expected PRIMARY KEY clause in: \(createSQL)"
+    )
+    XCTAssertTrue(
+      normalized.contains(ApolloSQLiteDatabase.cacheKeyColumnName) &&
+      normalized.contains(ApolloSQLiteDatabase.fieldNameColumnName),
+      "Expected composite (cache_key, field_name) in: \(createSQL)"
+    )
+  }
+
+  private func readTableSQL(dbURL: URL, tableName: String) throws -> String {
+    var db: OpaquePointer?
+    let flags = SQLITE_OPEN_READONLY | SQLITE_OPEN_FULLMUTEX | SQLITE_OPEN_URI
+    let openResult = sqlite3_open_v2(dbURL.path, &db, flags, nil)
+    guard openResult == SQLITE_OK else {
+      throw SQLiteError.open(path: dbURL.path, resultCode: openResult)
+    }
+    defer { sqlite3_close(db) }
+
+    var stmt: OpaquePointer?
+    let prepareResult = sqlite3_prepare_v2(db, "SELECT sql FROM sqlite_master WHERE type='table' AND name=?", -1, &stmt, nil)
+    guard prepareResult == SQLITE_OK else {
+      throw SQLiteError.prepare(message: "Failed to prepare sqlite_master lookup", resultCode: prepareResult)
+    }
+    defer { sqlite3_finalize(stmt) }
+
+    let sqliteTransient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+    sqlite3_bind_text(stmt, 1, tableName, -1, sqliteTransient)
+
+    let step = sqlite3_step(stmt)
+    guard step == SQLITE_ROW, let cStr = sqlite3_column_text(stmt, 0) else {
+      return ""
+    }
+    return String(cString: cStr)
+  }
   
   private func dropSQLiteTable(dbURL: URL, tableName: String) throws {
     var db: OpaquePointer?

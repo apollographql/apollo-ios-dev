@@ -85,6 +85,28 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     }
   }
 
+  public func createNewRecordsTableIfNeeded() throws {
+    try performSync {
+      let sql = """
+      CREATE TABLE IF NOT EXISTS "\(Self.tableName)" (
+        "\(Self.cacheKeyColumnName)"           TEXT NOT NULL,
+        "\(Self.fieldNameColumnName)"          TEXT NOT NULL,
+        "\(Self.intValueColumnName)"           INTEGER,
+        "\(Self.stringValueColumnName)"        TEXT,
+        "\(Self.floatValueColumnName)"         REAL,
+        "\(Self.boolValueColumnName)"          INTEGER,
+        "\(Self.listValueColumnName)"          TEXT,
+        "\(Self.childKeyValueColumnName)"      TEXT,
+        "\(Self.customScalarValueColumnName)"  TEXT,
+        "\(Self.writtenAtColumnName)"          INTEGER NOT NULL,
+        PRIMARY KEY ("\(Self.cacheKeyColumnName)", "\(Self.fieldNameColumnName)")
+      ) WITHOUT ROWID;
+      """
+      try exec(sql, errorMessage: "Failed to create row-per-field '\(Self.tableName)' database table")
+    }
+    try writeSchemaVersion(Self.currentSchemaVersion)
+  }
+
   public func createSchemaMetadataTableIfNeeded() throws {
     try performSync {
       let sql = """
