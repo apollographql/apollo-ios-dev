@@ -24,6 +24,7 @@ public final class SQLiteNormalizedCache {
     self.database = try databaseType.init(fileURL: fileURL)
     self.shouldVacuumOnClear = shouldVacuumOnClear
     try self.database.createRecordsTableIfNeeded()
+    try self.database.createSchemaMetadataTableIfNeeded()
   }
 
   public init(database: any SQLiteDatabase,
@@ -31,6 +32,7 @@ public final class SQLiteNormalizedCache {
     self.database = database
     self.shouldVacuumOnClear = shouldVacuumOnClear
     try self.database.createRecordsTableIfNeeded()
+    try self.database.createSchemaMetadataTableIfNeeded()
   }
   
   private func recordCacheKey(forFieldCacheKey fieldCacheKey: CacheKey) -> CacheKey {
