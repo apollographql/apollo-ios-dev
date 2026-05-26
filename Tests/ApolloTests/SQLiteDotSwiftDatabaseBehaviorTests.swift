@@ -21,6 +21,68 @@ class ApolloSQLiteDatabaseBehaviorTests: XCTestCase {
 
     XCTAssertThrowsError(try db.selectRawRows(forKeys: ["key"]))
   }
+
+  // MARK: - schema_metadata
+
+  func test__readSchemaVersion__givenFreshlyCreatedTable_returnsZero() throws {
+    let db = try ApolloSQLiteDatabase(fileURL: SQLiteTestCacheProvider.temporarySQLiteFileURL())
+    try db.createSchemaMetadataTableIfNeeded()
+
+    XCTAssertEqual(try db.readSchemaVersion(), 0)
+  }
+
+  func test__readSchemaVersion__afterWrite_roundTripsValue() throws {
+    let db = try ApolloSQLiteDatabase(fileURL: SQLiteTestCacheProvider.temporarySQLiteFileURL())
+    try db.createSchemaMetadataTableIfNeeded()
+
+    try db.writeSchemaVersion(3)
+
+    XCTAssertEqual(try db.readSchemaVersion(), 3)
+  }
+
+  func test__writeSchemaVersion__overwritesPriorValue() throws {
+    let db = try ApolloSQLiteDatabase(fileURL: SQLiteTestCacheProvider.temporarySQLiteFileURL())
+    try db.createSchemaMetadataTableIfNeeded()
+
+    try db.writeSchemaVersion(1)
+    try db.writeSchemaVersion(3)
+
+    XCTAssertEqual(try db.readSchemaVersion(), 3)
+  }
+
+  func test__createSchemaMetadataTableIfNeeded__isIdempotent() throws {
+    let db = try ApolloSQLiteDatabase(fileURL: SQLiteTestCacheProvider.temporarySQLiteFileURL())
+
+    try db.createSchemaMetadataTableIfNeeded()
+    try db.createSchemaMetadataTableIfNeeded()
+    try db.writeSchemaVersion(3)
+    try db.createSchemaMetadataTableIfNeeded()
+
+    XCTAssertEqual(try db.readSchemaVersion(), 3)
+  }
+
+  func test__readSchemaVersion__persistsAcrossDatabaseHandles() throws {
+    let url = SQLiteTestCacheProvider.temporarySQLiteFileURL()
+
+    let writer = try ApolloSQLiteDatabase(fileURL: url)
+    try writer.createSchemaMetadataTableIfNeeded()
+    try writer.writeSchemaVersion(3)
+
+    let reader = try ApolloSQLiteDatabase(fileURL: url)
+    XCTAssertEqual(try reader.readSchemaVersion(), 3)
+  }
+
+  func test__SQLiteNormalizedCache_init__createsSchemaMetadataTable() throws {
+    let url = SQLiteTestCacheProvider.temporarySQLiteFileURL()
+
+    _ = try SQLiteNormalizedCache(fileURL: url)
+
+    // Opening a fresh database against the same URL and querying the schema
+    // table should succeed (returning the default of 0) because
+    // `SQLiteNormalizedCache.init` is responsible for creating the table.
+    let probe = try ApolloSQLiteDatabase(fileURL: url)
+    XCTAssertEqual(try probe.readSchemaVersion(), 0)
+  }
   
   private func dropSQLiteTable(dbURL: URL, tableName: String) throws {
     var db: OpaquePointer?

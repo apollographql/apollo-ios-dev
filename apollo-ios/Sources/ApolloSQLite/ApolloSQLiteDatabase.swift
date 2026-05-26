@@ -85,6 +85,75 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     }
   }
 
+  public func createSchemaMetadataTableIfNeeded() throws {
+    try performSync {
+      let sql = """
+      CREATE TABLE IF NOT EXISTS "\(Self.schemaMetadataTableName)" (
+        "\(Self.schemaMetadataKeyColumnName)"   TEXT PRIMARY KEY,
+        "\(Self.schemaMetadataValueColumnName)" TEXT
+      );
+      """
+      try exec(sql, errorMessage: "Failed to create '\(Self.schemaMetadataTableName)' database table")
+    }
+  }
+
+  public func readSchemaVersion() throws -> Int {
+    try performSync {
+      let sql = """
+      SELECT \(Self.schemaMetadataValueColumnName)
+      FROM \(Self.schemaMetadataTableName)
+      WHERE \(Self.schemaMetadataKeyColumnName) = ?
+      """
+
+      let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare schema-version read")
+      defer { sqlite3_finalize(stmt) }
+
+      sqlite3_bind_text(stmt, 1, Self.schemaVersionMetadataKey, -1, SQLITE_TRANSIENT)
+
+      let stepResult = sqlite3_step(stmt)
+      switch stepResult {
+      case SQLITE_DONE:
+        // No row stored for the schema-version key — treat as version 0.
+        return 0
+      case SQLITE_ROW:
+        guard let textPtr = sqlite3_column_text(stmt, 0) else {
+          return 0
+        }
+        let raw = String(cString: textPtr)
+        return Int(raw) ?? 0
+      default:
+        throw SQLiteError.step(
+          message: "Schema-version read failed: \(sqliteErrorMessage())",
+          resultCode: stepResult
+        )
+      }
+    }
+  }
+
+  public func writeSchemaVersion(_ version: Int) throws {
+    try performSync {
+      let sql = """
+      INSERT INTO \(Self.schemaMetadataTableName) (\(Self.schemaMetadataKeyColumnName), \(Self.schemaMetadataValueColumnName))
+      VALUES (?, ?)
+      ON CONFLICT(\(Self.schemaMetadataKeyColumnName)) DO UPDATE SET \(Self.schemaMetadataValueColumnName) = excluded.\(Self.schemaMetadataValueColumnName)
+      """
+
+      let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare schema-version write")
+      defer { sqlite3_finalize(stmt) }
+
+      sqlite3_bind_text(stmt, 1, Self.schemaVersionMetadataKey, -1, SQLITE_TRANSIENT)
+      sqlite3_bind_text(stmt, 2, String(version), -1, SQLITE_TRANSIENT)
+
+      let stepResult = sqlite3_step(stmt)
+      if stepResult != SQLITE_DONE {
+        throw SQLiteError.step(
+          message: "Schema-version write failed: \(sqliteErrorMessage())",
+          resultCode: stepResult
+        )
+      }
+    }
+  }
+
   public func selectRawRows(forKeys keys: Set<CacheKey>) throws -> [DatabaseRow] {
       guard !keys.isEmpty else { return [] }
 
