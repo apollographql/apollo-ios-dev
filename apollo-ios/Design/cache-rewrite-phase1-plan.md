@@ -191,6 +191,10 @@ struct SystemTimeProvider: TimeProvider {
 
 The provider is held by `ApolloStore` and threaded into the normalizer construction.
 
+**Phase 1A interim:** `Record`'s legacy convenience initializer (`Record(key:_:writtenAt:)`) introduced alongside the field-aware `Record` change uses `writtenAt: Int64 = 0` as a default so existing call sites (the result normalizer's `Record(key: cachePath, object)` site, plus test fixtures using the dictionary-literal form) continue to compile unchanged. This is purely a placeholder during Phase 1A and 1B — no code reads `writtenAt` for any decision until TTL evaluation lands in Phase 1C. The reason the default is `0` rather than `Date.now` is to preserve deterministic equality for the parser-record tests (per [§3.2](#32-record-becomes-field-aware), two `Record`s with the same key and same field values but different `writtenAt` timestamps compare unequal; a `Date.now` default would make every test assertion comparing parser output against a literal-constructed fixture race against the wall clock).
+
+**Phase 1C migration:** when the `TimeProvider` plumbing above lands, the convenience initializer's `writtenAt` default is **dropped entirely** — the parameter becomes required. Production write sites pass the `TimeProvider`'s current epoch seconds; tests pass a pinned value from a stubbed clock. This forces every record-write site to take an explicit stance on the write timestamp rather than silently accepting an epoch-`0` record that would be immediately stale once TTL evaluation goes live.
+
 ## 5. Read-mode split
 
 Two read modes exist on `ApolloStore.load`:
