@@ -20,20 +20,21 @@ public struct SchemaVersion: Sendable, Hashable, Comparable, CustomStringConvert
   /// input. A bare integer (`"3"`) is treated as `"3.0"` so older stamps that
   /// omitted the minor component still load.
   public init?(_ rawValue: String) {
-    let trimmed = rawValue.trimmingCharacters(in: .whitespaces)
-    guard !trimmed.isEmpty else { return nil }
-
-    let parts = trimmed.split(separator: ".", maxSplits: 1, omittingEmptySubsequences: false)
-    guard let parsedMajor = Int(parts[0]) else { return nil }
-
-    if parts.count == 1 {
-      self.major = parsedMajor
-      self.minor = 0
+    let majorPart: Substring
+    let minorPart: Substring
+    if let dot = rawValue.firstIndex(of: ".") {
+      majorPart = rawValue[..<dot]
+      minorPart = rawValue[rawValue.index(after: dot)...]
     } else {
-      guard let parsedMinor = Int(parts[1]) else { return nil }
-      self.major = parsedMajor
-      self.minor = parsedMinor
+      majorPart = Substring(rawValue)
+      minorPart = "0"
     }
+
+    guard let major = Int(majorPart), let minor = Int(minorPart) else {
+      return nil
+    }
+    self.major = major
+    self.minor = minor
   }
 
   public var description: String {
