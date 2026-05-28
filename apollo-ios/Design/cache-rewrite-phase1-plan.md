@@ -281,19 +281,21 @@ public enum Source: Sendable {
 
 ### 7.1 New schema (DDL)
 
+The schema is row-per-element: each scalar field is one row and each list element is one row, all in the same `records` table. The `position` column distinguishes them — `-1` for scalars, `0..N-1` for list elements — and is part of the primary key. List-element rows live at the same `cache_key` as their parent record's scalar fields and cluster physically next to them on disk via `WITHOUT ROWID`. Per [ADR 0006](./adr/0006-list-storage-strategy.md), nested lists (`[[T]]`) recurse via `child_key_value` indirection to synthetic sub-records that themselves use the same layout.
+
 ```sql
 CREATE TABLE IF NOT EXISTS records (
   cache_key            TEXT NOT NULL,
   field_name           TEXT NOT NULL,
+  position             INTEGER NOT NULL DEFAULT -1,  -- -1 = scalar; 0..N-1 = list element
   int_value            INTEGER,
   string_value         TEXT,
   float_value          REAL,
   bool_value           INTEGER,
-  list_value           TEXT,         -- JSON-encoded list
-  child_key_value      TEXT,         -- cache reference
+  child_key_value      TEXT,         -- cache reference (or synthetic sub-record key for nested lists; see ADR 0006)
   custom_scalar_value  TEXT,         -- JSON-encoded
   written_at           INTEGER NOT NULL,
-  PRIMARY KEY (cache_key, field_name)
+  PRIMARY KEY (cache_key, field_name, position)
 ) WITHOUT ROWID;
 ```
 
@@ -304,14 +306,16 @@ CREATE TABLE IF NOT EXISTS schema_metadata (
   key TEXT PRIMARY KEY,
   value TEXT
 );
--- on init: INSERT OR REPLACE INTO schema_metadata VALUES ('version', '3');
+-- on init: INSERT OR REPLACE INTO schema_metadata VALUES ('version', '4');
 ```
+
+The version bump from 3 to 4 corresponds to ADR 0006's adoption of the row-per-element layout. v3 (the JSON `list_value` shape predecessor) was never tagged externally; the bump exists to give any local dev databases that ran the v3 shape on the plan branch a clean rebuild path on next launch.
 
 ### 7.2 Operations
 
-- `selectRecords(forKeys:)` — single `SELECT … WHERE cache_key IN (?, ?, …) ORDER BY cache_key, field_name`. Reassembles into `Record` instances by grouping by `cache_key` in Swift. Composite-PK clustering ensures rows for one record arrive contiguous in the result set.
-- `addOrUpdate(records:)` — shreds each `Record.fields` into N row UPSERTs in one transaction. Each row carries its `written_at`.
-- `deleteRecord(for:)` — `DELETE FROM records WHERE cache_key = ?`.
+- `selectRecords(forKeys:)` — single `SELECT … WHERE cache_key IN (?, ?, …) ORDER BY cache_key, field_name, position`. Reassembles into `Record` instances by grouping by `cache_key` in Swift; the decoder branches on `position` to dispatch scalar rows (`position = -1`) and list-element rows (`position >= 0`, accumulated in order). Composite-PK clustering ensures rows for one record arrive contiguous in the result set, with scalar and list-element rows for a given field arriving as a contiguous run.
+- `addOrUpdate(records:)` — shreds each `Record.fields` into row UPSERTs in one transaction. Scalar fields produce one row at `position = -1`; list-typed fields produce N rows at `position = 0..N-1`. Each row carries its `written_at`. List-element rows for a field are rewritten atomically — an update to a list-typed field deletes the existing element rows and inserts the new ones in the same transaction, so partial-list states are not observable.
+- `deleteRecord(for:)` — `DELETE FROM records WHERE cache_key = ?`. Scalar rows and depth-1 list-element rows delete in the same statement (they share the cache_key). Nested-list sub-records at depth ≥ 2 live at synthetic keys (`<parent>.<field>[N]` per [ADR 0006](./adr/0006-list-storage-strategy.md)) and require a small cascading reachability walk that follows `child_key_value` columns.
 - `deleteRecords(matching:)` — unchanged semantics (`WHERE cache_key LIKE ? COLLATE NOCASE`).
 - `clearDatabase` — unchanged.
 
@@ -320,10 +324,10 @@ CREATE TABLE IF NOT EXISTS schema_metadata (
 On `init`, after `createRecordsTableIfNeeded`:
 
 1. Read `schema_metadata` for the version.
-2. If version is missing or `< 3`, drop and recreate the records table; insert the new version.
-3. If version is `3`, no migration needed.
+2. If version is missing or `< 4`, drop and recreate the records table; insert the new version.
+3. If version is `4`, no migration needed.
 
-The drop-and-rebuild is silent — no user-visible event other than the network fetches that follow on cache-miss reads.
+The drop-and-rebuild is silent — no user-visible event other than the network fetches that follow on cache-miss reads. The migration trigger absorbs both genuine upgrades from 2.x (no `schema_metadata` row at all) and local-dev databases that ran the v3 shape on the plan branch before [ADR 0006](./adr/0006-list-storage-strategy.md) (version row reads `3`). v3 never tagged externally, so no end-user installation is on v3.
 
 ### 7.4 Performance gates
 
