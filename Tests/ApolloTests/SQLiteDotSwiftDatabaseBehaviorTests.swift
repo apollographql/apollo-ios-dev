@@ -156,9 +156,9 @@ class ApolloSQLiteDatabaseBehaviorTests: XCTestCase {
     try db.createNewRecordsTableIfNeeded()
 
     let createSQL = try readTableSQL(dbURL: url, tableName: SQLiteSchema.recordsTableName)
-    // The PRIMARY KEY clause must mention both composite columns; verifying
-    // both names appear together in the SQL is sufficient to catch a regression
-    // that dropped or reordered the composite key.
+    // The PRIMARY KEY clause must mention all three composite columns;
+    // verifying their names appear together in the SQL is sufficient to
+    // catch a regression that dropped or reordered the composite key.
     let normalized = createSQL.replacingOccurrences(of: "\"", with: "")
     XCTAssertTrue(
       normalized.contains("PRIMARY KEY"),
@@ -166,8 +166,28 @@ class ApolloSQLiteDatabaseBehaviorTests: XCTestCase {
     )
     XCTAssertTrue(
       normalized.contains(SQLiteSchema.Records.cacheKey) &&
-      normalized.contains(SQLiteSchema.Records.fieldName),
-      "Expected composite (cache_key, field_name) in: \(createSQL)"
+      normalized.contains(SQLiteSchema.Records.fieldName) &&
+      normalized.contains(SQLiteSchema.Records.position),
+      "Expected composite (cache_key, field_name, position) in: \(createSQL)"
+    )
+  }
+
+  func test__createNewRecordsTableIfNeeded__positionColumnHasDefaultValue() throws {
+    let url = SQLiteTestCacheProvider.temporarySQLiteFileURL()
+    let db = try ApolloSQLiteDatabase(fileURL: url)
+    try db.createSchemaMetadataTableIfNeeded()
+
+    try db.createNewRecordsTableIfNeeded()
+
+    // The column must declare `INTEGER NOT NULL DEFAULT -1`. The default
+    // ensures non-list writes that omit `position` land in the right row;
+    // dropping or changing the default would silently break that path.
+    let createSQL = try readTableSQL(dbURL: url, tableName: SQLiteSchema.recordsTableName)
+    let normalized = createSQL.replacingOccurrences(of: "\"", with: "")
+    XCTAssertTrue(
+      normalized.range(of: "\(SQLiteSchema.Records.position)[^,]*INTEGER[^,]*NOT NULL[^,]*DEFAULT \(SQLiteSchema.Records.defaultPositionValue)",
+                       options: [.regularExpression, .caseInsensitive]) != nil,
+      "Expected '\(SQLiteSchema.Records.position) INTEGER NOT NULL DEFAULT \(SQLiteSchema.Records.defaultPositionValue)' in: \(createSQL)"
     )
   }
 

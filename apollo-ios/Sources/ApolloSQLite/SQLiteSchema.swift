@@ -17,18 +17,29 @@ public enum SQLiteSchema {
   /// Shared physical name of the records table across both layouts.
   public static let recordsTableName = "records"
 
-  /// Columns for the row-per-field records-table layout.
+  /// Columns for the row-per-element records-table layout.
   public enum Records {
     public static let cacheKey = "cache_key"
     public static let fieldName = "field_name"
+    /// `-1` for non-list rows (a scalar field, a cache reference, or any
+    /// other field that occupies a single row), `0..N-1` for the
+    /// elements of a list-typed field. Part of the primary key, so
+    /// `(cache_key, field_name)` is no longer unique on its own — see
+    /// `defaultPositionValue`.
+    public static let position = "position"
     public static let intValue = "int_value"
     public static let stringValue = "string_value"
     public static let floatValue = "float_value"
     public static let boolValue = "bool_value"
-    public static let listValue = "list_value"
     public static let childKeyValue = "child_key_value"
     public static let customScalarValue = "custom_scalar_value"
     public static let writtenAt = "written_at"
+
+    /// The `position` value for any row that does not represent a list
+    /// element — scalars and cache references both occupy a single row
+    /// at this position. Matches the column's DDL `DEFAULT -1` so
+    /// writes that omit `position` still land in the right row.
+    public static let defaultPositionValue: Int64 = -1
   }
 
   /// Columns for the legacy single-row JSON-blob records-table layout used

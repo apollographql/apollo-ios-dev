@@ -91,18 +91,22 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
       CREATE TABLE IF NOT EXISTS "\(SQLiteSchema.recordsTableName)" (
         "\(SQLiteSchema.Records.cacheKey)"           TEXT NOT NULL,
         "\(SQLiteSchema.Records.fieldName)"          TEXT NOT NULL,
+        "\(SQLiteSchema.Records.position)"           INTEGER NOT NULL DEFAULT \(SQLiteSchema.Records.defaultPositionValue),
         "\(SQLiteSchema.Records.intValue)"           INTEGER,
         "\(SQLiteSchema.Records.stringValue)"        TEXT,
         "\(SQLiteSchema.Records.floatValue)"         REAL,
         "\(SQLiteSchema.Records.boolValue)"          INTEGER,
-        "\(SQLiteSchema.Records.listValue)"          TEXT,
         "\(SQLiteSchema.Records.childKeyValue)"      TEXT,
         "\(SQLiteSchema.Records.customScalarValue)"  TEXT,
         "\(SQLiteSchema.Records.writtenAt)"          INTEGER NOT NULL,
-        PRIMARY KEY ("\(SQLiteSchema.Records.cacheKey)", "\(SQLiteSchema.Records.fieldName)")
+        PRIMARY KEY (
+          "\(SQLiteSchema.Records.cacheKey)",
+          "\(SQLiteSchema.Records.fieldName)",
+          "\(SQLiteSchema.Records.position)"
+        )
       ) WITHOUT ROWID;
       """
-      try exec(sql, errorMessage: "Failed to create row-per-field '\(SQLiteSchema.recordsTableName)' database table")
+      try exec(sql, errorMessage: "Failed to create row-per-element '\(SQLiteSchema.recordsTableName)' database table")
     }
     try writeSchemaVersion(SQLiteSchema.currentVersion)
   }

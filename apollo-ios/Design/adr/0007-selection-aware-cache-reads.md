@@ -100,7 +100,7 @@ The sub-phase 1A.5 PRs that implement this decision, in order. PR-008b and PR-00
 
 | Slot | Title | Notes |
 |---|---|---|
-| PR-008b | feat(sqlite): position-keyed v4 schema | per ADR 0006; lands the schema this ADR's projection mechanism reads against |
+| PR-008b | feat(sqlite): position-keyed schema | per ADR 0006; lands the schema this ADR's projection mechanism reads against. Schema version stays at `3` (Apollo iOS 3.x has not shipped externally, so the layout change is a within-v3 evolution rather than a wire-version bump). |
 | PR-009 | feat(sqlite): row-per-element CRUD against position-keyed schema | amended per ADR 0006; the internal-test-only `selectRecords` is kept here until PR-009g supersedes it |
 | PR-009a | docs(cache): ADR 0007 — selection-set-aware cache reads | **this PR** |
 | PR-009b | refactor(cache): introduce `FieldProjection` types | new value types, no consumers yet; includes the scalar-vs-list discriminator required by Principle 1 |

@@ -306,10 +306,10 @@ CREATE TABLE IF NOT EXISTS schema_metadata (
   key TEXT PRIMARY KEY,
   value TEXT
 );
--- on init: INSERT OR REPLACE INTO schema_metadata VALUES ('version', '4');
+-- on init: INSERT OR REPLACE INTO schema_metadata VALUES ('version', '3');
 ```
 
-The version bump from 3 to 4 corresponds to ADR 0006's adoption of the row-per-element layout. v3 (the JSON `list_value` shape predecessor) was never tagged externally; the bump exists to give any local dev databases that ran the v3 shape on the plan branch a clean rebuild path on next launch.
+The schema version is `3` and stays aligned with the Apollo iOS major library version (3.x). The records-table layout *within v3* evolved during Phase 1A development — first to the row-per-field shape in PR-008, then to the row-per-element shape in PR-008b per ADR 0006 — but Apollo iOS 3.x has not shipped externally, so no end-user installation has ever been on any in-progress v3 layout. Any local development databases that ran an earlier in-progress v3 layout rebuild silently via the drop-and-rebuild path in §7.3 on next open.
 
 ### 7.2 Operations
 
@@ -324,10 +324,10 @@ The version bump from 3 to 4 corresponds to ADR 0006's adoption of the row-per-e
 On `init`, after `createRecordsTableIfNeeded`:
 
 1. Read `schema_metadata` for the version.
-2. If version is missing or `< 4`, drop and recreate the records table; insert the new version.
-3. If version is `4`, no migration needed.
+2. If version is missing or `< 3`, drop and recreate the records table; insert the new version (`3`).
+3. If version is `3`, no migration needed.
 
-The drop-and-rebuild is silent — no user-visible event other than the network fetches that follow on cache-miss reads. The migration trigger absorbs both genuine upgrades from 2.x (no `schema_metadata` row at all) and local-dev databases that ran the v3 shape on the plan branch before [ADR 0006](./adr/0006-list-storage-strategy.md) (version row reads `3`). v3 never tagged externally, so no end-user installation is on v3.
+The drop-and-rebuild is silent — no user-visible event other than the network fetches that follow on cache-miss reads. The migration trigger handles genuine upgrades from 2.x (where there is no `schema_metadata` row at all). Apollo iOS 3.x has not shipped externally, so no end-user installation has ever been on any in-progress v3 layout; local development databases that ran an earlier in-progress v3 layout during Phase 1A (e.g., the row-per-field shape from PR-008) need to be removed manually — they are not auto-detected and re-migrated because the wire-version is unchanged.
 
 ### 7.4 Performance gates
 
