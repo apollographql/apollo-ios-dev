@@ -492,16 +492,16 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
         cacheKey: cacheKey,
         fieldName: fieldName,
         position: position,
-        column: .childKey(syntheticKey),
+        typedValue: .childKey(syntheticKey),
         writtenAt: writtenAt
       )
     } else {
-      let column = try SQLiteFieldEncoding.encode(element)
+      let typedValue = try SQLiteFieldEncoding.encode(element)
       try upsertRow(
         cacheKey: cacheKey,
         fieldName: fieldName,
         position: position,
-        column: column,
+        typedValue: typedValue,
         writtenAt: writtenAt
       )
     }
@@ -533,7 +533,7 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     cacheKey: CacheKey,
     fieldName: String,
     position: Int64,
-    column: SQLiteFieldEncoding.Column,
+    typedValue: SQLiteFieldEncoding.TypedValue,
     writtenAt: Int64
   ) throws {
     let sql = """
@@ -569,7 +569,7 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     sqlite3_bind_text(stmt, 2, fieldName, -1, SQLITE_TRANSIENT)
     sqlite3_bind_int64(stmt, 3, position)
 
-    switch column {
+    switch typedValue {
     case .int(let v):           sqlite3_bind_int64(stmt, 4, v)
     case .string(let v):        sqlite3_bind_text(stmt, 5, v, -1, SQLITE_TRANSIENT)
     case .real(let v):          sqlite3_bind_double(stmt, 6, v)
@@ -614,7 +614,7 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
   /// into `Record` instances. Follows synthetic `child_key_value`
   /// pointers to materialize nested lists.
   private func loadRecordBatch(_ keys: Set<CacheKey>) throws -> [Record] {
-    let placeholders = keys.map { _ in "?" }.joined(separator: ", ")
+    let placeholders = Array(repeating: "?", count: keys.count).joined(separator: ", ")
     let sql = """
     SELECT
       \(SQLiteSchema.Records.cacheKey),

@@ -33,8 +33,13 @@ import Foundation
 /// should account for this.
 internal enum SQLiteFieldEncoding {
 
-  /// The column slot a single non-array value occupies on a row.
-  internal enum Column: Equatable {
+  /// A `Record.Value` already classified into the column slot it
+  /// occupies on a row. The case payload carries the typed-Swift
+  /// representation of the value as it will be bound to the
+  /// statement, and the case tag identifies the destination column
+  /// (`bool_value`, `int_value`, `float_value`, `string_value`,
+  /// `child_key_value`, or `custom_scalar_value`).
+  internal enum TypedValue: Equatable {
     case bool(Bool)
     case int(Int64)
     case real(Double)
@@ -43,7 +48,7 @@ internal enum SQLiteFieldEncoding {
     case customScalar(String)
   }
 
-  /// Selects the column slot for a single value.
+  /// Classifies a single value into its destination column slot.
   ///
   /// Numeric values (whether native Swift `Int` / `Double` or
   /// `NSNumber`-bridged from JSON) all reach the `as NSNumber` case
@@ -52,7 +57,7 @@ internal enum SQLiteFieldEncoding {
   /// keeping `NSNumber(value: 1)` in `int_value` and
   /// `NSNumber(value: true)` in `bool_value` — they would otherwise
   /// both satisfy `as Bool`.
-  static func encode(_ value: Record.Value) throws -> Column {
+  static func encode(_ value: Record.Value) throws -> TypedValue {
     switch value {
     case let n as NSNumber:
       if CFGetTypeID(n) == CFBooleanGetTypeID() {
