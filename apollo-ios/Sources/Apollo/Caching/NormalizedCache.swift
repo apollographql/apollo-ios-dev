@@ -57,4 +57,63 @@ public protocol ReadOnlyNormalizedCache: AnyObject {
   /// - Returns: A dictionary of cache keys to records containing the records that have been found.
   func loadRecords(forKeys keys: Set<CacheKey>) async throws -> [CacheKey: Record]
 
+  /// Loads the field values described by `projections`, returning each
+  /// requested record's fields as a partial `Record` containing only the
+  /// fields the caller asked for. Per ADR 0007 this is the projection-
+  /// aware replacement for ``loadRecords(forKeys:)``; the executor
+  /// (PR-009d) and `ApolloStore` (PR-009e) migrate to this method
+  /// during sub-phase 1A.5, and PR-009g lands SQL-level column
+  /// projection on the SQLite backend.
+  ///
+  /// - Parameters:
+  ///   - projections: The set of fields to read. Each
+  ///     ``FieldProjection`` identifies one `(cacheKey, fieldName)`
+  ///     pair plus its storage shape. Multiple projections may share
+  ///     a `cacheKey` to request different fields on the same record.
+  ///     Duplicate projections are tolerated; their results coalesce.
+  ///
+  /// - Returns: A dictionary of cache keys to partial records. A cache
+  ///   key appears in the result only if at least one of its requested
+  ///   fields was found in the cache. The returned `Record.fields` is
+  ///   restricted to the requested field names that were present in
+  ///   the cache; unrequested fields on the same record are excluded
+  ///   even if they exist in storage.
+  @_spi(Execution)
+  func loadFields(_ projections: [FieldProjection]) async throws -> [CacheKey: Record]
+
+}
+
+@_spi(Execution)
+extension ReadOnlyNormalizedCache {
+
+  /// Default implementation. Delegates to ``loadRecords(forKeys:)`` to
+  /// fetch the full records for the projections' cache keys, then
+  /// filters each record's `fields` to the requested field names.
+  ///
+  /// This is the "fallback" path the ADR 0007 table references for the
+  /// SQLite backend during the 1A.5 transition: until PR-009g lands
+  /// SQL-level column projection, every backend that conforms to
+  /// ``ReadOnlyNormalizedCache`` automatically inherits a correct (if
+  /// unoptimized) `loadFields` implementation by reading whole records
+  /// and filtering in Swift. Custom cache implementors get the same
+  /// behavior without a forced API migration; they may override the
+  /// method with a projection-aware path when they're ready.
+  public func loadFields(_ projections: [FieldProjection]) async throws -> [CacheKey: Record] {
+    guard !projections.isEmpty else { return [:] }
+
+    let projectionsByKey = Dictionary(grouping: projections, by: \.cacheKey)
+    let keys = Set(projectionsByKey.keys)
+    let records = try await loadRecords(forKeys: keys)
+
+    var result: [CacheKey: Record] = [:]
+    for (key, fieldProjections) in projectionsByKey {
+      guard let record = records[key] else { continue }
+      let requestedFieldNames = Set(fieldProjections.map(\.fieldName))
+      let filteredFields = record.fields.filter { requestedFieldNames.contains($0.key) }
+      if !filteredFields.isEmpty {
+        result[key] = Record(key: key, fields: filteredFields)
+      }
+    }
+    return result
+  }
 }

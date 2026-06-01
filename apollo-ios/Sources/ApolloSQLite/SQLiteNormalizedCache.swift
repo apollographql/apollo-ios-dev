@@ -1,5 +1,5 @@
 import Foundation
-import Apollo
+@_spi(Execution) import Apollo
 
 public enum SQLiteNormalizedCacheError: Error {
   case invalidRecordEncoding(record: String)  
