@@ -572,7 +572,7 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     switch typedValue {
     case .int(let v):           sqlite3_bind_int64(stmt, 4, v)
     case .string(let v):        sqlite3_bind_text(stmt, 5, v, -1, SQLITE_TRANSIENT)
-    case .real(let v):          sqlite3_bind_double(stmt, 6, v)
+    case .float(let v):         sqlite3_bind_double(stmt, 6, v)
     case .bool(let v):          sqlite3_bind_int64(stmt, 7, v ? 1 : 0)
     case .childKey(let v):      sqlite3_bind_text(stmt, 8, v, -1, SQLITE_TRANSIENT)
     case .customScalar(let v):  sqlite3_bind_text(stmt, 9, v, -1, SQLITE_TRANSIENT)

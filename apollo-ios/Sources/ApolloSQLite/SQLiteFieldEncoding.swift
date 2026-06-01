@@ -42,7 +42,7 @@ internal enum SQLiteFieldEncoding {
   internal enum TypedValue: Equatable {
     case bool(Bool)
     case int(Int64)
-    case real(Double)
+    case float(Double)
     case string(String)
     case childKey(String)
     case customScalar(String)
@@ -69,7 +69,7 @@ internal enum SQLiteFieldEncoding {
            .nsIntegerType, .cfIndexType:
         return .int(n.int64Value)
       default:
-        return .real(n.doubleValue)
+        return .float(n.doubleValue)
       }
     case let v as String:
       return .string(v)
