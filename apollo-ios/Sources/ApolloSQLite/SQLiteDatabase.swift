@@ -88,21 +88,16 @@ public protocol SQLiteDatabase {
   /// - **List-typed fields** are written as `N` rows at positions
   ///   `0..N-1`. The write is atomic: any existing rows for
   ///   `(cacheKey, fieldName)` are deleted before the new ones are
-  ///   inserted, so a partial-list state is never observable to
-  ///   readers and shape transitions (scalar↔list, longer-list →
-  ///   shorter-list) leave no in-field orphans.
+  ///   inserted — including any reachable synthetic sub-records the
+  ///   prior rows pointed at — so partial-list states are never
+  ///   observable and shape transitions (scalar↔list, longer-list →
+  ///   shorter-list, nested-list → anything) leave no orphans.
   /// - **Nested-list elements** (a list whose elements are themselves
   ///   lists, e.g. `[[Int]]`) recurse via a synthetic sub-record at
   ///   `<parent>.<field>.$[<position>]`. The parent row's
   ///   `child_key_value` points to the sub-record key. The sub-record
   ///   holds the inner list's element rows under the sentinel
   ///   `field_name = "$"`.
-  ///
-  /// Note: when overwriting a field whose previous value was a nested
-  /// list, the synthetic sub-record rows are *not* cleaned up by this
-  /// method. They remain in the database as orphans until a follow-up
-  /// cascade-delete PR ships. Reads are unaffected — orphans are
-  /// unreachable through `selectRecords`.
   ///
   /// If any row fails to bind or step, the whole transaction is rolled
   /// back so callers either see all writes applied or none.
@@ -111,26 +106,28 @@ public protocol SQLiteDatabase {
   /// `createNewRecordsTableIfNeeded()`).
   func insertOrUpdate(records: [Record]) throws
 
-  /// Removes every row whose `cache_key` matches `cacheKey`.
-  ///
-  /// Synthetic sub-records (`<parent>.<field>.$[N]`) produced by
-  /// nested-list writes against this `cacheKey` are *not* cascade-
-  /// deleted by this method. If the record being deleted has list-
-  /// typed fields with depth ≥ 2, the corresponding synthetic sub-
-  /// record rows remain in the database as orphans (unreachable but
-  /// persistent). A follow-up cascade-delete PR handles that
-  /// cleanup. Reads are unaffected — orphans never surface through
-  /// `selectRecords`.
+  /// Removes every row whose `cache_key` matches `cacheKey`, plus
+  /// every row of every synthetic sub-record reachable from those
+  /// rows via `child_key_value` pointers matching the synthetic-key
+  /// suffix (`.$[<integer>]`). Real (non-synthetic) `CacheReference`
+  /// targets are *not* followed — those point to independent records
+  /// that may be reachable from other cache keys and have their own
+  /// lifecycle.
   ///
   /// Distinct from the legacy `deleteRecord(for:)` by the column it
-  /// targets; this method operates on the row-per-element schema's
-  /// `cache_key`.
+  /// targets and the cascade behavior; this method operates on the
+  /// row-per-element schema's `cache_key`.
   func deleteRecord(forKey cacheKey: CacheKey) throws
 
   /// Removes every row whose `cache_key` matches the wildcard
-  /// `pattern`. Comparison is case-insensitive (`COLLATE NOCASE`).
-  /// `\`, `%`, and `_` in `pattern` are escaped so they match
-  /// literally rather than acting as `LIKE` wildcards.
+  /// `pattern`, plus every row of every synthetic sub-record
+  /// reachable from those records via `child_key_value` pointers.
+  /// Comparison is case-insensitive (`COLLATE NOCASE`). `\`, `%`,
+  /// and `_` in `pattern` are escaped so they match literally
+  /// rather than acting as `LIKE` wildcards. The synthetic cascade
+  /// follows the same rule as `deleteRecord(forKey:)` — only
+  /// synthetic-suffix children are removed; real `CacheReference`
+  /// targets are left alone.
   func deleteRecords(matchingKey pattern: CacheKey) throws
 
 }
