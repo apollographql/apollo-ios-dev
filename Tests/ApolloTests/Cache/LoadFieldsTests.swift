@@ -152,11 +152,14 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     expect(result["User:99"]).to(beNil())
   }
 
-  func test__loadFields__givenFieldMissingFromPresentRecord__omitsKeyFromResult() async throws {
+  func test__loadFields__givenFieldMissingFromPresentRecord__returnsEmptyFieldsRecord() async throws {
     // A cache key whose record exists, but the *requested* field doesn't.
-    // The result should omit the key entirely — per the doc on
-    // `loadFields(_:)`, a key only appears if at least one requested
-    // field was found.
+    // The contract — per the doc on `loadFields(_:)` — is that the
+    // record-existence signal goes through verbatim: the key appears
+    // in the result with an empty `fields` dictionary. The executor
+    // relies on this distinction to wrap per-field `missingValue`
+    // errors with response-path context (rather than failing the
+    // whole record-level lookup at the cache boundary).
     let (cache, _) = await cacheType.makeNormalizedCache()
     try await seed(cache: cache, records: [
       Record(key: "User:1", fields: ["name": CachedField(value: "Alice", writtenAt: 0)])
@@ -167,7 +170,9 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
                       columnShape: .string, cardinality: .scalar)
     ])
 
-    expect(result.isEmpty) == true
+    expect(result.count) == 1
+    let record = try XCTUnwrap(result["User:1"])
+    expect(record.fields.isEmpty) == true
   }
 
   func test__loadFields__givenSomeFieldsPresentAndSomeAbsent__returnsOnlyPresentFields() async throws {

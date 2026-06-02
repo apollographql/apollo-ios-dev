@@ -73,11 +73,17 @@ public protocol ReadOnlyNormalizedCache: AnyObject {
   ///     Duplicate projections are tolerated; their results coalesce.
   ///
   /// - Returns: A dictionary of cache keys to partial records. A cache
-  ///   key appears in the result only if at least one of its requested
-  ///   fields was found in the cache. The returned `Record.fields` is
-  ///   restricted to the requested field names that were present in
-  ///   the cache; unrequested fields on the same record are excluded
-  ///   even if they exist in storage.
+  ///   key appears in the result if and only if the *record* exists in
+  ///   the cache — independent of whether the specific projected
+  ///   fields are present. A record that exists but holds none of the
+  ///   requested fields is returned as a `Record` with empty `fields`.
+  ///   The distinction matters for the executor: `record exists,
+  ///   field missing` surfaces a per-field `missingValue` error with
+  ///   response-path context, whereas `record absent` is handled as
+  ///   a record-level lookup miss by the caller. Returned
+  ///   `Record.fields` is otherwise restricted to the requested field
+  ///   names that were present; unrequested fields on the same record
+  ///   are excluded.
   @_spi(Execution)
   func loadFields(_ projections: [FieldProjection]) async throws -> [CacheKey: Record]
 
@@ -110,9 +116,13 @@ extension ReadOnlyNormalizedCache {
       guard let record = records[key] else { continue }
       let requestedFieldNames = Set(fieldProjections.map(\.fieldName))
       let filteredFields = record.fields.filter { requestedFieldNames.contains($0.key) }
-      if !filteredFields.isEmpty {
-        result[key] = Record(key: key, fields: filteredFields)
-      }
+      // Keep the key in the result even when `filteredFields` is empty
+      // (record exists, but the requested fields don't). The caller
+      // distinguishes "record absent" (key absent from result) from
+      // "record present but field missing" (key present with empty
+      // fields); the executor needs that distinction to surface per-
+      // field `missingValue` errors with response-path context.
+      result[key] = Record(key: key, fields: filteredFields)
     }
     return result
   }

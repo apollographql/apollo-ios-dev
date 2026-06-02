@@ -1,5 +1,5 @@
 import Foundation
-@_spi(Unsafe) import ApolloAPI
+@_spi(Unsafe) @_spi(Execution) import ApolloAPI
 
 /// The ``ApolloStoreSubscriber`` provides a means to observe changes to items in the ``ApolloStore``.
 /// This protocol is available for advanced use cases only. Most users will prefer using `ApolloClient.watch(query:)`.
@@ -207,9 +207,9 @@ public final class ApolloStore: Sendable {
     /// It is safe to directly load the raw record data of the cache from within the transaction block.
     public var readOnlyCache: any ReadOnlyNormalizedCache { _cache }
 
-    fileprivate lazy var loader: DataLoader<CacheKey, Record> = DataLoader { [weak self] batchLoad in
+    fileprivate lazy var projectionLoader: ProjectionLoader = ProjectionLoader { [weak self] projections in
       guard let self else { return [:] }
-      return try await _cache.loadRecords(forKeys: batchLoad)
+      return try await _cache.loadFields(projections)
     }
 
     fileprivate lazy var executor = GraphQLExecutor(
@@ -261,7 +261,12 @@ public final class ApolloStore: Sendable {
       variables: GraphQLOperation.Variables? = nil,
       accumulator: Accumulator
     ) async throws -> Accumulator.FinalResult {
-      let object = try await loadObject(forKey: key).get()
+      let object = try await loadObject(
+        forKey: key,
+        selections: type.__selections,
+        variables: variables,
+        schema: SelectionSet.Schema.self
+      ).get()
 
       return try await executor.execute(
         selectionSet: type,
@@ -272,9 +277,55 @@ public final class ApolloStore: Sendable {
       )
     }
 
-    final func loadObject(forKey key: CacheKey) -> PossiblyDeferred<Record> {
-      self.loader[key].map { record in
-        guard let record = record else { throw JSONDecodingError.missingValue }
+    /// Loads the projected fields the given selection set would
+    /// traverse on the record at `key`, returning the partial Record
+    /// containing those fields. Per ADR 0007 sub-phase 1A.5, this is
+    /// the projection-driven replacement for the 2.x whole-record
+    /// `loadObject(forKey:)` path: the read batches via
+    /// `ProjectionLoader`, which coalesces every projection enqueued
+    /// across the executor's deferred resolutions into one
+    /// `NormalizedCache.loadFields(_:)` call when the first
+    /// `PossiblyDeferred` is forced.
+    ///
+    /// Inline fragments are projected unconditionally
+    /// (`includeAllInlineFragments: true`) because the child record's
+    /// `__typename` is not yet loaded at projection time. The
+    /// executor's later selection-set traversal uses the loaded
+    /// `__typename` to pick the matching type case; the unmatched
+    /// type-case fields are an over-fetch that PR-009g will narrow
+    /// once SQL-level projection lands on the SQLite backend.
+    final func loadObject(
+      forKey key: CacheKey,
+      selections: [Selection],
+      variables: GraphQLOperation.Variables?,
+      schema: (any SchemaMetadata.Type)? = nil,
+      responsePath: ResponsePath = []
+    ) -> PossiblyDeferred<Record> {
+      let projections: Set<FieldProjection>
+      do {
+        projections = try FieldProjectionCollector.collect(
+          selections: selections,
+          cacheKey: key,
+          variables: variables,
+          resolveRuntimeType: { nil },
+          includeAllInlineFragments: true,
+          schema: schema,
+          responsePath: responsePath
+        )
+      } catch {
+        return .immediate(.failure(error))
+      }
+      projectionLoader.enqueue(projections)
+      return projectionLoader.deferredRecord(forKey: key).map { record in
+        // `nil` here means the record is *absent* from the cache. The
+        // projection-aware `loadFields(_:)` contract preserves the
+        // existence signal: records that exist but happen to lack
+        // every requested field come back as `Record(fields: [:])`,
+        // not nil. That distinction lets the executor's per-field
+        // resolution surface `missingValue` with response-path
+        // context — matching the legacy whole-record read path's
+        // behavior — instead of failing the whole load here.
+        guard let record else { throw JSONDecodingError.missingValue }
         return record
       }
     }
@@ -413,7 +464,7 @@ public final class ApolloStore: Sendable {
 
       // Remove cached records, so subsequent reads
       // within the same transaction will reload the updated value.
-      loader.removeAll()
+      projectionLoader.removeAll()
 
       if let didChangeKeysFunc = self.updateChangedKeysFunc {
         didChangeKeysFunc(changedKeys)
