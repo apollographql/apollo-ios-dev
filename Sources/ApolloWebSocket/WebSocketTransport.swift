@@ -164,6 +164,11 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     )
   }
 
+  deinit {
+    pingTimerTask?.cancel()
+    connection.close()
+  }
+
   // MARK: - Request Setup
 
   private static func createURLRequest(
@@ -228,21 +233,21 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
       connectingPayload: configuration.connectingPayload
     )
 
-    Task {
+    Task { [weak self] in
       do {
         for try await message in connectionStream {
-          didReceive(message: message)
+          await self?.didReceive(message: message)
         }
 
-        guard self.connection === loopConnection else { return }
-        await handleDisconnection()
+        guard await self?.connection === loopConnection else { return }
+        await self?.handleDisconnection()
       } catch {
-        guard self.connection === loopConnection else { return }
+        guard await self?.connection === loopConnection else { return }
         // Use Task.isCancelled to distinguish genuine task cancellation from
         // connection errors. The WebSocket task's receive() may throw errors
         // (including CancellationError) when the connection closes, which should
         // be treated as a disconnection — not as task cancellation.
-        await handleDisconnection(error: Task.isCancelled ? nil : error)
+        await self?.handleDisconnection(error: Task.isCancelled ? nil : error)
       }
     }
   }
