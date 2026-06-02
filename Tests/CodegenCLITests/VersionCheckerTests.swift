@@ -299,6 +299,29 @@ class VersionCheckerTests: XCTestCase {
     }
   }
 
+  func test__matchCLIVersionToApolloVersion__givenPackageResolvedFileNestedInHiddenDirectory_returnsNoApolloVersionFound() async throws {
+    // given
+    for packageVersion in packageResolvedVersion.allCases {
+      try await testPackageResolvedFile(
+        packageVersion: packageVersion,
+        inDirectory: ".hidden/MyProject.xcworkspace/xcshareddata/swiftpm",
+        apolloVersion: Constants.CLIVersion
+      ) {
+
+        // when
+        let result = try await VersionChecker.matchCLIVersionToApolloVersion(
+          projectRootURL: fileManager.directoryURL
+        )
+
+        // then
+        // The search skips hidden directories, so a project nested inside one is intentionally
+        // not discovered. This is what keeps the search from recursively walking large hidden
+        // trees (`.build`, `.git`, git worktrees, …) that never hold the user's project.
+        expect(result).to(equal(.noApolloVersionFound))
+      }
+    }
+  }
+
 }
 
 // MARK: - Helpers
