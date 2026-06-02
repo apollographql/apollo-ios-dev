@@ -2694,7 +2694,103 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     XCTAssertTrueEventually(
       weakTransport == nil,
+      timeout: 3.0,
       message: "WebSocketTransport should be deallocated after subscriptions complete and all external references are dropped"
+    )
+  }
+
+  func testTransport__whenPausedAndAllReferencesDropped__shouldDeallocate() async throws {
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
+
+    // Consume in a cancellable task — pause() leaves subscriptions alive on the registry,
+    // so the consumer must cancel to release the inner Task's strong self reference.
+    let consumeTask = Task {
+      for try await _ in subscription {}
+    }
+    await expect { await self.networkTransport.subscriberCount }.toEventually(equal(1))
+
+    // Pause — closes the underlying WebSocket and exits the receive loop without
+    // triggering auto-reconnection.
+    await networkTransport.pause()
+
+    consumeTask.cancel()
+    await expect { await self.networkTransport.subscriberCount }.toEventually(equal(0))
+
+    weak let weakTransport = networkTransport
+    networkTransport = nil
+    client = nil
+
+    XCTAssertTrueEventually(
+      weakTransport == nil,
+      timeout: 3.0,
+      message: "WebSocketTransport should be deallocated after pause() and all external references are dropped"
+    )
+  }
+
+  func testTransport__whenSubscriberCancelsMidStreamAndAllReferencesDropped__shouldDeallocate() async throws {
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (subscription, operationID) = try await subscribe(on: mockTask, using: client)
+
+    // Deliver one value mid-stream — server never sends complete.
+    mockTask.emit(.next(
+      id: operationID,
+      payload: Self.reviewAddedPayload(stars: 5, commentary: "Mid-stream")
+    ))
+
+    let consumeTask = Task {
+      for try await _ in subscription {}
+    }
+    await expect { await self.networkTransport.subscriberCount }.toEventually(equal(1))
+
+    // Cancel the consumer mid-stream — should trigger onTermination → complete to server,
+    // unregister the subscriber, and let the inner Task release its strong self reference.
+    consumeTask.cancel()
+    await expect { await self.networkTransport.subscriberCount }.toEventually(equal(0))
+
+    weak let weakTransport = networkTransport
+    networkTransport = nil
+    client = nil
+
+    XCTAssertTrueEventually(
+      weakTransport == nil,
+      timeout: 3.0,
+      message: "WebSocketTransport should be deallocated after subscriber cancels mid-stream and all external references are dropped"
+    )
+  }
+
+  func testTransport__whenReconnectedAndAllReferencesDropped__shouldDeallocate() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+
+    // Establish initial connection on task1.
+    task1.emit(.connectionAck(payload: nil))
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+
+    // Disconnect task1 — triggers auto-reconnect onto task2.
+    task1.finish()
+    task2.emit(.connectionAck(payload: nil))
+
+    // Wait for the resubscribe on the new connection to confirm the reconnect cycle completed.
+    // Both the old and new receive-loop Tasks should hold only weak self references.
+    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    // Complete the subscription on the new connection so the inner Task exits and releases self.
+    task2.emit(.complete(id: operationID))
+    await expect { await self.networkTransport.subscriberCount }.toEventually(equal(0))
+
+    weak let weakTransport = networkTransport
+    networkTransport = nil
+    client = nil
+    _ = subscription
+
+    XCTAssertTrueEventually(
+      weakTransport == nil,
+      timeout: 3.0,
+      message: "WebSocketTransport should be deallocated after a reconnection cycle and all external references are dropped"
     )
   }
 }
