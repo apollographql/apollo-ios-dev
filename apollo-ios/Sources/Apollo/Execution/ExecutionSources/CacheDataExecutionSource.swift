@@ -53,30 +53,37 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     with info: FieldExecutionInfo,
     on object: Record
   ) throws -> JSONValue? {
-    // `Selection.Field.cacheFieldKey` centralizes the field-policy
+    // `info.cacheReadStrategy()` centralizes the field-policy
     // resolution rules (programmatic `FieldPolicy.Provider` first,
-    // `@fieldPolicy` directive second, standard `cacheKey(with:)`
-    // last) so this resolver and the projection-time
-    // `FieldProjectionCollector` always compute the same name(s).
-    // Without this shared call site the two paths would drift
-    // silently — the cache load would fetch under one name and the
-    // resolver would subscript under another, producing a phantom
-    // miss.
-    let key = try info.field.cacheFieldKey(
-      variables: info.parentInfo.variables,
-      schema: info.parentInfo.schema,
-      responsePath: info.responsePath
-    )
+    // `@fieldPolicy` directive second, plain field name last) and
+    // memoizes the result on the `FieldExecutionInfo` so the
+    // projection-time and resolve-time paths share a single
+    // computation per `(field, info)`.
+    let strategy = try info.cacheReadStrategy()
 
-    switch key {
-    case .single(let name):
+    switch strategy {
+    case .parentRecordKey(let name):
+      // Standard non-policy read: the field's value lives on the
+      // parent record under its normalized name (the same name the
+      // writer used in `GraphQLResultNormalizer`). Subscript to get
+      // it.
       return object[name]
-    case .list(let names):
-      var values: [JSONValue] = []
-      for name in names {
-        if let value = object[name] { values.append(value) }
-      }
-      return values as JSONValue
+
+    case .policyReference(let key):
+      // `@fieldPolicy` redirect: the field's value is a direct cache
+      // reference, computed from the field's arguments without
+      // consulting the parent record. The writer never wrote an
+      // entry under this name on the parent — the policy targets a
+      // record that `@typePolicy` (or another write path) populated
+      // under the canonical key. Return the reference; the executor's
+      // existing `CacheReference` resolution will load it.
+      return CacheReference(key) as JSONValue
+
+    case .policyReferenceList(let keys):
+      // Same as `policyReference`, lifted to a list-typed field:
+      // each policy-derived key becomes one `CacheReference` in the
+      // returned array.
+      return keys.map { CacheReference($0) } as JSONValue
     }
   }
 

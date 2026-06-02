@@ -46,7 +46,7 @@ class BaseGraphQLResultNormalizer: GraphQLResultAccumulator {
 
   final func accept(fieldEntry: JSONValue?, info: FieldExecutionInfo) throws -> (key: String, value: JSONValue)? {
     guard let fieldEntry else { return nil }
-    return (try info.cacheKeyForField(), fieldEntry)
+    return (try info.normalizedFieldName(), fieldEntry)
   }
 
   final func accept(
