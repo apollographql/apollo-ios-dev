@@ -2672,6 +2672,31 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
       expect(error).to(beAKindOf(FailingWriteCache.WriteError.self))
     }
   }
+
+  // MARK: - Memory Management
+
+  func testTransport__whenSubscriptionCompletedAndAllReferencesDropped__shouldDeallocate() async throws {
+    mockTask.emit(.connectionAck(payload: nil))
+
+    let (subscription, operationID) = try await subscribe(on: mockTask, using: client)
+
+    mockTask.emit(.next(
+      id: operationID,
+      payload: Self.reviewAddedPayload(stars: 5, commentary: "Great")
+    ))
+    _ = try await subscription.stream.first(where: { _ in true })
+
+    mockTask.emit(.complete(id: operationID))
+
+    weak let weakTransport = networkTransport
+    networkTransport = nil
+    client = nil
+
+    XCTAssertTrueEventually(
+      weakTransport == nil,
+      message: "WebSocketTransport should be deallocated after subscriptions complete and all external references are dropped"
+    )
+  }
 }
 
 // MARK: - Test Helpers
