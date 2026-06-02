@@ -88,162 +88,81 @@ public enum FieldProjectionCollector {
     responsePath: ResponsePath = []
   ) throws -> Set<FieldProjection> {
     var projections: Set<FieldProjection> = []
-    try walk(
+    // `SelectionWalker` owns the case dispatch — see PR-009d-iv. The
+    // projection path differs from `DefaultFieldSelectionCollector` only
+    // in the per-field action and the policy choices:
+    //
+    //  - `inlineFragmentPolicy`: when the receiving record's
+    //    `__typename` isn't yet loaded (typical on the projection-time
+    //    pre-pass driven by `CacheDataExecutionSource`), the caller
+    //    passes `includeAllInlineFragments: true`, which selects
+    //    `.includeAll`. The resulting projection set over-fetches every
+    //    type case's fields; the executor's later, type-aware traversal
+    //    surfaces only the matching type case to the response. PR-009g
+    //    will narrow this at the SQL layer.
+    //
+    //  - `deferredFragmentPolicy: .eager` because the cache path has no
+    //    incremental delivery channel — `CacheDataExecutionSource` sets
+    //    `shouldAttemptDeferredFragmentExecution = true` and the
+    //    executor eagerly resolves deferred fragments on cache reads.
+    //
+    // No fragment-tracking callbacks: the projection set carries
+    // everything downstream needs by `(cacheKey, fieldName)`. The
+    // fulfilled/deferred-fragment bookkeeping that the resolve path
+    // maintains is irrelevant here.
+    try SelectionWalker.walk(
       selections,
-      into: &projections,
-      cacheKey: cacheKey,
       variables: variables,
       resolveRuntimeType: resolveRuntimeType,
-      includeAllInlineFragments: includeAllInlineFragments,
-      schema: schema,
-      responsePath: responsePath
-    )
-    return projections
-  }
-
-  // MARK: - Selection walk
-
-  /// Mirrors the `Selection` case handling in
-  /// `DefaultFieldSelectionCollector.collectFields(...)` so the
-  /// upfront-projection path and the lazy-resolution path always agree
-  /// on which fields each Selection case contributes. Differences from
-  /// the default collector:
-  ///
-  /// - The output is a flat `Set<FieldProjection>` keyed by
-  ///   `(cacheKey, fieldName, columnShape, cardinality)`, not a
-  ///   `FieldSelectionGrouping` of `FieldExecutionInfo`. The collector
-  ///   doesn't need response-key grouping because cache rows are
-  ///   keyed by cache-field-key, not by response key, and the cache
-  ///   read doesn't need to know about fragment fulfillment state.
-  /// - There's no separate "fulfilled fragment" bookkeeping. The
-  ///   collector enters every fulfilled fragment and inline fragment
-  ///   to collect its inner fields; downstream callers don't need a
-  ///   fulfilled-set output because the projections themselves carry
-  ///   the necessary `(cacheKey, fieldName)` pairs.
-  /// - `.deferred` fragments are handled identically to the cache's
-  ///   existing executor behavior: the executor sets
-  ///   `shouldAttemptDeferredFragmentExecution = true` for
-  ///   `CacheDataExecutionSource`, so all deferred fragments are
-  ///   eagerly entered here (subject to the deferred condition).
-  ///   This keeps cache reads complete on a cold read; the executor
-  ///   ignores deferred-fragment incrementality on the cache path.
-  private static func walk(
-    _ selections: [Selection],
-    into projections: inout Set<FieldProjection>,
-    cacheKey: CacheKey,
-    variables: GraphQLOperation.Variables?,
-    resolveRuntimeType: () -> Object?,
-    includeAllInlineFragments: Bool,
-    schema: (any SchemaMetadata.Type)?,
-    responsePath: ResponsePath
-  ) throws {
-    for selection in selections {
-      switch selection {
-      case .field(let field):
-        // `Selection.Field.cacheReadStrategy` is the shared helper that
-        // also drives `CacheDataExecutionSource.resolveCacheKey` — both
-        // call sites compute the same strategy for the same
-        // `(field, variables, schema, responsePath)`. The projection's
-        // `fieldName` matches what the resolver will subscript on the
-        // loaded parent record.
-        //
-        // For `@fieldPolicy`-redirected fields (`.policyReference` /
-        // `.policyReferenceList`), the reader does NOT subscript the
-        // parent record — it produces `CacheReference`s directly from
-        // the field's arguments. No parent-record projection is needed
-        // for those cases; the next level of the read loads the
-        // policy-referenced records via their canonical keys.
-        let strategy = try field.cacheReadStrategy(
-          variables: variables,
-          schema: schema,
-          responsePath: responsePath
-        )
-        switch strategy {
-        case .parentRecordKey(let name):
-          projections.insert(FieldProjection(
-            cacheKey: cacheKey,
-            fieldName: name,
-            outputType: field.type
-          ))
-        case .policyReference, .policyReferenceList:
-          // No parent-record projection: the field's value is a direct
-          // `CacheReference` derived from the field's arguments.
-          break
-        }
-
-      case .conditional(let conditions, let nested):
-        if conditions.evaluate(with: variables) {
-          try walk(
-            nested,
-            into: &projections,
-            cacheKey: cacheKey,
-            variables: variables,
-            resolveRuntimeType: resolveRuntimeType,
-            includeAllInlineFragments: includeAllInlineFragments,
-            schema: schema,
-            responsePath: responsePath
-          )
-        }
-
-      case .fragment(let fragmentType):
-        try walk(
-          fragmentType.__selections,
+      inlineFragmentPolicy: includeAllInlineFragments ? .includeAll : .byRuntimeType,
+      deferredFragmentPolicy: .eager,
+      onField: { field in
+        try collectField(
+          field,
           into: &projections,
           cacheKey: cacheKey,
           variables: variables,
-          resolveRuntimeType: resolveRuntimeType,
-          includeAllInlineFragments: includeAllInlineFragments,
-          schema: schema,
-          responsePath: responsePath
-        )
-
-      case .inlineFragment(let typeCase):
-        let shouldEnter: Bool
-        if includeAllInlineFragments {
-          shouldEnter = true
-        } else if let runtimeType = resolveRuntimeType(),
-                  typeCase.__parentType.canBeConverted(from: runtimeType) {
-          shouldEnter = true
-        } else {
-          shouldEnter = false
-        }
-        if shouldEnter {
-          try walk(
-            typeCase.__selections,
-            into: &projections,
-            cacheKey: cacheKey,
-            variables: variables,
-            resolveRuntimeType: resolveRuntimeType,
-            includeAllInlineFragments: includeAllInlineFragments,
-            schema: schema,
-            responsePath: responsePath
-          )
-        }
-
-      case .deferred(_, let typeCase, _):
-        // The cache executor path treats deferred fragments as fully
-        // fulfilled regardless of the `@defer(if:)` condition: it
-        // has no incremental delivery channel to honor `@defer`, so
-        // `CacheDataExecutionSource` sets
-        // `shouldAttemptDeferredFragmentExecution = true` and
-        // `GraphQLExecutor` eagerly executes the deferred fragment's
-        // selections after the normal grouping pass. Mirror that
-        // behavior here so the collected projection set is complete
-        // for the level — every deferred fragment's fields are
-        // projected. The `if:` condition only controls *whether* the
-        // fragment is deferred (yes/no); under the cache path the
-        // fields are read in either branch.
-        try walk(
-          typeCase.__selections,
-          into: &projections,
-          cacheKey: cacheKey,
-          variables: variables,
-          resolveRuntimeType: resolveRuntimeType,
-          includeAllInlineFragments: includeAllInlineFragments,
           schema: schema,
           responsePath: responsePath
         )
       }
+    )
+    return projections
+  }
+
+  // MARK: - Per-field projection
+
+  /// Emits the projection(s) for one `.field` selection. For fields
+  /// resolved via `@fieldPolicy` (`.policyReference` /
+  /// `.policyReferenceList`), no parent-record projection is needed —
+  /// the reader returns a direct `CacheReference` and the next-level
+  /// read loads the policy-referenced record under its canonical key.
+  /// See `CacheDataExecutionSource.resolveCacheKey` for the matching
+  /// resolve-time switch.
+  private static func collectField(
+    _ field: Selection.Field,
+    into projections: inout Set<FieldProjection>,
+    cacheKey: CacheKey,
+    variables: GraphQLOperation.Variables?,
+    schema: (any SchemaMetadata.Type)?,
+    responsePath: ResponsePath
+  ) throws {
+    let strategy = try field.cacheReadStrategy(
+      variables: variables,
+      schema: schema,
+      responsePath: responsePath
+    )
+    switch strategy {
+    case .parentRecordKey(let name):
+      projections.insert(FieldProjection(
+        cacheKey: cacheKey,
+        fieldName: name,
+        outputType: field.type
+      ))
+    case .policyReference, .policyReferenceList:
+      // No parent-record projection: the field's value is a direct
+      // `CacheReference` derived from the field's arguments.
+      break
     }
   }
 

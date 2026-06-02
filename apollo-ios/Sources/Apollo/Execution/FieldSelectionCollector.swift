@@ -102,65 +102,29 @@ public struct DefaultFieldSelectionCollector: FieldSelectionCollector {
     resolveRuntimeType: () -> Object?,
     info: ObjectExecutionInfo
   ) throws {
-    for selection in selections {
-      switch selection {
-      case let .field(field):
-        groupedFields.append(field: field, withInfo: info)
-
-      case let .conditional(conditions, conditionalSelections):
-        if conditions.evaluate(with: info.variables) {
-          try collectFields(from: conditionalSelections,
-                            into: &groupedFields,
-                            resolveRuntimeType: resolveRuntimeType,
-                            info: info)
-        }
-
-      case let .deferred(condition, typeCase, _):
-        // In Apollo's implementation (Router + Server) of deferSpec=20220824 ALL defer directives
-        // will be honoured and sent as separate incremental responses. This means deferred
-        // selection fields only need to be collected when they are parsed with the incremental
-        // data, at which time they are no longer deferred. The deferred fragment identifiers still
-        // need to be collected becuase that is how the user determines the state of the deferred
-        // fragment via the @Deferred property wrapper.
-        //
-        // If the defer condition evaluates to false though, the fragment is considered to be fulfilled
-        // and and the fields must be collected.
-        let isDeferred: Bool = {
-          if let condition, !condition.evaluate(with: info.variables) {
-            return false
-          }
-          return true
-        }()
-
-        if isDeferred {
-          groupedFields.addDeferredFragment(typeCase)
-
-        } else {
-          groupedFields.addFulfilledFragment(typeCase)
-          try collectFields(from: typeCase.__selections,
-                            into: &groupedFields,
-                            resolveRuntimeType: resolveRuntimeType,
-                            info: info)
-        }
-
-      case let .fragment(fragment):
-        groupedFields.addFulfilledFragment(fragment)
-        try collectFields(from: fragment.__selections,
-                          into: &groupedFields,
-                          resolveRuntimeType: resolveRuntimeType,
-                          info: info)
-
-      case let .inlineFragment(typeCase):
-        if let runtimeType = resolveRuntimeType(),
-           typeCase.__parentType.canBeConverted(from: runtimeType) {
-          groupedFields.addFulfilledFragment(typeCase)
-          try collectFields(from: typeCase.__selections,
-                            into: &groupedFields,
-                            resolveRuntimeType: resolveRuntimeType,
-                            info: info)
-        }
-      }
-    }
+    // Selection-case dispatch is delegated to `SelectionWalker` so this
+    // collector and `FieldProjectionCollector` share one walk
+    // implementation. Per the Apollo Router + Server's deferSpec=20220824
+    // implementation, every `@defer` is honored — deferred selection
+    // fields are only collected when parsed with the incremental
+    // response, at which point they're no longer deferred. The
+    // deferred-fragment identifiers still need recording so the
+    // `@Deferred` property wrapper can surface the fragment's state.
+    // When a `@defer(if:)` condition evaluates to `false`, the fragment
+    // is considered fulfilled rather than deferred and the walker
+    // recurses into its selections.
+    try SelectionWalker.walk(
+      selections,
+      variables: info.variables,
+      resolveRuntimeType: resolveRuntimeType,
+      inlineFragmentPolicy: .byRuntimeType,
+      deferredFragmentPolicy: .respectDeferCondition,
+      onField: { groupedFields.append(field: $0, withInfo: info) },
+      onFragmentEntered: { groupedFields.addFulfilledFragment($0) },
+      onInlineFragmentEntered: { groupedFields.addFulfilledFragment($0) },
+      onDeferredFragmentEntered: { groupedFields.addFulfilledFragment($0) },
+      onDeferredFragmentSkipped: { groupedFields.addDeferredFragment($0) }
+    )
   }
 }
 
