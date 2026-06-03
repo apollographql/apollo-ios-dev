@@ -1,11 +1,12 @@
 @_spi(Execution) import ApolloAPI
 
 /// Batches `FieldProjection` reads against a `NormalizedCache` for the
-/// duration of one `ReadTransaction`. Mirrors `DataLoader`'s
-/// deferred-then-batched pattern but at field-projection granularity:
-/// projections enqueued across multiple deferred call sites coalesce
-/// into a single `loadFields(_:)` call when the first deferred value
-/// is forced.
+/// duration of one `ReadTransaction`. Projections enqueued across
+/// multiple deferred call sites coalesce into a single
+/// `loadFields(_:)` call when the first deferred value is forced —
+/// the deferred-then-batched pattern that the 2.x `DataLoader<CacheKey,
+/// Record>` previously provided at whole-record granularity, now
+/// expressed at field-projection granularity.
 ///
 /// This is the "phase 2 resolve" half of ADR 0007 Principle 5's
 /// two-phase pattern. `FieldProjectionCollector` (PR-009d-i) drives
@@ -14,7 +15,7 @@
 /// returns a `PossiblyDeferred<Record?>` to the executor. The
 /// executor's existing `lazilyEvaluateAll` forcing pattern triggers
 /// the flush at level boundaries, preserving the cross-sibling
-/// batching the legacy `DataLoader<CacheKey, Record>` provided.
+/// batching the pre-3.0 implementation relied on.
 ///
 /// # Lifecycle
 ///
@@ -37,8 +38,9 @@ final class ProjectionLoader {
   /// `isAlreadyLoaded(_:)`.
   ///
   /// `Result` rather than `Record` directly so that a load failure
-  /// for one key fails subsequent reads of that key consistently
-  /// (matching `DataLoader`'s behavior).
+  /// for one key fails subsequent reads of that key consistently —
+  /// a sticky-failure semantic carried over from the pre-3.0
+  /// whole-record loader.
   private var loaded: [CacheKey: Result<Record, any Error>] = [:]
 
   init(_ batchLoad: @escaping BatchLoad) {
@@ -62,8 +64,8 @@ final class ProjectionLoader {
   ///
   /// The first force across all siblings is the one that triggers the
   /// `batchLoad` call — every other sibling's force finds its key in
-  /// `loaded` and returns immediately. This matches `DataLoader`'s
-  /// single-flush-per-level behavior.
+  /// `loaded` and returns immediately. Single flush per level,
+  /// matching the pre-3.0 whole-record loader's batching shape.
   func deferredRecord(forKey cacheKey: CacheKey) -> PossiblyDeferred<Record?> {
     if pending.isEmpty {
       return .immediate(loadResult(forKey: cacheKey))
