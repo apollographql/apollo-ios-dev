@@ -10,8 +10,9 @@
 ///
 /// The three cases capture this asymmetry explicitly:
 ///
-/// - ``parentRecordKey(_:)`` — Standard, non-policy resolution. Subscript
-///   the parent record under `name`; the value is whatever the writer
+/// - ``parentRecordField(_:)`` — Standard, non-policy resolution. The
+///   associated value is the field's name on the parent record;
+///   subscript the parent under that name to get whatever the writer
 ///   stored (a `CacheReference`, a scalar, a list, etc.).
 /// - ``policyReference(_:)`` — `@fieldPolicy` applied. The reader
 ///   produces a `CacheReference(key)` directly. No parent-record
@@ -30,10 +31,11 @@
 /// `DefaultCacheResolver` (no policy) performs parent-record lookup.
 /// This enum encodes the same distinction in the Swift cache executor.
 enum CacheReadStrategy {
-  /// Standard read: subscript the parent record by `name`. Used for
-  /// every field that does not have a `@fieldPolicy` /
-  /// `FieldPolicy.Provider` redirect.
-  case parentRecordKey(String)
+  /// Standard read: the associated value is the field's name on the
+  /// parent record. The resolver subscripts `parent[name]` to fetch
+  /// whatever the writer stored. Used for every field that does not
+  /// have a `@fieldPolicy` / `FieldPolicy.Provider` redirect.
+  case parentRecordField(String)
 
   /// `@fieldPolicy` redirect: the field's value is a single
   /// `CacheReference(key)`, resolved directly from the field's
@@ -60,7 +62,7 @@ extension Selection.Field {
   ///    `@fieldPolicy` directive second), return ``CacheReadStrategy/policyReference(_:)``
   ///    or ``CacheReadStrategy/policyReferenceList(_:)`` with the
   ///    policy-derived key(s) formatted as `"\(uniqueKeyGroup ?? typename):\(id)"`.
-  /// 2. Otherwise, return ``CacheReadStrategy/parentRecordKey(_:)`` with
+  /// 2. Otherwise, return ``CacheReadStrategy/parentRecordField(_:)`` with
   ///    `try cacheKey(with: variables)` — the field's normalized name on
   ///    its parent record (matches what the writer wrote).
   ///
@@ -93,7 +95,7 @@ extension Selection.Field {
         return .policyReferenceList(infos.map { formatPolicyCacheKey(info: $0, typename: typename) })
       }
     }
-    return .parentRecordKey(try cacheKey(with: variables))
+    return .parentRecordField(try cacheKey(with: variables))
   }
 
   /// The typename used to format a policy-derived cache field name.

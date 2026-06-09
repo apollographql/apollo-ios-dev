@@ -186,6 +186,28 @@ final class FieldProjectionTests: XCTestCase {
     expect(FieldProjection.columnShape(of: outputType)) == .childKey
   }
 
+  func test__columnShape__givenAsymmetricNestedList_nullableOuterNonNullInner__returnsChildKey() {
+    // `[[Int!]]` — GraphQL allows the outer list to be nullable while
+    // the inner list (and its elements) remain non-null. Codegen
+    // typically emits the fully-non-null wrapping, but the underlying
+    // type system permits this asymmetric shape. The nested-list rule
+    // (depth ≥ 2 → `.childKey`) must hold regardless of which wrapper
+    // layers are `.nonNull`-wrapped.
+    let outputType: Selection.Field.OutputType =
+      .list(.nonNull(.list(.nonNull(.scalar(Int.self)))))
+    expect(FieldProjection.columnShape(of: outputType)) == .childKey
+    expect(FieldProjection.cardinality(of: outputType)) == .list
+  }
+
+  func test__columnShape__givenAsymmetricNestedList_nonNullOuterNullableInner__returnsChildKey() {
+    // `[[Int]!]` — outer list non-null, inner list nullable. Mirror
+    // of the above case, asserting the rule is direction-agnostic.
+    let outputType: Selection.Field.OutputType =
+      .nonNull(.list(.list(.scalar(Int.self))))
+    expect(FieldProjection.columnShape(of: outputType)) == .childKey
+    expect(FieldProjection.cardinality(of: outputType)) == .list
+  }
+
   func test__columnShape__givenSingleListOfScalars__doesNotApplyNestingRule() {
     // `[Int]` — one `.list` wrapper. Inner-typed column applies.
     let outputType: Selection.Field.OutputType =

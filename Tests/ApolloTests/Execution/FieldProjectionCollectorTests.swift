@@ -163,6 +163,10 @@ final class FieldProjectionCollectorTests: XCTestCase {
 
   func test__collect__givenConditionalSkipTrue__skipsConditional() throws {
     let selections: [Selection] = [
+      // Unconditional sibling that MUST survive — guards against the
+      // (otherwise-tautological) "empty input produces empty output"
+      // case the test would silently degenerate into without it.
+      .field("__typename", String.self),
       .include(if: !"skipAge", .field("age", Int.self)),
     ]
 
@@ -173,7 +177,11 @@ final class FieldProjectionCollectorTests: XCTestCase {
       resolveRuntimeType: { nil }
     )
 
-    expect(projections.isEmpty) == true
+    expect(projections.contains(where: { $0.fieldName == "age" })) == false
+    // The unconditional sibling proves the walk ran and produced output
+    // — the conditional's `age` field was specifically dropped, not
+    // accidentally short-circuited along with everything else.
+    expect(projections.contains(where: { $0.fieldName == "__typename" })) == true
   }
 
   // MARK: - Fragment selections
