@@ -227,7 +227,9 @@ final class ProjectionLoaderTests: XCTestCase {
   }
 
   func test__deferredRecord__givenAbsentRecord__returnsNilWithoutThrowing() async throws {
-    let loader = ProjectionLoader { _ in
+    let recorder = BatchRecorder()
+    let loader = ProjectionLoader { projections in
+      await recorder.record(projections)
       // Cache has no record for the requested key — return empty dict.
       return [:]
     }
@@ -236,6 +238,135 @@ final class ProjectionLoaderTests: XCTestCase {
     let result = try await loader.deferredRecord(forKey: "MISSING").get()
 
     XCTAssertNil(result, "Absent record surfaces as nil, distinct from a thrown error")
+
+    // Repeat-ask short-circuit: the projection was already attempted,
+    // so a second enqueue must NOT trigger another batch. This is the
+    // semantic the pre-3.0 whole-record loader provided implicitly
+    // via `cache[key] = .success(nil)` for absent keys.
+    loader.enqueue([projection("MISSING", "name")])
+    let secondResult = try await loader.deferredRecord(forKey: "MISSING").get()
+
+    XCTAssertNil(secondResult)
+    let calls = await recorder.calls
+    XCTAssertEqual(calls.count, 1, "Repeated enqueue of an already-attempted absent key must not re-batch")
+  }
+
+  // MARK: - Absence memoization (close the DataLoaderTests.testCachesRepeatedRequests gap)
+
+  func test__enqueue__givenPriorFlushReturnedRecordWithoutTheRequestedField__doesNotRebatchOnRepeatedAsk() async throws {
+    let recorder = BatchRecorder()
+    let loader = ProjectionLoader { projections in
+      await recorder.record(projections)
+      // Cache holds an "A" record with `name` only — never `age`. The
+      // loader must remember `age` was *attempted*, even though it's
+      // absent from the returned record, so subsequent asks short-
+      // circuit instead of re-batching.
+      return ["A": Record(key: "A", ["name": "Alice"])]
+    }
+
+    // Round 1: load `name` (found).
+    loader.enqueue([projection("A", "name")])
+    _ = try await loader.deferredRecord(forKey: "A").get()
+
+    // Round 2: load `age` (known-missing — record present but field absent).
+    loader.enqueue([projection("A", "age")])
+    _ = try await loader.deferredRecord(forKey: "A").get()
+
+    // Round 3: ask `age` again. Must NOT re-batch.
+    loader.enqueue([projection("A", "age")])
+    _ = try await loader.deferredRecord(forKey: "A").get()
+
+    let calls = await recorder.calls
+    XCTAssertEqual(calls.count, 2, "Round 3 must short-circuit — `age` was attempted in round 2")
+    XCTAssertEqual(Set(calls[1]), Set([projection("A", "age")]), "Round 2 carries only the new field")
+  }
+
+  func test__enqueue__givenPriorFlushReturnedAbsentRecord__doesNotRebatchOnRepeatedAsk() async throws {
+    let recorder = BatchRecorder()
+    let loader = ProjectionLoader { projections in
+      await recorder.record(projections)
+      // Cache has no record at all for the requested key.
+      return [:]
+    }
+
+    // Round 1: load `MISSING.name` — absent record. The loader records
+    // the attempt even though `loaded[MISSING]` stays nil.
+    loader.enqueue([projection("MISSING", "name")])
+    _ = try await loader.deferredRecord(forKey: "MISSING").get()
+
+    // Round 2: ask the same `(cacheKey, fieldName)` again. Must NOT
+    // re-batch — repeated probes of an absent key are wasteful.
+    loader.enqueue([projection("MISSING", "name")])
+    _ = try await loader.deferredRecord(forKey: "MISSING").get()
+
+    let calls = await recorder.calls
+    XCTAssertEqual(calls.count, 1, "Absent records must short-circuit on repeated enqueue")
+  }
+
+  func test__enqueue__givenMixedSuccessAndAbsentInSameBatch__remembersBothForFutureShortCircuit() async throws {
+    let recorder = BatchRecorder()
+    let loader = ProjectionLoader { projections in
+      await recorder.record(projections)
+      // "A" exists with `name`; "B" is absent. The loader must remember
+      // both attempts so future enqueues skip both.
+      return ["A": Record(key: "A", ["name": "Alice"])]
+    }
+
+    loader.enqueue([projection("A", "name"), projection("B", "name")])
+    _ = try await loader.deferredRecord(forKey: "A").get()
+    _ = try await loader.deferredRecord(forKey: "B").get()
+
+    // Both attempts memoized. Re-enqueueing either must not re-batch.
+    loader.enqueue([projection("A", "name"), projection("B", "name")])
+    _ = try await loader.deferredRecord(forKey: "A").get()
+    _ = try await loader.deferredRecord(forKey: "B").get()
+
+    let calls = await recorder.calls
+    XCTAssertEqual(calls.count, 1, "Mixed-result batch memoizes every attempted key, including absent ones")
+  }
+
+  // MARK: - Sticky failure isolation
+
+  func test__deferredRecord__givenBatchFailure__doesNotPoisonPriorSuccessfulKeyLoads() async throws {
+    let recorder = BatchRecorder()
+    let failure = TestError(message: "boom")
+    let callCount = Atomic<Int>(wrappedValue: 0)
+    let loader = ProjectionLoader { projections in
+      await recorder.record(projections)
+      // First call succeeds; subsequent calls throw. Dispatch on the
+      // atomic counter so this works under any execution order.
+      let current = callCount.increment()
+      if current == 1 {
+        return ["A": Record(key: "A", ["name": "Alice"])]
+      } else {
+        throw failure
+      }
+    }
+
+    // Round 1: successful load of A.
+    loader.enqueue([projection("A", "name")])
+    let firstA = try await loader.deferredRecord(forKey: "A").get()
+    XCTAssertEqual(firstA?["name"] as? String, "Alice")
+
+    // Round 2: failed load of B. A's success must persist; B becomes
+    // a sticky failure.
+    loader.enqueue([projection("B", "name")])
+    await assertThrows(TestError.self) {
+      _ = try await loader.deferredRecord(forKey: "B").get()
+    }
+
+    // A's prior success survives the unrelated failure for B.
+    let secondA = try await loader.deferredRecord(forKey: "A").get()
+    XCTAssertEqual(secondA?["name"] as? String, "Alice",
+                   "Prior success for A must not be overwritten by an unrelated failure for B")
+
+    // B's failure is sticky; no re-batch on repeated ask.
+    await assertThrows(TestError.self) {
+      _ = try await loader.deferredRecord(forKey: "B").get()
+    }
+
+    let calls = await recorder.calls
+    XCTAssertEqual(calls.count, 2, "Two flushes total — A's repeat ask short-circuits, B's repeat ask hits the sticky failure")
   }
 
   // MARK: - Throw helper
