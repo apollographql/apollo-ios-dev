@@ -11,8 +11,13 @@ public protocol NormalizedCache: AnyObject, ReadOnlyNormalizedCache {
   ///
   /// - Parameters:
   ///   - records: The set of records to merge.
-  /// - Returns: A set of keys corresponding to *fields* that have changed (i.e. QUERY_ROOT.Foo.myField). These are the same type of keys as are returned by RecordSet.merge(records:).
-  func merge(records: RecordSet) async throws -> Set<CacheKey>
+  /// - Returns: A set of ``CacheDependentKey``s identifying every
+  ///   `(cacheKey, fieldName)` pair whose stored value changed. These
+  ///   are the same dependency-tracking keys recorded by
+  ///   `GraphQLDependencyTracker` and consumed by
+  ///   ``ApolloStoreSubscriber/store(_:didChangeKeys:)`` /
+  ///   ``GraphQLQueryWatcher`` for dirty-set computation.
+  func merge(records: RecordSet) async throws -> Set<CacheDependentKey>
 
   /// Removes a record for the specified key. This method will only
   /// remove whole records, not individual fields.

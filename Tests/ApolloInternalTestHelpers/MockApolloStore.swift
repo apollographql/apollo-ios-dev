@@ -19,8 +19,8 @@ public class NoCache: NormalizedCache {
     return [:]
   }
 
-  public func merge(records: RecordSet) throws -> Set<String> {
-    return Set()
+  public func merge(records: RecordSet) throws -> Set<CacheDependentKey> {
+    return []
   }
 
   public func removeRecord(for key: String) throws { }

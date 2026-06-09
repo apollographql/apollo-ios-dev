@@ -1748,7 +1748,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
           "Human:1000.name",
           "QUERY_ROOT.hero",
         ]
-        let actualDependentKeys = try XCTUnwrap(graphQLResult.dependentKeys)
+        let actualDependentKeys = Set(try XCTUnwrap(graphQLResult.dependentKeys).map(\.description))
         expect(actualDependentKeys).to(equal(expectedDependentKeys))
       }
     }
@@ -1788,7 +1788,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
           "Human:1002.name",
           "QUERY_ROOT.hero",
         ]
-        let actualDependentKeys = try XCTUnwrap(graphQLResult.dependentKeys)
+        let actualDependentKeys = Set(try XCTUnwrap(graphQLResult.dependentKeys).map(\.description))
         expect(actualDependentKeys).to(equal(expectedDependentKeys))
       }
     }
@@ -1894,7 +1894,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
           "Human:1000.name",
           "QUERY_ROOT.hero",
         ]
-        let actualDependentKeys = try XCTUnwrap(graphQLResult.dependentKeys)
+        let actualDependentKeys = Set(try XCTUnwrap(graphQLResult.dependentKeys).map(\.description))
         XCTAssertEqual(actualDependentKeys, expectedDependentKeys)
       }
     }
@@ -1951,7 +1951,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
           "Human:1002.name",
           "QUERY_ROOT.hero",
         ]
-        let actualDependentKeys = try XCTUnwrap(graphQLResult.dependentKeys)
+        let actualDependentKeys = Set(try XCTUnwrap(graphQLResult.dependentKeys).map(\.description))
         XCTAssertEqual(actualDependentKeys, expectedDependentKeys)
       }
     }
@@ -2056,7 +2056,7 @@ class WatchQueryTests: XCTestCase, CacheDependentTesting, @unchecked Sendable {
           "Human:1000.name",
           "QUERY_ROOT.hero",
         ]
-        let actualDependentKeys = try XCTUnwrap(graphQLResult.dependentKeys)
+        let actualDependentKeys = Set(try XCTUnwrap(graphQLResult.dependentKeys).map(\.description))
         XCTAssertEqual(actualDependentKeys, expectedDependentKeys)
       }
     }

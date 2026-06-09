@@ -34,7 +34,7 @@ final class ApolloClientOperationTests: XCTestCase {
 
   class MockCache: InMemoryNormalizedCache {
     var publishedRecordSets: [RecordSet] = []
-    override func merge(records newRecords: RecordSet) throws -> Set<CacheKey> {
+    override func merge(records newRecords: RecordSet) throws -> Set<CacheDependentKey> {
       publishedRecordSets.append(newRecords)
       return try super.merge(records: newRecords)
     }

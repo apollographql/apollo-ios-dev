@@ -5,12 +5,16 @@ import Foundation
 /// This protocol is available for advanced use cases only. Most users will prefer using `ApolloClient.watch(query:)`.
 public protocol ApolloStoreSubscriber: AnyObject, Sendable {
 
-  /// This function will be called when keys are changed within the database.
+  /// This function will be called when fields are changed within the cache.
   ///
   /// - Parameters:
-  ///   - store: The ``ApolloStore`` which made the changes
-  ///   - changedKeys: The set of changed keys
-  func store(_ store: ApolloStore, didChangeKeys changedKeys: Set<CacheKey>)
+  ///   - store: The ``ApolloStore`` which made the changes.
+  ///   - changedKeys: The set of ``CacheDependentKey``s identifying each
+  ///     `(cacheKey, fieldName)` pair whose stored value changed in the
+  ///     underlying cache. Subscribers can intersect this set with the
+  ///     dependent-key set recorded on their last read to detect
+  ///     whether the change is relevant.
+  func store(_ store: ApolloStore, didChangeKeys changedKeys: Set<CacheDependentKey>)
 }
 
 /// The ``ApolloStore`` class manages access to a local cache for reading/writing normalized GraphQL results.
@@ -52,7 +56,7 @@ public final class ApolloStore: Sendable {
     self.cache = cache
   }
 
-  fileprivate func didChangeKeys(_ changedKeys: Set<CacheKey>) {
+  fileprivate func didChangeKeys(_ changedKeys: Set<CacheDependentKey>) {
     for subscriber in self.subscribers.values {
       subscriber.store(self, didChangeKeys: changedKeys)
     }
@@ -359,7 +363,7 @@ public final class ApolloStore: Sendable {
     /// It is safe to directly operate on the raw record data of the cache from within the transaction block.
     public var cache: any NormalizedCache { _cache }
     
-    fileprivate var updateChangedKeysFunc: ((Set<CacheKey>) -> Void)?
+    fileprivate var updateChangedKeysFunc: ((Set<CacheDependentKey>) -> Void)?
 
     override init(store: ApolloStore) {
       self.updateChangedKeysFunc = store.didChangeKeys

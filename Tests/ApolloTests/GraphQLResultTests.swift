@@ -291,7 +291,7 @@ final class GraphQLResultTests: XCTestCase {
       extensions: nil,
       errors: nil,
       source: .server,
-      dependentKeys: [try CacheKey(_jsonValue: "SomeKey")]
+      dependentKeys: [CacheDependentKey(cacheKey: "SomeKey", fieldName: "field")]
     )
 
     let incremental = IncrementalGraphQLResult(
@@ -300,14 +300,14 @@ final class GraphQLResultTests: XCTestCase {
       data: nil,
       extensions: nil,
       errors: nil,
-      dependentKeys: [try CacheKey(_jsonValue: "AnotherKey")]
+      dependentKeys: [CacheDependentKey(cacheKey: "AnotherKey", fieldName: "field")]
     )
 
     let merged = try result.merging(incremental)
 
-    let expected: Set<CacheKey> = [
-      try CacheKey(_jsonValue: "SomeKey"),
-      try CacheKey(_jsonValue: "AnotherKey"),
+    let expected: Set<CacheDependentKey> = [
+      CacheDependentKey(cacheKey: "SomeKey", fieldName: "field"),
+      CacheDependentKey(cacheKey: "AnotherKey", fieldName: "field"),
     ]
 
     // then

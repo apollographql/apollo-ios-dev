@@ -35,33 +35,12 @@ public final class SQLiteNormalizedCache {
     try self.database.createSchemaMetadataTableIfNeeded()
   }
   
-  private func recordCacheKey(forFieldCacheKey fieldCacheKey: CacheKey) -> CacheKey {
-    let components = fieldCacheKey.splitIntoCacheKeyComponents()
-    var updatedComponents = [String]()
-    if components.first?.contains("_ROOT") == true {
-      for component in components {
-        if updatedComponents.last?.last?.isNumber ?? false && component.first?.isNumber ?? false {
-          updatedComponents[updatedComponents.count - 1].append(".\(component)")
-        } else {
-          updatedComponents.append(component)
-        }
-      }
-    } else {
-      updatedComponents = components
-    }
-
-    if updatedComponents.count > 1 {
-      updatedComponents.removeLast()
-    }
-    return updatedComponents.joined(separator: ".")
-  }
-
-  private func mergeRecords(records: RecordSet) throws -> Set<CacheKey> {
+  private func mergeRecords(records: RecordSet) throws -> Set<CacheDependentKey> {
     var recordSet = RecordSet(records: try self.selectRecords(for: records.keys))
     let changedFieldKeys = recordSet.merge(records: records)
-    let changedRecordKeys = changedFieldKeys.map { self.recordCacheKey(forFieldCacheKey: $0) }
+    let changedRecordKeys = Set(changedFieldKeys.map(\.cacheKey))
 
-    let serializedRecords = try Set(changedRecordKeys)
+    let serializedRecords = try changedRecordKeys
       .compactMap { recordKey -> (CacheKey, String)? in
         if let recordFields = recordSet[recordKey]?.fields {
           let recordData = try SQLiteSerialization.serialize(fields: recordFields)
@@ -75,7 +54,7 @@ public final class SQLiteNormalizedCache {
       }
 
     try self.database.addOrUpdate(records: serializedRecords)
-    return Set(changedFieldKeys)
+    return changedFieldKeys
   }
   
   fileprivate func selectRecords(for keys: Set<CacheKey>) throws -> [Record] {
@@ -104,7 +83,7 @@ extension SQLiteNormalizedCache: NormalizedCache {
                                 })
   }
   
-  public func merge(records: RecordSet) throws -> Set<CacheKey> {
+  public func merge(records: RecordSet) throws -> Set<CacheDependentKey> {
     return try mergeRecords(records: records)
   }
   

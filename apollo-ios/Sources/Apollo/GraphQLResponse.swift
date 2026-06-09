@@ -21,17 +21,20 @@ public struct GraphQLResponse<Operation: GraphQLOperation>: Sendable {
   /// Source of data
   public let source: Source
 
-  /// The cache keys for the fields that were included in this response. Custom ``ApolloStoreSubscriber``s can use these
-  /// keys to understand when changes to the cache would affect the result of a specific response.
+  /// The ``CacheDependentKey``s identifying each `(cacheKey, fieldName)`
+  /// pair the response's data depends on. Custom ``ApolloStoreSubscriber``s
+  /// can intersect this set with the changed-key set delivered to
+  /// ``ApolloStoreSubscriber/store(_:didChangeKeys:)`` to detect whether
+  /// a cache change affects the response.
   @_spi(Execution)
-  public let dependentKeys: Set<CacheKey>?
+  public let dependentKeys: Set<CacheDependentKey>?
 
   public init(
     data: Operation.Data?,
     extensions: JSONObject?,
     errors: [GraphQLError]?,
     source: Source,
-    dependentKeys: Set<CacheKey>?
+    dependentKeys: Set<CacheDependentKey>?
   ) {
     self.data = data
     self.extensions = extensions
