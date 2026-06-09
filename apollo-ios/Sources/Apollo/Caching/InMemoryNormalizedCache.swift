@@ -18,7 +18,7 @@ public class InMemoryNormalizedCache: NormalizedCache {
     records.removeRecord(for: key)
   }
   
-  public func merge(records newRecords: RecordSet) throws -> Set<CacheKey> {
+  public func merge(records newRecords: RecordSet) throws -> Set<CacheDependentKey> {
     return records.merge(records: newRecords)
   }
 

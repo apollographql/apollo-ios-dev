@@ -19,7 +19,7 @@ struct IncrementalGraphQLResult: Sendable {
   /// A dictionary which services can use however they see fit to provide additional information to clients.
   let extensions: JSONObject?
 
-  let dependentKeys: Set<CacheKey>?
+  let dependentKeys: Set<CacheDependentKey>?
 
   init(
     label: String,
@@ -27,7 +27,7 @@ struct IncrementalGraphQLResult: Sendable {
     data: (any SelectionSet)?,
     extensions: JSONObject?,
     errors: [GraphQLError]?,
-    dependentKeys: Set<CacheKey>?
+    dependentKeys: Set<CacheDependentKey>?
   ) {
     self.label = label
     self.path = path

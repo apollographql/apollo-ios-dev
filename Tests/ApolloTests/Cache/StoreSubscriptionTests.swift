@@ -20,7 +20,10 @@ class StoreSubscriptionTests: XCTestCase {
   // MARK: - Tests
 
   func testSubscriberIsNotifiedOfStoreUpdate() async throws {
-    let expectedChangeKeySet: Set<String> = ["QUERY_ROOT.__typename", "QUERY_ROOT.name"]
+    let expectedChangeKeySet: Set<CacheDependentKey> = [
+      CacheDependentKey(cacheKey: "QUERY_ROOT", fieldName: "__typename"),
+      CacheDependentKey(cacheKey: "QUERY_ROOT", fieldName: "name"),
+    ]
     let subscriber = SimpleSubscriber(expectedChangeKeySet)
 
     let subscriptionToken = await store.subscribe(subscriber)
@@ -51,9 +54,9 @@ class StoreSubscriptionTests: XCTestCase {
   }
 
   internal actor SimpleSubscriber: ApolloStoreSubscriber {
-    var changeSet: Set<String>
+    var changeSet: Set<CacheDependentKey>
 
-    init(_ changeSet: Set<String>) {
+    init(_ changeSet: Set<CacheDependentKey>) {
       self.changeSet = changeSet
     }
 
@@ -61,7 +64,7 @@ class StoreSubscriptionTests: XCTestCase {
       block(self)
     }
 
-    nonisolated func store(_ store: ApolloStore, didChangeKeys changedKeys: Set<CacheKey>) {
+    nonisolated func store(_ store: ApolloStore, didChangeKeys changedKeys: Set<CacheDependentKey>) {
       Task(priority: .high) {
         await self.isolatedDo {
           $0.changeSet.subtract(changedKeys)
