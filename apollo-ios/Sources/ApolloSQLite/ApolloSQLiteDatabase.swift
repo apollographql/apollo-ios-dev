@@ -25,6 +25,19 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     sqlite3_close(db)
   }
 
+  /// Closes the underlying SQLite connection. After calling this, the database
+  /// must not be used for further operations. Intended for test teardown
+  /// scenarios where the database file is about to be unlinked — closing the
+  /// connection before unlink prevents libsqlite3's "vnode unlinked while in
+  /// use" diagnostic from firing.
+  @_spi(Testing)
+  public func close() {
+    dbQueue.sync {
+      sqlite3_close(db)
+      db = nil
+    }
+  }
+
   // MARK: - Internal Helpers
 
   private func performSync<T>(_ block: () throws -> T) throws -> T {
