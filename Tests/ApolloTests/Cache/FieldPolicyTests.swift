@@ -1559,6 +1559,245 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting, @unchecked Send
     XCTAssertEqual(data.hero?.name, "Luke")
   }
 
+  /// Variant of the round-trip test where the cache was populated by a
+  /// *different* mechanism (e.g., a sibling query that wrote the
+  /// canonical record via `@typePolicy`) and the QUERY_ROOT entry under
+  /// the field's normalized name does NOT exist. This exercises the
+  /// `loadObject` empty-projection short-circuit: the executor must
+  /// resolve the `@fieldPolicy` redirect into a direct `CacheReference`
+  /// without requiring the parent record to be present.
+  ///
+  /// Matches Apollo Kotlin's `FieldPolicyCacheResolver` semantic: a
+  /// policy-resolved field does not require the parent record to exist.
+  func test_fieldPolicy_givenEmptyParentRecordButPolicyTargetExists_resolvesViaDirectReference() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("hero", Hero.self, arguments: ["name": .variable("name")], fieldPolicy: .init(keyArgs: ["name"]))
+      ]}
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [], keyFields: ["name"])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("name", String.self),
+        ]}
+      }
+    }
+
+    await FieldPolicySchemaMetadata.stub_objectTypeForTypeName { typename in
+      typename == "Hero"
+        ? Object(typename: "Hero", implementedInterfaces: [], keyFields: ["name"])
+        : nil
+    }
+
+    // Stage only the canonical Hero record. QUERY_ROOT does NOT exist —
+    // simulating a cross-query cache hit where some other code path
+    // populated "Hero:Luke" but this query has never been fetched.
+    try await store.publish(records: [
+      "Hero:Luke": [
+        "__typename": "Hero",
+        "name": "Luke",
+      ]
+    ])
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = ["name": "Luke"]
+
+    let cacheResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    XCTAssertEqual(cacheResult?.source, .cache)
+    XCTAssertNil(cacheResult?.errors)
+    let data = try XCTUnwrap(cacheResult?.data, "Cache read must succeed via the @fieldPolicy redirect even though QUERY_ROOT has no entry for the field")
+    XCTAssertEqual(data.hero?.name, "Luke")
+  }
+
+  /// `@fieldPolicy` with a programmatic `FieldPolicy.Provider` (vs the
+  /// directive). Round-trips network → cache via the same provider that
+  /// drives the read.
+  func test_fieldPolicyProvider_withMatchingTypePolicy_networkFetchPopulatesCache_andCacheReadResolves() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("hero", Hero.self, arguments: ["name": .variable("name")])
+      ]}
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [], keyFields: ["name"])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("name", String.self),
+        ]}
+      }
+    }
+
+    await FieldPolicySchemaMetadata.stub_objectTypeForTypeName { typename in
+      typename == "Hero"
+        ? Object(typename: "Hero", implementedInterfaces: [], keyFields: ["name"])
+        : nil
+    }
+    await FieldPolicySchemaMetadata.stub_cacheKeyForField_SingleReturn { _, inputData, _ in
+      guard let name = inputData["name"] as? String else { return nil }
+      return CacheKeyInfo(id: name)
+    }
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = ["name": "Luke"]
+
+    let serverExpectation = await server.expect(MockQuery<HeroSelectionSet>.self) { _ in
+      [
+        "data": [
+          "hero": [
+            "__typename": "Hero",
+            "name": "Luke",
+          ]
+        ]
+      ]
+    }
+
+    let networkResult = try await client.fetch(query: query, cachePolicy: .networkOnly)
+    XCTAssertEqual(networkResult.data?.hero?.name, "Luke")
+    await fulfillment(of: [serverExpectation], timeout: Self.defaultWaitTimeout)
+
+    let cacheResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+    XCTAssertEqual(cacheResult?.source, .cache)
+    let data = try XCTUnwrap(cacheResult?.data)
+    XCTAssertEqual(data.hero?.name, "Luke")
+  }
+
+  /// `@fieldPolicy` with a `uniqueKeyGroup` (vs the default typename
+  /// formatter). The CacheKeyInfo's `uniqueKeyGroup` produces a key
+  /// shape of `"\(uniqueKeyGroup):\(id)"` rather than `"\(typename):\(id)"`,
+  /// and the matching `@typePolicy` must produce the same key.
+  func test_fieldPolicyProvider_withUniqueKeyGroup_andMatchingTypePolicy_roundTrips() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("hero", Hero.self, arguments: ["name": .variable("name")])
+      ]}
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("name", String.self),
+        ]}
+      }
+    }
+
+    await FieldPolicySchemaMetadata.stub_objectTypeForTypeName { _ in
+      Object(typename: "Hero", implementedInterfaces: [])
+    }
+    // The configuration's cacheKeyInfo(for:object:) acts as the
+    // @typePolicy substitute: writes resolve "Hero" data via this hook,
+    // producing "Character:Luke" (uniqueKeyGroup overrides typename).
+    await FieldPolicySchemaMetadata.stub_cacheKeyInfoForType_Object { _, object in
+      guard let name = object["name"] as? String else { return nil }
+      return CacheKeyInfo(id: name, uniqueKeyGroup: "Character")
+    }
+    // FieldPolicy.Provider must produce the same uniqueKeyGroup so reads
+    // match writes.
+    await FieldPolicySchemaMetadata.stub_cacheKeyForField_SingleReturn { _, inputData, _ in
+      guard let name = inputData["name"] as? String else { return nil }
+      return CacheKeyInfo(id: name, uniqueKeyGroup: "Character")
+    }
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = ["name": "Luke"]
+
+    let serverExpectation = await server.expect(MockQuery<HeroSelectionSet>.self) { _ in
+      [
+        "data": [
+          "hero": [
+            "__typename": "Hero",
+            "name": "Luke",
+          ]
+        ]
+      ]
+    }
+
+    let networkResult = try await client.fetch(query: query, cachePolicy: .networkOnly)
+    XCTAssertEqual(networkResult.data?.hero?.name, "Luke")
+    await fulfillment(of: [serverExpectation], timeout: Self.defaultWaitTimeout)
+
+    // Verify the writer keyed the canonical record under "Character:Luke",
+    // not "Hero:Luke" — uniqueKeyGroup overrides typename.
+    try await store.withinReadTransaction { transaction in
+      let records = try await transaction.readOnlyCache.loadRecords(
+        forKeys: ["Character:Luke", "Hero:Luke"]
+      )
+      XCTAssertNotNil(records["Character:Luke"], "Writer keyed the record under uniqueKeyGroup, not typename")
+      XCTAssertNil(records["Hero:Luke"], "No fallback typename key when uniqueKeyGroup overrides")
+    }
+
+    let cacheResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+    let data = try XCTUnwrap(cacheResult?.data)
+    XCTAssertEqual(data.hero?.name, "Luke")
+  }
+
+  /// List-typed `@fieldPolicy` (`.policyReferenceList`) round-trip. Each
+  /// list element resolves to its own policy-derived `CacheReference`;
+  /// the matching `@typePolicy` keys each element under the same canonical
+  /// key.
+  func test_fieldPolicyProvider_listReturn_withMatchingTypePolicy_roundTrips() async throws {
+    class HeroesSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("heroes", [Hero].self, arguments: ["names": .variable("names")])
+      ]}
+      var heroes: [Hero] { __data["heroes"] }
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [], keyFields: ["name"])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("name", String.self),
+        ]}
+      }
+    }
+
+    await FieldPolicySchemaMetadata.stub_objectTypeForTypeName { typename in
+      typename == "Hero"
+        ? Object(typename: "Hero", implementedInterfaces: [], keyFields: ["name"])
+        : nil
+    }
+    await FieldPolicySchemaMetadata.stub_cacheKeyForField_ListReturn { _, inputData, _ in
+      guard let names = inputData["names"] as? [String] else { return nil }
+      return names.map { CacheKeyInfo(id: $0) }
+    }
+
+    let query = MockQuery<HeroesSelectionSet>()
+    query.__variables = ["names": ["Anakin", "Obi-Wan"]]
+
+    let serverExpectation = await server.expect(MockQuery<HeroesSelectionSet>.self) { _ in
+      [
+        "data": [
+          "heroes": [
+            ["__typename": "Hero", "name": "Anakin"],
+            ["__typename": "Hero", "name": "Obi-Wan"],
+          ]
+        ]
+      ]
+    }
+
+    let networkResult = try await client.fetch(query: query, cachePolicy: .networkOnly)
+    XCTAssertEqual(networkResult.data?.heroes.count, 2)
+    XCTAssertEqual(networkResult.data?.heroes[0].name, "Anakin")
+    XCTAssertEqual(networkResult.data?.heroes[1].name, "Obi-Wan")
+    await fulfillment(of: [serverExpectation], timeout: Self.defaultWaitTimeout)
+
+    let cacheResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+    XCTAssertEqual(cacheResult?.source, .cache)
+    let data = try XCTUnwrap(cacheResult?.data)
+    XCTAssertEqual(data.heroes.count, 2)
+    XCTAssertEqual(data.heroes[0].name, "Anakin")
+    XCTAssertEqual(data.heroes[1].name, "Obi-Wan")
+  }
+
 }
 
 class FieldPolicySchemaMetadata: SchemaMetadata {
