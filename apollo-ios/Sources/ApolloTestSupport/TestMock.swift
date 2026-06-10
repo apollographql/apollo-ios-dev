@@ -102,7 +102,15 @@ public class Mock<O: MockObject>: AnyMock, Hashable {
       if let mockArray = $0 as? Array<Any> {
         return mockArray._unsafelyConvertToSelectionSetData() as JSONValue
       }
-      return $0 as JSONValue
+      // `AnyHashable`'s `Sendable` conformance is explicitly unavailable, so it cannot be cast
+      // to `JSONValue` directly. Numeric values are converted through `NSNumber` to preserve the
+      // type-promiscuous casting (e.g. `Int32` to `Int`) that `AnyHashable` storage previously
+      // provided. The base of an `AnyHashable` is always `Hashable`, so the forced cast in the
+      // fallback will never fail.
+      if let number = $0.base as? NSNumber {
+        return number as JSONValue
+      }
+      return $0.base as! JSONValue
     }
   }
 

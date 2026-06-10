@@ -63,7 +63,9 @@ enum RegexMatcher {
           startOfLine
           /(?:public)? var [`\w]+?: [^\n]+?(?:\?)?\ /
         }
-        let getter = /{ __data\["\w+?"\] }\n?/
+        // Use \x22 for quotes to avoid Swift Regex quoted-literal parsing inside composed regexes.
+        let getter = /[{] __data\[\x22\w+?\x22\] [}]\n?/
+        let setter = /set [{] __data\[\x22\w+?\x22\] = newValue [}]\n/
 
         let regex = {
           if mutable {
@@ -74,7 +76,7 @@ enum RegexMatcher {
                   /\n/; startOfLine
                   "get "; getter
                   startOfLine
-                  /set { __data\["\w+?"\] = newValue }\n/
+                  setter
                   startOfLine; "}"
                 }
               }
@@ -173,4 +175,3 @@ enum RegexMatcher {
     }
   }
 }
-

@@ -36,8 +36,10 @@ extension RootSelectionSet {
       } else  {
         if let dictValue = value as? [String: Any] {
           result[key] = try convertToAnyHashableValueDict(dict: dictValue) as JSONValue
-        } else if let hashableValue = value as? AnyHashable {
-          result[key] = hashableValue as JSONValue
+        } else if case let jsonValue as JSONValue = value {
+          // A type cast pattern is used here because `AnyHashable`'s `Sendable` conformance is
+          // explicitly unavailable, making `as?`/`as` casts to `JSONValue` ill-formed.
+          result[key] = jsonValue
         } else {
           throw RootSelectionSetInitializeError.hasNonHashableValue
         }
@@ -56,8 +58,10 @@ extension RootSelectionSet {
         result.append(try convertToAnyHashableArray(array: array) as JSONValue)
       } else if let dict = value as? [String: Any] {
         result.append(try convertToAnyHashableValueDict(dict: dict) as JSONValue)
-      } else if let hashable = value as? AnyHashable {
-        result.append(hashable as JSONValue)
+      } else if case let jsonValue as JSONValue = value {
+        // A type cast pattern is used here because `AnyHashable`'s `Sendable` conformance is
+        // explicitly unavailable, making `as?`/`as` casts to `JSONValue` ill-formed.
+        result.append(jsonValue)
       } else {
         throw RootSelectionSetInitializeError.hasNonHashableValue
       }
