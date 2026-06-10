@@ -20,7 +20,7 @@ extension Target {
         .folderReference(path: "Sources/\(target.name)/animalkingdom-graphql")
       ]),
       dependencies: [
-        .package(product: "ApolloAPI")
+        .target(name: ApolloTarget.apolloWrapper.name)
       ],
       settings: .forTarget(target)
     )

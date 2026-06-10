@@ -16,10 +16,7 @@ extension Target {
             ],
             dependencies: [
                 .target(name: ApolloTarget.apolloInternalTestHelpers.name),
-                .package(product: "Apollo"),
-                .package(product: "ApolloAPI"),
-                .package(product: "ApolloTestSupport"),
-                .package(product: "ApolloPagination"),
+                .target(name: ApolloTarget.apolloWrapper.name),
                 .package(product: "Nimble")
             ],
             settings: .forTarget(target)

@@ -22,7 +22,7 @@ extension Target {
         .target(name: ApolloTarget.apolloInternalTestHelpers.name),
         .target(name: ApolloTarget.animalKingdomAPI.name),
         .target(name: ApolloTarget.gitHubAPI.name),
-        .package(product: "Apollo"),
+        .target(name: ApolloTarget.apolloWrapper.name),
         .package(product: "Nimble"),
       ],
       settings: .forTarget(target)

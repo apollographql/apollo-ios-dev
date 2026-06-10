@@ -22,7 +22,6 @@ extension Target {
         .target(name: ApolloTarget.apolloCodegenInternalTestHelpers.name),
         .target(name: ApolloTarget.apolloCodegenLibWrapper.name),
         .target(name: ApolloTarget.apolloInternalTestHelpers.name),
-        .package(product: "OrderedCollections"),
         .package(product: "Nimble"),
       ],
       settings: .forTarget(target)
