@@ -96,14 +96,21 @@ public class Mock<O: MockObject>: AnyMock, Hashable {
 
   public var _selectionSetMockData: JSONObject {
     _data.mapValues {
-      if let mock = $0.base as? (any AnyMock) {
-        return mock._selectionSetMockData as JSONValue
-      }
-      if let mockArray = $0 as? Array<Any> {
-        return mockArray._unsafelyConvertToSelectionSetData() as JSONValue
-      }
-      return $0 as JSONValue
+      Self._selectionSetMockDataValue(from: $0.base)
     }
+  }
+
+  private static func _selectionSetMockDataValue(from value: Any) -> JSONValue {
+    if let mock = value as? (any AnyMock) {
+      return mock._selectionSetMockData as JSONValue
+    }
+    if let mockArray = value as? Array<Any> {
+      return mockArray._unsafelyConvertToSelectionSetData() as JSONValue
+    }
+    if let jsonEncodable = value as? any JSONEncodable {
+      return jsonEncodable._jsonValue
+    }
+    preconditionFailure("Mock value cannot be converted to JSONValue")
   }
 
   // MARK: Hashable

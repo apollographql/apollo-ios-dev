@@ -1,4 +1,4 @@
-import ApolloAPI
+@_spi(Internal) import ApolloAPI
 
 public enum RootSelectionSetInitializeError: Error {
   case hasNonHashableValue
@@ -20,48 +20,42 @@ extension RootSelectionSet {
     data: [String: Any],
     variables: GraphQLOperation.Variables? = nil
   ) async throws {
-    let jsonObject = try Self.convertToAnyHashableValueDict(dict: data)
+    let jsonObject = try Self.convertToJSONValueDict(dict: data)
     try await self.init(data: jsonObject, variables: variables)
   }
   
-  /// Convert dictionary type [String: Any] to [String: AnyHashable]
+  /// Convert dictionary type [String: Any] to JSONObject.
   /// - Parameter dict: [String: Any] type dictionary
-  /// - Returns: converted [String: AnyHashable] type dictionary
-  private static func convertToAnyHashableValueDict(dict: [String: Any]) throws -> JSONObject {
+  /// - Returns: converted JSONObject
+  private static func convertToJSONValueDict(dict: [String: Any]) throws -> JSONObject {
     var result = JSONObject()
 
     for (key, value) in dict {
-      if let arrayValue = value as? [Any] {
-        result[key] = try convertToAnyHashableArray(array: arrayValue) as JSONValue
-      } else  {
-        if let dictValue = value as? [String: Any] {
-          result[key] = try convertToAnyHashableValueDict(dict: dictValue) as JSONValue
-        } else if let hashableValue = value as? AnyHashable {
-          result[key] = hashableValue as JSONValue
-        } else {
-          throw RootSelectionSetInitializeError.hasNonHashableValue
-        }
-      }
+      result[key] = try convertToJSONValue(value)
     }
     return result
   }
 
-  /// Convert Any type Array type to AnyHashable type Array
+  /// Convert Any type Array to a JSONValue array.
   /// - Parameter array: Any type Array
-  /// - Returns: AnyHashable type Array
-  private static func convertToAnyHashableArray(array: [Any]) throws -> [JSONValue] {
+  /// - Returns: JSONValue array
+  private static func convertToJSONValueArray(array: [Any]) throws -> [JSONValue] {
     var result: [JSONValue] = []
     for value in array {
-      if let array = value as? [Any] {
-        result.append(try convertToAnyHashableArray(array: array) as JSONValue)
-      } else if let dict = value as? [String: Any] {
-        result.append(try convertToAnyHashableValueDict(dict: dict) as JSONValue)
-      } else if let hashable = value as? AnyHashable {
-        result.append(hashable as JSONValue)
-      } else {
-        throw RootSelectionSetInitializeError.hasNonHashableValue
-      }
+      result.append(try convertToJSONValue(value))
     }
     return result
+  }
+
+  private static func convertToJSONValue(_ value: Any) throws -> JSONValue {
+    if let array = value as? [Any] {
+      return try convertToJSONValueArray(array: array) as JSONValue
+    } else if let dict = value as? [String: Any] {
+      return try convertToJSONValueDict(dict: dict) as JSONValue
+    } else if let jsonEncodable = value as? any JSONEncodable {
+      return jsonEncodable._jsonValue
+    } else {
+      throw RootSelectionSetInitializeError.hasNonHashableValue
+    }
   }
 }
