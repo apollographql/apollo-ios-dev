@@ -1,4 +1,5 @@
 import ApolloAPI
+import Foundation
 
 public enum RootSelectionSetInitializeError: Error {
   case hasNonHashableValue
@@ -36,8 +37,8 @@ extension RootSelectionSet {
       } else  {
         if let dictValue = value as? [String: Any] {
           result[key] = try convertToAnyHashableValueDict(dict: dictValue) as JSONValue
-        } else if let hashableValue = value as? AnyHashable {
-          result[key] = hashableValue as JSONValue
+        } else if let scalarValue = scalarJSONValue(from: value) {
+          result[key] = scalarValue
         } else {
           throw RootSelectionSetInitializeError.hasNonHashableValue
         }
@@ -56,12 +57,29 @@ extension RootSelectionSet {
         result.append(try convertToAnyHashableArray(array: array) as JSONValue)
       } else if let dict = value as? [String: Any] {
         result.append(try convertToAnyHashableValueDict(dict: dict) as JSONValue)
-      } else if let hashable = value as? AnyHashable {
-        result.append(hashable as JSONValue)
+      } else if let scalarValue = scalarJSONValue(from: value) {
+        result.append(scalarValue)
       } else {
         throw RootSelectionSetInitializeError.hasNonHashableValue
       }
     }
     return result
+  }
+
+  /// Converts a scalar `Any` value to a `JSONValue`.
+  ///
+  /// Swift 6.4 marks `AnyHashable`'s `Sendable` conformance explicitly unavailable, so values can
+  /// no longer be cast to `JSONValue` (`any Sendable & Hashable`) via `AnyHashable`. Instead we
+  /// match the concrete Foundation types that represent valid JSON scalars.
+  ///
+  /// `Bool` must be checked before `NSNumber`: Swift's `Bool` bridges to `__NSCFBoolean` (an
+  /// `NSNumber` subclass), and `Bool`'s `JSONDecodable` implementation requires `value as? Bool`
+  /// to succeed — storing a bool as a plain `NSNumber` breaks boolean round-tripping.
+  private static func scalarJSONValue(from value: Any) -> JSONValue? {
+    if let value = value as? String  { return value }
+    if let value = value as? Bool    { return value }  // must precede NSNumber
+    if let value = value as? NSNumber { return value }
+    if let value = value as? NSNull  { return value }
+    return nil
   }
 }
