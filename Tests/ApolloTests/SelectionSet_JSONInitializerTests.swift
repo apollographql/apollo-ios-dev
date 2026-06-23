@@ -249,4 +249,51 @@ class SelectionSet_JSONInitializerTests: XCTestCase {
     expect(data.asHuman?.friend.asHuman).toNot(beNil())
     expect(data.asHuman?.friend.asHuman?.heroName).to(equal("Han Solo"))
   }
+
+  // MARK: - [String: Any] overload
+
+  /// Verifies the `@_disfavoredOverload init(data: [String: Any])` path through
+  /// `scalarJSONValue(from:)`. An untyped `[String: Any]` selects this overload rather than
+  /// the typed `JSONObject` overload, exercising both the scalar-dict and scalar-array branches.
+  func test__initFromAnyDictionary__withScalarAndScalarListValues_buildsSelectionSet() async throws {
+    // given
+    struct Types {
+      static let Human = Object(typename: "Human", implementedInterfaces: [])
+    }
+
+    MockSchemaMetadata.stub_objectTypeForTypeName({
+      switch $0 {
+      case "Human": return Types.Human
+      default: XCTFail(); return nil
+      }
+    })
+
+    class Hero: MockSelectionSet, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __parentType: any ParentType { Types.Human }
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("name", String.self),
+        .field("appearsIn", [String].self),
+      ]}
+
+      var name: String { __data["name"] }
+      var appearsIn: [String] { __data["appearsIn"] }
+    }
+
+    // An untyped [String: Any] selects init(data: [String: Any]), not the typed JSONObject overload.
+    let anyDictionary: [String: Any] = [
+      "__typename": "Human",
+      "name": "Luke Skywalker",
+      "appearsIn": ["NEWHOPE", "EMPIRE", "JEDI"],
+    ]
+
+    // when
+    let data = try await Hero(data: anyDictionary)
+
+    // then
+    expect(data.name).to(equal("Luke Skywalker"))
+    expect(data.appearsIn).to(equal(["NEWHOPE", "EMPIRE", "JEDI"]))
+  }
 }
