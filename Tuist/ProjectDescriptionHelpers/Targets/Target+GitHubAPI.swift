@@ -16,7 +16,7 @@ extension Target {
                 "Sources/\(target.name)/\(target.name)/Sources/**"
             ],
             dependencies: [
-                .package(product: "ApolloAPI")
+                .target(name: ApolloTarget.apolloWrapper.name)
             ],
             settings: .forTarget(target)
         )
