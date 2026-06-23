@@ -60,7 +60,7 @@ final class WebSocketConnection: Sendable {
   }
 
   func send(_ message: URLSessionWebSocketTask.Message) {
-    Task {
+    _ = Task {
       try await webSocketTask.send(message)
     }
   }
