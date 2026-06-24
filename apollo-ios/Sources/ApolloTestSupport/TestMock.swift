@@ -106,9 +106,10 @@ public class Mock<O: MockObject>: AnyMock, Hashable {
       return mockArray._unsafelyConvertToSelectionSetData() as JSONValue
     }
     // Swift 6.4 marks AnyHashable's Sendable conformance unavailable, so $0 (an AnyHashable)
-    // can no longer be cast directly to JSONValue. NSNumber covers all numeric types and Bool
-    // (via __NSCFBoolean); the forced cast in the fallback is safe because mock data values
-    // are always valid JSON scalars.
+    // can no longer be cast directly to JSONValue. Bool must be checked before NSNumber because
+    // Swift's Bool bridges to __NSCFBoolean (an NSNumber subclass), and Bool's JSONDecodable
+    // implementation requires `value as? Bool` — storing a bool as NSNumber breaks round-tripping.
+    if let bool = value as? Bool { return bool }
     if let number = value as? NSNumber { return number }
     return value as! JSONValue
   }
