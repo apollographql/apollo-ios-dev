@@ -60,8 +60,16 @@ final class WebSocketConnection: Sendable {
   }
 
   func send(_ message: URLSessionWebSocketTask.Message) {
-    _ = Task {
-      try await webSocketTask.send(message)
+    Task {
+      do {
+        try await webSocketTask.send(message)
+      } catch {
+        // Any send error means the connection is broken (cancelled, reset, network lost, etc.).
+        // Cancel the underlying task so the receive loop terminates with URLError(.cancelled),
+        // which feeds into the transport's handleDisconnection() / reconnection state machine.
+        // No-op if the task is already cancelled.
+        webSocketTask.cancel(with: .goingAway, reason: nil)
+      }
     }
   }
 
