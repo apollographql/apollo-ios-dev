@@ -785,6 +785,103 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     expect(results2[0].data?.reviewAdded?.commentary).to(equal("Sub2 recovered"))
   }
 
+  // MARK: - Send Errors
+
+  /// Verifies that a `send()` failure on `WebSocketConnection` cancels the underlying task
+  /// (which terminates the receive loop) and triggers reconnection when enabled.
+  ///
+  /// This exercises the fix that replaced the silent `_ = Task { try await ... }` pattern with
+  /// proper error handling: on error, `webSocketTask.cancel(with: .goingAway)` is called so the
+  /// receive loop terminates and the transport's reconnection state machine runs.
+  func testSubscription__whenSendErrorOccursWithReconnect__shouldCancelTaskAndReconnect() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+
+    task1.emit(.connectionAck(payload: nil))
+
+    // Establish the first subscription.
+    let (sub1, id1) = try await subscribe(on: task1, using: client)
+
+    // Deliver one result before the connection breaks.
+    task1.emit(.next(id: id1, payload: Self.reviewAddedPayload(stars: 5, commentary: "Before send error")))
+
+    // Configure the next send to fail — simulates the connection breaking mid-session
+    // (e.g. network loss detected only on write).
+    task1.sendError = URLError(.networkConnectionLost)
+
+    // Starting a second subscription sends a subscribe message via WebSocketConnection.send().
+    // MockWebSocketTask.send() appends the message before throwing, so subscribe() sees the
+    // expected message count and returns. The thrown error is caught by WebSocketConnection,
+    // which calls cancel(with: .goingAway) on task1 to terminate the receive loop.
+    let (sub2, id2) = try await subscribe(on: task1, using: client)
+
+    // Pre-buffer the ack for task2 so reconnection can proceed immediately.
+    task2.emit(.connectionAck(payload: nil))
+
+    // The cancel() call must have been made by the send-error handler.
+    await expect(task1.cancelCode).toEventually(equal(.goingAway))
+
+    // After reconnection, both active subscriptions should be re-subscribed on task2.
+    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(2))
+
+    let resubscribedIDs = Set(task2.clientSentMessages(ofType: "subscribe").compactMap { $0["id"] as? String })
+    expect(resubscribedIDs).to(contain(id1))
+    expect(resubscribedIDs).to(contain(id2))
+
+    // Deliver data and complete for both subscriptions on the reconnected task.
+    task2.emit(.next(id: id1, payload: Self.reviewAddedPayload(stars: 3, commentary: "After reconnect")))
+    task2.emit(.complete(id: id1))
+    task2.emit(.next(id: id2, payload: Self.reviewAddedPayload(stars: 4, commentary: "Sub2 data")))
+    task2.emit(.complete(id: id2))
+
+    let results1 = try await sub1.getAllValues()
+    let results2 = try await sub2.getAllValues()
+
+    expect(results1.count).to(equal(2))
+    expect(results1[0].data?.reviewAdded?.commentary).to(equal("Before send error"))
+    expect(results1[1].data?.reviewAdded?.commentary).to(equal("After reconnect"))
+
+    expect(results2.count).to(equal(1))
+    expect(results2[0].data?.reviewAdded?.commentary).to(equal("Sub2 data"))
+  }
+
+  /// Verifies that a `send()` failure cancels the underlying task and terminates subscribers
+  /// cleanly (without throwing) when auto-reconnection is disabled.
+  func testSubscription__whenSendErrorOccursWithReconnectDisabled__shouldCancelTaskAndTerminate() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    try setUpTransport(tasks: [task1, task2])  // default config: reconnectionInterval = -1 (disabled)
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+
+    // Deliver one result before the send error.
+    task1.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 5, commentary: "Only result")))
+
+    // Configure next send to fail.
+    task1.sendError = URLError(.networkConnectionLost)
+
+    // Trigger a send by starting another subscription — this causes the send error,
+    // which calls cancel() on task1 and terminates the receive loop.
+    let _ = try await subscribe(on: task1, using: client)
+
+    // The cancel() call must have been made by the send-error handler.
+    await expect(task1.cancelCode).toEventually(equal(.goingAway))
+
+    // Reconnection should not have been attempted.
+    expect(task2.isResumed).to(beFalse())
+
+    // The subscription stream should terminate cleanly: the receive loop ends with
+    // URLError(.cancelled) which is treated as normal completion, so handleDisconnection
+    // is called with error=nil, and finishAll(reason: .completed) ends the stream without
+    // throwing.
+    let results = try await subscription.getAllValues()
+    expect(results.count).to(equal(1))
+    expect(results[0].data?.reviewAdded?.commentary).to(equal("Only result"))
+  }
+
   // MARK: - Ping / Pong
 
   func testPing__whenServerSendsPing__shouldReplyWithPong() async throws {

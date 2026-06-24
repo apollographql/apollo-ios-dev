@@ -55,6 +55,19 @@ public final class MockWebSocketTask: WebSocketTask, @unchecked Sendable {
   private var _cancelCode: URLSessionWebSocketTask.CloseCode?
   private var _cancelReason: Data?
 
+  /// When set, the next call to `send(_:)` throws this error (consumed on use).
+  ///
+  /// Use this to simulate a broken connection mid-session: set `sendError` after the initial
+  /// handshake succeeds, then trigger any send (e.g. by starting a new subscription). The
+  /// mock appends the message to `clientSentMessages` before throwing, so helpers that wait
+  /// for a subscribe message count still see the message.
+  private var _sendError: (any Swift.Error)?
+
+  public var sendError: (any Swift.Error)? {
+    get { lock.withLock { _sendError } }
+    set { lock.withLock { _sendError = newValue } }
+  }
+
   public var isResumed: Bool {
     lock.lock()
     defer { lock.unlock() }
@@ -130,9 +143,13 @@ public final class MockWebSocketTask: WebSocketTask, @unchecked Sendable {
   }
 
   public func send(_ message: URLSessionWebSocketTask.Message) async throws {
-    lock.withLock {
+    let error: (any Swift.Error)? = lock.withLock {
       _clientSentMessages.append(message)
+      let e = _sendError
+      _sendError = nil  // consume: one-shot
+      return e
     }
+    if let error { throw error }
   }
 
   public func receive() async throws -> URLSessionWebSocketTask.Message {
