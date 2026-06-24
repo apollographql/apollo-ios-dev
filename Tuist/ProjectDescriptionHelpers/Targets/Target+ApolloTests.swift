@@ -19,10 +19,7 @@ extension Target {
         .target(name: ApolloTarget.apolloInternalTestHelpers.name),
         .target(name: ApolloTarget.starWarsAPI.name),
         .target(name: ApolloTarget.uploadAPI.name),
-        .package(product: "Apollo"),
-        .package(product: "ApolloSQLite"),
-        .package(product: "ApolloWebSocket"),
-        .package(product: "ApolloTestSupport"),
+        .target(name: ApolloTarget.apolloWrapper.name),
         .package(product: "Nimble"),
       ],
       settings: .forTarget(target)
