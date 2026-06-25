@@ -27,14 +27,17 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.base.ref }}
         fetch-depth: 0
-    - name: Setup SSH Keys
-      uses: webfactory/ssh-agent@v0.7.0
+    - name: Generate GitHub App Token
+      id: app-token
+      uses: actions/create-github-app-token@v1
       with:
-        ssh-private-key: |
-          ${{ secrets.APOLLO_IOS_DEPLOY_KEY }}
-          ${{ secrets.APOLLO_IOS_CODEGEN_DEPLOY_KEY }}
-          ${{ secrets.APOLLO_IOS_DEV_DEPLOY_KEY }}
-          ${{ secrets.APOLLO_IOS_PAGINATION_DEPLOY_KEY }}
+        app-id: ${{ secrets.APOLLO_IOS_SUBTREE_APP_ID }}
+        private-key: ${{ secrets.APOLLO_IOS_SUBTREE_APP_PRIVATE_KEY }}
+        owner: apollographql
+        repositories: |
+          apollo-ios
+          apollo-ios-codegen
+          apollo-ios-pagination
     - name: Configure Git
       uses: ./.github/actions/configure-git
     - name: Subtree - Apollo iOS
@@ -42,7 +45,7 @@ jobs:
       uses: ./.github/actions/subtree-split-push
       with:
         subtree: apollo-ios
-        remote: git@github.com:apollographql/apollo-ios.git
+        remote: https://github.com/apollographql/apollo-ios.git
         target-branch: ${{ github.event.pull_request.base.ref }}
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
@@ -52,7 +55,7 @@ jobs:
       uses: ./.github/actions/subtree-split-push
       with:
         subtree: apollo-ios-codegen
-        remote: git@github.com:apollographql/apollo-ios-codegen.git
+        remote: https://github.com/apollographql/apollo-ios-codegen.git
         target-branch: ${{ github.event.pull_request.base.ref }}
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
@@ -62,23 +65,31 @@ jobs:
       uses: ./.github/actions/subtree-split-push
       with:
         subtree: apollo-ios-pagination
-        remote: git@github.com:apollographql/apollo-ios-pagination.git
+        remote: https://github.com/apollographql/apollo-ios-pagination.git
         target-branch: ${{ github.event.pull_request.base.ref }}
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Push Subtrees
       if: success()
       shell: bash
+      env:
+        GH_APP_TOKEN: ${{ steps.app-token.outputs.token }}
       run: |
-        if [ -n "${{ steps.split-ios.outputs.split-sha }}" ]; then
-          git push git@github.com:apollographql/apollo-ios.git ${{ steps.split-ios.outputs.split-sha }}:refs/heads/${{ github.event.pull_request.base.ref }}
-        fi
-        if [ -n "${{ steps.split-codegen.outputs.split-sha }}" ]; then
-          git push git@github.com:apollographql/apollo-ios-codegen.git ${{ steps.split-codegen.outputs.split-sha }}:refs/heads/${{ github.event.pull_request.base.ref }}
-        fi
-        if [ -n "${{ steps.split-pagination.outputs.split-sha }}" ]; then
-          git push git@github.com:apollographql/apollo-ios-pagination.git ${{ steps.split-pagination.outputs.split-sha }}:refs/heads/${{ github.event.pull_request.base.ref }}
-        fi
+        # Push each split SHA to its upstream main. Uses an HTTPS URL with
+        # the GitHub App installation token in the Authorization header,
+        # so branch protection rules that restrict pushes to the app's
+        # identity will accept these pushes (and reject any others).
+        push_subtree() {
+          local repo="$1"
+          local sha="$2"
+          if [ -z "$sha" ]; then return; fi
+          git -c "http.https://github.com/.extraheader=Authorization: Bearer ${GH_APP_TOKEN}" \
+              push "https://github.com/apollographql/${repo}.git" \
+              "${sha}:refs/heads/${{ github.event.pull_request.base.ref }}"
+        }
+        push_subtree apollo-ios            "${{ steps.split-ios.outputs.split-sha }}"
+        push_subtree apollo-ios-codegen    "${{ steps.split-codegen.outputs.split-sha }}"
+        push_subtree apollo-ios-pagination "${{ steps.split-pagination.outputs.split-sha }}"
     - name: Push Updated History
       if: success()
       shell: bash
