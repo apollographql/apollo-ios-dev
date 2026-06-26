@@ -309,6 +309,61 @@ class OperationDefinition_VariableDefinition_Tests: XCTestCase {
     }
   }
 
+  func test__renderOperationVariableParameter__givenCapitalizationRule_withEnumDefaultValue__appliesRuleToRenderedDefault() throws {
+    // given
+    let variable: CompilationResult.VariableDefinition = .mock(
+      "input",
+      type: .enum(.mock(name: "EnumValue")),
+      defaultValue: .enum("userId")
+    )
+
+    // The enum case used as a default value must be renamed to match the generated case,
+    // otherwise the default references a case that no longer exists and won't compile.
+    let expected = "input: GraphQLNullable<GraphQLEnum<TestSchema.EnumValue>> = .init(.userID)"
+
+    // when
+    buildTemplate(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("id"), strategy: .upper)],
+      markTypesNonisolated: false
+    ))
+    let actual = template.VariableParameter(variable).description
+
+    // then
+    expect(actual).to(equal(expected))
+  }
+
+  func test__renderOperationVariableParameter__givenCapitalizationRule_withInputObjectDefaultValue__appliesRuleToRenderedFieldName() throws {
+    // given
+    let variable: CompilationResult.VariableDefinition = .mock(
+      "inputField",
+      type: .inputObject(.mock(
+        "InnerInputObject",
+        fields: [
+          .mock("userId", type: .scalar(.string()), defaultValue: nil)
+        ]
+      )),
+      defaultValue: .object(["userId": .string("Value")])
+    )
+
+    // The input field name inside the default literal must match the renamed initializer
+    // parameter on the generated input object.
+    let expected = """
+    inputField: GraphQLNullable<TestSchema.InnerInputObject> = .init(
+      TestSchema.InnerInputObject(userID: "Value")
+    )
+    """
+
+    // when
+    buildTemplate(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("id"), strategy: .upper)],
+      markTypesNonisolated: false
+    ))
+    let actual = template.VariableParameter(variable).description
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+
   func test__renderOperationVariableParameter__givenInputObjectField_withDefaultValue__generatesCorrectParametersWithInitializer_withNamespaceWhenRequired() throws {
     // given
     let variable: CompilationResult.VariableDefinition = .mock(

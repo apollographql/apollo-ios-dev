@@ -47,11 +47,57 @@ public struct CapitalizationRule: Codable, Equatable, Sendable {
   }
 
   /// The capitalization strategy to apply when a term is matched.
-  public enum CaseStrategy: String, Codable, Equatable, Sendable {
-    /// Replace the matched term with its UPPERCASED form (e.g., "id" → "ID").
+  public enum CaseStrategy: Codable, Equatable, Sendable {
+    /// Uppercase the matched segment (e.g., "Id" → "ID").
+    ///
+    /// Only applied when the matched segment's first character is already uppercase, matching
+    /// SwiftFormat's `acronyms` rule (so a leading lowercase `id` in `idToken` is preserved).
     case upper
-    /// Replace the matched term with its lowercased form (e.g., "ID" → "id").
+    /// Lowercase the matched segment (e.g., "ID" → "id").
     case lower
+    /// Replace the matched segment with an exact literal string (e.g., "graphql" → "GraphQL").
+    ///
+    /// Use this for mixed-case acronyms that neither ``upper`` nor ``lower`` can produce.
+    case replace(String)
+
+    private enum CodingKeys: String, CodingKey {
+      case replace
+    }
+
+    public init(from decoder: any Decoder) throws {
+      // Simple string form: "upper" / "lower".
+      if let single = try? decoder.singleValueContainer(),
+         let rawValue = try? single.decode(String.self) {
+        switch rawValue {
+        case "upper": self = .upper; return
+        case "lower": self = .lower; return
+        default: break
+        }
+      }
+      // Keyed object form: { "replace": "<string>" }.
+      let container = try decoder.container(keyedBy: CodingKeys.self)
+      guard let replacement = try container.decodeIfPresent(String.self, forKey: .replace) else {
+        throw DecodingError.dataCorrupted(.init(
+          codingPath: decoder.codingPath,
+          debugDescription: #"CaseStrategy expects "upper", "lower", or {"replace": <string>}."#
+        ))
+      }
+      self = .replace(replacement)
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+      switch self {
+      case .upper:
+        var container = encoder.singleValueContainer()
+        try container.encode("upper")
+      case .lower:
+        var container = encoder.singleValueContainer()
+        try container.encode("lower")
+      case .replace(let replacement):
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(replacement, forKey: .replace)
+      }
+    }
   }
 
   /// The term to search for within generated names.
@@ -184,6 +230,10 @@ struct Capitalizer: Sendable, Equatable {
       return segment.uppercased()
     case .lower:
       return segment.lowercased()
+    case .replace(let replacement):
+      // Explicit substitution — applied verbatim whenever the term matches, regardless of the
+      // segment's original casing or position.
+      return replacement
     }
   }
 

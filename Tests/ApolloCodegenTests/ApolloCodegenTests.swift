@@ -2331,6 +2331,23 @@ class ApolloCodegenTests: XCTestCase {
       .to(throwError(ApolloCodegen.Error.inputSearchPathInvalid(path: "schema/*.")))
   }
 
+  func test__validation__givenInvalidCapitalizationRuleRegex_shouldThrow() throws {
+    // given
+    let config = ApolloCodegenConfiguration.mock(
+      options: .init(additionalCapitalizationRules: [
+        .init(term: .regex("[unterminated"), strategy: .upper)
+      ])
+    )
+
+    // then
+    expect(try ApolloCodegen._validate(config: config))
+      .to(throwError { error in
+        guard case ApolloCodegen.Error.invalidConfiguration = error else {
+          return fail("Expected .invalidConfiguration, got \(error)")
+        }
+      })
+  }
+
   let conflictingSchemaNames = ["rocket", "Rocket"]
 
   func test__validation__givenSchemaName_matchingObjectName_shouldThrow() throws {

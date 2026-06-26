@@ -15,13 +15,13 @@ struct InputVariable: InputVariableRenderable {
 }
 
 extension InputVariableRenderable {
-  func renderVariableDefaultValue(config: ApolloCodegenConfiguration) -> TemplateString {
+  func renderVariableDefaultValue(config: ApolloCodegen.ConfigurationContext) -> TemplateString {
     renderVariableDefaultValue(inList: false, config: config)
   }
 
   private func renderVariableDefaultValue(
     inList: Bool,
-    config: ApolloCodegenConfiguration
+    config: ApolloCodegen.ConfigurationContext
   ) -> TemplateString {
     switch defaultValue {
     case .none: return ""
@@ -79,7 +79,7 @@ extension InputVariableRenderable {
 fileprivate extension GraphQLInputObjectType {
   func renderInitializer(
     values: OrderedDictionary<String, GraphQLValue>,
-    config: ApolloCodegenConfiguration
+    config: ApolloCodegen.ConfigurationContext
   ) -> TemplateString {
     let entries = values.compactMap { entry -> TemplateString in
       guard let field = self.fields[entry.0] else {

@@ -104,6 +104,26 @@ class CapitalizerTests: XCTestCase {
     expect(capitalizer.apply(to: "userID")).to(equal("userId"))
   }
 
+  // MARK: - Replace Strategy
+
+  func test__apply__replaceStrategy__midWordSegment__isReplacedVerbatim() {
+    let capitalizer = Capitalizer(rules: [
+      .init(term: .string("graphql"), strategy: .replace("GraphQL"))
+    ])
+
+    // "myGraphqlClient" → ["my", "Graphql", "Client"]; "Graphql" matches and is replaced.
+    expect(capitalizer.apply(to: "myGraphqlClient")).to(equal("myGraphQLClient"))
+  }
+
+  func test__apply__replaceStrategy__leadingSegment__isReplacedVerbatim() {
+    let capitalizer = Capitalizer(rules: [
+      .init(term: .string("graphql"), strategy: .replace("GraphQL"))
+    ])
+
+    // Unlike `.upper`, replace applies regardless of the segment's position or original case.
+    expect(capitalizer.apply(to: "graphqlEndpoint")).to(equal("GraphQLEndpoint"))
+  }
+
   // MARK: - Regex Term
 
   func test__apply__regexTermUpper__userId__becomesUserID() {
@@ -287,5 +307,24 @@ class CapitalizerTests: XCTestCase {
     let decoded = try JSONDecoder().decode(CapitalizationRule.self, from: json)
 
     expect(decoded).to(equal(CapitalizationRule(term: .regex("^[Ii]d$"), strategy: .upper)))
+  }
+
+  func test__capitalizationRule__encodesReplaceStrategyAsObject() throws {
+    let rule = CapitalizationRule(term: .string("graphql"), strategy: .replace("GraphQL"))
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = [.sortedKeys]
+
+    let json = try XCTUnwrap(String(data: encoder.encode(rule), encoding: .utf8))
+
+    // `.upper`/`.lower` stay plain strings; `.replace` is a keyed object.
+    expect(json).to(equal(#"{"strategy":{"replace":"GraphQL"},"term":{"string":"graphql"}}"#))
+  }
+
+  func test__capitalizationRule__decodesReplaceStrategy() throws {
+    let json = Data(#"{"term":{"string":"graphql"},"strategy":{"replace":"GraphQL"}}"#.utf8)
+
+    let decoded = try JSONDecoder().decode(CapitalizationRule.self, from: json)
+
+    expect(decoded).to(equal(CapitalizationRule(term: .string("graphql"), strategy: .replace("GraphQL"))))
   }
 }

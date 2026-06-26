@@ -36,7 +36,7 @@ extension OperationTemplateRenderer {
   ) -> TemplateString {
       """
       \(variable.name.renderAsFieldPropertyName(config: config)): \(variable.type.rendered(as: .inputValue, config: config.config))\
-      \(if: variable.defaultValue != nil, " = " + variable.renderVariableDefaultValue(config: config.config))
+      \(if: variable.defaultValue != nil, " = " + variable.renderVariableDefaultValue(config: config))
       """
   }
 

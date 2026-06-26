@@ -451,6 +451,7 @@ The top-level properties are:
 | Property Name | Description |
 | ------------- | ----------- |
 | [`additionalInflectionRules`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/additionalinflectionrules) | Any non-default rules for pluralization or singularization of type names. |
+| [`additionalCapitalizationRules`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/additionalcapitalizationrules) | Any non-default rules for capitalizing acronyms in generated names — e.g. rendering `userId` as `userID`, or `graphql` as `GraphQL`. |
 | [`deprecatedEnumCases`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/deprecatedenumcases) | Annotate generated Swift enums with the Swift `@available` attribute for GraphQL enum cases annotated with the built-in [`@deprecated` directive](https://spec.graphql.org/draft/#sec--deprecated). |
 | [`schemaDocumentation`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/schemadocumentation) | Include or exclude [schema documentation](https://spec.graphql.org/draft/#sec-Descriptions) in the generated files. |
 | [`selectionSetInitializers`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/selectionsetinitializers) | Generate initializers for your generated selection set models. |
@@ -473,6 +474,10 @@ The top-level properties are:
       "singularRegex": "animal"
     }
   }],
+  "additionalCapitalizationRules": [
+    { "term": { "string": "id" }, "strategy": "upper" },
+    { "term": { "string": "graphql" }, "strategy": { "replace": "GraphQL" } }
+  ],
   "appendSchemaTypeFilenameSuffix": false,
   "deprecatedEnumCases": "include",
   "schemaDocumentation": "include",
@@ -527,6 +532,10 @@ let configuration = ApolloCodegenConfiguration(
         singularRegex: "animal",
         replacementRegex: "animals"
       )
+    ],
+    additionalCapitalizationRules: [
+      CapitalizationRule(term: .string("id"), strategy: .upper),
+      CapitalizationRule(term: .string("graphql"), strategy: .replace("GraphQL"))
     ],
     appendSchemaTypeFilenameSuffix: false.
     deprecatedEnumCases: .include,
