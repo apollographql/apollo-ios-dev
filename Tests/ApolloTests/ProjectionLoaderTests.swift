@@ -1,3 +1,4 @@
+import Nimble
 import XCTest
 @_spi(Execution) @testable import Apollo
 @_spi(Execution) @_spi(Internal) import ApolloAPI
@@ -59,11 +60,12 @@ final class ProjectionLoaderTests: XCTestCase {
     loader.enqueue([projection("A", "name")])
     let result = try await loader.deferredRecord(forKey: "A").get()
 
-    XCTAssertEqual(result?.key, "A")
-    XCTAssertEqual(result?["name"] as? String, "Alice")
+    expect(result?.key) == "A"
+    expect(result?["name"] as? String) == "Alice"
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 1, "Exactly one batch fired")
-    XCTAssertEqual(calls.first?.count, 1, "Batch carried exactly one projection")
+    // Exactly one batch fired with exactly one projection.
+    expect(calls).to(haveCount(1))
+    expect(calls.first).to(haveCount(1))
   }
 
   func test__enqueue__givenMultipleDistinctProjectionsForcedTogether__collapseIntoSingleBatchLoad() async throws {
@@ -88,14 +90,15 @@ final class ProjectionLoaderTests: XCTestCase {
     let recordA = try await deferredA.get()
     let recordB = try await deferredB.get()
 
-    XCTAssertEqual(recordA?["name"] as? String, "Alice")
-    XCTAssertEqual(recordB?["name"] as? String, "Bob")
+    expect(recordA?["name"] as? String) == "Alice"
+    expect(recordB?["name"] as? String) == "Bob"
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 1, "Sibling forces share a single flush")
-    XCTAssertEqual(Set(calls.first ?? []), Set([
+    // Sibling forces share a single flush.
+    expect(calls).to(haveCount(1))
+    expect(Set(calls.first ?? [])) == Set([
       projection("A", "name"),
       projection("B", "name"),
-    ]))
+    ])
   }
 
   func test__enqueue__givenDuplicateProjections__coalescesIntoSingleEntryInBatch() async throws {
@@ -112,9 +115,10 @@ final class ProjectionLoaderTests: XCTestCase {
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 1)
-    XCTAssertEqual(calls.first?.count, 1, "Duplicates collapsed inside the batch")
-    XCTAssertEqual(calls.first?.first, same)
+    expect(calls).to(haveCount(1))
+    // Duplicates collapsed inside the batch.
+    expect(calls.first).to(haveCount(1))
+    expect(calls.first?.first) == same
   }
 
   func test__enqueue__givenAlreadyLoadedProjection__skipsRebatchingAcrossFlushes() async throws {
@@ -141,12 +145,10 @@ final class ProjectionLoaderTests: XCTestCase {
     _ = try await loader.deferredRecord(forKey: "C").get()
 
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 2, "Two flushes (round 1 + round 2)")
-    XCTAssertEqual(
-      Set(calls[1]),
-      Set([projection("C", "name")]),
-      "Round 2 batch carries only the new projection — already-loaded A.name is skipped"
-    )
+    // Two flushes (round 1 + round 2); round 2 batch carries only the
+    // new projection — already-loaded A.name is skipped.
+    expect(calls).to(haveCount(2))
+    expect(Set(calls[1])) == Set([projection("C", "name")])
   }
 
   func test__enqueue__givenSameKeyDifferentFieldAfterFlush__rebatchesTheNewField() async throws {
@@ -171,12 +173,13 @@ final class ProjectionLoaderTests: XCTestCase {
     let result = try await loader.deferredRecord(forKey: "A").get()
 
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 2, "Two flushes — distinct fields on same key still require a new batch")
-    XCTAssertEqual(Set(calls[1]), Set([projection("A", "age")]))
+    // Two flushes — distinct fields on same key still require a new batch.
+    expect(calls).to(haveCount(2))
+    expect(Set(calls[1])) == Set([projection("A", "age")])
     // The loader merges the new field into the existing record entry,
     // so the final result carries both fields.
-    XCTAssertEqual(result?["name"] as? String, "v_name")
-    XCTAssertEqual(result?["age"] as? String, "v_age")
+    expect(result?["name"] as? String) == "v_name"
+    expect(result?["age"] as? String) == "v_age"
   }
 
   func test__deferredRecord__givenBatchLoadFailure__returnsSameFailureOnRepeatedAsk() async throws {
@@ -190,19 +193,18 @@ final class ProjectionLoaderTests: XCTestCase {
     loader.enqueue([projection("A", "name")])
 
     // First ask: should throw the batch-load failure.
-    await assertThrows(TestError.self) {
-      _ = try await loader.deferredRecord(forKey: "A").get()
-    }
+    await expect { _ = try await loader.deferredRecord(forKey: "A").get() }
+      .to(throwError(errorType: TestError.self))
 
     // Second ask for the same key: should also throw the *same* failure
     // — sticky, no re-batch. `pending` is empty after the flush, so
     // `deferredRecord` returns immediately with the recorded failure.
-    await assertThrows(TestError.self) {
-      _ = try await loader.deferredRecord(forKey: "A").get()
-    }
+    await expect { _ = try await loader.deferredRecord(forKey: "A").get() }
+      .to(throwError(errorType: TestError.self))
 
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 1, "No re-batch after a recorded failure for the key")
+    // No re-batch after a recorded failure for the key.
+    expect(calls).to(haveCount(1))
   }
 
   func test__removeAll__clearsPendingAndLoadedState__allowsRefetch() async throws {
@@ -223,7 +225,8 @@ final class ProjectionLoaderTests: XCTestCase {
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 2, "removeAll forces a re-batch on the next ask")
+    // removeAll forces a re-batch on the next ask.
+    expect(calls).to(haveCount(2))
   }
 
   // MARK: - Selective invalidation
@@ -258,12 +261,10 @@ final class ProjectionLoaderTests: XCTestCase {
     _ = try await loader.deferredRecord(forKey: "B").get()
 
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 2, "Second flush re-batches A but not B")
-    XCTAssertEqual(
-      Set(calls[1]),
-      Set([projection("A", "name")]),
-      "Round 2's batch must contain only the invalidated key's projection"
-    )
+    // Second flush re-batches A but not B.
+    expect(calls).to(haveCount(2))
+    // Round 2's batch must contain only the invalidated key's projection.
+    expect(Set(calls[1])) == Set([projection("A", "name")])
   }
 
   func test__invalidate_keys__givenAbsentKey__allowsRefreshOnNextAsk() async throws {
@@ -291,7 +292,8 @@ final class ProjectionLoaderTests: XCTestCase {
     _ = try await loader.deferredRecord(forKey: "MISSING").get()
 
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 2, "Invalidation must clear `.absent` so a re-ask re-batches")
+    // Invalidation must clear `.absent` so a re-ask re-batches.
+    expect(calls).to(haveCount(2))
   }
 
   func test__invalidate_keys__givenEmptyInput__isANoop() async throws {
@@ -310,7 +312,8 @@ final class ProjectionLoaderTests: XCTestCase {
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 1, "Empty invalidation must not clear unrelated state")
+    // Empty invalidation must not clear unrelated state.
+    expect(calls).to(haveCount(1))
   }
 
   func test__invalidate_keys__alsoDropsPendingProjectionsForThoseKeys() async throws {
@@ -331,12 +334,9 @@ final class ProjectionLoaderTests: XCTestCase {
     _ = try await loader.deferredRecord(forKey: "B").get()
 
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 1)
-    XCTAssertEqual(
-      Set(calls[0]),
-      Set([projection("B", "name")]),
-      "Pending projection for an invalidated key must be dropped before flush"
-    )
+    expect(calls).to(haveCount(1))
+    // Pending projection for an invalidated key must be dropped before flush.
+    expect(Set(calls[0])) == Set([projection("B", "name")])
   }
 
   func test__invalidate_matching__clearsKeysContainingPattern_caseInsensitive() async throws {
@@ -377,12 +377,13 @@ final class ProjectionLoaderTests: XCTestCase {
     _ = try await loader.deferredRecord(forKey: "Post:1").get()
 
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 2, "Pattern-matched keys re-batch; unmatched keys stay warm")
-    XCTAssertEqual(
-      Set(calls[1]),
-      Set([projection("User:1", "name"), projection("User:2", "name")]),
-      "Round 2's batch contains only the pattern-matched keys"
-    )
+    // Pattern-matched keys re-batch; unmatched keys stay warm.
+    expect(calls).to(haveCount(2))
+    // Round 2's batch contains only the pattern-matched keys.
+    expect(Set(calls[1])) == Set([
+      projection("User:1", "name"),
+      projection("User:2", "name"),
+    ])
   }
 
   func test__invalidate_matching__givenEmptyPattern__isANoop() async throws {
@@ -403,7 +404,8 @@ final class ProjectionLoaderTests: XCTestCase {
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 1, "Empty pattern must not clear any state")
+    // Empty pattern must not clear any state.
+    expect(calls).to(haveCount(1))
   }
 
   func test__deferredRecord__givenAbsentRecord__returnsNilWithoutThrowing() async throws {
@@ -417,7 +419,8 @@ final class ProjectionLoaderTests: XCTestCase {
     loader.enqueue([projection("MISSING", "name")])
     let result = try await loader.deferredRecord(forKey: "MISSING").get()
 
-    XCTAssertNil(result, "Absent record surfaces as nil, distinct from a thrown error")
+    // Absent record surfaces as nil, distinct from a thrown error.
+    expect(result).to(beNil())
 
     // Repeat-ask short-circuit: the projection was already attempted,
     // so a second enqueue must NOT trigger another batch. This is the
@@ -426,9 +429,10 @@ final class ProjectionLoaderTests: XCTestCase {
     loader.enqueue([projection("MISSING", "name")])
     let secondResult = try await loader.deferredRecord(forKey: "MISSING").get()
 
-    XCTAssertNil(secondResult)
+    expect(secondResult).to(beNil())
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 1, "Repeated enqueue of an already-attempted absent key must not re-batch")
+    // Repeated enqueue of an already-attempted absent key must not re-batch.
+    expect(calls).to(haveCount(1))
   }
 
   // MARK: - Absence memoization (close the DataLoaderTests.testCachesRepeatedRequests gap)
@@ -457,8 +461,10 @@ final class ProjectionLoaderTests: XCTestCase {
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 2, "Round 3 must short-circuit — `age` was attempted in round 2")
-    XCTAssertEqual(Set(calls[1]), Set([projection("A", "age")]), "Round 2 carries only the new field")
+    // Round 3 must short-circuit — `age` was attempted in round 2.
+    expect(calls).to(haveCount(2))
+    // Round 2 carries only the new field.
+    expect(Set(calls[1])) == Set([projection("A", "age")])
   }
 
   func test__enqueue__givenPriorFlushReturnedAbsentRecord__doesNotRebatchOnRepeatedAsk() async throws {
@@ -480,7 +486,8 @@ final class ProjectionLoaderTests: XCTestCase {
     _ = try await loader.deferredRecord(forKey: "MISSING").get()
 
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 1, "Absent records must short-circuit on repeated enqueue")
+    // Absent records must short-circuit on repeated enqueue.
+    expect(calls).to(haveCount(1))
   }
 
   func test__enqueue__givenPriorFlushReturnedAbsentRecord__doesNotRebatchOnAskForDifferentField() async throws {
@@ -505,13 +512,12 @@ final class ProjectionLoaderTests: XCTestCase {
     loader.enqueue([projection("MISSING", "age")])
     let secondResult = try await loader.deferredRecord(forKey: "MISSING").get()
 
-    XCTAssertNil(secondResult, "Different field on absent record still surfaces as nil")
+    // Different field on absent record still surfaces as nil.
+    expect(secondResult).to(beNil())
     let calls = await recorder.calls
-    XCTAssertEqual(
-      calls.count,
-      1,
-      "Absent records are sticky for every field — a different-field probe must not re-batch"
-    )
+    // Absent records are sticky for every field — a different-field
+    // probe must not re-batch.
+    expect(calls).to(haveCount(1))
   }
 
   func test__enqueue__givenMixedSuccessAndAbsentInSameBatch__remembersBothForFutureShortCircuit() async throws {
@@ -533,7 +539,8 @@ final class ProjectionLoaderTests: XCTestCase {
     _ = try await loader.deferredRecord(forKey: "B").get()
 
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 1, "Mixed-result batch memoizes every attempted key, including absent ones")
+    // Mixed-result batch memoizes every attempted key, including absent ones.
+    expect(calls).to(haveCount(1))
   }
 
   // MARK: - Sticky failure isolation
@@ -557,46 +564,25 @@ final class ProjectionLoaderTests: XCTestCase {
     // Round 1: successful load of A.
     loader.enqueue([projection("A", "name")])
     let firstA = try await loader.deferredRecord(forKey: "A").get()
-    XCTAssertEqual(firstA?["name"] as? String, "Alice")
+    expect(firstA?["name"] as? String) == "Alice"
 
     // Round 2: failed load of B. A's success must persist; B becomes
     // a sticky failure.
     loader.enqueue([projection("B", "name")])
-    await assertThrows(TestError.self) {
-      _ = try await loader.deferredRecord(forKey: "B").get()
-    }
+    await expect { _ = try await loader.deferredRecord(forKey: "B").get() }
+      .to(throwError(errorType: TestError.self))
 
     // A's prior success survives the unrelated failure for B.
     let secondA = try await loader.deferredRecord(forKey: "A").get()
-    XCTAssertEqual(secondA?["name"] as? String, "Alice",
-                   "Prior success for A must not be overwritten by an unrelated failure for B")
+    expect(secondA?["name"] as? String) == "Alice"
 
     // B's failure is sticky; no re-batch on repeated ask.
-    await assertThrows(TestError.self) {
-      _ = try await loader.deferredRecord(forKey: "B").get()
-    }
+    await expect { _ = try await loader.deferredRecord(forKey: "B").get() }
+      .to(throwError(errorType: TestError.self))
 
     let calls = await recorder.calls
-    XCTAssertEqual(calls.count, 2, "Two flushes total — A's repeat ask short-circuits, B's repeat ask hits the sticky failure")
-  }
-
-  // MARK: - Throw helper
-
-  /// Asserts the block throws an error of the given type. Inline because
-  /// the project doesn't have a shared `XCTAssertThrowsErrorAsync` helper.
-  private func assertThrows<E: Error>(
-    _ type: E.Type,
-    file: StaticString = #filePath,
-    line: UInt = #line,
-    _ block: () async throws -> Void
-  ) async {
-    do {
-      try await block()
-      XCTFail("Expected throw of \(E.self)", file: file, line: line)
-    } catch is E {
-      // expected
-    } catch {
-      XCTFail("Expected \(E.self), got \(error)", file: file, line: line)
-    }
+    // Two flushes total — A's repeat ask short-circuits, B's repeat
+    // ask hits the sticky failure.
+    expect(calls).to(haveCount(2))
   }
 }
