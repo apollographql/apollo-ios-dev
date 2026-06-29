@@ -1,5 +1,5 @@
 import Foundation
-import Apollo
+@_spi(Execution) import Apollo
 
 public struct DatabaseRow {
   let cacheKey: CacheKey
@@ -132,6 +132,45 @@ public protocol SQLiteDatabase {
   /// `\`, `%`, and `_` in `pattern` are escaped so they match
   /// literally rather than acting as `LIKE` wildcards.
   func deleteRecords(matchingKey pattern: CacheKey) throws
+
+  /// Loads the row-per-element rows for the requested
+  /// `(cacheKey, fieldName)` pairs and assembles them into partial
+  /// `Record`s.
+  ///
+  /// Honors the same contract as ``ReadOnlyNormalizedCache/loadFields(_:)``:
+  /// a cache key appears in the result if and only if the *record*
+  /// exists in the database — independent of whether the specific
+  /// projected fields are present. A record that exists but holds
+  /// none of the requested fields is returned as a `Record` with empty
+  /// `fields`; a record absent from the database is omitted entirely.
+  /// The distinction is what lets the executor surface per-field
+  /// `missingValue` errors with response-path context (record present
+  /// but field missing) versus a record-level lookup miss (record
+  /// absent) at the caller.
+  ///
+  /// Nested-list fields are reassembled by following
+  /// `child_key_value` synthetic-sub-record references; the synthetic
+  /// rows are loaded transparently and their list contents materialize
+  /// into the returned `Record.fields`. Synthetic sub-records never
+  /// surface as top-level cache keys.
+  ///
+  /// Duplicate projections (same `cacheKey` and `fieldName`) are
+  /// tolerated and coalesce to a single SQL bind. Projections whose
+  /// `columnShape`/`cardinality` differ but share `(cacheKey, fieldName)`
+  /// is a programmer error per the
+  /// ``ReadOnlyNormalizedCache/loadFields(_:)`` precondition; this
+  /// implementation does not detect or report the conflict — it reads
+  /// whichever row exists and returns its actual stored shape.
+  ///
+  /// Requires the row-per-element records table (see
+  /// `createNewRecordsTableIfNeeded()`).
+  ///
+  /// - Parameter projections: The set of fields to read. May be empty,
+  ///   in which case the returned dictionary is empty.
+  /// - Returns: A dictionary of cache keys to partial records as
+  ///   described above.
+  @_spi(Execution)
+  func selectFields(_ projections: [FieldProjection]) throws -> [CacheKey: Record]
 
 }
 
