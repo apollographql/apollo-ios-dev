@@ -74,7 +74,8 @@ public class FieldExecutionInfo {
   let responseKeyForField: String
 
   var cachePath: ResponsePath = []
-  private var _cacheKeyForField: String?
+  private var _normalizedFieldName: String?
+  private var _cacheReadStrategy: CacheReadStrategy?
 
   init(
     field: Selection.Field,
@@ -90,16 +91,50 @@ public class FieldExecutionInfo {
   }
 
   fileprivate func computeCacheKeyAndPath() throws {
-    cachePath = try parentInfo.cachePath.appending(cacheKeyForField())
+    cachePath = try parentInfo.cachePath.appending(normalizedFieldName())
   }
-  
-  func cacheKeyForField() throws -> String {
-    guard let _cacheKeyForField else {
+
+  /// The field's name in a normalized cache record: the GraphQL field
+  /// name combined with its argument values (e.g. `"hero(name:\"Luke\")"`).
+  /// This is the *write-side* identity: the writer stores the field
+  /// entry on its parent record under this name, and the cache-path
+  /// machinery uses it as a path segment when synthesizing a child
+  /// record key in the absence of an explicit `@typePolicy`.
+  ///
+  /// Distinct from [`cacheReadStrategy()`](`FieldExecutionInfo`), which
+  /// describes how the *reader* resolves this field — including
+  /// `@fieldPolicy` redirections that bypass the parent-record subscript
+  /// entirely. For fields with no policy the two compute the same name;
+  /// for policy fields they intentionally diverge (see
+  /// [`CacheReadStrategy`](`Selection.Field+CacheReadStrategy.swift`)).
+  func normalizedFieldName() throws -> String {
+    guard let _normalizedFieldName else {
       let cacheKey = try field.cacheKey(with: parentInfo.variables)
-      _cacheKeyForField = cacheKey
+      _normalizedFieldName = cacheKey
       return cacheKey
     }
-    return _cacheKeyForField
+    return _normalizedFieldName
+  }
+
+  /// How the cache reader resolves this field — either by subscripting
+  /// the parent record under the field's normalized name, or by following
+  /// a `@fieldPolicy`-derived direct cache reference.
+  ///
+  /// Memoizes the result of `field.cacheReadStrategy(variables:schema:responsePath:)`
+  /// so the projection-collection path and the per-field resolve path
+  /// share one policy evaluation per `(field, info)`. Mirrors the
+  /// `_normalizedFieldName` memo pattern.
+  func cacheReadStrategy() throws -> CacheReadStrategy {
+    guard let _cacheReadStrategy else {
+      let strategy = try field.cacheReadStrategy(
+        variables: parentInfo.variables,
+        schema: parentInfo.schema,
+        responsePath: responsePath
+      )
+      _cacheReadStrategy = strategy
+      return strategy
+    }
+    return _cacheReadStrategy
   }
 
   /// Computes the `ObjectExecutionInfo` and selections that should be used for
@@ -150,7 +185,8 @@ public class FieldExecutionInfo {
     self.responsePath = info.responsePath
     self.responseKeyForField = info.responseKeyForField
     self.cachePath = info.cachePath
-    self._cacheKeyForField = info._cacheKeyForField
+    self._normalizedFieldName = info._normalizedFieldName
+    self._cacheReadStrategy = info._cacheReadStrategy
   }
 
 }

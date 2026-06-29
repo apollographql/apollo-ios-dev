@@ -1467,7 +1467,98 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting, @unchecked Send
     XCTAssertEqual(data.heroes[2].isJedi, true)
     XCTAssertEqual(data.heroes[2].weight, 138.5)
   }
-  
+
+  // MARK: - Network write + cache read round-trip
+
+  /// Verifies that a query carrying both `@fieldPolicy(keyArgs:)` on a field and
+  /// `@typePolicy(keyFields:)` on the field's return type produces matching cache
+  /// keys at write and read time. The docs describe these directives as
+  /// complementary — `@typePolicy` keys the object at write time, `@fieldPolicy`
+  /// derives the same key from field arguments at read time. A network fetch
+  /// followed by a cache-only fetch of the same query must therefore round-trip
+  /// successfully.
+  func test_fieldPolicy_withMatchingTypePolicy_networkFetchPopulatesCache_andCacheReadResolves() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("hero", Hero.self, arguments: ["name": .variable("name")], fieldPolicy: .init(keyArgs: ["name"]))
+      ]}
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [], keyFields: ["name"])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("name", String.self),
+        ]}
+      }
+    }
+
+    // @typePolicy(keyFields: ["name"]) on Hero — drives the writer's cache key.
+    await FieldPolicySchemaMetadata.stub_objectTypeForTypeName { typename in
+      typename == "Hero"
+        ? Object(typename: "Hero", implementedInterfaces: [], keyFields: ["name"])
+        : nil
+    }
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = ["name": "Luke"]
+
+    // 1. Network fetch — writer normalizes the response into the cache.
+    let serverExpectation = await server.expect(MockQuery<HeroSelectionSet>.self) { _ in
+      [
+        "data": [
+          "hero": [
+            "__typename": "Hero",
+            "name": "Luke",
+          ]
+        ]
+      ]
+    }
+
+    let networkResult = try await client.fetch(query: query, cachePolicy: .networkOnly)
+    XCTAssertEqual(networkResult.source, .server)
+    XCTAssertNil(networkResult.errors)
+    XCTAssertEqual(networkResult.data?.hero?.name, "Luke")
+
+    await fulfillment(of: [serverExpectation], timeout: Self.defaultWaitTimeout)
+
+    // 2. Confirm the on-disk cache layout the writer produces. The writer
+    //    is `@fieldPolicy`-agnostic: it stores the parent-record entry under
+    //    the field's *normalized* name (`hero(name:Luke)`), and `@typePolicy`
+    //    keys the child record canonically (`Hero:Luke`). The `@fieldPolicy`
+    //    redirect happens at read time only — see Apollo Kotlin's
+    //    FieldPolicyCacheResolver for the same split.
+    try await store.withinReadTransaction { transaction in
+      let records = try await transaction.readOnlyCache.loadRecords(
+        forKeys: ["QUERY_ROOT", "Hero:Luke"]
+      )
+      let queryRoot = try XCTUnwrap(records["QUERY_ROOT"], "QUERY_ROOT must exist after the network fetch")
+      let heroRecord = try XCTUnwrap(records["Hero:Luke"], "@typePolicy(keyFields: [\"name\"]) must key the child record under 'Hero:Luke'")
+
+      XCTAssertEqual(
+        queryRoot["hero(name:Luke)"] as? CacheReference,
+        CacheReference("Hero:Luke"),
+        "Writer stores the reference under the field's normalized name on the parent record"
+      )
+      XCTAssertNil(
+        queryRoot["Hero:Luke"],
+        "Writer does NOT store an entry under the @fieldPolicy-resolved name — the reader uses it as a direct reference target instead"
+      )
+      XCTAssertEqual(heroRecord["name"] as? String, "Luke")
+    }
+
+    // 3. Cache-only fetch — read path applies @fieldPolicy(keyArgs: ["name"])
+    //    to resolve to "Hero:Luke", matching what @typePolicy wrote.
+    let cacheResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    XCTAssertEqual(cacheResult?.source, .cache)
+    XCTAssertNil(cacheResult?.errors)
+
+    let data = try XCTUnwrap(cacheResult?.data)
+    XCTAssertEqual(data.hero?.name, "Luke")
+  }
+
 }
 
 class FieldPolicySchemaMetadata: SchemaMetadata {
