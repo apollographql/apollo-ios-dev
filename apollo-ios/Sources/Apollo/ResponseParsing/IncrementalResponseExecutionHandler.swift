@@ -104,7 +104,7 @@ extension JSONResponseParser {
     }
 
     fileprivate func makeResult(
-      executor: ((any Deferrable.Type) async throws -> (data: DataDict?, dependentKeys: Set<CacheKey>?))
+      executor: ((any Deferrable.Type) async throws -> (data: DataDict?, dependentKeys: Set<CacheDependentKey>?))
     ) async throws -> IncrementalGraphQLResult {
       guard let path = base.responseBody["path"] as? [JSONValue] else {
         throw IncrementalResponseError.missingPath

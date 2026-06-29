@@ -2903,7 +2903,7 @@ private final class FailingWriteCache: NormalizedCache, @unchecked Sendable {
     return [:]
   }
 
-  func merge(records: RecordSet) async throws -> Set<CacheKey> {
+  func merge(records: RecordSet) async throws -> Set<CacheDependentKey> {
     throw WriteError()
   }
 

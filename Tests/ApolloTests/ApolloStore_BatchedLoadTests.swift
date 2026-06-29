@@ -31,7 +31,7 @@ private final class MockBatchedNormalizedCache: NormalizedCache {
     records.removeRecords(matching: pattern)
   }
 
-  func merge(records: RecordSet) async throws -> Set<CacheKey> {
+  func merge(records: RecordSet) async throws -> Set<CacheDependentKey> {
     try await Task.sleep(nanoseconds: 1_000_000)
     return self.records.merge(records: records)
   }
