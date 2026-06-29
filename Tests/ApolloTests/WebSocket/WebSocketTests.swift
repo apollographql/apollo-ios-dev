@@ -31,17 +31,17 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   override func setUpWithError() throws {
     try super.setUpWithError()
-    try setUpTransport()
+    setUpTransport()
   }
 
   private func setUpTransport(
     tasks: [MockWebSocketTask] = [MockWebSocketTask()],
     configuration: WebSocketTransport.Configuration = .init(),
     store: ApolloStore = .mock()
-  ) throws {
+  ) {
     factory = MockWebSocketTaskFactory(tasks)
     session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
-    networkTransport = try WebSocketTransport(
+    networkTransport = WebSocketTransport(
       urlSession: session,
       store: store,
       endpointURL: Self.endpointURL,
@@ -124,7 +124,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testConnectionInit__withConnectingPayload__shouldSendPayloadInConnectionInit() async throws {
-    try setUpTransport(configuration: .init(connectingPayload: [
+    setUpTransport(configuration: .init(connectingPayload: [
       "authToken": "my-secret-token",
       "version": 2,
     ]))
@@ -147,7 +147,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testConnectionInit__withConnectingPayload__shouldResendPayloadOnReconnect() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(
+    setUpTransport(
       tasks: [task1, task2],
       configuration: .init(reconnectionInterval: 0, connectingPayload: ["authToken": "reconnect-token"])
     )
@@ -255,7 +255,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testSubscription__afterDisconnect__shouldReconnectWithNewTask() async throws {
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [MockWebSocketTask(), task2])
+    setUpTransport(tasks: [MockWebSocketTask(), task2])
 
     // First subscription on mockTask — buffer all messages including the stream close
     // so the receive loop processes the disconnection as part of the same iteration batch.
@@ -520,7 +520,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenConnectionDropsWithReconnect__shouldContinueReceivingData() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     // Establish connection and subscribe.
     task1.emit(.connectionAck(payload: nil))
@@ -562,7 +562,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenConnectionDropsWithReconnect__shouldResubscribeAllActive() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -601,7 +601,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenReconnectionFails__shouldTerminateSubscribers() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -627,7 +627,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenConnectionDropsWithNoSubscribers__shouldNotReconnect() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     // Connect, subscribe, get data, and complete — leaving no active subscribers.
     task1.emit(.connectionAck(payload: nil))
@@ -652,7 +652,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenCancelledDuringReconnect__shouldNotResubscribe() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0.1))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0.1))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -687,7 +687,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenTransportErrorWithReconnect__shouldContinueReceivingData() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -719,7 +719,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testSubscription__whenTransportErrorWithReconnectDisabled__shouldTerminateWithError() async throws {
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [MockWebSocketTask(), task2])
+    setUpTransport(tasks: [MockWebSocketTask(), task2])
 
     mockTask.emit(.connectionAck(payload: nil))
 
@@ -752,7 +752,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenTransportErrorWithMultipleSubscribers__shouldReconnectAll() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -796,7 +796,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenSendErrorOccursWithReconnect__shouldCancelTaskAndReconnect() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -851,7 +851,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whenSendErrorOccursWithReconnectDisabled__shouldCancelTaskAndTerminate() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2])  // default config: reconnectionInterval = -1 (disabled)
+    setUpTransport(tasks: [task1, task2])  // default config: reconnectionInterval = -1 (disabled)
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -954,7 +954,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   // MARK: - Client-Initiated Ping Keepalive
 
   func testPingInterval__whenConfigured__shouldSendPeriodicPings() async throws {
-    try setUpTransport(configuration: .init(pingInterval: 0.1))
+    setUpTransport(configuration: .init(pingInterval: 0.1))
 
     factory.currentTask.emit(.connectionAck(payload: nil))
 
@@ -982,7 +982,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testPingInterval__shouldStopOnDisconnect() async throws {
-    try setUpTransport(configuration: .init(pingInterval: 0.1))
+    setUpTransport(configuration: .init(pingInterval: 0.1))
 
     factory.currentTask.emit(.connectionAck(payload: nil))
 
@@ -1007,7 +1007,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testPingInterval__shouldStopOnPause__andRestartOnResume() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(pingInterval: 0.1))
+    setUpTransport(tasks: [task1, task2], configuration: .init(pingInterval: 0.1))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -1034,7 +1034,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testPingInterval__shouldRestartOnReconnect() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0, pingInterval: 0.1))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0, pingInterval: 0.1))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -1077,7 +1077,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testSubscription__whenReconnectDisabled__shouldTerminateOnDisconnect() async throws {
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [MockWebSocketTask(), task2])
+    setUpTransport(tasks: [MockWebSocketTask(), task2])
 
     // Default configuration has reconnectionInterval = -1 (disabled).
     mockTask.emit(.connectionAck(payload: nil))
@@ -1141,7 +1141,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testQuery__whenConnectionDropsWithReconnect__shouldNotRetry() async throws {
     let task1 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, MockWebSocketTask()], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, MockWebSocketTask()], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -1186,7 +1186,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testMutation__whenConnectionDropsWithReconnect__shouldNotRetry() async throws {
     let task1 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, MockWebSocketTask()], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, MockWebSocketTask()], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -1214,7 +1214,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testQueryAndSubscription__whenConnectionDropsWithReconnect__shouldOnlyResubscribeSubscription() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -1267,7 +1267,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
       }
     }
 
-    try setUpTransport(configuration: .init(operationMessageIdCreator: FixedIdCreator()))
+    setUpTransport(configuration: .init(operationMessageIdCreator: FixedIdCreator()))
 
     factory.currentTask.emit(.connectionAck(payload: nil))
 
@@ -1305,7 +1305,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testDelegate__whenReconnected__shouldCallDidReconnectNotDidConnect() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
     let delegate = MockWebSocketTransportDelegate()
     await networkTransport.setDelegate(delegate)
 
@@ -1409,7 +1409,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testDelegate__fullLifecycle__shouldReceiveEventsInOrder() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
     let delegate = MockWebSocketTransportDelegate()
     await networkTransport.setDelegate(delegate)
 
@@ -1452,7 +1452,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testSubscription__withSequencedCreatorStartingAtCustomNumber__shouldUseSequentialIds() async throws {
-    try setUpTransport(configuration: .init(
+    setUpTransport(configuration: .init(
       operationMessageIdCreator: ApolloSequencedOperationMessageIdCreator(startAt: 100)
     ))
 
@@ -1473,7 +1473,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   // MARK: - updateHeaderValues
 
   func testUpdateHeaderValues__whenReconnectIfConnected__whenConnected__shouldReconnect() async throws {
-    try setUpTransport(tasks: [MockWebSocketTask(), MockWebSocketTask()])
+    setUpTransport(tasks: [MockWebSocketTask(), MockWebSocketTask()])
 
     // Connect on mockTask.
     mockTask.emit(.connectionAck(payload: nil))
@@ -1526,7 +1526,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testUpdateHeaderValues__withNilValue__shouldRemoveHeader() async throws {
-    try setUpTransport(tasks: [MockWebSocketTask(), MockWebSocketTask(), MockWebSocketTask()])
+    setUpTransport(tasks: [MockWebSocketTask(), MockWebSocketTask(), MockWebSocketTask()])
 
     // Connect on mockTask.
     mockTask.emit(.connectionAck(payload: nil))
@@ -1566,7 +1566,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testUpdateHeaderValues__withMultipleHeaders__shouldApplyAll() async throws {
-    try setUpTransport(tasks: [MockWebSocketTask(), MockWebSocketTask()])
+    setUpTransport(tasks: [MockWebSocketTask(), MockWebSocketTask()])
 
     // Connect on mockTask.
     mockTask.emit(.connectionAck(payload: nil))
@@ -1592,7 +1592,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testUpdateHeaderValues__shouldPersistAcrossReconnections() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     // Connect on task1.
     task1.emit(.connectionAck(payload: nil))
@@ -1618,7 +1618,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   // MARK: - updateConnectingPayload
 
   func testUpdateConnectingPayload__whenReconnectIfConnected__whenConnected__shouldReconnect() async throws {
-    try setUpTransport(tasks: [MockWebSocketTask(), MockWebSocketTask()])
+    setUpTransport(tasks: [MockWebSocketTask(), MockWebSocketTask()])
 
     // Connect on mockTask.
     mockTask.emit(.connectionAck(payload: nil))
@@ -1645,7 +1645,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testUpdateConnectingPayload__withoutReconnect__whenConnected__shouldNotReconnect() async throws {
-    try setUpTransport(
+    setUpTransport(
       tasks: [MockWebSocketTask(), MockWebSocketTask()],
       configuration: .init(connectingPayload: ["authToken": "old-token"])
     )
@@ -1676,7 +1676,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testUpdateConnectingPayload__withNilPayload__shouldClearPayload() async throws {
-    try setUpTransport(
+    setUpTransport(
       tasks: [MockWebSocketTask(), MockWebSocketTask(), MockWebSocketTask()],
       configuration: .init(connectingPayload: ["authToken": "initial-token"])
     )
@@ -1708,7 +1708,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testUpdateConnectingPayload__shouldPersistAcrossReconnections() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     // Connect on task1.
     task1.emit(.connectionAck(payload: nil))
@@ -1804,7 +1804,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testResume__whenPaused__shouldReconnectAndResubscribe() async throws {
     let task1 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, MockWebSocketTask()])
+    setUpTransport(tasks: [task1, MockWebSocketTask()])
 
     // Connect on task1.
     task1.emit(.connectionAck(payload: nil))
@@ -1848,7 +1848,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testResume__whenPaused__shouldFireDidReconnectDelegate() async throws {
     let task1 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, MockWebSocketTask()])
+    setUpTransport(tasks: [task1, MockWebSocketTask()])
     let delegate = MockWebSocketTransportDelegate()
     await networkTransport.setDelegate(delegate)
 
@@ -1899,7 +1899,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testResume__whenDisconnected__shouldOpenConnection() async throws {
-    try setUpTransport(tasks: [MockWebSocketTask(), MockWebSocketTask()])
+    setUpTransport(tasks: [MockWebSocketTask(), MockWebSocketTask()])
 
     // Connect and disconnect (reconnection disabled by default).
     mockTask.emit(.connectionAck(payload: nil))
@@ -1946,7 +1946,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testPause__withMultipleSubscribers__shouldPreserveAll() async throws {
     let task1 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, MockWebSocketTask()])
+    setUpTransport(tasks: [task1, MockWebSocketTask()])
 
     // Connect on task1.
     task1.emit(.connectionAck(payload: nil))
@@ -2067,7 +2067,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscriptionState__shouldBecomeReconnecting__onDisconnectWithReconnectEnabled() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     task1.emit(.connectionAck(payload: nil))
     let (stream, operationID) = try await subscribe(on: task1, using: client)
@@ -2089,7 +2089,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testSubscriptionState__shouldBecomePaused__whenTransportPaused() async throws {
     let task1 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, MockWebSocketTask()])
+    setUpTransport(tasks: [task1, MockWebSocketTask()])
 
     task1.emit(.connectionAck(payload: nil))
     let (stream, operationID) = try await subscribe(on: task1, using: client)
@@ -2149,7 +2149,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testPause__duringReconnectionDelay__shouldStopReconnection() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0.5))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0.5))
 
     task1.emit(.connectionAck(payload: nil))
 
@@ -2186,7 +2186,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testSubscription__whilePaused__shouldWaitForResume() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2])
+    setUpTransport(tasks: [task1, task2])
 
     // Connect on task1.
     task1.emit(.connectionAck(payload: nil))
@@ -2235,7 +2235,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
     let task3 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2, task3])
+    setUpTransport(tasks: [task1, task2, task3])
 
     // Connect on task1.
     task1.emit(.connectionAck(payload: nil))
@@ -2271,7 +2271,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   // MARK: - Client Awareness Headers
 
   func testClientAwarenessHeaders__withMetadata__shouldApplyHeadersToConnectionRequest() async throws {
-    try setUpTransport(configuration: .init(
+    setUpTransport(configuration: .init(
       clientAwarenessMetadata: ClientAwarenessMetadata(
         clientApplicationName: "test-app",
         clientApplicationVersion: "1.2.3"
@@ -2310,7 +2310,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testClientAwarenessHeaders__withNameOnly__shouldApplyOnlyNameHeader() async throws {
-    try setUpTransport(configuration: .init(
+    setUpTransport(configuration: .init(
       clientAwarenessMetadata: ClientAwarenessMetadata(
         clientApplicationName: "my-app",
         clientApplicationVersion: nil
@@ -2334,7 +2334,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testClientAwarenessHeaders__shouldPersistAcrossReconnection() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(
+    setUpTransport(tasks: [task1, task2], configuration: .init(
       reconnectionInterval: 0,
       clientAwarenessMetadata: ClientAwarenessMetadata(
         clientApplicationName: "reconnect-app",
@@ -2377,7 +2377,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testSubscription__cacheThenNetwork__cacheHit__yieldsCacheThenServerResults() async throws {
     let store = ApolloStore(cache: InMemoryNormalizedCache())
-    try setUpTransport(store: store)
+    setUpTransport(store: store)
 
     // Pre-populate the cache with subscription data.
     try await store.publish(records: [
@@ -2417,7 +2417,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testSubscription__cacheThenNetwork__cacheMiss__yieldsOnlyServerResults() async throws {
-    try setUpTransport(store: ApolloStore(cache: InMemoryNormalizedCache()))
+    setUpTransport(store: ApolloStore(cache: InMemoryNormalizedCache()))
 
     // Do not populate cache — cache miss.
 
@@ -2441,7 +2441,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testSubscription__networkOnly__doesNotReadCache() async throws {
     let store = ApolloStore(cache: InMemoryNormalizedCache())
-    try setUpTransport(store: store)
+    setUpTransport(store: store)
 
     // Pre-populate the cache — but networkOnly should not read it.
     try await store.publish(records: [
@@ -2475,7 +2475,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testSubscription__writeResultsToCache__writesServerResponsesToStore() async throws {
     let store = ApolloStore(cache: InMemoryNormalizedCache())
-    try setUpTransport(store: store)
+    setUpTransport(store: store)
 
     factory.currentTask.emit(.connectionAck(payload: nil))
 
@@ -2503,7 +2503,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testSubscription__writeResultsToCache_false__doesNotWriteToStore() async throws {
     let store = ApolloStore(cache: InMemoryNormalizedCache())
-    try setUpTransport(store: store)
+    setUpTransport(store: store)
 
     factory.currentTask.emit(.connectionAck(payload: nil))
 
@@ -2530,7 +2530,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testQuery__cacheFirst__cacheHit__returnsCacheWithoutWebSocketMessage() async throws {
     let store = ApolloStore(cache: InMemoryNormalizedCache())
-    try setUpTransport(store: store)
+    setUpTransport(store: store)
 
     // Pre-populate cache with query data.
     try await store.publish(records: [
@@ -2556,7 +2556,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testQuery__cacheFirst__cacheMiss__fetchesViaWebSocket() async throws {
-    try setUpTransport(store: ApolloStore(cache: InMemoryNormalizedCache()))
+    setUpTransport(store: ApolloStore(cache: InMemoryNormalizedCache()))
 
     // Empty cache — cache miss triggers network fetch.
     // Messages are pre-emitted and queued by MockWebSocketTask. The operation ID "1" relies on
@@ -2577,7 +2577,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testQuery__cacheOnly__cacheHit__returnsCache() async throws {
     let store = ApolloStore(cache: InMemoryNormalizedCache())
-    try setUpTransport(store: store)
+    setUpTransport(store: store)
 
     try await store.publish(records: [
       "QUERY_ROOT": ["reviewAdded": CacheReference("QUERY_ROOT.reviewAdded")],
@@ -2603,7 +2603,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   }
 
   func testQuery__cacheOnly__cacheMiss__returnsNil() async throws {
-    try setUpTransport(store: ApolloStore(cache: InMemoryNormalizedCache()))
+    setUpTransport(store: ApolloStore(cache: InMemoryNormalizedCache()))
 
     let result = try await client.fetch(
       query: MockQuery<ReviewAddedData>(),
@@ -2616,7 +2616,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testQuery__networkOnly__writeResultsToCache__populatesCache() async throws {
     let store = ApolloStore(cache: InMemoryNormalizedCache())
-    try setUpTransport(store: store)
+    setUpTransport(store: store)
 
     factory.currentTask.emit(.connectionAck(payload: nil))
     factory.currentTask.emit(.next(id: "1", payload: Self.reviewAddedPayload(stars: 5, commentary: "Cached by write")))
@@ -2642,7 +2642,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testMutation__writeResultsToCache__populatesCache() async throws {
     let store = ApolloStore(cache: InMemoryNormalizedCache())
-    try setUpTransport(store: store)
+    setUpTransport(store: store)
 
     factory.currentTask.emit(.connectionAck(payload: nil))
     factory.currentTask.emit(.next(id: "1", payload: Self.reviewAddedPayload(stars: 4, commentary: "Mutation cached")))
@@ -2663,7 +2663,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testMutation__writeResultsToCache_false__doesNotPopulateCache() async throws {
     let store = ApolloStore(cache: InMemoryNormalizedCache())
-    try setUpTransport(store: store)
+    setUpTransport(store: store)
 
     factory.currentTask.emit(.connectionAck(payload: nil))
     factory.currentTask.emit(.next(id: "1", payload: Self.reviewAddedPayload(stars: 4, commentary: "Not cached")))
@@ -2685,7 +2685,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testQuery__networkFirst__connectionFailure__fallsBackToCache() async throws {
     let store = ApolloStore(cache: InMemoryNormalizedCache())
-    try setUpTransport(store: store)
+    setUpTransport(store: store)
 
     // Pre-populate the cache with query data.
     try await store.publish(records: [
@@ -2714,7 +2714,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testQuery__networkFirst__graphQLError__doesNotFallBackToCache() async throws {
     let store = ApolloStore(cache: InMemoryNormalizedCache())
-    try setUpTransport(store: store)
+    setUpTransport(store: store)
 
     // Pre-populate the cache so fallback data is available if incorrectly triggered.
     try await store.publish(records: [
@@ -2746,7 +2746,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
   func testSubscription__writeResultsToCache__cacheWriteFailure__terminatesStream() async throws {
     // A cache that throws on writes but works for reads.
-    try setUpTransport(store: ApolloStore(cache: FailingWriteCache()))
+    setUpTransport(store: ApolloStore(cache: FailingWriteCache()))
 
     factory.currentTask.emit(.connectionAck(payload: nil))
 
@@ -2861,7 +2861,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testTransport__whenReconnectedAndAllReferencesDropped__shouldDeallocate() async throws {
     let task1 = MockWebSocketTask()
     let task2 = MockWebSocketTask()
-    try setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
+    setUpTransport(tasks: [task1, task2], configuration: .init(reconnectionInterval: 0))
 
     // Establish initial connection on task1.
     task1.emit(.connectionAck(payload: nil))
