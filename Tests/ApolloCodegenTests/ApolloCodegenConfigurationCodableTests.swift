@@ -38,6 +38,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           testMocks: .swiftPackage(targetName: "SchemaTestMocks")
         ),
         options: .init(
+          additionalCapitalizationRules: [
+            .init(term: .string("id"), strategy: .upper)
+          ],
           additionalInflectionRules: [
             .pluralization(singularRegex: "animal", replacementRegex: "animals")
           ],
@@ -101,6 +104,14 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           "version" : "persistedQueries"
         },
         "options" : {
+          "additionalCapitalizationRules" : [
+            {
+              "strategy" : "upper",
+              "term" : {
+                "string" : "id"
+              }
+            }
+          ],
           "additionalInflectionRules" : [
             {
               "pluralization" : {
@@ -1223,6 +1234,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           ]
         },
         "options" : {
+          "additionalCapitalizationRules" : [
+
+          ],
           "additionalInflectionRules" : [
 
           ],
@@ -1321,6 +1335,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           ]
         },
         "options" : {
+          "additionalCapitalizationRules" : [
+
+          ],
           "additionalInflectionRules" : [
 
           ],
@@ -1411,6 +1428,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           ]
         },
         "options" : {
+          "additionalCapitalizationRules" : [
+
+          ],
           "additionalInflectionRules" : [
 
           ],
@@ -1509,6 +1529,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           ]
         },
         "options" : {
+          "additionalCapitalizationRules" : [
+
+          ],
           "additionalInflectionRules" : [
 
           ],
@@ -1601,6 +1624,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           ]
         },
         "options" : {
+          "additionalCapitalizationRules" : [
+
+          ],
           "additionalInflectionRules" : [
 
           ],
@@ -1704,6 +1730,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           ]
         },
         "options" : {
+          "additionalCapitalizationRules" : [
+
+          ],
           "additionalInflectionRules" : [
 
           ],
@@ -1811,6 +1840,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           ]
         },
         "options" : {
+          "additionalCapitalizationRules" : [
+
+          ],
           "additionalInflectionRules" : [
 
           ],
@@ -1918,6 +1950,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           ]
         },
         "options" : {
+          "additionalCapitalizationRules" : [
+
+          ],
           "additionalInflectionRules" : [
 
           ],
@@ -2025,6 +2060,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           ]
         },
         "options" : {
+          "additionalCapitalizationRules" : [
+
+          ],
           "additionalInflectionRules" : [
 
           ],
@@ -2132,6 +2170,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           ]
         },
         "options" : {
+          "additionalCapitalizationRules" : [
+
+          ],
           "additionalInflectionRules" : [
 
           ],
@@ -2239,6 +2280,9 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           ]
         },
         "options" : {
+          "additionalCapitalizationRules" : [
+
+          ],
           "additionalInflectionRules" : [
 
           ],

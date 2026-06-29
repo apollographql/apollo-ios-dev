@@ -84,6 +84,7 @@ public final class ApolloCodegen: Sendable {
   struct ConfigurationContext: Sendable, Equatable {
     let config: ApolloCodegenConfiguration
     let pluralizer: Pluralizer
+    let capitalizer: Capitalizer
     let rootURL: URL?
 
     init(
@@ -92,6 +93,7 @@ public final class ApolloCodegen: Sendable {
     ) {
       self.config = config
       self.pluralizer = Pluralizer(rules: config.options.additionalInflectionRules)
+      self.capitalizer = Capitalizer(rules: config.options.additionalCapitalizationRules)
       self.rootURL = rootURL?.standardizedFileURL
     }
 

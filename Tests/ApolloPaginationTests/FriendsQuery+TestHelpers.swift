@@ -7,12 +7,12 @@ extension Mocks.Hero.FriendsQuery {
     let query = MockQuery<Mocks.Hero.FriendsQuery>()
     query.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
     return await server.expect(query) { _ in
-      let pageInfo: [AnyHashable: AnyHashable] = [
+      let pageInfo: JSONObject = [
         "__typename": "PageInfo",
         "endCursor": "Y3Vyc29yMg==",
         "hasNextPage": true,
       ]
-      let friends: [[String: AnyHashable]] = [
+      let friends: [JSONObject] = [
         [
           "__typename": "Human",
           "name": "Luke Skywalker",
@@ -24,22 +24,22 @@ extension Mocks.Hero.FriendsQuery {
           "id": "1002",
         ],
       ]
-      let friendsConnection: [String: AnyHashable] = [
+      let friendsConnection: JSONObject = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
-        "friends": friends,
-        "pageInfo": pageInfo,
+        "friends": friends as JSONValue,
+        "pageInfo": pageInfo as JSONValue,
       ]
 
-      let hero = [
+      let hero: JSONObject = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection,
+        "friendsConnection": friendsConnection as JSONValue,
       ]
 
-      let data = [
-        "hero": hero
+      let data: JSONObject = [
+        "hero": hero as JSONValue
       ]
 
       return [
@@ -52,34 +52,34 @@ extension Mocks.Hero.FriendsQuery {
     let query = MockQuery<Mocks.Hero.FriendsQuery>()
     query.__variables = ["id": "2001", "first": 2, "after": "Y3Vyc29yMg=="]
     return await server.expect(query) { _ in
-      let pageInfo: [AnyHashable: AnyHashable] = [
+      let pageInfo: JSONObject = [
         "__typename": "PageInfo",
         "endCursor": "Y3Vyc29yMw==",
         "hasNextPage": false,
       ]
-      let friends: [[String: AnyHashable]] = [
+      let friends: [JSONObject] = [
         [
           "__typename": "Human",
           "name": "Leia Organa",
           "id": "1003",
         ],
       ]
-      let friendsConnection: [String: AnyHashable] = [
+      let friendsConnection: JSONObject = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
-        "friends": friends,
-        "pageInfo": pageInfo,
+        "friends": friends as JSONValue,
+        "pageInfo": pageInfo as JSONValue,
       ]
 
-      let hero = [
+      let hero: JSONObject = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection,
+        "friendsConnection": friendsConnection as JSONValue,
       ]
 
-      let data = [
-        "hero": hero
+      let data: JSONObject = [
+        "hero": hero as JSONValue
       ]
 
       return [
@@ -92,12 +92,12 @@ extension Mocks.Hero.FriendsQuery {
     let query = MockQuery<Mocks.Hero.FriendsQuery>()
     query.__variables = ["id": "2001", "first": 2, "after": GraphQLNullable<String>.null]
     return await server.expect(query) { _ in
-      let pageInfo: [AnyHashable: AnyHashable] = [
+      let pageInfo: JSONObject = [
         "__typename": "PageInfo",
         "endCursor": "Y3Vyc29yMg==",
         "hasNextPage": true,
       ]
-      let friends: [[String: AnyHashable]] = [
+      let friends: [JSONObject] = [
         [
           "__typename": "Human",
           "name": "Luke Skywalker",
@@ -109,22 +109,22 @@ extension Mocks.Hero.FriendsQuery {
           "id": "1002",
         ],
       ]
-      let friendsConnection: [String: AnyHashable] = [
+      let friendsConnection: JSONObject = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
-        "friends": friends,
-        "pageInfo": pageInfo,
+        "friends": friends as JSONValue,
+        "pageInfo": pageInfo as JSONValue,
       ]
 
-      let hero = [
+      let hero: JSONObject = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection,
+        "friendsConnection": friendsConnection as JSONValue,
       ]
 
-      let data = [
-        "hero": hero
+      let data: JSONObject = [
+        "hero": hero as JSONValue
       ]
 
       return [
@@ -181,34 +181,34 @@ extension Mocks.Hero.ReverseFriendsQuery {
     let query = MockQuery<Mocks.Hero.ReverseFriendsQuery>()
     query.__variables = ["id": "2001", "first": 2, "before": "Y3Vyc29yMg=="]
     return await server.expect(query) { _ in
-      let pageInfo: [AnyHashable: AnyHashable] = [
+      let pageInfo: JSONObject = [
         "__typename": "PageInfo",
         "startCursor": "Y3Vyc29yZg==",
         "hasPreviousPage": false,
       ]
-      let friends: [[String: AnyHashable]] = [
+      let friends: [JSONObject] = [
         [
           "__typename": "Human",
           "name": "Luke Skywalker",
           "id": "1000",
         ],
       ]
-      let friendsConnection: [String: AnyHashable] = [
+      let friendsConnection: JSONObject = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
-        "friends": friends,
-        "pageInfo": pageInfo,
+        "friends": friends as JSONValue,
+        "pageInfo": pageInfo as JSONValue,
       ]
 
-      let hero = [
+      let hero: JSONObject = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection,
+        "friendsConnection": friendsConnection as JSONValue,
       ]
 
-      let data = [
-        "hero": hero
+      let data: JSONObject = [
+        "hero": hero as JSONValue
       ]
 
       return [
@@ -220,12 +220,12 @@ extension Mocks.Hero.ReverseFriendsQuery {
     let query = MockQuery<Mocks.Hero.ReverseFriendsQuery>()
     query.__variables = ["id": "2001", "first": 2, "before": "Y3Vyc29yMw=="]
     return await server.expect(query) { _ in
-      let pageInfo: [AnyHashable: AnyHashable] = [
+      let pageInfo: JSONObject = [
         "__typename": "PageInfo",
         "startCursor": "Y3Vyc29yMg==",
         "hasPreviousPage": true,
       ]
-      let friends: [[String: AnyHashable]] = [
+      let friends: [JSONObject] = [
         [
           "__typename": "Human",
           "name": "Han Solo",
@@ -237,22 +237,22 @@ extension Mocks.Hero.ReverseFriendsQuery {
           "id": "1003",
         ],
       ]
-      let friendsConnection: [String: AnyHashable] = [
+      let friendsConnection: JSONObject = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
-        "friends": friends,
-        "pageInfo": pageInfo,
+        "friends": friends as JSONValue,
+        "pageInfo": pageInfo as JSONValue,
       ]
 
-      let hero = [
+      let hero: JSONObject = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection,
+        "friendsConnection": friendsConnection as JSONValue,
       ]
 
-      let data = [
-        "hero": hero
+      let data: JSONObject = [
+        "hero": hero as JSONValue
       ]
 
       return [
@@ -267,36 +267,36 @@ extension Mocks.Hero.BidirectionalFriendsQuery {
     let query = MockQuery<Mocks.Hero.BidirectionalFriendsQuery>()
     query.__variables = ["id": "2001", "first": 1, "before": GraphQLNullable<String>.null, "after": "Y3Vyc29yMw=="]
     return await server.expect(query) { _ in
-      let pageInfo: [AnyHashable: AnyHashable] = [
+      let pageInfo: JSONObject = [
         "__typename": "PageInfo",
         "startCursor": "Y3Vyc29yMw==",
         "hasPreviousPage": true,
         "endCursor": "Y3Vyc29yMg==",
         "hasNextPage": true,
       ]
-      let friends: [[String: AnyHashable]] = [
+      let friends: [JSONObject] = [
         [
           "__typename": "Human",
           "name": "Leia Organa",
           "id": "1003",
         ],
       ]
-      let friendsConnection = [
+      let friendsConnection: JSONObject = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
-        "friends": friends,
-        "pageInfo": pageInfo,
+        "friends": friends as JSONValue,
+        "pageInfo": pageInfo as JSONValue,
       ]
 
-      let hero = [
+      let hero: JSONObject = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection,
+        "friendsConnection": friendsConnection as JSONValue,
       ]
 
-      let data = [
-        "hero": hero
+      let data: JSONObject = [
+        "hero": hero as JSONValue
       ]
 
       return [
@@ -309,36 +309,36 @@ extension Mocks.Hero.BidirectionalFriendsQuery {
     let query = MockQuery<Mocks.Hero.BidirectionalFriendsQuery>()
     query.__variables = ["id": "2001", "first": 1, "after": "Y3Vyc29yMg==", "before": GraphQLNullable<String>.null]
     return await server.expect(query) { _ in
-      let pageInfo: [AnyHashable: AnyHashable] = [
+      let pageInfo: JSONObject = [
         "__typename": "PageInfo",
         "startCursor": "Y3Vyc29yMg==",
         "hasPreviousPage": true,
         "endCursor": "Y3Vyc29yMa==",
         "hasNextPage": false,
       ]
-      let friends: [[String: AnyHashable]] = [
+      let friends: [JSONObject] = [
         [
           "__typename": "Human",
           "name": "Han Solo",
           "id": "1002",
         ],
       ]
-      let friendsConnection: [String: AnyHashable] = [
+      let friendsConnection: JSONObject = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
-        "friends": friends,
-        "pageInfo": pageInfo,
+        "friends": friends as JSONValue,
+        "pageInfo": pageInfo as JSONValue,
       ]
 
-      let hero = [
+      let hero: JSONObject = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection,
+        "friendsConnection": friendsConnection as JSONValue,
       ]
 
-      let data = [
-        "hero": hero
+      let data: JSONObject = [
+        "hero": hero as JSONValue
       ]
 
       return [
@@ -351,36 +351,36 @@ extension Mocks.Hero.BidirectionalFriendsQuery {
     let query = MockQuery<Mocks.Hero.BidirectionalFriendsQuery>()
     query.__variables = ["id": "2001", "first": 1, "before": "Y3Vyc29yMw==", "after": GraphQLNullable<String>.null]
     return await server.expect(query) { _ in
-      let pageInfo: [AnyHashable: AnyHashable] = [
+      let pageInfo: JSONObject = [
         "__typename": "PageInfo",
         "startCursor": "Y3Vyc29yMq==",
         "hasPreviousPage": false,
         "endCursor": "Y3Vyc29yMw==",
         "hasNextPage": true,
       ]
-      let friends: [[String: AnyHashable]] = [
+      let friends: [JSONObject] = [
         [
           "__typename": "Human",
           "name": "Luke Skywalker",
           "id": "1000",
         ],
       ]
-      let friendsConnection: [String: AnyHashable] = [
+      let friendsConnection: JSONObject = [
         "__typename": "FriendsConnection",
         "totalCount": 3,
-        "friends": friends,
-        "pageInfo": pageInfo,
+        "friends": friends as JSONValue,
+        "pageInfo": pageInfo as JSONValue,
       ]
 
-      let hero = [
+      let hero: JSONObject = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friendsConnection": friendsConnection,
+        "friendsConnection": friendsConnection as JSONValue,
       ]
 
-      let data = [
-        "hero": hero
+      let data: JSONObject = [
+        "hero": hero as JSONValue
       ]
 
       return [
@@ -395,7 +395,7 @@ extension Mocks.Hero.OffsetFriendsQuery {
     let query = MockQuery<Mocks.Hero.OffsetFriendsQuery>()
     query.__variables = ["id": "2001", "offset": 0, "limit": 2]
     return await server.expect(query) { _ in
-      let friends: [[String: AnyHashable]] = [
+      let friends: [JSONObject] = [
         [
           "__typename": "Human",
           "name": "Luke Skywalker",
@@ -408,15 +408,15 @@ extension Mocks.Hero.OffsetFriendsQuery {
         ],
       ]
 
-      let hero = [
+      let hero: JSONObject = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friends": friends,
+        "friends": friends as JSONValue,
       ]
 
-      let data = [
-        "hero": hero
+      let data: JSONObject = [
+        "hero": hero as JSONValue
       ]
 
       return [
@@ -429,7 +429,7 @@ extension Mocks.Hero.OffsetFriendsQuery {
     let query = MockQuery<Mocks.Hero.OffsetFriendsQuery>()
     query.__variables = ["id": "2001", "offset": 2, "limit": 2]
     return await server.expect(query) { _ in
-      let friends: [[String: AnyHashable]] = [
+      let friends: [JSONObject] = [
         [
           "__typename": "Human",
           "name": "Leia Organa",
@@ -437,15 +437,15 @@ extension Mocks.Hero.OffsetFriendsQuery {
         ],
       ]
 
-      let hero = [
+      let hero: JSONObject = [
         "__typename": "Droid",
         "id": "2001",
         "name": "R2-D2",
-        "friends": friends,
+        "friends": friends as JSONValue,
       ]
 
-      let data = [
-        "hero": hero
+      let data: JSONObject = [
+        "hero": hero as JSONValue
       ]
 
       return [

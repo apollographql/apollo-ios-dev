@@ -20,7 +20,7 @@ extension Target {
       ],
       dependencies: [
         .target(name: ApolloTarget.apolloInternalTestHelpers.name),
-        .package(product: "Apollo"),
+        .target(name: ApolloTarget.apolloWrapper.name),
         .package(product: "CodegenCLI"),
         .package(product: "Nimble"),
       ],

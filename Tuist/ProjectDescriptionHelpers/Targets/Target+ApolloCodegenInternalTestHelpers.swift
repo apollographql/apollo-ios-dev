@@ -22,7 +22,7 @@ extension Target {
       dependencies: [
         .target(name: ApolloTarget.apolloCodegenLibWrapper.name),
         .target(name: ApolloTarget.apolloInternalTestHelpers.name),
-        .package(product: "OrderedCollections")        
+        .package(product: "OrderedCollections"),
       ],
       settings: .forTarget(target)
     )

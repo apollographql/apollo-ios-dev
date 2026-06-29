@@ -20,9 +20,6 @@ extension Target {
       ]),
       dependencies: [
         .target(name: ApolloTarget.apolloWrapper.name),
-        .package(product: "ApolloAPI"),
-        .package(product: "ApolloSQLite"),
-        .package(product: "ApolloWebSocket"),
       ],
       settings: .forTarget(target)
     )

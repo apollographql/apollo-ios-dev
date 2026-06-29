@@ -1,5 +1,12 @@
 # Change Log
 
+## v2.2.0
+
+### Fixed
+- **Xcode 27 (Swift 6.4) build compatibility ([#1034](https://github.com/apollographql/apollo-ios-dev/pull/1034)):** Fixed multiple build failures introduced by Swift 6.4 / Xcode 27. `AnyHashable`'s `Sendable` conformance is now explicitly unavailable in Swift 6.4, so `AnyHashable as JSONValue` casts no longer compile; replaced with explicit scalar type-matching helpers (with `Bool` checked before `NSNumber` to preserve round-trip fidelity). Fixed a duplicate runtime type descriptor crash caused by multiple test targets statically linking the same SPM products; all Apollo package products are now linked exclusively through a single `apolloWrapper` target. Fixed `WebSocketConnection.send()` silently discarding errors by cancelling the underlying task on failure so the transport's reconnection state machine runs correctly. Also fixed `\x22` escapes in composed Swift Regexes and `AsyncResultObserver.handler` `@Sendable` conformance under Swift 6.4. _Thank you to the community members who submitted PRs identifying these issues._
+- **Fix `WebSocketTransport` retain cycle in receive loop ([#1011](https://github.com/apollographql/apollo-ios-dev/pull/1011)):** The `WebSocketTransport` actor was never deallocated after a connection was established because the unstructured `Task` in `startConnectionReceiveLoop()` captured `self` strongly. The receive loop now uses `[weak self]` and `deinit` explicitly closes the connection so the transport deallocates correctly when all external references are dropped. _Thank you to [@heltoft](https://github.com/heltoft) for the contribution._
+- **Fix crash in `SelectionSet` equality for nullable-inner object lists ([#986](https://github.com/apollographql/apollo-ios-dev/pull/986)):** Comparing two `SelectionSet` values containing a `[Object?]` (non-null list, nullable element) field where any element was `null` triggered a `preconditionFailure("Expected list data to contain objects.")`. Added a `[DataDict?]` branch in `convertElements` that handles the mixed `DataDict + NSNull` case and preserves null positions so position-sensitive equality remains correct. _Thank you to [@dfed](https://github.com/dfed) for the contribution._
+
 ## v2.1.2
 
 ### Fixed

@@ -143,7 +143,7 @@ class JSONTests: XCTestCase {
       }
     }
 
-    let jsonObj: [String: AnyHashable] = [
+    let jsonObj: JSONObject = [
       "hero": [
         "name": "Luke Skywalker",
         "__typename": "Human"

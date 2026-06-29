@@ -52,7 +52,17 @@ public final actor AsyncResultObserver<Success: Sendable, Failure: Swift.Error> 
     block(self)
   }
 
-  public nonisolated func handler(_ result: Result<Success, Failure>) {
+  /// A `@Sendable` closure for receiving results, suitable for passing to APIs that take a result
+  /// handler.
+  ///
+  /// Returned as a computed property rather than a method because Swift 6.4 no longer treats
+  /// partial applications of nonisolated actor methods as `@Sendable`, so a method reference
+  /// (`observer.handler`) cannot be passed where a `@Sendable` closure is expected.
+  public nonisolated var handler: @Sendable (Result<Success, Failure>) -> Void {
+    { result in self.receive(result) }
+  }
+
+  private nonisolated func receive(_ result: Result<Success, Failure>) {
     Task {
       await isolatedDo { isolatedSelf in
 
