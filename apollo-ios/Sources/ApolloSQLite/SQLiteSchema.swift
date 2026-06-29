@@ -40,6 +40,31 @@ public enum SQLiteSchema {
     /// at this position. Matches the column's DDL `DEFAULT -1` so
     /// writes that omit `position` still land in the right row.
     public static let defaultPositionValue: Int64 = -1
+
+    /// The `field_name` column value used for the rows inside a
+    /// synthetic sub-record. Synthetic sub-records hold the elements
+    /// of a nested list; they don't have multiple named fields, so a
+    /// single sentinel `field_name` clusters all their rows together.
+    /// The `$` character cannot start a GraphQL Name, so this sentinel
+    /// cannot collide with any real GraphQL field name.
+    public static let syntheticFieldName: String = "$"
+
+    /// Regex matching the trailing `.$[<integer>]` segment of a
+    /// synthetic sub-record cache key. Anchored to the end of the
+    /// string. The `$` character cannot appear in a GraphQL Name, so
+    /// this pattern only matches the synthetic keys this database
+    /// produces for nested-list indirection — user-defined cache keys
+    /// will not match unless they deliberately mimic the format.
+    public static let syntheticKeySuffixPattern: String = #"\.\$\[[0-9]+\]$"#
+
+    /// SQL `LIKE` pattern matching the trailing `.$[<anything>]`
+    /// segment of a synthetic sub-record cache key. Less precise than
+    /// `syntheticKeySuffixPattern` (SQLite `LIKE` has no character-
+    /// class support for digits), but sufficient for the cascading-
+    /// delete walk: the writer never produces a cache key ending in
+    /// `.$[<non-integer>]`, so a stray match is impossible against
+    /// data we wrote.
+    public static let syntheticKeySuffixLikePattern: String = "%.$[%]"
   }
 
   /// Columns for the legacy single-row JSON-blob records-table layout used

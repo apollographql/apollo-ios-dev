@@ -1,5 +1,5 @@
 import Foundation
-import Apollo
+@_spi(Execution) import Apollo
 import SQLite3
 
 public final class ApolloSQLiteDatabase: SQLiteDatabase {
@@ -320,6 +320,453 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     try performSync {
       _ = try exec("PRAGMA journal_mode = \(mode.rawValue);", errorMessage: "Failed to set journal mode")
     }
+  }
+
+  // MARK: - Row-per-element schema
+
+  public func insertOrUpdate(records: [Record]) throws {
+    guard !records.isEmpty else { return }
+
+    try performSync {
+      try exec("BEGIN TRANSACTION", errorMessage: "Failed to begin insertOrUpdate transaction")
+      do {
+        for record in records {
+          for (fieldName, cachedField) in record.fields {
+            try writeFieldOrList(
+              cacheKey: record.key,
+              fieldName: fieldName,
+              value: cachedField.value,
+              writtenAt: cachedField.writtenAt
+            )
+          }
+        }
+      } catch {
+        rollbackTransaction()
+        throw error
+      }
+      do {
+        try exec("COMMIT TRANSACTION", errorMessage: "Failed to commit insertOrUpdate transaction")
+      } catch {
+        rollbackTransaction()
+        throw error
+      }
+    }
+  }
+
+  public func deleteRecord(forKey cacheKey: CacheKey) throws {
+    // Direct delete only — synthetic sub-records (`<parent>.<field>.$[N]`)
+    // produced by nested-list writes are not cascaded here. If the
+    // record being deleted has list-typed fields with depth ≥ 2, the
+    // corresponding synthetic sub-record rows remain in the database
+    // as orphans. They are unreachable from any cache key after this
+    // delete (the parent's `child_key_value` pointers are gone) but
+    // they take up storage until a follow-up cascade-delete PR cleans
+    // them up. Reads are unaffected — orphans never surface through
+    // `selectRecords`.
+    try performSync {
+      try directDelete(cacheKey: cacheKey)
+    }
+  }
+
+  public func deleteRecords(matchingKey pattern: CacheKey) throws {
+    guard !pattern.isEmpty else { return }
+    // `LIKE` treats `%` and `_` as wildcards. Escape them (along with
+    // the escape character itself) so callers passing a literal
+    // substring like "User_" don't accidentally delete "UserA1",
+    // "User:1", "Users", etc.
+    let escaped = pattern
+      .replacingOccurrences(of: "\\", with: "\\\\")
+      .replacingOccurrences(of: "%", with: "\\%")
+      .replacingOccurrences(of: "_", with: "\\_")
+    let wildcardPattern = "%\(escaped)%"
+
+    try performSync {
+      let sql = """
+      DELETE FROM \(SQLiteSchema.recordsTableName)
+      WHERE \(SQLiteSchema.Records.cacheKey) LIKE ? COLLATE NOCASE ESCAPE '\\'
+      """
+      let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare row-per-element pattern delete")
+      defer { sqlite3_finalize(stmt) }
+
+      sqlite3_bind_text(stmt, 1, wildcardPattern, -1, SQLITE_TRANSIENT)
+      let result = sqlite3_step(stmt)
+      if result != SQLITE_DONE {
+        throw SQLiteError.step(message: "Row-per-element pattern delete failed: \(sqliteErrorMessage())", resultCode: result)
+      }
+    }
+  }
+
+  /// Test-only read path: loads every row for the given cache keys,
+  /// reassembles them into `Record` instances, and follows synthetic
+  /// sub-record `child_key_value` pointers to materialize nested lists.
+  /// **Not part of the `SQLiteDatabase` public protocol** — production
+  /// reads will use a projection-aware API introduced in a later PR
+  /// (per ADR 0007). This helper exists so the write/delete tests can
+  /// verify round-trip behavior in the interim.
+  internal func selectRecords(forKeys keys: Set<CacheKey>) throws -> [Record] {
+    guard !keys.isEmpty else { return [] }
+
+    var records: [Record] = []
+    for batch in keys.chunked(into: 500) {
+      let batchRecords = try performSync {
+        try loadRecordBatch(Set(batch))
+      }
+      // Filter out synthetic sub-records — they're consumed by their
+      // parent's nested-list assembly via `resolveSyntheticIfNeeded`
+      // and shouldn't surface as top-level records to callers.
+      records.append(contentsOf: batchRecords.filter { !Self.isSyntheticKey($0.key) })
+    }
+    return records
+  }
+
+  // MARK: - Row-per-element internals
+
+  /// Writes one field's value, choosing the right row shape:
+  /// - scalars get one row at `position = -1`
+  /// - list-typed values get N rows at positions `0..N-1`
+  /// - nested-list elements recurse via a synthetic sub-record
+  ///
+  /// Any prior rows for `(cacheKey, fieldName)` are cleared first so
+  /// shape transitions (scalar → list, list → scalar, longer-list →
+  /// shorter-list) leave no in-field orphans. The clear-then-write
+  /// happens inside the caller's transaction so partial states are
+  /// never observable to readers.
+  ///
+  /// Note: this implementation does NOT cascade-clean synthetic sub-
+  /// records pointed to by the previous rows. If the prior value was
+  /// a list with depth ≥ 2, those synthetic sub-record rows remain
+  /// in the database as orphans (unreachable but persistent). A
+  /// follow-up cascade-delete PR handles that cleanup.
+  private func writeFieldOrList(
+    cacheKey: CacheKey,
+    fieldName: String,
+    value: Record.Value,
+    writtenAt: Int64
+  ) throws {
+    try directDelete(cacheKey: cacheKey, fieldName: fieldName)
+
+    if let array = value as? [Record.Value] {
+      for (idx, element) in array.enumerated() {
+        try writeElement(
+          cacheKey: cacheKey,
+          fieldName: fieldName,
+          position: Int64(idx),
+          element: element,
+          writtenAt: writtenAt
+        )
+      }
+    } else {
+      try writeElement(
+        cacheKey: cacheKey,
+        fieldName: fieldName,
+        position: SQLiteSchema.Records.defaultPositionValue,
+        element: value,
+        writtenAt: writtenAt
+      )
+    }
+  }
+
+  /// Writes one row's worth of data: either a leaf typed value, or a
+  /// nested list which becomes a synthetic sub-record linked via
+  /// `child_key_value`.
+  private func writeElement(
+    cacheKey: CacheKey,
+    fieldName: String,
+    position: Int64,
+    element: Record.Value,
+    writtenAt: Int64
+  ) throws {
+    if let nestedArray = element as? [Record.Value] {
+      let syntheticKey = syntheticSubRecordKey(
+        parentCacheKey: cacheKey,
+        parentFieldName: fieldName,
+        position: position
+      )
+      try writeFieldOrList(
+        cacheKey: syntheticKey,
+        fieldName: SQLiteSchema.Records.syntheticFieldName,
+        value: nestedArray as Record.Value,
+        writtenAt: writtenAt
+      )
+      try upsertRow(
+        cacheKey: cacheKey,
+        fieldName: fieldName,
+        position: position,
+        typedValue: .childKey(syntheticKey),
+        writtenAt: writtenAt
+      )
+    } else {
+      let typedValue = try SQLiteFieldEncoding.encode(element)
+      try upsertRow(
+        cacheKey: cacheKey,
+        fieldName: fieldName,
+        position: position,
+        typedValue: typedValue,
+        writtenAt: writtenAt
+      )
+    }
+  }
+
+  /// Constructs a synthetic sub-record cache key. If the parent is
+  /// already a synthetic sub-record (`fieldName` is the sentinel `$`),
+  /// the new key just appends `.$[<position>]` to keep the synthetic
+  /// chain readable. Otherwise the new key embeds the parent field
+  /// name: `<parentCacheKey>.<parentFieldName>.$[<position>]`.
+  private func syntheticSubRecordKey(
+    parentCacheKey: CacheKey,
+    parentFieldName: String,
+    position: Int64
+  ) -> CacheKey {
+    if parentFieldName == SQLiteSchema.Records.syntheticFieldName {
+      return "\(parentCacheKey).$[\(position)]"
+    } else {
+      return "\(parentCacheKey).\(parentFieldName).$[\(position)]"
+    }
+  }
+
+  /// Issues one UPSERT against the records table for a single row.
+  /// `ON CONFLICT (cache_key, field_name, position) DO UPDATE` copies
+  /// every value column from `excluded.*`, so a field changing type
+  /// (e.g. Int → String at the same position) also clears its prior
+  /// column.
+  private func upsertRow(
+    cacheKey: CacheKey,
+    fieldName: String,
+    position: Int64,
+    typedValue: SQLiteFieldEncoding.TypedValue,
+    writtenAt: Int64
+  ) throws {
+    let sql = """
+    INSERT INTO \(SQLiteSchema.recordsTableName) (
+      \(SQLiteSchema.Records.cacheKey),
+      \(SQLiteSchema.Records.fieldName),
+      \(SQLiteSchema.Records.position),
+      \(SQLiteSchema.Records.intValue),
+      \(SQLiteSchema.Records.stringValue),
+      \(SQLiteSchema.Records.floatValue),
+      \(SQLiteSchema.Records.boolValue),
+      \(SQLiteSchema.Records.childKeyValue),
+      \(SQLiteSchema.Records.customScalarValue),
+      \(SQLiteSchema.Records.writtenAt)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(
+      \(SQLiteSchema.Records.cacheKey),
+      \(SQLiteSchema.Records.fieldName),
+      \(SQLiteSchema.Records.position)
+    ) DO UPDATE SET
+      \(SQLiteSchema.Records.intValue)          = excluded.\(SQLiteSchema.Records.intValue),
+      \(SQLiteSchema.Records.stringValue)       = excluded.\(SQLiteSchema.Records.stringValue),
+      \(SQLiteSchema.Records.floatValue)        = excluded.\(SQLiteSchema.Records.floatValue),
+      \(SQLiteSchema.Records.boolValue)         = excluded.\(SQLiteSchema.Records.boolValue),
+      \(SQLiteSchema.Records.childKeyValue)     = excluded.\(SQLiteSchema.Records.childKeyValue),
+      \(SQLiteSchema.Records.customScalarValue) = excluded.\(SQLiteSchema.Records.customScalarValue),
+      \(SQLiteSchema.Records.writtenAt)         = excluded.\(SQLiteSchema.Records.writtenAt)
+    """
+    let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare record-row upsert")
+    defer { sqlite3_finalize(stmt) }
+
+    sqlite3_bind_text(stmt, 1, cacheKey, -1, SQLITE_TRANSIENT)
+    sqlite3_bind_text(stmt, 2, fieldName, -1, SQLITE_TRANSIENT)
+    sqlite3_bind_int64(stmt, 3, position)
+
+    switch typedValue {
+    case .int(let v):           sqlite3_bind_int64(stmt, 4, v)
+    case .string(let v):        sqlite3_bind_text(stmt, 5, v, -1, SQLITE_TRANSIENT)
+    case .float(let v):         sqlite3_bind_double(stmt, 6, v)
+    case .bool(let v):          sqlite3_bind_int64(stmt, 7, v ? 1 : 0)
+    case .childKey(let v):      sqlite3_bind_text(stmt, 8, v, -1, SQLITE_TRANSIENT)
+    case .customScalar(let v):  sqlite3_bind_text(stmt, 9, v, -1, SQLITE_TRANSIENT)
+    }
+
+    sqlite3_bind_int64(stmt, 10, writtenAt)
+
+    let result = sqlite3_step(stmt)
+    if result != SQLITE_DONE {
+      throw SQLiteError.step(message: "Record-row upsert failed: \(sqliteErrorMessage())", resultCode: result)
+    }
+  }
+
+  /// Deletes the rows for a given cache key (and optional field). Does
+  /// not cascade synthetic sub-records — that's a follow-up PR.
+  private func directDelete(cacheKey: CacheKey, fieldName: String? = nil) throws {
+    let sql: String
+    if fieldName == nil {
+      sql = "DELETE FROM \(SQLiteSchema.recordsTableName) WHERE \(SQLiteSchema.Records.cacheKey) = ?"
+    } else {
+      sql = "DELETE FROM \(SQLiteSchema.recordsTableName) WHERE \(SQLiteSchema.Records.cacheKey) = ? AND \(SQLiteSchema.Records.fieldName) = ?"
+    }
+    let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare direct delete")
+    defer { sqlite3_finalize(stmt) }
+
+    sqlite3_bind_text(stmt, 1, cacheKey, -1, SQLITE_TRANSIENT)
+    if let fieldName {
+      sqlite3_bind_text(stmt, 2, fieldName, -1, SQLITE_TRANSIENT)
+    }
+    let result = sqlite3_step(stmt)
+    if result != SQLITE_DONE {
+      throw SQLiteError.step(message: "Direct delete failed: \(sqliteErrorMessage())", resultCode: result)
+    }
+  }
+
+  // MARK: - Row-per-element read assembly (test-only)
+
+  /// Loads all rows for a batch of cache keys and groups them back
+  /// into `Record` instances. Follows synthetic `child_key_value`
+  /// pointers to materialize nested lists.
+  private func loadRecordBatch(_ keys: Set<CacheKey>) throws -> [Record] {
+    let placeholders = Array(repeating: "?", count: keys.count).joined(separator: ", ")
+    let sql = """
+    SELECT
+      \(SQLiteSchema.Records.cacheKey),
+      \(SQLiteSchema.Records.fieldName),
+      \(SQLiteSchema.Records.position),
+      \(SQLiteSchema.Records.intValue),
+      \(SQLiteSchema.Records.stringValue),
+      \(SQLiteSchema.Records.floatValue),
+      \(SQLiteSchema.Records.boolValue),
+      \(SQLiteSchema.Records.childKeyValue),
+      \(SQLiteSchema.Records.customScalarValue),
+      \(SQLiteSchema.Records.writtenAt)
+    FROM \(SQLiteSchema.recordsTableName)
+    WHERE \(SQLiteSchema.Records.cacheKey) IN (\(placeholders))
+    ORDER BY \(SQLiteSchema.Records.cacheKey),
+             \(SQLiteSchema.Records.fieldName),
+             \(SQLiteSchema.Records.position)
+    """
+    let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare row-per-element select")
+    defer { sqlite3_finalize(stmt) }
+
+    var bindIdx: Int32 = 1
+    for key in keys {
+      sqlite3_bind_text(stmt, bindIdx, key, -1, SQLITE_TRANSIENT)
+      bindIdx += 1
+    }
+
+    var rawRows: [DecodedRow] = []
+    var step = sqlite3_step(stmt)
+    while step == SQLITE_ROW {
+      guard let cacheKeyPtr = sqlite3_column_text(stmt, 0) else {
+        throw SQLiteError.step(message: "Unexpected NULL cache_key in row-per-element select", resultCode: SQLITE_NOMEM)
+      }
+      guard let fieldNamePtr = sqlite3_column_text(stmt, 1) else {
+        throw SQLiteError.step(message: "Unexpected NULL field_name in row-per-element select", resultCode: SQLITE_NOMEM)
+      }
+      let cacheKey = String(cString: cacheKeyPtr)
+      let fieldName = String(cString: fieldNamePtr)
+      let position = sqlite3_column_int64(stmt, 2)
+      let value = try SQLiteFieldEncoding.decode(
+        boolValue: Self.optionalInt64(stmt: stmt, column: 6),
+        intValue: Self.optionalInt64(stmt: stmt, column: 3),
+        floatValue: Self.optionalDouble(stmt: stmt, column: 5),
+        stringValue: Self.optionalText(stmt: stmt, column: 4),
+        childKeyValue: Self.optionalText(stmt: stmt, column: 7),
+        customScalarValue: Self.optionalText(stmt: stmt, column: 8)
+      )
+      let writtenAt = sqlite3_column_int64(stmt, 9)
+      rawRows.append(DecodedRow(
+        cacheKey: cacheKey, fieldName: fieldName, position: position,
+        value: value, writtenAt: writtenAt
+      ))
+      step = sqlite3_step(stmt)
+    }
+    if step != SQLITE_DONE {
+      throw SQLiteError.step(message: "Failed to step row-per-element select: \(sqliteErrorMessage())", resultCode: step)
+    }
+
+    return try assembleRecords(from: rawRows)
+  }
+
+  /// Groups raw rows by cache_key, then by field_name, distinguishing
+  /// scalar fields (single row at `position = -1`) from list fields
+  /// (rows at `position >= 0`, sorted), and recursively resolves any
+  /// synthetic child_key_value references into their nested-list
+  /// contents.
+  private func assembleRecords(from rows: [DecodedRow]) throws -> [Record] {
+    var byKey: [CacheKey: [DecodedRow]] = [:]
+    for row in rows {
+      byKey[row.cacheKey, default: []].append(row)
+    }
+
+    var records: [Record] = []
+    for (key, keyRows) in byKey {
+      // Returns ALL records, including synthetic sub-records. The
+      // synthetic-key filter happens at the `selectRecords` boundary
+      // for top-level reads; internal callers like
+      // `resolveSyntheticIfNeeded` need synthetic sub-records here.
+      var fields: Record.Fields = [:]
+      let byField = Dictionary(grouping: keyRows, by: \.fieldName)
+      for (fieldName, fieldRows) in byField {
+        let sorted = fieldRows.sorted { $0.position < $1.position }
+
+        if sorted.count == 1 && sorted[0].position == SQLiteSchema.Records.defaultPositionValue {
+          let row = sorted[0]
+          let resolved = try resolveSyntheticIfNeeded(row.value)
+          fields[fieldName] = CachedField(value: resolved, writtenAt: row.writtenAt)
+        } else {
+          var elements: [Record.Value] = []
+          var maxWrittenAt: Int64 = 0
+          for row in sorted where row.position >= 0 {
+            let resolved = try resolveSyntheticIfNeeded(row.value)
+            elements.append(resolved)
+            maxWrittenAt = max(maxWrittenAt, row.writtenAt)
+          }
+          fields[fieldName] = CachedField(value: elements as Record.Value, writtenAt: maxWrittenAt)
+        }
+      }
+      records.append(Record(key: key, fields: fields))
+    }
+    return records
+  }
+
+  /// If `value` is a `CacheReference` whose key matches the synthetic-
+  /// key suffix pattern, load the synthetic sub-record and return its
+  /// inner list. Otherwise return the value unchanged.
+  private func resolveSyntheticIfNeeded(_ value: Record.Value) throws -> Record.Value {
+    guard let ref = value as? CacheReference, Self.isSyntheticKey(ref.key) else {
+      return value
+    }
+    // Load the synthetic sub-record. Its rows are clustered under
+    // field_name = "$" and live at the synthetic cache_key.
+    let subRecords = try loadRecordBatch([ref.key])
+    guard let subRecord = subRecords.first,
+          let listField = subRecord.fields[SQLiteSchema.Records.syntheticFieldName] else {
+      // Defensive: the synthetic key was referenced but the sub-
+      // record's rows are missing. Return the reference unchanged
+      // so the issue surfaces in the caller's assertion rather than
+      // here as a silent empty list.
+      return value
+    }
+    return listField.value
+  }
+
+  // MARK: - Row-per-element helpers
+
+  private static func isSyntheticKey(_ key: CacheKey) -> Bool {
+    key.range(of: SQLiteSchema.Records.syntheticKeySuffixPattern, options: .regularExpression) != nil
+  }
+
+  private static func optionalInt64(stmt: OpaquePointer?, column: Int32) -> Int64? {
+    if sqlite3_column_type(stmt, column) == SQLITE_NULL { return nil }
+    return sqlite3_column_int64(stmt, column)
+  }
+
+  private static func optionalDouble(stmt: OpaquePointer?, column: Int32) -> Double? {
+    if sqlite3_column_type(stmt, column) == SQLITE_NULL { return nil }
+    return sqlite3_column_double(stmt, column)
+  }
+
+  private static func optionalText(stmt: OpaquePointer?, column: Int32) -> String? {
+    if sqlite3_column_type(stmt, column) == SQLITE_NULL { return nil }
+    guard let ptr = sqlite3_column_text(stmt, column) else { return nil }
+    return String(cString: ptr)
+  }
+
+  private struct DecodedRow {
+    let cacheKey: CacheKey
+    let fieldName: CacheKey
+    let position: Int64
+    let value: Record.Value
+    let writtenAt: Int64
   }
 }
 
