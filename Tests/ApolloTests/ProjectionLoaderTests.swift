@@ -303,6 +303,37 @@ final class ProjectionLoaderTests: XCTestCase {
     XCTAssertEqual(calls.count, 1, "Absent records must short-circuit on repeated enqueue")
   }
 
+  func test__enqueue__givenPriorFlushReturnedAbsentRecord__doesNotRebatchOnAskForDifferentField() async throws {
+    // `.absent` is sticky across the rest of the transaction: the
+    // read/write lock prevents a concurrent write from surfacing a
+    // record under a key we already observed missing, and an
+    // intra-transaction write would call `removeAll()` to invalidate
+    // all state. So once `(MISSING, name)` returns absent, asking for
+    // `(MISSING, age)` must also short-circuit to the same answer —
+    // re-batching for a different field on a known-missing record is
+    // wasteful, and the cache would return the same "no record" answer
+    // regardless.
+    let recorder = BatchRecorder()
+    let loader = ProjectionLoader { projections in
+      await recorder.record(projections)
+      return [:]
+    }
+
+    loader.enqueue([projection("MISSING", "name")])
+    _ = try await loader.deferredRecord(forKey: "MISSING").get()
+
+    loader.enqueue([projection("MISSING", "age")])
+    let secondResult = try await loader.deferredRecord(forKey: "MISSING").get()
+
+    XCTAssertNil(secondResult, "Different field on absent record still surfaces as nil")
+    let calls = await recorder.calls
+    XCTAssertEqual(
+      calls.count,
+      1,
+      "Absent records are sticky for every field — a different-field probe must not re-batch"
+    )
+  }
+
   func test__enqueue__givenMixedSuccessAndAbsentInSameBatch__remembersBothForFutureShortCircuit() async throws {
     let recorder = BatchRecorder()
     let loader = ProjectionLoader { projections in

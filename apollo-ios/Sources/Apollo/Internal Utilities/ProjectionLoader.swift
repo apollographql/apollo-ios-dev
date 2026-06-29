@@ -42,50 +42,39 @@ final class ProjectionLoader {
   ///   `record.fields` (found); the rest were asked about but came
   ///   back missing (known-missing). The reader merges new fields
   ///   into the existing record and unions new field names into
-  ///   `attempted` on subsequent flushes.
-  /// - ``absent(attempted:)`` — the cache had no record for this
-  ///   key. The set of `attempted` fields is preserved so subsequent
-  ///   enqueues for the same `(cacheKey, fieldName)` short-circuit
-  ///   without re-batching the absent record over and over.
-  /// - ``failed(_:)`` — a prior flush threw for this key. Sticky:
-  ///   every subsequent projection on this key short-circuits as the
-  ///   same failure via `loadResult(forKey:)`. Attempted fields are
-  ///   not tracked because the short-circuit fires before any
-  ///   field-level check.
+  ///   `attempted` on subsequent flushes. The `attempted` set is the
+  ///   load-bearing distinction in this case: `loadFields(_:)` only
+  ///   returns the fields the caller asked about, so an un-attempted
+  ///   field on a `.loaded` record might still exist in the cache and
+  ///   warrants a re-batch.
+  /// - ``absent`` — the cache had no record for this key. Sticky for
+  ///   the rest of the transaction: the read/write lock guarantees no
+  ///   concurrent writes can surface a record under a key we already
+  ///   observed missing, and an intra-transaction write calls
+  ///   `removeAll()` to invalidate every entry. So every subsequent
+  ///   field projection on this key — same field or different — must
+  ///   short-circuit to the same "absent" answer; tracking which
+  ///   fields were attempted would add no information.
+  /// - ``failed(_:)`` — a prior flush threw for this key. Sticky for
+  ///   the same lock-driven reason as `.absent`: every subsequent
+  ///   projection on this key short-circuits as the same failure via
+  ///   `loadResult(forKey:)`.
   ///
   /// Absence of an entry (`state[key] == nil`) is the "never attempted"
   /// fourth state: the key has not been seen this transaction.
   private enum KeyState {
     case loaded(Record, attempted: Set<String>)
-    case absent(attempted: Set<String>)
+    case absent
     case failed(any Error)
 
-    /// Inserts `fieldName` into the `attempted` set on the in-place
-    /// enum, preserving the case. A no-op on `.failed` because sticky
-    /// failure short-circuits before the field-level check.
-    mutating func recordAttempt(_ fieldName: String) {
-      switch self {
-      case .loaded(let record, var attempted):
-        attempted.insert(fieldName)
-        self = .loaded(record, attempted: attempted)
-      case .absent(var attempted):
-        attempted.insert(fieldName)
-        self = .absent(attempted: attempted)
-      case .failed:
-        break
-      }
-    }
-
-    /// True iff this state has already attempted `fieldName`. A
-    /// sticky-failure state returns `true` for every field — every
-    /// projection on a failed key short-circuits regardless of which
-    /// field it names.
+    /// True iff this state has already attempted `fieldName`. For
+    /// `.absent` and `.failed` the answer is always `true` — both are
+    /// sticky states whose answer for any field is the recorded
+    /// outcome of the key as a whole.
     func hasAttempted(_ fieldName: String) -> Bool {
       switch self {
-      case .loaded(_, let attempted), .absent(let attempted):
-        return attempted.contains(fieldName)
-      case .failed:
-        return true
+      case .loaded(_, let attempted): return attempted.contains(fieldName)
+      case .absent, .failed:           return true
       }
     }
   }
@@ -153,7 +142,8 @@ final class ProjectionLoader {
   ///   `.loaded(record, attempted: { fieldName, … })` and the field
   ///   is absent from `record.fields`.
   /// - **Absent record:** the cache had no record for this key at
-  ///   all. The state is `.absent(attempted: { fieldName, … })`.
+  ///   all. The state is `.absent`, which short-circuits every field
+  ///   on the key — same field, different field, doesn't matter.
   /// - **Sticky failure:** a prior flush threw for this key. The
   ///   state is `.failed(error)` and every subsequent projection on
   ///   this key short-circuits as the same failure via
@@ -188,11 +178,9 @@ final class ProjectionLoader {
   /// populated a subset of the fields a subsequent projection
   /// requests, and the caller wants to see the union.
   ///
-  /// Every attempted field is recorded into the `attempted` set on
-  /// its key's state regardless of the found/missing/absent triage,
-  /// so subsequent enqueues for already-attempted pairs always
-  /// short-circuit. A prior `.failed` is sticky — neither the
-  /// record nor the attempted-fields set is updated against it.
+  /// `.absent` and `.failed` are sticky and never updated — a key
+  /// that landed in either state during a prior flush short-circuits
+  /// at `enqueue` so its projections never reach this loop.
   private func flush() async throws {
     guard !pending.isEmpty else { return }
     let toLoad = Array(pending)
@@ -206,9 +194,11 @@ final class ProjectionLoader {
         let newRecord = newRecords[cacheKey]
 
         switch state[cacheKey] {
-        case .some(.failed):
-          // Prior failure is sticky; new load doesn't overwrite it
-          // and the `attempted` set isn't tracked in this state.
+        case .some(.failed), .some(.absent):
+          // Sticky states — should not reach this branch in practice
+          // (the projection would have short-circuited at `enqueue`),
+          // but coexisting with an already-sticky state is harmless:
+          // we just don't update it.
           continue
 
         case .some(.loaded(var existing, var attempted)):
@@ -218,33 +208,19 @@ final class ProjectionLoader {
           attempted.insert(fieldName)
           state[cacheKey] = .loaded(existing, attempted: attempted)
 
-        case .some(.absent(var attempted)):
-          attempted.insert(fieldName)
-          if let newRecord {
-            // The cache used to have no record for this key but a
-            // later flush surfaced one. Promote to `.loaded`,
-            // preserving the prior attempts so siblings that already
-            // short-circuited don't get re-batched.
-            state[cacheKey] = .loaded(newRecord, attempted: attempted)
-          } else {
-            state[cacheKey] = .absent(attempted: attempted)
-          }
-
         case .none:
           if let newRecord {
             state[cacheKey] = .loaded(newRecord, attempted: [fieldName])
           } else {
-            state[cacheKey] = .absent(attempted: [fieldName])
+            state[cacheKey] = .absent
           }
         }
       }
     } catch {
       // Record the failure for every key that was in this batch so
       // subsequent reads see a consistent error. A key that already
-      // has a `.loaded` or `.absent` entry keeps it — only previously
-      // un-attempted keys are marked failed, matching the pre-refactor
-      // behavior of recording the failure only when `loaded[key]` was
-      // `nil`.
+      // has a `.loaded` entry keeps it — only previously un-attempted
+      // keys are marked failed.
       for projection in toLoad {
         if state[projection.cacheKey] == nil {
           state[projection.cacheKey] = .failed(error)
