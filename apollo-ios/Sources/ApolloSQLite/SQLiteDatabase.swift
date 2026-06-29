@@ -16,7 +16,7 @@ public enum SQLiteError: Error, CustomStringConvertible {
   case open(path: String, resultCode: Int32)
   case prepare(message: String, resultCode: Int32)
   case step(message: String, resultCode: Int32)
-  
+
   public var description: String {
     switch self {
     case .execution(let message, _):
@@ -34,9 +34,36 @@ public enum SQLiteError: Error, CustomStringConvertible {
 public protocol SQLiteDatabase {
 
   init(fileURL: URL) throws
-  
+
   func createRecordsTableIfNeeded() throws
-  
+
+  /// Creates the row-per-field records table if it doesn't exist, and
+  /// stamps `SQLiteSchema.Metadata.versionKey` with `SQLiteSchema.currentVersion`.
+  /// The table uses a composite `(cache_key, field_name)` primary key and is
+  /// declared `WITHOUT ROWID` so rows for one record cluster on disk in
+  /// primary-key order, which keeps batched reads sequential.
+  ///
+  /// The caller must ensure the schema-metadata table already exists
+  /// (call `createSchemaMetadataTableIfNeeded()` first).
+  func createNewRecordsTableIfNeeded() throws
+
+  /// Creates the schema-metadata table if it doesn't exist. The table is a
+  /// key/value store keyed on `String`; the only reserved key currently
+  /// recognized is `SQLiteSchema.Metadata.versionKey`, holding the
+  /// `SchemaVersion` of the records-table layout (read via `readSchemaVersion()`).
+  func createSchemaMetadataTableIfNeeded() throws
+
+  /// Returns the `SchemaVersion` stamped in the metadata table, or `nil` if
+  /// no version row exists or the stored value cannot be parsed. Callers
+  /// use the value to decide whether the stored data needs to be migrated
+  /// to a newer schema layout.
+  func readSchemaVersion() throws -> SchemaVersion?
+
+  /// Writes the `SchemaVersion` into the metadata table, replacing any
+  /// prior value. The metadata table must already exist; the caller is
+  /// expected to call `createSchemaMetadataTableIfNeeded()` first.
+  func writeSchemaVersion(_ version: SchemaVersion) throws
+
   func selectRawRows(forKeys keys: Set<CacheKey>) throws -> [DatabaseRow]
 
   func addOrUpdate(records: [(cacheKey: CacheKey, recordString: String)]) throws
@@ -44,7 +71,7 @@ public protocol SQLiteDatabase {
   func deleteRecord(for cacheKey: CacheKey) throws
 
   func deleteRecords(matching pattern: CacheKey) throws
-  
+
   func clearDatabase(shouldVacuumOnClear: Bool) throws
 
   @available(*, deprecated, renamed: "addOrUpdate(records:)")
@@ -58,23 +85,4 @@ extension SQLiteDatabase {
     try addOrUpdate(records: [(cacheKey, recordString)])
   }
 
-}
-
-public extension SQLiteDatabase {
-  
-  static var tableName: String {
-    "records"
-  }
-  
-  static var idColumnName: String {
-    "_id"
-  }
-
-  static var keyColumnName: String {
-    "key"
-  }
-
-  static var recordColumName: String {
-    "record"
-  }
 }

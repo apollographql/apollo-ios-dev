@@ -166,8 +166,12 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     return object.key
   }
 
-  /// A wrapper around the `DefaultFieldSelectionCollector` that maps the `Record` object to it's
-  /// `fields` representing the object's data.
+  /// A wrapper around the `DefaultFieldSelectionCollector` that supplies a
+  /// lazy `runtimeObjectType` resolver derived from the `Record`'s
+  /// `__typename` field. Resolution is deferred until an inline fragment
+  /// actually requires the runtime type, avoiding any transformation of
+  /// the record's field dictionary on selection sets that don't use type
+  /// cases.
   struct CacheDataFieldSelectionCollector: FieldSelectionCollector {
     static func collectFields(
       from selections: [Selection],
@@ -178,7 +182,7 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
       return try DefaultFieldSelectionCollector.collectFields(
         from: selections,
         into: &groupedFields,
-        for: object.fields,
+        resolveRuntimeType: { info.runtimeObjectType(forTypename: object["__typename"] as? String) },
         info: info
       )
     }
