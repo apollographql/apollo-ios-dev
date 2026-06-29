@@ -101,16 +101,19 @@ To automatically update the manifest for each new app release, you can include t
 
 Once you've configured your code generation to include operation IDs, you can update your client to query by operation ID rather than the full operation string. This configuration is the same whether you're using APQ or persisted queries:
 
-- Initialize a custom `NetworkTransport` using `RequestChainNetworkTransport` with `autoPersistQueries` parameter set to `true` and an `interceptorProvider` that includes the `AutomaticPersistedQueryInterceptor` (such as `DefaultInterceptorProvider`).
+- Initialize a custom `NetworkTransport` using `RequestChainNetworkTransport` with a custom `apqConfig` parameter.
+- Set `useGETForQueries` to `true` to take advantage of CDN-level result caching.
 - Initialize your `ApolloClient` with the custom `NetworkTransport` that supports persisted queries.
 
 ```swift
 let store = ApolloStore(cache: InMemoryNormalizedCache())
-let interceptorProvider = DefaultInterceptorProvider(store: store)
 let networkTransport = RequestChainNetworkTransport(
-    interceptorProvider: interceptorProvider,
+    urlSession: URLSession.shared,
+    interceptorProvider: DefaultInterceptorProvider.shared,
+    store: store,
     endpointURL: URL(string: "http://localhost:4000/graphql")!,
-    autoPersistQueries: true
+    apqConfig: .init(autoPersistQueries: true),
+    useGETForQueries: true,
 )
 
 let client = ApolloClient(networkTransport: networkTransport, store: store)
@@ -124,6 +127,6 @@ For more information on configuring your `ApolloClient`, `NetworkTransport`, `In
 
 By default, the Apollo clients sends operation retries as `POST` requests.  In some cases, you may prefer or need to retry an operation using a `GET` request: for example, you may make requests to a CDN that has better performance with `GET`s.
 
-To use `GET` for APQ retry requests, set the `useGETForPersistedQueryRetry` on your `RequestChainNetworkTransport` to `true`.
+To use `GET` for APQ retry requests, set the `useGETForPersistedQueryRetry` on your `apqConfig` parameter to `true`.
 
 In most cases, keeping the default option (`false`) suffices.
