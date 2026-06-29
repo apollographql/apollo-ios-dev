@@ -42,7 +42,7 @@ struct MockObjectTemplate: TemplateRenderer {
       .map {
          TemplateField(
           responseKey: $0.0,
-          propertyName: $0.0.asTestMockFieldPropertyName,
+          propertyName: $0.0.renderAsTestMockFieldPropertyName(config: config),
           initializerParameterName: $0.0.asTestMockInitializerParameterName,
           type: $0.1,
           mockType: mockTypeName(for: $0.1),

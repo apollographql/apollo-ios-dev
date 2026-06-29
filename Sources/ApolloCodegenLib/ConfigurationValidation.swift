@@ -1,3 +1,4 @@
+import Foundation
 import GraphQLCompiler
 import IR
 
@@ -52,6 +53,18 @@ extension ApolloCodegen.ConfigurationContext {
     }
     for searchPath in self.input.operationSearchPaths {
       try validate(inputSearchPath: searchPath)
+    }
+
+    for rule in self.options.additionalCapitalizationRules {
+      guard case let .regex(pattern) = rule.term else { continue }
+      do {
+        _ = try NSRegularExpression(pattern: pattern)
+      } catch {
+        throw ApolloCodegen.Error.invalidConfiguration(message: """
+          Invalid regular expression '\(pattern)' in additionalCapitalizationRules: \
+          \(error.localizedDescription)
+          """)
+      }
     }
   }
 

@@ -530,7 +530,7 @@ struct SelectionSetTemplate {
     return """
       \(documentation: field.underlyingField.documentation, config: config)
       \(deprecationReason: field.underlyingField.deprecationReason, config: config)
-      \(accessControlRenderer.render())var \(field.responseKey.renderAsFieldPropertyName(config: config.config)): \
+      \(accessControlRenderer.render())var \(field.responseKey.renderAsFieldPropertyName(config: config)): \
       \(typeName(for: field, forceOptional: field.isConditionallyIncluded(in: scope))) {\
       \(if: isMutable,
       """
@@ -727,7 +727,7 @@ struct SelectionSetTemplate {
   ) -> TemplateString {
     let isOptional: Bool = field.type.isNullable || field.isConditionallyIncluded(in: scope)
     return """
-      \(field.responseKey.renderAsInitializerParameterName(config: config.config)): \
+      \(field.responseKey.renderAsInitializerParameterName(config: config)): \
       \(typeName(for: field, forceOptional: isOptional))\
       \(if: isOptional, " = nil")
       """
@@ -761,7 +761,7 @@ struct SelectionSetTemplate {
     }()
 
     return """
-      "\(field.responseKey)": \(field.responseKey.renderAsInitializerParameterAccessorName(config: config.config))\
+      "\(field.responseKey)": \(field.responseKey.renderAsInitializerParameterAccessorName(config: config))\
       \(if: isEntityField, "._fieldData")
       """
   }
