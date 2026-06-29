@@ -1,11 +1,12 @@
 @_spi(Execution) import ApolloAPI
 
 /// Batches `FieldProjection` reads against a `NormalizedCache` for the
-/// duration of one `ReadTransaction`. Mirrors `DataLoader`'s
-/// deferred-then-batched pattern but at field-projection granularity:
-/// projections enqueued across multiple deferred call sites coalesce
-/// into a single `loadFields(_:)` call when the first deferred value
-/// is forced.
+/// duration of one `ReadTransaction`. Projections enqueued across
+/// multiple deferred call sites coalesce into a single
+/// `loadFields(_:)` call when the first deferred value is forced —
+/// the deferred-then-batched pattern that the 2.x `DataLoader<CacheKey,
+/// Record>` previously provided at whole-record granularity, now
+/// expressed at field-projection granularity.
 ///
 /// This is the "phase 2 resolve" half of ADR 0007 Principle 5's
 /// two-phase pattern. `FieldProjectionCollector` (PR-009d-i) drives
@@ -14,32 +15,84 @@
 /// returns a `PossiblyDeferred<Record?>` to the executor. The
 /// executor's existing `lazilyEvaluateAll` forcing pattern triggers
 /// the flush at level boundaries, preserving the cross-sibling
-/// batching the legacy `DataLoader<CacheKey, Record>` provided.
+/// batching the pre-3.0 implementation relied on.
 ///
 /// # Lifecycle
 ///
 /// One instance per `ReadTransaction`. Reads accumulate in the
 /// transaction's lifetime. The `removeAll()` method clears both the
-/// pending and loaded state — called after a write so subsequent
+/// pending and per-key state — called after a write so subsequent
 /// reads within the same transaction observe fresh data.
 final class ProjectionLoader {
   typealias BatchLoad = ([FieldProjection]) async throws -> [CacheKey: Record]
+
+  /// Per-cacheKey state machine for everything the loader needs to
+  /// remember after a flush. Collapses the prior two-dictionary
+  /// representation (`loaded: [CacheKey: Result<Record, Error>]` plus
+  /// `attemptedFields: [CacheKey: Set<String>]`) into one enum so the
+  /// possible states are exhaustive in the type system rather than
+  /// enforced by hand at every read site.
+  ///
+  /// Four legal states, mapping back to the documented post-flush
+  /// triage:
+  ///
+  /// - ``loaded(_:attempted:)`` — the cache returned a record for the
+  ///   key (the `Record`), and every `attempted` field has been
+  ///   asked about. Some attempted fields are present in
+  ///   `record.fields` (found); the rest were asked about but came
+  ///   back missing (known-missing). The reader merges new fields
+  ///   into the existing record and unions new field names into
+  ///   `attempted` on subsequent flushes. The `attempted` set is the
+  ///   load-bearing distinction in this case: `loadFields(_:)` only
+  ///   returns the fields the caller asked about, so an un-attempted
+  ///   field on a `.loaded` record might still exist in the cache and
+  ///   warrants a re-batch.
+  /// - ``absent`` — the cache had no record for this key. Sticky
+  ///   until something explicitly invalidates the entry: the
+  ///   store's read/write lock guarantees no concurrent writer can
+  ///   surface a record under a key we already observed missing,
+  ///   and an intra-transaction write to this key would route
+  ///   through `invalidate(keys:)` which clears the entry. While
+  ///   the entry survives, every field projection on this key —
+  ///   same field or different — must short-circuit to the same
+  ///   "absent" answer, so tracking which fields were attempted
+  ///   would add no information.
+  /// - ``failed(_:)`` — a prior flush threw for this key. Sticky
+  ///   for the same reason as `.absent`: no concurrent mutation can
+  ///   change the recorded outcome under us, and any explicit
+  ///   in-transaction mutation routes through `invalidate(keys:)`
+  ///   to clear the entry first. While the entry survives, every
+  ///   subsequent projection on this key short-circuits as the
+  ///   same failure via `loadResult(forKey:)`.
+  ///
+  /// Absence of an entry (`state[key] == nil`) is the "never attempted"
+  /// fourth state: the key has not been seen this transaction.
+  private enum KeyState {
+    case loaded(Record, attempted: Set<String>)
+    case absent
+    case failed(any Error)
+
+    /// True iff this state has already attempted `fieldName`. For
+    /// `.absent` and `.failed` the answer is always `true` — both are
+    /// sticky states whose answer for any field is the recorded
+    /// outcome of the key as a whole.
+    func hasAttempted(_ fieldName: String) -> Bool {
+      switch self {
+      case .loaded(_, let attempted): return attempted.contains(fieldName)
+      case .absent, .failed:           return true
+      }
+    }
+  }
 
   private let batchLoad: BatchLoad
 
   /// Projections waiting to be flushed on the next force.
   private var pending: Set<FieldProjection> = []
 
-  /// Per-cacheKey result cache. After a flush, each cache key whose
-  /// projections were loaded has a `Record` here containing only the
-  /// projected fields. Subsequent enqueues for the same `(cacheKey,
-  /// fieldName)` short-circuit out of `pending` via
-  /// `isAlreadyLoaded(_:)`.
-  ///
-  /// `Result` rather than `Record` directly so that a load failure
-  /// for one key fails subsequent reads of that key consistently
-  /// (matching `DataLoader`'s behavior).
-  private var loaded: [CacheKey: Result<Record, any Error>] = [:]
+  /// Per-cacheKey post-flush state. See ``KeyState`` for the four
+  /// states this map encodes and how they replace the prior
+  /// two-dictionary representation.
+  private var state: [CacheKey: KeyState] = [:]
 
   init(_ batchLoad: @escaping BatchLoad) {
     self.batchLoad = batchLoad
@@ -62,8 +115,8 @@ final class ProjectionLoader {
   ///
   /// The first force across all siblings is the one that triggers the
   /// `batchLoad` call — every other sibling's force finds its key in
-  /// `loaded` and returns immediately. This matches `DataLoader`'s
-  /// single-flush-per-level behavior.
+  /// `state` and returns immediately. Single flush per level, matching
+  /// the pre-3.0 whole-record loader's batching shape.
   func deferredRecord(forKey cacheKey: CacheKey) -> PossiblyDeferred<Record?> {
     if pending.isEmpty {
       return .immediate(loadResult(forKey: cacheKey))
@@ -74,49 +127,102 @@ final class ProjectionLoader {
     }
   }
 
-  /// Clears all pending and loaded state. Called after a write
-  /// transaction merge so subsequent reads observe the updated data.
+  /// Clears all pending and per-key state. Reserved as an escape
+  /// hatch for cases that need a full reset; production callers
+  /// invalidate selectively (see ``invalidate(keys:)`` and
+  /// ``invalidate(matching:)``).
   func removeAll() {
     pending.removeAll()
-    loaded.removeAll()
+    state.removeAll()
+  }
+
+  /// Drops per-key state and pending projections for `keys` only.
+  /// Other keys keep whatever they last observed.
+  ///
+  /// Called by `ReadWriteTransaction.write(_:withKey:variables:)`
+  /// (with the cache keys of the records the merge wrote) and by the
+  /// transaction's remove methods, so reads later in the same
+  /// transaction see fresh state for the keys whose underlying data
+  /// changed — but reads for *unrelated* keys keep their warm
+  /// `.loaded`/`.absent` state and do not re-batch on the next ask.
+  func invalidate<S: Sequence>(keys: S) where S.Element == CacheKey {
+    let toInvalidate = Set(keys)
+    guard !toInvalidate.isEmpty else { return }
+    for key in toInvalidate {
+      state.removeValue(forKey: key)
+    }
+    if !pending.isEmpty {
+      pending = pending.filter { !toInvalidate.contains($0.cacheKey) }
+    }
+  }
+
+  /// Drops per-key state for every tracked cacheKey whose value
+  /// contains `pattern` (case-insensitive). Mirrors
+  /// `NormalizedCache.removeRecords(matching:)`'s match semantics so
+  /// the loader's invalidated set matches the cache's deleted set
+  /// exactly. Untracked keys can't be invalidated — they have no
+  /// loader state to drop — and are by definition not in the
+  /// short-circuit path.
+  func invalidate(matching pattern: CacheKey) {
+    guard !pattern.isEmpty else { return }
+    let matchingKeys = state.keys.filter {
+      $0.range(of: pattern, options: .caseInsensitive) != nil
+    }
+    invalidate(keys: matchingKeys)
   }
 
   // MARK: - Private
 
-  /// True iff a prior flush has already loaded a value for this
-  /// projection's `(cacheKey, fieldName)` pair. Used to avoid
-  /// re-issuing already-satisfied projections on subsequent forces.
+  /// True iff a prior flush has already *attempted* to load this
+  /// projection's `(cacheKey, fieldName)` pair — covering all
+  /// post-flush states for the field:
+  ///
+  /// - **Found:** the cache returned a record containing this field.
+  ///   The state is `.loaded(record, attempted: { fieldName, … })`.
+  /// - **Known missing:** the cache returned a record for this key
+  ///   but without this field. The state is
+  ///   `.loaded(record, attempted: { fieldName, … })` and the field
+  ///   is absent from `record.fields`.
+  /// - **Absent record:** the cache had no record for this key at
+  ///   all. The state is `.absent`, which short-circuits every field
+  ///   on the key — same field, different field, doesn't matter.
+  /// - **Sticky failure:** a prior flush threw for this key. The
+  ///   state is `.failed(error)` and every subsequent projection on
+  ///   this key short-circuits as the same failure via
+  ///   `loadResult(forKey:)`.
+  ///
+  /// Short-circuiting in every post-attempt case avoids re-batching
+  /// known-missing fields and known-absent records on repeated
+  /// enqueue — a behavior the pre-3.0 whole-record `DataLoader`
+  /// provided implicitly via `cache[key] = .success(nil)` for absent
+  /// keys.
   private func isAlreadyLoaded(_ projection: FieldProjection) -> Bool {
-    guard let result = loaded[projection.cacheKey] else { return false }
-    switch result {
-    case .success(let record):
-      return record.fields.keys.contains(projection.fieldName)
-    case .failure:
-      // A prior failure for this key is final; counting it as
-      // "loaded" prevents re-issuing the same projection.
-      return true
-    }
+    state[projection.cacheKey]?.hasAttempted(projection.fieldName) ?? false
   }
 
   /// Returns the `Result<Record?, Error>` for the given key, lifting
-  /// a missing key to `.success(nil)`. A failure short-circuits as
-  /// the recorded error.
+  /// a missing key or an `.absent` state to `.success(nil)`. A failure
+  /// short-circuits as the recorded error.
   private func loadResult(forKey cacheKey: CacheKey) -> Result<Record?, any Error> {
-    switch loaded[cacheKey] {
-    case .none: return .success(nil)
-    case .some(.success(let record)): return .success(record)
-    case .some(.failure(let error)): return .failure(error)
+    switch state[cacheKey] {
+    case .none, .some(.absent):           return .success(nil)
+    case .some(.loaded(let record, _)):   return .success(record)
+    case .some(.failed(let error)):       return .failure(error)
     }
   }
 
   /// Fires one `batchLoad` covering every currently-pending
-  /// projection, merges the returned records into `loaded`, and
-  /// clears `pending`.
+  /// projection, then updates `state` to reflect the outcome for each
+  /// attempted `(cacheKey, fieldName)` pair.
   ///
-  /// Each loaded `Record`'s `fields` is *merged* into any existing
-  /// entry under the same key — a prior flush may have populated a
-  /// subset of the fields a subsequent projection requests, and the
-  /// caller wants to see the union.
+  /// Each returned `Record`'s `fields` is *merged* into any existing
+  /// `.loaded` entry under the same key — a prior flush may have
+  /// populated a subset of the fields a subsequent projection
+  /// requests, and the caller wants to see the union.
+  ///
+  /// `.absent` and `.failed` are sticky and never updated — a key
+  /// that landed in either state during a prior flush short-circuits
+  /// at `enqueue` so its projections never reach this loop.
   private func flush() async throws {
     guard !pending.isEmpty else { return }
     let toLoad = Array(pending)
@@ -126,40 +232,40 @@ final class ProjectionLoader {
       let newRecords = try await batchLoad(toLoad)
       for projection in toLoad {
         let cacheKey = projection.cacheKey
+        let fieldName = projection.fieldName
         let newRecord = newRecords[cacheKey]
-        switch loaded[cacheKey] {
-        case .some(.success(var existing)):
+
+        switch state[cacheKey] {
+        case .some(.failed), .some(.absent):
+          // Sticky states — should not reach this branch in practice
+          // (the projection would have short-circuited at `enqueue`),
+          // but coexisting with an already-sticky state is harmless:
+          // we just don't update it.
+          continue
+
+        case .some(.loaded(var existing, var attempted)):
           if let newRecord {
             existing.fields.merge(newRecord.fields) { _, new in new }
-            loaded[cacheKey] = .success(existing)
           }
-          // If newRecord is nil, the prior partial record still
-          // covers what we had; nothing to merge.
+          attempted.insert(fieldName)
+          state[cacheKey] = .loaded(existing, attempted: attempted)
+
         case .none:
           if let newRecord {
-            loaded[cacheKey] = .success(newRecord)
+            state[cacheKey] = .loaded(newRecord, attempted: [fieldName])
           } else {
-            // Record the absence so subsequent projections for this
-            // key short-circuit via `loadResult`'s `.success(nil)`
-            // path. We do NOT insert a sentinel here — `loaded[key]
-            // == nil` already encodes "absent". The next enqueue
-            // for the same `(cacheKey, fieldName)` will rejoin the
-            // pending set, which is wasteful but correct; a future
-            // refinement (e.g. PR-009g) can introduce a per-key
-            // "known missing" set if profiling motivates it.
-            break
+            state[cacheKey] = .absent
           }
-        case .some(.failure):
-          // Prior failure is sticky; new load doesn't overwrite it.
-          break
         }
       }
     } catch {
       // Record the failure for every key that was in this batch so
-      // subsequent reads see a consistent error.
+      // subsequent reads see a consistent error. A key that already
+      // has a `.loaded` entry keeps it — only previously un-attempted
+      // keys are marked failed.
       for projection in toLoad {
-        if loaded[projection.cacheKey] == nil {
-          loaded[projection.cacheKey] = .failure(error)
+        if state[projection.cacheKey] == nil {
+          state[projection.cacheKey] = .failed(error)
         }
       }
       throw error
