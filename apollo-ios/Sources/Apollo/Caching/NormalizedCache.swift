@@ -72,6 +72,26 @@ public protocol ReadOnlyNormalizedCache: AnyObject {
   ///     a `cacheKey` to request different fields on the same record.
   ///     Duplicate projections are tolerated; their results coalesce.
   ///
+  ///     **Precondition:** the caller must not supply two projections
+  ///     with the same `(cacheKey, fieldName)` but a different
+  ///     `columnShape` or `cardinality`. The cache backend stores each
+  ///     field under a single column-shape (determined at write time
+  ///     by the field's GraphQL type) and cannot answer two
+  ///     incompatible projections for the same row. ``FieldProjection``'s
+  ///     `Hashable` conformance hashes by the full tuple, so the
+  ///     pending set in `ProjectionLoader` won't dedupe such conflicts
+  ///     — they will reach the backend as two separate projections
+  ///     that ask for inconsistent answers. The
+  ///     `FieldProjectionCollector` path derives `columnShape` /
+  ///     `cardinality` from `Selection.Field.OutputType`, which GraphQL
+  ///     validation guarantees is identical for every selection of the
+  ///     same `(cacheKey, fieldName)`, so this can only happen when
+  ///     callers hand-construct projections via the direct
+  ///     ``FieldProjection/init(cacheKey:fieldName:columnShape:cardinality:)``
+  ///     initializer. PR-009g's SQL projection path enforces the
+  ///     precondition implicitly by picking one storage column per
+  ///     field.
+  ///
   /// - Returns: A dictionary of cache keys to partial records. A cache
   ///   key appears in the result if and only if the *record* exists in
   ///   the cache — independent of whether the specific projected
@@ -104,6 +124,14 @@ extension ReadOnlyNormalizedCache {
   /// and filtering in Swift. Custom cache implementors get the same
   /// behavior without a forced API migration; they may override the
   /// method with a projection-aware path when they're ready.
+  ///
+  /// **Performance:** this default is `O(records.count * filteredFields.count)`
+  /// with one new dict allocation per surfaced record (the `record.fields.filter`
+  /// closure produces a fresh `[CacheKey: CachedField]`). That's fine for the
+  /// in-memory backend, which is already paying the dict-walk cost. Backends
+  /// where the inherited behavior would surface as a regression versus a
+  /// hand-rolled `loadRecords`-backed path (e.g. when a partial-row read is
+  /// significantly cheaper than a full-row read) should override.
   public func loadFields(_ projections: [FieldProjection]) async throws -> [CacheKey: Record] {
     guard !projections.isEmpty else { return [:] }
 

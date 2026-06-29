@@ -62,7 +62,7 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     let strategy = try info.cacheReadStrategy()
 
     switch strategy {
-    case .parentRecordKey(let name):
+    case .parentRecordField(let name):
       // Standard non-policy read: the field's value lives on the
       // parent record under its normalized name (the same name the
       // writer used in `GraphQLResultNormalizer`). Subscript to get

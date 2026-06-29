@@ -153,7 +153,7 @@ public enum FieldProjectionCollector {
       responsePath: responsePath
     )
     switch strategy {
-    case .parentRecordKey(let name):
+    case .parentRecordField(let name):
       projections.insert(FieldProjection(
         cacheKey: cacheKey,
         fieldName: name,
