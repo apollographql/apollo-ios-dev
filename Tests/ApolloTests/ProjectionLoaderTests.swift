@@ -226,6 +226,186 @@ final class ProjectionLoaderTests: XCTestCase {
     XCTAssertEqual(calls.count, 2, "removeAll forces a re-batch on the next ask")
   }
 
+  // MARK: - Selective invalidation
+
+  func test__invalidate_keys__clearsOnlySpecifiedKeys__preservesOthersWarm() async throws {
+    // After a write that touches only key A, other reads (B) in the
+    // same transaction should keep their warm `.loaded` state and
+    // not re-batch. This is the win Option A captures over a blanket
+    // `removeAll()`: per-key state survives partial-cache mutation.
+    let recorder = BatchRecorder()
+    let loader = ProjectionLoader { projections in
+      await recorder.record(projections)
+      return [
+        "A": Record(key: "A", ["name": "Alice"]),
+        "B": Record(key: "B", ["name": "Bob"]),
+      ]
+    }
+
+    // Round 1: load both A and B into `.loaded` state.
+    loader.enqueue([projection("A", "name"), projection("B", "name")])
+    _ = try await loader.deferredRecord(forKey: "A").get()
+    _ = try await loader.deferredRecord(forKey: "B").get()
+
+    // Invalidate only A (simulating a write that touched A).
+    loader.invalidate(keys: ["A"])
+
+    // Round 2: re-asks must re-batch A (state was cleared) but NOT B
+    // (state is still warm). The recorded batch must contain *only*
+    // the A projection.
+    loader.enqueue([projection("A", "name"), projection("B", "name")])
+    _ = try await loader.deferredRecord(forKey: "A").get()
+    _ = try await loader.deferredRecord(forKey: "B").get()
+
+    let calls = await recorder.calls
+    XCTAssertEqual(calls.count, 2, "Second flush re-batches A but not B")
+    XCTAssertEqual(
+      Set(calls[1]),
+      Set([projection("A", "name")]),
+      "Round 2's batch must contain only the invalidated key's projection"
+    )
+  }
+
+  func test__invalidate_keys__givenAbsentKey__allowsRefreshOnNextAsk() async throws {
+    // A key in `.absent` state should be re-batched after invalidation
+    // — covers the `removeObject(for:)` use case where the cache state
+    // for the key changes and the loader's prior absent-observation
+    // must not stick.
+    var callCount = 0
+    let recorder = BatchRecorder()
+    let loader = ProjectionLoader { projections in
+      await recorder.record(projections)
+      defer { callCount += 1 }
+      // First call: empty (cache miss). Second call: empty again
+      // (still a miss, but we want to confirm a *re-batch happens*).
+      return callCount == 0 ? [:] : [:]
+    }
+
+    loader.enqueue([projection("MISSING", "name")])
+    _ = try await loader.deferredRecord(forKey: "MISSING").get()
+
+    // Without invalidation, this would short-circuit via `.absent`.
+    loader.invalidate(keys: ["MISSING"])
+
+    loader.enqueue([projection("MISSING", "name")])
+    _ = try await loader.deferredRecord(forKey: "MISSING").get()
+
+    let calls = await recorder.calls
+    XCTAssertEqual(calls.count, 2, "Invalidation must clear `.absent` so a re-ask re-batches")
+  }
+
+  func test__invalidate_keys__givenEmptyInput__isANoop() async throws {
+    let recorder = BatchRecorder()
+    let loader = ProjectionLoader { projections in
+      await recorder.record(projections)
+      return ["A": Record(key: "A", ["name": "Alice"])]
+    }
+
+    loader.enqueue([projection("A", "name")])
+    _ = try await loader.deferredRecord(forKey: "A").get()
+
+    loader.invalidate(keys: [] as [CacheKey])
+
+    loader.enqueue([projection("A", "name")])
+    _ = try await loader.deferredRecord(forKey: "A").get()
+
+    let calls = await recorder.calls
+    XCTAssertEqual(calls.count, 1, "Empty invalidation must not clear unrelated state")
+  }
+
+  func test__invalidate_keys__alsoDropsPendingProjectionsForThoseKeys() async throws {
+    // If a projection for key A is enqueued but the flush hasn't
+    // happened yet, an invalidation of A should drop the pending
+    // projection too — otherwise the next flush would re-batch a
+    // projection whose source-of-truth has been invalidated under us.
+    let recorder = BatchRecorder()
+    let loader = ProjectionLoader { projections in
+      await recorder.record(projections)
+      return ["B": Record(key: "B", ["name": "Bob"])]
+    }
+
+    loader.enqueue([projection("A", "name"), projection("B", "name")])
+    loader.invalidate(keys: ["A"])
+
+    // The next force should flush only B's projection.
+    _ = try await loader.deferredRecord(forKey: "B").get()
+
+    let calls = await recorder.calls
+    XCTAssertEqual(calls.count, 1)
+    XCTAssertEqual(
+      Set(calls[0]),
+      Set([projection("B", "name")]),
+      "Pending projection for an invalidated key must be dropped before flush"
+    )
+  }
+
+  func test__invalidate_matching__clearsKeysContainingPattern_caseInsensitive() async throws {
+    // Mirrors `NormalizedCache.removeRecords(matching:)`'s substring,
+    // case-insensitive match. Only tracked keys whose value contains
+    // `pattern` should be invalidated.
+    let recorder = BatchRecorder()
+    let loader = ProjectionLoader { projections in
+      await recorder.record(projections)
+      return [
+        "User:1": Record(key: "User:1", ["name": "Alice"]),
+        "User:2": Record(key: "User:2", ["name": "Bob"]),
+        "Post:1": Record(key: "Post:1", ["title": "Hi"]),
+      ]
+    }
+
+    loader.enqueue([
+      projection("User:1", "name"),
+      projection("User:2", "name"),
+      projection("Post:1", "title"),
+    ])
+    _ = try await loader.deferredRecord(forKey: "User:1").get()
+    _ = try await loader.deferredRecord(forKey: "User:2").get()
+    _ = try await loader.deferredRecord(forKey: "Post:1").get()
+
+    // Invalidate all User: keys via pattern match.
+    loader.invalidate(matching: "user")  // lowercase to verify case-insensitive
+
+    // Re-ask all three. Only User:1 and User:2 should re-batch; Post:1
+    // stays warm.
+    loader.enqueue([
+      projection("User:1", "name"),
+      projection("User:2", "name"),
+      projection("Post:1", "title"),
+    ])
+    _ = try await loader.deferredRecord(forKey: "User:1").get()
+    _ = try await loader.deferredRecord(forKey: "User:2").get()
+    _ = try await loader.deferredRecord(forKey: "Post:1").get()
+
+    let calls = await recorder.calls
+    XCTAssertEqual(calls.count, 2, "Pattern-matched keys re-batch; unmatched keys stay warm")
+    XCTAssertEqual(
+      Set(calls[1]),
+      Set([projection("User:1", "name"), projection("User:2", "name")]),
+      "Round 2's batch contains only the pattern-matched keys"
+    )
+  }
+
+  func test__invalidate_matching__givenEmptyPattern__isANoop() async throws {
+    // Matches `removeRecords(matching:)`'s behavior: empty pattern
+    // means no-op (rather than "match everything").
+    let recorder = BatchRecorder()
+    let loader = ProjectionLoader { projections in
+      await recorder.record(projections)
+      return ["A": Record(key: "A", ["name": "Alice"])]
+    }
+
+    loader.enqueue([projection("A", "name")])
+    _ = try await loader.deferredRecord(forKey: "A").get()
+
+    loader.invalidate(matching: "")
+
+    loader.enqueue([projection("A", "name")])
+    _ = try await loader.deferredRecord(forKey: "A").get()
+
+    let calls = await recorder.calls
+    XCTAssertEqual(calls.count, 1, "Empty pattern must not clear any state")
+  }
+
   func test__deferredRecord__givenAbsentRecord__returnsNilWithoutThrowing() async throws {
     let recorder = BatchRecorder()
     let loader = ProjectionLoader { projections in

@@ -47,18 +47,23 @@ final class ProjectionLoader {
   ///   returns the fields the caller asked about, so an un-attempted
   ///   field on a `.loaded` record might still exist in the cache and
   ///   warrants a re-batch.
-  /// - ``absent`` — the cache had no record for this key. Sticky for
-  ///   the rest of the transaction: the read/write lock guarantees no
-  ///   concurrent writes can surface a record under a key we already
-  ///   observed missing, and an intra-transaction write calls
-  ///   `removeAll()` to invalidate every entry. So every subsequent
-  ///   field projection on this key — same field or different — must
-  ///   short-circuit to the same "absent" answer; tracking which
-  ///   fields were attempted would add no information.
-  /// - ``failed(_:)`` — a prior flush threw for this key. Sticky for
-  ///   the same lock-driven reason as `.absent`: every subsequent
-  ///   projection on this key short-circuits as the same failure via
-  ///   `loadResult(forKey:)`.
+  /// - ``absent`` — the cache had no record for this key. Sticky
+  ///   until something explicitly invalidates the entry: the
+  ///   store's read/write lock guarantees no concurrent writer can
+  ///   surface a record under a key we already observed missing,
+  ///   and an intra-transaction write to this key would route
+  ///   through `invalidate(keys:)` which clears the entry. While
+  ///   the entry survives, every field projection on this key —
+  ///   same field or different — must short-circuit to the same
+  ///   "absent" answer, so tracking which fields were attempted
+  ///   would add no information.
+  /// - ``failed(_:)`` — a prior flush threw for this key. Sticky
+  ///   for the same reason as `.absent`: no concurrent mutation can
+  ///   change the recorded outcome under us, and any explicit
+  ///   in-transaction mutation routes through `invalidate(keys:)`
+  ///   to clear the entry first. While the entry survives, every
+  ///   subsequent projection on this key short-circuits as the
+  ///   same failure via `loadResult(forKey:)`.
   ///
   /// Absence of an entry (`state[key] == nil`) is the "never attempted"
   /// fourth state: the key has not been seen this transaction.
@@ -122,11 +127,48 @@ final class ProjectionLoader {
     }
   }
 
-  /// Clears all pending and per-key state. Called after a write
-  /// transaction merge so subsequent reads observe the updated data.
+  /// Clears all pending and per-key state. Reserved as an escape
+  /// hatch for cases that need a full reset; production callers
+  /// invalidate selectively (see ``invalidate(keys:)`` and
+  /// ``invalidate(matching:)``).
   func removeAll() {
     pending.removeAll()
     state.removeAll()
+  }
+
+  /// Drops per-key state and pending projections for `keys` only.
+  /// Other keys keep whatever they last observed.
+  ///
+  /// Called by `ReadWriteTransaction.write(_:withKey:variables:)`
+  /// (with the cache keys of the records the merge wrote) and by the
+  /// transaction's remove methods, so reads later in the same
+  /// transaction see fresh state for the keys whose underlying data
+  /// changed — but reads for *unrelated* keys keep their warm
+  /// `.loaded`/`.absent` state and do not re-batch on the next ask.
+  func invalidate<S: Sequence>(keys: S) where S.Element == CacheKey {
+    let toInvalidate = Set(keys)
+    guard !toInvalidate.isEmpty else { return }
+    for key in toInvalidate {
+      state.removeValue(forKey: key)
+    }
+    if !pending.isEmpty {
+      pending = pending.filter { !toInvalidate.contains($0.cacheKey) }
+    }
+  }
+
+  /// Drops per-key state for every tracked cacheKey whose value
+  /// contains `pattern` (case-insensitive). Mirrors
+  /// `NormalizedCache.removeRecords(matching:)`'s match semantics so
+  /// the loader's invalidated set matches the cache's deleted set
+  /// exactly. Untracked keys can't be invalidated — they have no
+  /// loader state to drop — and are by definition not in the
+  /// short-circuit path.
+  func invalidate(matching pattern: CacheKey) {
+    guard !pattern.isEmpty else { return }
+    let matchingKeys = state.keys.filter {
+      $0.range(of: pattern, options: .caseInsensitive) != nil
+    }
+    invalidate(keys: matchingKeys)
   }
 
   // MARK: - Private
