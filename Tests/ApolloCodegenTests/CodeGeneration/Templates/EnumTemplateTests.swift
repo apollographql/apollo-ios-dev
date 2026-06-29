@@ -52,6 +52,25 @@ class EnumTemplateTests: XCTestCase {
     subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
+  // MARK: Capitalization Rule Tests
+
+  func test__render__givenCapitalizationRule__rendersEnumCaseWithRenamedIdentifier_preservingRawValue() {
+    // given
+    buildSubject(
+      values: [("userId", nil, nil, nil)],
+      config: .mock(.swiftPackage(), options: .init(
+        additionalCapitalizationRules: [.init(term: .string("id"), strategy: .upper)],
+        markTypesNonisolated: false
+      ))
+    )
+
+    // when
+    let actual = renderSubject()
+
+    // then — the case name is capitalized; the GraphQL raw value is preserved.
+    expect(actual).to(contain("case userID = \"userId\""))
+  }
+
   // MARK: Access Level Tests
 
   func test_render_givenModuleType_swiftPackageManager_generatesSwiftEnum_withPublicAccess() {

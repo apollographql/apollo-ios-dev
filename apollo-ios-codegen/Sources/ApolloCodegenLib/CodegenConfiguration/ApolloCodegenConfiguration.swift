@@ -647,6 +647,14 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
 
   // MARK: - Other Types
   public struct OutputOptions: Codable, Equatable, Sendable {
+    /// Any non-default rules for capitalization you wish to include.
+    ///
+    /// Rules are applied to the names of generated field accessors, initializer parameters,
+    /// enum cases, input object fields, and test mock fields, following SwiftFormat's
+    /// `acronyms` convention: an acronym is only capitalized when its first character is
+    /// already uppercase, so the leading `id` in `idToken` is preserved while the `Id` in
+    /// `userId` becomes `ID`. Schema and selection set *type* names are not affected.
+    public let additionalCapitalizationRules: [CapitalizationRule]
     /// Any non-default rules for pluralization or singularization you wish to include.
     public let additionalInflectionRules: [InflectionRule]
     /// How deprecated enum cases from the schema should be handled.
@@ -701,6 +709,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
 
     /// Default property values
     public struct Default {
+      public static let additionalCapitalizationRules: [CapitalizationRule] = []
       public static let additionalInflectionRules: [InflectionRule] = []
       public static let deprecatedEnumCases: Composition = .include
       public static let schemaDocumentation: Composition = .include
@@ -723,6 +732,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     /// Designated initializer.
     ///
     /// - Parameters:
+    ///   - additionalCapitalizationRules: Any non-default rules for capitalization you wish to include.
     ///   - additionalInflectionRules: Any non-default rules for pluralization or singularization
     ///   you wish to include.
     ///   - deprecatedEnumCases: How deprecated enum cases from the schema should be handled.
@@ -744,6 +754,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     ///   - markTypesNonisolated: When `true`, generated types are marked `nonisolated` for
     ///     compatibility with Swift 6.2's default actor isolation (`@MainActor`).
     public init(
+      additionalCapitalizationRules: [CapitalizationRule] = Default.additionalCapitalizationRules,
       additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
       deprecatedEnumCases: Composition = Default.deprecatedEnumCases,
       schemaDocumentation: Composition = Default.schemaDocumentation,
@@ -757,6 +768,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix,
       markTypesNonisolated: Bool = Default.markTypesNonisolated
     ) {
+      self.additionalCapitalizationRules = additionalCapitalizationRules
       self.additionalInflectionRules = additionalInflectionRules
       self.deprecatedEnumCases = deprecatedEnumCases
       self.schemaDocumentation = schemaDocumentation
@@ -774,6 +786,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     // MARK: Codable
 
     enum CodingKeys: CodingKey, CaseIterable {
+      case additionalCapitalizationRules
       case additionalInflectionRules
       case queryStringLiteralFormat
       case deprecatedEnumCases
@@ -792,6 +805,12 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     public init(from decoder: any Decoder) throws {
       let values = try decoder.container(keyedBy: CodingKeys.self)
       try throwIfContainsUnexpectedKey(container: values, type: Self.self, decoder: decoder)
+
+      additionalCapitalizationRules =
+        try values.decodeIfPresent(
+          [CapitalizationRule].self,
+          forKey: .additionalCapitalizationRules
+        ) ?? Default.additionalCapitalizationRules
 
       additionalInflectionRules =
         try values.decodeIfPresent(
@@ -869,6 +888,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     public func encode(to encoder: any Encoder) throws {
       var container = encoder.container(keyedBy: CodingKeys.self)
 
+      try container.encode(self.additionalCapitalizationRules, forKey: .additionalCapitalizationRules)
       try container.encode(self.additionalInflectionRules, forKey: .additionalInflectionRules)
       try container.encode(self.deprecatedEnumCases, forKey: .deprecatedEnumCases)
       try container.encode(self.schemaDocumentation, forKey: .schemaDocumentation)

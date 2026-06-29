@@ -37,6 +37,26 @@ class InputObjectTemplateTests: XCTestCase {
     subject.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
   }
 
+  // MARK: Capitalization Rule Tests
+
+  func test__render__givenCapitalizationRule__rendersFieldWithRenamedIdentifier_preservingResponseKey() throws {
+    // given
+    buildSubject(
+      fields: [GraphQLInputField.mock("userId", type: .scalar(.string()), defaultValue: nil)],
+      config: .mock(.swiftPackage(), options: .init(
+        additionalCapitalizationRules: [.init(term: .string("id"), strategy: .upper)],
+        markTypesNonisolated: false
+      ))
+    )
+
+    // when
+    let actual = renderSubject()
+
+    // then — the Swift identifier is capitalized while the GraphQL response key is preserved.
+    expect(actual).to(contain("var userID"))
+    expect(actual).to(contain("\"userId\""))
+  }
+
   // MARK: Definition Tests
 
   func test__render__generatesInputObject_withInputDictVariableAndInitializer() throws {

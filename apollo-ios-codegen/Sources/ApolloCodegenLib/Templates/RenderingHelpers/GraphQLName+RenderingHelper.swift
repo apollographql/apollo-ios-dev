@@ -107,9 +107,19 @@ extension GraphQLEnumValue {
     as context: RenderContext,
     config: ApolloCodegen.ConfigurationContext
   ) -> String {
-    render(as: context, config: config.config)
+    //If the name has been customized and its not for .enumRawValue, return it unchanged
+    if let customName = name.customName, context != .enumRawValue {
+      return customName
+    }
+
+    switch context {
+    case .enumCase:
+      return renderEnumCase(config)
+    case .enumRawValue:
+      return name.schemaName
+    }
   }
-  
+
   func render(
     as context: RenderContext,
     config: ApolloCodegenConfiguration
@@ -118,35 +128,52 @@ extension GraphQLEnumValue {
     if let customName = name.customName, context != .enumRawValue {
       return customName
     }
-    
+
     switch context {
     case .enumCase:
-      return renderEnumCase(config)
+      return renderEnumCase(config, capitalizer: nil)
     case .enumRawValue:
       return name.schemaName
     }
   }
-  
+
   private func renderEnumCase(
-    _ config: ApolloCodegenConfiguration
+    _ config: ApolloCodegen.ConfigurationContext
   ) -> String {
+    renderEnumCase(config.config, capitalizer: config.capitalizer)
+  }
+
+  private func renderEnumCase(
+    _ config: ApolloCodegenConfiguration,
+    capitalizer: Capitalizer?
+  ) -> String {
+    var caseName: String
     switch config.options.conversionStrategies.enumCases {
     case .none:
-      return self.name.schemaName.asEnumCaseName
+      caseName = self.name.schemaName
     case .camelCase:
-      return self.name.schemaName.convertToCamelCase().asEnumCaseName
+      caseName = self.name.schemaName.convertToCamelCase()
     }
+    if let capitalizer {
+      caseName = capitalizer.apply(to: caseName)
+    }
+    return caseName.asEnumCaseName
   }
 }
 
 extension GraphQLInputField {
-  
+
   func render(
     config: ApolloCodegen.ConfigurationContext
   ) -> String {
-    render(config: config.config)
+    //If the name has been customized return it unchanged
+    if let customName = name.customName {
+      return customName
+    }
+
+    return renderInputField(config)
   }
-  
+
   func render(
     config: ApolloCodegenConfiguration
   ) -> String {
@@ -154,25 +181,33 @@ extension GraphQLInputField {
     if let customName = name.customName {
       return customName
     }
-    
-    return renderInputField(config)
+
+    return renderInputField(config, capitalizer: nil)
   }
-  
+
   private func renderInputField(
-    _ config: ApolloCodegenConfiguration
+    _ config: ApolloCodegen.ConfigurationContext
   ) -> String {
-    var typename = name.schemaName
+    renderInputField(config.config, capitalizer: config.capitalizer)
+  }
+
+  private func renderInputField(
+    _ config: ApolloCodegenConfiguration,
+    capitalizer: Capitalizer?
+  ) -> String {
+    var fieldName = name.schemaName
     switch config.options.conversionStrategies.inputObjects {
     case .none:
       break
     case .camelCase:
-      typename = typename.convertToCamelCase()
-      break
+      fieldName = fieldName.convertToCamelCase()
     }
-    
-    return typename.escapeIf(in: SwiftKeywords.FieldAccessorNamesToEscape)
+    if let capitalizer {
+      fieldName = capitalizer.apply(to: fieldName)
+    }
+    return fieldName.escapeIf(in: SwiftKeywords.FieldAccessorNamesToEscape)
   }
-  
+
 }
 
 extension GraphQLScalarType {
