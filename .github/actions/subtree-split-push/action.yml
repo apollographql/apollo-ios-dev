@@ -30,6 +30,11 @@ runs:
       PR_TITLE: ${{ inputs.pr-title }}
     run: |
       echo "git: $(git --version)"
+      # git-subtree is a bash script that can recurse thousands of frames deep
+      # when a subtree's rejoin anchor is stale (its walk grows with repo
+      # history). Remove the stack ceiling so deep walks cost time, never a
+      # segfault. See claude/ci-subtree-troubleshooting.md (July 2026 incident).
+      ulimit -s unlimited 2>/dev/null || ulimit -s "$(ulimit -Hs)" || true
       # Fetch upstream for diagnostic visibility in logs. We do NOT pull —
       # the dev repo is the only writer to upstream subtree repos, so a pull
       # would only ever do work in degenerate cases (and historically caused
