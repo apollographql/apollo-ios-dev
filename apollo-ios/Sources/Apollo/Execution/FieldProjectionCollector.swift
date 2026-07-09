@@ -140,23 +140,35 @@ public enum FieldProjectionCollector {
     for selection in selections {
       switch selection {
       case .field(let field):
-        // `Selection.Field.cacheFieldKey` is the shared helper that
-        // also drives `CacheDataExecutionSource.resolveCacheKey` —
-        // both call sites compute the same name(s) for the same
-        // `(field, variables, schema, responsePath)`, so the
-        // projection's `fieldName` is exactly what the resolver
-        // will later subscript on the loaded record.
-        let key = try field.cacheFieldKey(
+        // `Selection.Field.cacheReadStrategy` is the shared helper that
+        // also drives `CacheDataExecutionSource.resolveCacheKey` — both
+        // call sites compute the same strategy for the same
+        // `(field, variables, schema, responsePath)`. The projection's
+        // `fieldName` matches what the resolver will subscript on the
+        // loaded parent record.
+        //
+        // For `@fieldPolicy`-redirected fields (`.policyReference` /
+        // `.policyReferenceList`), the reader does NOT subscript the
+        // parent record — it produces `CacheReference`s directly from
+        // the field's arguments. No parent-record projection is needed
+        // for those cases; the next level of the read loads the
+        // policy-referenced records via their canonical keys.
+        let strategy = try field.cacheReadStrategy(
           variables: variables,
           schema: schema,
           responsePath: responsePath
         )
-        for fieldName in key.allNames {
+        switch strategy {
+        case .parentRecordKey(let name):
           projections.insert(FieldProjection(
             cacheKey: cacheKey,
-            fieldName: fieldName,
+            fieldName: name,
             outputType: field.type
           ))
+        case .policyReference, .policyReferenceList:
+          // No parent-record projection: the field's value is a direct
+          // `CacheReference` derived from the field's arguments.
+          break
         }
 
       case .conditional(let conditions, let nested):
