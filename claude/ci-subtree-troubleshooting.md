@@ -22,7 +22,10 @@ The action used to run `git subtree pull --squash` before `split`. That step exi
 
 ## Historical incident: macos-26 runner segfault in `git subtree split` (July 2026)
 
-**How it happened:** GitHub rolled the `macos-latest` label over from `macos-15-arm64` to `macos-26-arm64`. On the macos-26 image, `git subtree split` (a bash script from Homebrew git, same git 2.55.0 as the working image) segfaulted mid-split with exit code 139:
+**How it happened:** Two independent changes intersected.
+
+1. **git 2.54.0 removed the multi-subtree walk optimization.** Upstream commit [`1f70684b51`](https://github.com/git/git/commit/1f70684b51) (Feb 2026) deliberately removed `should_ignore_subtree_split_commit` — the logic that skipped *other* subtrees' split/squash commits during a split — because it could incorrectly exclude commits and alter split hashes (an API contract violation). The consequence for multi-subtree repos like this one: each split now crawls essentially the **entire repo history** as "extra" commits, every run, and that crawl grows with every merged PR. Measured on a July 2026 run (git 2.55, ~5,500 commits on main): apollo-ios walked ~300 commits, codegen ~3,500, pagination ~3,900. On git ≤2.53 (including Apple/Xcode git 2.50) the same pagination split walks ~130 commits with zero extras. This crawl is deep bash recursion in the `git-subtree` script — one stack frame chain per uncached ancestry run.
+2. **GitHub rolled `macos-latest` over to `macos-26-arm64`** (June 2026). Same Bash 3.2.57 and git 2.55.0 as macos-15, but the recompiled system bash and/or default stack rlimit on the new image tolerates less recursion depth. The ~1,900-frame-deep crawl that (barely) fit on macos-15 segfaulted on macos-26:
 
 ```
 /opt/homebrew/opt/git/libexec/git-core/git-subtree: line 925: 12196 Done    eval "$grl"
@@ -35,7 +38,11 @@ During the label rollover, runs landed on either image at random, so failures lo
 
 **Impact:** None to repair. `Push Subtrees` is gated on `if: success()`, so failed runs pushed nothing and no rejoin metadata reached `main`. The missed subtree commits were carried upstream automatically by the next successful run (splits walk full history).
 
-**Fix:** Moved the workflow's jobs to `runs-on: ubuntu-latest`. The job only needs git and ssh — nothing macOS-specific — and Linux runners avoid both the macOS image churn and Homebrew git drift. Do not move these jobs back to macOS runners.
+**Fix:** Moved the workflow's jobs to `runs-on: ubuntu-latest` (nothing in them is macOS-specific) and added `ulimit -s unlimited` before the split in the `subtree-split-push` action, which Linux permits — deep crawls now cost minutes, never a segfault. Do not move these jobs back to macOS runners.
+
+**Residual issue:** the O(full-history) crawl per split is upstream git's intended behavior as of 2.54 — split wall-clock time grows with repo history forever. If runs get too slow, the candidate escape hatch is [`splitsh-lite`](https://github.com/splitsh/lite) (a C/libgit2 splitter that claims hash-compatibility with `git subtree split`, used by Symfony's monorepo, walks full history in seconds and supports a persistent cache). Verify hash-compatibility against the existing upstream heads before switching — a mismatched split SHA would push non-fast-forward.
+
+**⚠️ Local vs CI git divergence:** Apple/Xcode git (2.50.x as of this writing) still contains the removed optimization — the one upstream deleted *because it can compute incorrect split hashes*. Prefer git ≥2.54 (e.g. `brew install git`) when performing any local recovery split intended to be pushed upstream; CI's hashes are the canonical ones.
 
 ## Historical incident: stale-upstream pull conflict (May 2026)
 
