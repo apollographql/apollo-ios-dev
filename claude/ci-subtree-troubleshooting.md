@@ -20,6 +20,23 @@ If any step fails, the runner exits without ever pushing the broken rejoin metad
 
 The action used to run `git subtree pull --squash` before `split`. That step existed to defensively bring upstream commits into dev — but in our setup, upstream never has commits dev doesn't, so the pull was always either a no-op or a problem. The May 2026 incident (below) showed it was a self-perpetuating failure source. Removed in PR #990 (or whatever).
 
+## Historical incident: macos-26 runner segfault in `git subtree split` (July 2026)
+
+**How it happened:** GitHub rolled the `macos-latest` label over from `macos-15-arm64` to `macos-26-arm64`. On the macos-26 image, `git subtree split` (a bash script from Homebrew git, same git 2.55.0 as the working image) segfaulted mid-split with exit code 139:
+
+```
+/opt/homebrew/opt/git/libexec/git-core/git-subtree: line 925: 12196 Done    eval "$grl"
+     12197 Segmentation fault: 11  | while read rev parents; do
+    process_split_commit "$rev" "$parents";
+done
+```
+
+During the label rollover, runs landed on either image at random, so failures looked flaky — two PRs failed while one in between succeeded (it happened to get a macos-15 runner).
+
+**Impact:** None to repair. `Push Subtrees` is gated on `if: success()`, so failed runs pushed nothing and no rejoin metadata reached `main`. The missed subtree commits were carried upstream automatically by the next successful run (splits walk full history).
+
+**Fix:** Moved the workflow's jobs to `runs-on: ubuntu-latest`. The job only needs git and ssh — nothing macOS-specific — and Linux runners avoid both the macOS image churn and Homebrew git drift. Do not move these jobs back to macOS runners.
+
 ## Historical incident: stale-upstream pull conflict (May 2026)
 
 Fixed in PR #989; root cause prevention in PR #990 (approx — match by date).
