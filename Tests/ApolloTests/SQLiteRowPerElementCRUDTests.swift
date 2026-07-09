@@ -25,20 +25,6 @@ class SQLiteRowPerElementCRUDTests: XCTestCase {
     )
   }
 
-  /// Counts every row in the records table — used to assert that
-  /// atomic list rewrites and cascading deletes leave no orphans.
-  private func totalRowCount(_ db: ApolloSQLiteDatabase) throws -> Int {
-    let dbURL = SQLiteTestCacheProvider.temporarySQLiteFileURL()
-    _ = dbURL // unused; rowCount runs via the internal-test select helper
-    // The cheapest way without exposing more internals is to load
-    // every known key and inspect — but we don't know all keys.
-    // Instead, use clearDatabase as a destructive end-of-test check
-    // where appropriate. For row-count assertions, the tests
-    // explicitly select the keys they wrote and check the returned
-    // structure.
-    fatalError("Use selectRecords to assert structure; this helper is unused")
-  }
-
   // MARK: - Per-scalar round-trip
 
   func test__roundTrip__stringValue() throws {
