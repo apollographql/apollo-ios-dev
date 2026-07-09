@@ -33,12 +33,12 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     on object: Record
   ) -> PossiblyDeferred<JSONValue?> {
     PossiblyDeferred {
-      
+
       let value = try resolveCacheKey(with: info, on: object)
 
       switch value {
       case let reference as CacheReference:
-        return deferredResolve(reference: reference).map { $0 as JSONValue }
+        return deferredResolve(reference: reference, info: info).map { $0 as JSONValue }
 
       case let referenceList as [JSONValue]:
         return resolveReferences(in: referenceList, info: info).map { $0 as JSONValue? }
@@ -53,73 +53,30 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     with info: FieldExecutionInfo,
     on object: Record
   ) throws -> JSONValue? {
-    if let fieldPolicyResult = resolveProgrammaticFieldPolicy(with: info, and: info.field.type) ??
-        FieldPolicyDirectiveEvaluator(field: info.field, variables: info.parentInfo.variables)?.resolveFieldPolicy(),
-       let returnTypename = typename(for: info.field) {
-      
-      switch fieldPolicyResult {
-      case .single(let key):
-        return object[formatCacheKey(withInfo: key, andTypename: returnTypename)]
-      case .list(let keys):
-        var keyList: [JSONValue] = []
-        for key in keys {
-          if let cacheKey = object[formatCacheKey(withInfo: key, andTypename: returnTypename)] {
-            keyList.append(cacheKey)
-          }
-        }
-        return keyList as JSONValue
+    // `Selection.Field.cacheFieldKey` centralizes the field-policy
+    // resolution rules (programmatic `FieldPolicy.Provider` first,
+    // `@fieldPolicy` directive second, standard `cacheKey(with:)`
+    // last) so this resolver and the projection-time
+    // `FieldProjectionCollector` always compute the same name(s).
+    // Without this shared call site the two paths would drift
+    // silently — the cache load would fetch under one name and the
+    // resolver would subscript under another, producing a phantom
+    // miss.
+    let key = try info.field.cacheFieldKey(
+      variables: info.parentInfo.variables,
+      schema: info.parentInfo.schema,
+      responsePath: info.responsePath
+    )
+
+    switch key {
+    case .single(let name):
+      return object[name]
+    case .list(let names):
+      var values: [JSONValue] = []
+      for name in names {
+        if let value = object[name] { values.append(value) }
       }
-    }
-    
-    let key = try info.cacheKeyForField()
-    return object[key]
-  }
-  
-  private func resolveProgrammaticFieldPolicy(
-    with info: FieldExecutionInfo,
-    and type: Selection.Field.OutputType
-  ) -> FieldPolicyResult? {
-    guard let provider = info.parentInfo.schema.configuration.self as? (any FieldPolicy.Provider.Type),
-          let arguments = info.field.arguments else {
-      return nil
-    }
-    
-    switch type {
-    case .nonNull(let innerType):
-      return resolveProgrammaticFieldPolicy(with: info, and: innerType)
-    case .list(_):
-      if let keys = provider.cacheKeyList(
-        for: FieldPolicy.Field(info.field),
-        inputData: FieldPolicy.InputData(_rawType: .inputValue(arguments), _variables: info.parentInfo.variables),
-        path: info.responsePath
-      ) {
-        return .list(keys)
-      }
-    default:
-      if let key = provider.cacheKey(
-        for: FieldPolicy.Field(info.field),
-        inputData: FieldPolicy.InputData(_rawType: .inputValue(arguments), _variables: info.parentInfo.variables),
-        path: info.responsePath
-      ) {
-        return .single(key)
-      }
-    }
-    return nil
-  }
-  
-  private func formatCacheKey(
-    withInfo info: CacheKeyInfo,
-    andTypename typename: String
-  ) -> String {
-    return "\(info.uniqueKeyGroup ?? typename):\(info.id)"
-  }
-  
-  private func typename(for field: Selection.Field) -> String? {
-    switch field.type.namedType {
-    case .object(let selectionSetType):
-      return selectionSetType.__parentType.__typename
-    default:
-      return nil
+      return values as JSONValue
     }
   }
 
@@ -131,7 +88,7 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
       .enumerated()
       .deferredFlatMap { index, element in
         if let cacheReference = element as? CacheReference {
-          return self.deferredResolve(reference: cacheReference)
+          return self.deferredResolve(reference: cacheReference, info: info)
             .mapError { error in
               if !(error is GraphQLExecutionError) {
                 return GraphQLExecutionError(
@@ -150,12 +107,66 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
       }.map { $0 as JSONValue }
   }
 
-  private func deferredResolve(reference: CacheReference) -> PossiblyDeferred<Record> {
+  private func deferredResolve(
+    reference: CacheReference,
+    info: FieldExecutionInfo
+  ) -> PossiblyDeferred<Record> {
     guard let transaction else {
       return .immediate(.failure(ApolloStore.Error.notWithinReadTransaction))
     }
 
-    return transaction.loadObject(forKey: reference.key)
+    // The child's selection set is the union of the selections of
+    // every field merged into this `FieldExecutionInfo`, mirroring
+    // `FieldExecutionInfo.computeChildExecutionData` — the executor
+    // executes that union against the loaded record, so projecting
+    // from `info.field` alone would under-collect whenever the same
+    // field is selected more than once with divergent sub-selections
+    // (e.g. directly and again inside a named or inline fragment),
+    // turning fully-cached data into a spurious cache miss. Each
+    // merged field's declared OutputType is peeled (`.nonNull` and
+    // `.list` wrappers) down to its `.object` case; non-object
+    // output types contribute nothing. Reaching this site with no
+    // object-typed merged field at all is a contract violation —
+    // only object-typed fields produce `CacheReference` values — and
+    // is surfaced as an explicit decoding error.
+    var childSelections: [Selection] = []
+    var foundObjectOutputType = false
+    for mergedField in info.mergedFields {
+      guard let selections = Self.childSelections(of: mergedField.type) else { continue }
+      foundObjectOutputType = true
+      childSelections.append(contentsOf: selections)
+    }
+    guard foundObjectOutputType else {
+      return .immediate(.failure(JSONDecodingError.wrongType))
+    }
+
+    return transaction.loadObject(
+      forKey: reference.key,
+      selections: childSelections,
+      variables: info.parentInfo.variables,
+      schema: info.parentInfo.schema,
+      responsePath: info.responsePath
+    )
+  }
+
+  /// Peels `.nonNull` and `.list` wrappers off `outputType` to find
+  /// the inner `.object(RootSelectionSetType)` and returns that type's
+  /// `__selections`. Returns `nil` if there is no object case
+  /// (scalar or customScalar), in which case the caller is asking us
+  /// to resolve a reference for a non-object-typed field — a contract
+  /// violation we surface as an explicit decoding error rather than
+  /// silently no-op.
+  private static func childSelections(
+    of outputType: Selection.Field.OutputType
+  ) -> [Selection]? {
+    switch outputType {
+    case .nonNull(let inner), .list(let inner):
+      return childSelections(of: inner)
+    case .object(let selectionSetType):
+      return selectionSetType.__selections
+    case .scalar, .customScalar:
+      return nil
+    }
   }
 
   func computeCacheKey(

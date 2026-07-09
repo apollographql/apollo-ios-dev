@@ -1,4 +1,4 @@
-@_spi(Execution) import ApolloAPI
+@_spi(Execution) @_spi(Internal) import ApolloAPI
 
 /// Walks a `[Selection]` tree for one level of a selection set and emits
 /// the `FieldProjection`s the cache should be asked to read for that
@@ -50,13 +50,42 @@ public enum FieldProjectionCollector {
   ///     `__typename` from the record (or whatever source they have)
   ///     until an inline fragment is actually encountered. Return
   ///     `nil` to skip every inline fragment.
+  ///   - includeAllInlineFragments: When `true`, every
+  ///     `.inlineFragment` is entered regardless of `resolveRuntimeType`
+  ///     — the closure is not invoked. Used by the pre-load path in
+  ///     `CacheDataExecutionSource` (PR-009d-ii) when projecting
+  ///     fields for a child record whose `__typename` isn't yet
+  ///     loaded: every type case's fields are projected
+  ///     (an "over-fetch"); the executor's actual traversal still
+  ///     uses the loaded `__typename` to select which type case
+  ///     applies, so only the matching type case's fields are
+  ///     surfaced to the response. Defaults to `false` for the
+  ///     conservative collect-by-known-type semantics.
+  ///   - schema: The `SchemaMetadata.Type` for the operation being
+  ///     read. Used to resolve *programmatic* field policies
+  ///     (`SchemaConfiguration: FieldPolicy.Provider`) — if a field
+  ///     has a configured programmatic policy, the parent record
+  ///     stores the field reference under the policy-derived name
+  ///     (e.g. `"Hero:1"`) rather than the standard
+  ///     `field.cacheKey(with:)` name, and the collector must emit
+  ///     projections matching the stored name. Pass `nil` (the
+  ///     default) when the caller doesn't have schema context — only
+  ///     the directive-based `@fieldPolicy` is then honored.
+  ///   - responsePath: The response path of the *object* whose fields
+  ///     are being projected — the path that the executor uses for
+  ///     `FieldPolicy.Provider`'s `path:` argument when resolving
+  ///     programmatic policies. Defaults to empty; most providers
+  ///     don't consult it.
   /// - Returns: The projections to request from the cache for this
   ///   record at this level.
   public static func collect(
     selections: [Selection],
     cacheKey: CacheKey,
     variables: GraphQLOperation.Variables?,
-    resolveRuntimeType: () -> Object?
+    resolveRuntimeType: () -> Object?,
+    includeAllInlineFragments: Bool = false,
+    schema: (any SchemaMetadata.Type)? = nil,
+    responsePath: ResponsePath = []
   ) throws -> Set<FieldProjection> {
     var projections: Set<FieldProjection> = []
     try walk(
@@ -64,7 +93,10 @@ public enum FieldProjectionCollector {
       into: &projections,
       cacheKey: cacheKey,
       variables: variables,
-      resolveRuntimeType: resolveRuntimeType
+      resolveRuntimeType: resolveRuntimeType,
+      includeAllInlineFragments: includeAllInlineFragments,
+      schema: schema,
+      responsePath: responsePath
     )
     return projections
   }
@@ -100,17 +132,32 @@ public enum FieldProjectionCollector {
     into projections: inout Set<FieldProjection>,
     cacheKey: CacheKey,
     variables: GraphQLOperation.Variables?,
-    resolveRuntimeType: () -> Object?
+    resolveRuntimeType: () -> Object?,
+    includeAllInlineFragments: Bool,
+    schema: (any SchemaMetadata.Type)?,
+    responsePath: ResponsePath
   ) throws {
     for selection in selections {
       switch selection {
       case .field(let field):
-        let fieldName = try field.cacheKey(with: variables)
-        projections.insert(FieldProjection(
-          cacheKey: cacheKey,
-          fieldName: fieldName,
-          outputType: field.type
-        ))
+        // `Selection.Field.cacheFieldKey` is the shared helper that
+        // also drives `CacheDataExecutionSource.resolveCacheKey` —
+        // both call sites compute the same name(s) for the same
+        // `(field, variables, schema, responsePath)`, so the
+        // projection's `fieldName` is exactly what the resolver
+        // will later subscript on the loaded record.
+        let key = try field.cacheFieldKey(
+          variables: variables,
+          schema: schema,
+          responsePath: responsePath
+        )
+        for fieldName in key.allNames {
+          projections.insert(FieldProjection(
+            cacheKey: cacheKey,
+            fieldName: fieldName,
+            outputType: field.type
+          ))
+        }
 
       case .conditional(let conditions, let nested):
         if conditions.evaluate(with: variables) {
@@ -119,7 +166,10 @@ public enum FieldProjectionCollector {
             into: &projections,
             cacheKey: cacheKey,
             variables: variables,
-            resolveRuntimeType: resolveRuntimeType
+            resolveRuntimeType: resolveRuntimeType,
+            includeAllInlineFragments: includeAllInlineFragments,
+            schema: schema,
+            responsePath: responsePath
           )
         }
 
@@ -129,18 +179,32 @@ public enum FieldProjectionCollector {
           into: &projections,
           cacheKey: cacheKey,
           variables: variables,
-          resolveRuntimeType: resolveRuntimeType
+          resolveRuntimeType: resolveRuntimeType,
+          includeAllInlineFragments: includeAllInlineFragments,
+          schema: schema,
+          responsePath: responsePath
         )
 
       case .inlineFragment(let typeCase):
-        if let runtimeType = resolveRuntimeType(),
-           typeCase.__parentType.canBeConverted(from: runtimeType) {
+        let shouldEnter: Bool
+        if includeAllInlineFragments {
+          shouldEnter = true
+        } else if let runtimeType = resolveRuntimeType(),
+                  typeCase.__parentType.canBeConverted(from: runtimeType) {
+          shouldEnter = true
+        } else {
+          shouldEnter = false
+        }
+        if shouldEnter {
           try walk(
             typeCase.__selections,
             into: &projections,
             cacheKey: cacheKey,
             variables: variables,
-            resolveRuntimeType: resolveRuntimeType
+            resolveRuntimeType: resolveRuntimeType,
+            includeAllInlineFragments: includeAllInlineFragments,
+            schema: schema,
+            responsePath: responsePath
           )
         }
 
@@ -162,9 +226,13 @@ public enum FieldProjectionCollector {
           into: &projections,
           cacheKey: cacheKey,
           variables: variables,
-          resolveRuntimeType: resolveRuntimeType
+          resolveRuntimeType: resolveRuntimeType,
+          includeAllInlineFragments: includeAllInlineFragments,
+          schema: schema,
+          responsePath: responsePath
         )
       }
     }
   }
+
 }
