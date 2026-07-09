@@ -409,13 +409,140 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     }
   }
 
+  /// Per-ADR 0007 projection-aware read. Two SQL statements inside
+  /// one `performSync`: an existence probe so the caller can tell
+  /// "record absent" from "record present, field missing", then a
+  /// row-filter `SELECT` that fetches only the requested
+  /// `(cacheKey, fieldName)` pairs. Synthetic sub-record references
+  /// in the returned rows are resolved transparently via
+  /// `resolveSyntheticIfNeeded`, so nested-list fields materialize
+  /// in their assembled form.
+  @_spi(Execution)
+  public func selectFields(_ projections: [FieldProjection]) throws -> [CacheKey: Record] {
+    guard !projections.isEmpty else { return [:] }
+
+    // Dedupe `(cacheKey, fieldName)` early — `FieldProjection`'s
+    // `Hashable` conformance hashes by the full tuple including shape
+    // info, so two projections that differ only in `columnShape` /
+    // `cardinality` won't collapse via `Set<FieldProjection>`. The
+    // SQL doesn't read shape info, only the storage pair, so we
+    // dedupe on that.
+    let uniqueProjections = Set(projections.map {
+      ProjectionKey(cacheKey: $0.cacheKey, fieldName: $0.fieldName)
+    })
+    let requestedKeys = Set(uniqueProjections.map(\.cacheKey))
+
+    return try performSync {
+      let existingKeys = try selectExistingKeys(requestedKeys)
+
+      // No matching records exist — short-circuit before the
+      // projection query so we don't issue a `WHERE (...) IN ()`
+      // (SQLite rejects an empty IN-list anyway, and the result
+      // would be empty regardless).
+      guard !existingKeys.isEmpty else { return [:] }
+
+      let projectedRows = try selectProjectedRows(Array(uniqueProjections))
+      let assembled = try assembleRecords(from: projectedRows)
+      let assembledByKey = Dictionary(uniqueKeysWithValues: assembled.map { ($0.key, $0) })
+
+      var result: [CacheKey: Record] = [:]
+      result.reserveCapacity(existingKeys.count)
+      for key in existingKeys {
+        // Honor `loadFields`'s contract: a record that exists but
+        // has none of the requested fields surfaces with empty
+        // `fields`. The caller's executor needs this to distinguish
+        // a per-field `missingValue` error (record present, field
+        // missing) from a record-level lookup miss.
+        result[key] = assembledByKey[key] ?? Record(key: key, fields: [:])
+      }
+      return result
+    }
+  }
+
+  /// Runs the existence-probe SQL: `SELECT DISTINCT cache_key …
+  /// WHERE cache_key IN (?, ?, …)`. The result tells the caller
+  /// which of the requested cache keys correspond to records that
+  /// actually exist in the database.
+  private func selectExistingKeys(_ keys: Set<CacheKey>) throws -> Set<CacheKey> {
+    guard !keys.isEmpty else { return [] }
+    let placeholders = Array(repeating: "?", count: keys.count).joined(separator: ", ")
+    let sql = """
+    SELECT DISTINCT \(SQLiteSchema.Records.cacheKey)
+    FROM \(SQLiteSchema.recordsTableName)
+    WHERE \(SQLiteSchema.Records.cacheKey) IN (\(placeholders))
+    """
+    let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare existence-probe select")
+    defer { sqlite3_finalize(stmt) }
+
+    var bindIdx: Int32 = 1
+    for key in keys {
+      sqlite3_bind_text(stmt, bindIdx, key, -1, SQLITE_TRANSIENT)
+      bindIdx += 1
+    }
+
+    var result: Set<CacheKey> = []
+    var step = sqlite3_step(stmt)
+    while step == SQLITE_ROW {
+      if let ptr = sqlite3_column_text(stmt, 0) {
+        result.insert(String(cString: ptr))
+      }
+      step = sqlite3_step(stmt)
+    }
+    if step != SQLITE_DONE {
+      throw SQLiteError.step(
+        message: "Existence-probe step failed: \(sqliteErrorMessage())",
+        resultCode: step
+      )
+    }
+    return result
+  }
+
+  /// Runs the projection SQL: `SELECT … WHERE (cache_key, field_name)
+  /// IN (VALUES (?, ?), (?, ?), …)`. Returns the raw rows; assembly
+  /// happens in the caller via the shared `assembleRecords` helper.
+  private func selectProjectedRows<C: Collection>(_ projections: C) throws -> [DecodedRow]
+  where C.Element == ProjectionKey {
+    guard !projections.isEmpty else { return [] }
+
+    let valuesClause = Array(repeating: "(?, ?)", count: projections.count).joined(separator: ", ")
+    let sql = """
+    SELECT
+      \(SQLiteSchema.Records.cacheKey),
+      \(SQLiteSchema.Records.fieldName),
+      \(SQLiteSchema.Records.position),
+      \(SQLiteSchema.Records.intValue),
+      \(SQLiteSchema.Records.stringValue),
+      \(SQLiteSchema.Records.floatValue),
+      \(SQLiteSchema.Records.boolValue),
+      \(SQLiteSchema.Records.childKeyValue),
+      \(SQLiteSchema.Records.customScalarValue),
+      \(SQLiteSchema.Records.writtenAt)
+    FROM \(SQLiteSchema.recordsTableName)
+    WHERE (\(SQLiteSchema.Records.cacheKey), \(SQLiteSchema.Records.fieldName))
+      IN (VALUES \(valuesClause))
+    ORDER BY \(SQLiteSchema.Records.cacheKey),
+             \(SQLiteSchema.Records.fieldName),
+             \(SQLiteSchema.Records.position)
+    """
+    let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare projection select")
+    defer { sqlite3_finalize(stmt) }
+
+    var bindIdx: Int32 = 1
+    for projection in projections {
+      sqlite3_bind_text(stmt, bindIdx, projection.cacheKey, -1, SQLITE_TRANSIENT)
+      sqlite3_bind_text(stmt, bindIdx + 1, projection.fieldName, -1, SQLITE_TRANSIENT)
+      bindIdx += 2
+    }
+
+    return try readDecodedRows(stmt: stmt)
+  }
+
   /// Test-only read path: loads every row for the given cache keys,
   /// reassembles them into `Record` instances, and follows synthetic
   /// sub-record `child_key_value` pointers to materialize nested lists.
   /// **Not part of the `SQLiteDatabase` public protocol** — production
-  /// reads will use a projection-aware API introduced in a later PR
-  /// (per ADR 0007). This helper exists so the write/delete tests can
-  /// verify round-trip behavior in the interim.
+  /// reads use ``selectFields(_:)``. Retained as test infrastructure
+  /// for the row-per-element CRUD tests until PR-009h.
   internal func selectRecords(forKeys keys: Set<CacheKey>) throws -> [Record] {
     guard !keys.isEmpty else { return [] }
 
@@ -674,6 +801,16 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
       bindIdx += 1
     }
 
+    let rawRows = try readDecodedRows(stmt: stmt)
+    return try assembleRecords(from: rawRows)
+  }
+
+  /// Iterates a prepared `SELECT` whose column order matches the
+  /// row-per-element schema's `cache_key, field_name, position,
+  /// int_value, string_value, float_value, bool_value, child_key_value,
+  /// custom_scalar_value, written_at` projection and decodes each
+  /// row into a `DecodedRow`.
+  private func readDecodedRows(stmt: OpaquePointer?) throws -> [DecodedRow] {
     var rawRows: [DecodedRow] = []
     var step = sqlite3_step(stmt)
     while step == SQLITE_ROW {
@@ -711,8 +848,7 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     if step != SQLITE_DONE {
       throw SQLiteError.step(message: "Failed to step row-per-element select: \(sqliteErrorMessage())", resultCode: step)
     }
-
-    return try assembleRecords(from: rawRows)
+    return rawRows
   }
 
   /// Groups raw rows by cache_key, then by field_name, distinguishing
@@ -810,6 +946,15 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     let position: Int64
     let value: Record.Value
     let writtenAt: Int64
+  }
+
+  /// Storage-shape-agnostic key for deduping projections before
+  /// issuing the SQL. `FieldProjection`'s `Hashable` hashes the full
+  /// tuple (including `columnShape` and `cardinality`), but the row-
+  /// filter SQL only consults `cacheKey` and `fieldName`.
+  private struct ProjectionKey: Hashable {
+    let cacheKey: CacheKey
+    let fieldName: String
   }
 }
 
