@@ -474,9 +474,13 @@ public final class ApolloStore: Sendable {
 
       let changedKeys = try await self.cache.merge(records: records)
 
-      // Remove cached records, so subsequent reads
-      // within the same transaction will reload the updated value.
-      projectionLoader.removeAll()
+      // Invalidate only the keys whose underlying data just changed.
+      // Reads earlier in the transaction for *other* keys keep their
+      // warm loader state and won't re-batch on the next ask. The
+      // pre-3.0 loader used a blanket clear here; the per-field
+      // projection loader can be more surgical because its state map
+      // is keyed by cacheKey.
+      projectionLoader.invalidate(keys: records.keys)
 
       if let didChangeKeysFunc = self.updateChangedKeysFunc {
         didChangeKeysFunc(changedKeys)
@@ -492,6 +496,10 @@ public final class ApolloStore: Sendable {
     ///   - key: The cache key of the object to remove from the cache.
     public func removeObject(for key: CacheKey) async throws {
       try await self.cache.removeRecord(for: key)
+      // Invalidate the loader's state for this key so a subsequent
+      // read in the same transaction surfaces `.absent` instead of
+      // a stale `.loaded(record, …)` left behind by a prior read.
+      projectionLoader.invalidate(keys: [key])
     }
 
     /// Removes records with keys that match the specified pattern.
@@ -511,6 +519,7 @@ public final class ApolloStore: Sendable {
     ///   - pattern: The pattern that will be applied to find matching keys.
     public func removeObjects(matching pattern: CacheKey) async throws {
       try await self.cache.removeRecords(matching: pattern)
+      projectionLoader.invalidate(matching: pattern)
     }
 
   }

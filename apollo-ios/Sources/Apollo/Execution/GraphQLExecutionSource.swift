@@ -22,8 +22,10 @@ public protocol GraphQLExecutionSource {
   /// Resolves the value for given field on a data object from the source.
   ///
   ///  Because data may be loaded from a database, these loads are batched for performance reasons.
-  ///  By returning a `PossiblyDeferred` wrapper, we allow `ApolloStore` to use a `DataLoader` that
-  ///  will defer loading the next batch of records from the cache until they are needed.
+  ///  By returning a `PossiblyDeferred` wrapper, we allow `ApolloStore` to use a `ProjectionLoader`
+  ///  that defers each cache read until the first sibling's `PossiblyDeferred` is forced — at which
+  ///  point every projection accumulated across the level is flushed in one `NormalizedCache.loadFields(_:)`
+  ///  call.
   ///
   /// - Returns: The value for the field represented by the `info` on the `object`.
   ///  For a field with a scalar value, this should be a raw JSON value.
