@@ -200,7 +200,7 @@ guard let launch = launch else {
     return
 }
         
-launch.isBooked ? cancelTrip(with: launch.id) : bookTrip(with: launch.id)
+launch.isBooked ? await cancelTrip(with: launch.id) : await bookTrip(with: launch.id)
 ```
 
 Now build and run the application, if you go to the detail view for any launch and click "Book trip" you should get a message that the trip was successfully booked, but you'll notice that the UI doesn't update, even if you go out of the detail view and back into it again.
