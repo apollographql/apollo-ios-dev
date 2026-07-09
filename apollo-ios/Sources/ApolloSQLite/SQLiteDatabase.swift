@@ -16,6 +16,11 @@ public enum SQLiteError: Error, CustomStringConvertible {
   case open(path: String, resultCode: Int32)
   case prepare(message: String, resultCode: Int32)
   case step(message: String, resultCode: Int32)
+  /// A caller attempted to store a record whose cache key contains
+  /// `SQLiteSchema.Records.syntheticKeyToken`, which is reserved for
+  /// the synthetic sub-record keys the database generates internally
+  /// for nested-list storage.
+  case reservedCacheKey(key: String)
 
   public var description: String {
     switch self {
@@ -27,6 +32,8 @@ public enum SQLiteError: Error, CustomStringConvertible {
       return message
     case .step(let message, _):
       return message
+    case .reservedCacheKey(let key):
+      return "Cache key '\(key)' contains '\(SQLiteSchema.Records.syntheticKeyToken)', which is reserved for synthetic sub-record keys, and cannot be stored"
     }
   }
 }
@@ -91,12 +98,23 @@ public protocol SQLiteDatabase {
   ///   inserted, so a partial-list state is never observable to
   ///   readers and shape transitions (scalar↔list, longer-list →
   ///   shorter-list) leave no in-field orphans.
+  /// - **Empty lists** (`[]`) become a single marker row at
+  ///   `position = -2` (`SQLiteSchema.Records.emptyListPositionValue`)
+  ///   with no value column populated, so a cached empty list stays
+  ///   distinguishable from a field that was never written.
   /// - **Nested-list elements** (a list whose elements are themselves
   ///   lists, e.g. `[[Int]]`) recurse via a synthetic sub-record at
   ///   `<parent>.<field>.$[<position>]`. The parent row's
   ///   `child_key_value` points to the sub-record key. The sub-record
   ///   holds the inner list's element rows under the sentinel
   ///   `field_name = "$"`.
+  ///
+  /// Throws `SQLiteError.reservedCacheKey` — before any row is
+  /// written — if any record's cache key contains the reserved
+  /// synthetic-key token `SQLiteSchema.Records.syntheticKeyToken`
+  /// (`.$[`). Reserving the token guarantees user records can never
+  /// collide with the synthetic sub-record keys generated for
+  /// nested-list storage.
   ///
   /// Note: when overwriting a field whose previous value was a nested
   /// list, the synthetic sub-record rows are *not* cleaned up by this

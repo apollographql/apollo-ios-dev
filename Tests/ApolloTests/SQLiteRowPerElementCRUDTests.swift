@@ -1,4 +1,5 @@
 import XCTest
+import Nimble
 @testable @_spi(Execution) import Apollo
 @testable import ApolloSQLite
 import ApolloInternalTestHelpers
@@ -149,12 +150,57 @@ class SQLiteRowPerElementCRUDTests: XCTestCase {
     try db.insertOrUpdate(records: [original])
 
     let loaded = try db.selectRecords(forKeys: ["User:1"])
-    // An empty list writes zero element rows. With no scalar row and
-    // no list rows, the field is indistinguishable from "never
-    // written" — the documented behavior of the row-per-element
-    // schema. The record itself has no fields and is therefore not
-    // present in the result set.
-    XCTAssertEqual(loaded.count, 0)
+    // An empty list writes a single marker row (`position = -2`) so
+    // it stays distinguishable from a never-written field:
+    // `colors: []` is cached, valid data — not a cache miss.
+    expect(loaded).to(haveCount(1))
+    let reloaded = loaded[0].fields["colors"]?.value as? [Any]
+    expect(reloaded).toNot(beNil())
+    expect(reloaded).to(beEmpty())
+    expect(loaded[0].fields["colors"]?.writtenAt).to(equal(100))
+  }
+
+  func test__insertOrUpdate__overwritingNonEmptyListWithEmptyList__readsBackEmptyList() throws {
+    let db = try makeDatabase()
+    let full: [Record.Value] = ["red", "green"]
+    try db.insertOrUpdate(records: [Record(
+      key: "User:1",
+      fields: ["colors": CachedField(value: full as Record.Value, writtenAt: 100)]
+    )])
+
+    let empty: [Record.Value] = []
+    try db.insertOrUpdate(records: [Record(
+      key: "User:1",
+      fields: ["colors": CachedField(value: empty as Record.Value, writtenAt: 200)]
+    )])
+
+    let loaded = try db.selectRecords(forKeys: ["User:1"])
+    expect(loaded).to(haveCount(1))
+    let reloaded = loaded[0].fields["colors"]?.value as? [Any]
+    expect(reloaded).toNot(beNil())
+    expect(reloaded).to(beEmpty())
+    expect(loaded[0].fields["colors"]?.writtenAt).to(equal(200))
+  }
+
+  func test__insertOrUpdate__overwritingEmptyListWithNonEmptyList__readsBackElements() throws {
+    let db = try makeDatabase()
+    let empty: [Record.Value] = []
+    try db.insertOrUpdate(records: [Record(
+      key: "User:1",
+      fields: ["colors": CachedField(value: empty as Record.Value, writtenAt: 100)]
+    )])
+
+    let full: [Record.Value] = ["red", "green"]
+    try db.insertOrUpdate(records: [Record(
+      key: "User:1",
+      fields: ["colors": CachedField(value: full as Record.Value, writtenAt: 200)]
+    )])
+
+    let loaded = try db.selectRecords(forKeys: ["User:1"])
+    let reloaded = loaded[0].fields["colors"]?.value as? [Any]
+    expect(reloaded).to(haveCount(2))
+    expect(reloaded?[0] as? String).to(equal("red"))
+    expect(reloaded?[1] as? String).to(equal("green"))
   }
 
   // MARK: - Nested lists (2D, 3D)
@@ -204,6 +250,53 @@ class SQLiteRowPerElementCRUDTests: XCTestCase {
     let level2 = level1?[0] as? [Any]
     XCTAssertEqual(level2?[0] as? Int, 5,
                    "3D nesting should round-trip through two synthetic sub-records")
+  }
+
+  func test__roundTrip__nestedList_containingEmptyInnerList() throws {
+    let db = try makeDatabase()
+    // `[[1, 2], []]` — the empty inner list must survive the
+    // synthetic sub-record round-trip as `[]`, not leak a dangling
+    // `CacheReference` to the (row-less) synthetic key.
+    let row0: [Record.Value] = [1, 2]
+    let row1: [Record.Value] = []
+    let matrix: [Record.Value] = [row0 as Record.Value, row1 as Record.Value]
+    let original = Record(
+      key: "Math:1",
+      fields: ["matrix": CachedField(value: matrix as Record.Value, writtenAt: 100)]
+    )
+
+    try db.insertOrUpdate(records: [original])
+
+    let loaded = try db.selectRecords(forKeys: ["Math:1"])
+    let reloadedOuter = loaded[0].fields["matrix"]?.value as? [Any]
+    expect(reloadedOuter).to(haveCount(2))
+    let inner0 = reloadedOuter?[0] as? [Any]
+    expect(inner0?.count).to(equal(2))
+    expect(inner0?[0] as? Int).to(equal(1))
+    expect(reloadedOuter?[1] as? CacheReference).to(beNil())
+    let inner1 = reloadedOuter?[1] as? [Any]
+    expect(inner1).toNot(beNil())
+    expect(inner1).to(beEmpty())
+  }
+
+  func test__roundTrip__nestedList_singleEmptyInnerList() throws {
+    let db = try makeDatabase()
+    // `[[]]` — a one-element outer list whose only element is empty.
+    let inner: [Record.Value] = []
+    let outer: [Record.Value] = [inner as Record.Value]
+    let original = Record(
+      key: "Math:1",
+      fields: ["matrix": CachedField(value: outer as Record.Value, writtenAt: 100)]
+    )
+
+    try db.insertOrUpdate(records: [original])
+
+    let loaded = try db.selectRecords(forKeys: ["Math:1"])
+    let reloadedOuter = loaded[0].fields["matrix"]?.value as? [Any]
+    expect(reloadedOuter).to(haveCount(1))
+    let inner0 = reloadedOuter?[0] as? [Any]
+    expect(inner0).toNot(beNil())
+    expect(inner0).to(beEmpty())
   }
 
   func test__roundTrip__nestedList_listOfReferences() throws {
@@ -522,6 +615,39 @@ class SQLiteRowPerElementCRUDTests: XCTestCase {
 
     let loaded = try db.selectRecords(forKeys: ["Stock:AAPL"])
     XCTAssertEqual(loaded[0].fields["price"]?.value as? Double, 199.25)
+  }
+
+  // MARK: - Reserved-key audit (ADR 0006)
+
+  func test__insertOrUpdate__givenKeyContainingReservedSyntheticToken__throwsAndWritesNothing() throws {
+    let db = try makeDatabase()
+    // `.$[` is reserved for synthetic sub-record keys. A user key
+    // containing it (even without the trailing-digits shape the regex
+    // classifier requires) must be rejected so the SQL `LIKE`
+    // classifier can never match a stored user record.
+    let reserved = record("Order:receipt.$[final]", fields: ["total": 10])
+
+    expect { try db.insertOrUpdate(records: [reserved]) }.to(throwError { error in
+      guard case SQLiteError.reservedCacheKey(let key) = error else {
+        fail("Expected SQLiteError.reservedCacheKey, got \(error)")
+        return
+      }
+      expect(key).to(equal("Order:receipt.$[final]"))
+    })
+
+    expect(try db.selectRecords(forKeys: ["Order:receipt.$[final]"])).to(beEmpty())
+  }
+
+  func test__insertOrUpdate__givenReservedKeyAnywhereInBatch__writesNoRecordsFromBatch() throws {
+    let db = try makeDatabase()
+    let good = record("User:1", fields: ["name": "Anthony"])
+    let reserved = record("Item:x.$[3]", fields: ["qty": 1])
+
+    expect { try db.insertOrUpdate(records: [good, reserved]) }.to(throwError())
+
+    // The audit runs before the transaction opens: the valid record
+    // in the same batch is not written either.
+    expect(try db.selectRecords(forKeys: ["User:1"])).to(beEmpty())
   }
 
   // MARK: - Documented empty-record behavior

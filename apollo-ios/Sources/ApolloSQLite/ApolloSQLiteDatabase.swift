@@ -327,6 +327,19 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
   public func insertOrUpdate(records: [Record]) throws {
     guard !records.isEmpty else { return }
 
+    // Reserved-key audit (ADR 0006): `.$[` is reserved for the
+    // synthetic sub-record keys generated for nested-list storage.
+    // Rejecting user keys that contain the token guarantees the
+    // synthetic-key classifiers (`syntheticKeySuffixPattern` and
+    // `syntheticKeySuffixLikePattern`) can never match a stored user
+    // record. Checked before the transaction opens so a bad key in a
+    // batch writes nothing.
+    for record in records {
+      if record.key.contains(SQLiteSchema.Records.syntheticKeyToken) {
+        throw SQLiteError.reservedCacheKey(key: record.key)
+      }
+    }
+
     try performSync {
       try exec("BEGIN TRANSACTION", errorMessage: "Failed to begin insertOrUpdate transaction")
       do {
@@ -424,6 +437,9 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
   /// Writes one field's value, choosing the right row shape:
   /// - scalars get one row at `position = -1`
   /// - list-typed values get N rows at positions `0..N-1`
+  /// - empty lists get a single marker row at `position = -2` with no
+  ///   value column populated, so `[]` stays distinguishable from a
+  ///   never-written field
   /// - nested-list elements recurse via a synthetic sub-record
   ///
   /// Any prior rows for `(cacheKey, fieldName)` are cleared first so
@@ -446,6 +462,16 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     try directDelete(cacheKey: cacheKey, fieldName: fieldName)
 
     if let array = value as? [Record.Value] {
+      guard !array.isEmpty else {
+        try upsertRow(
+          cacheKey: cacheKey,
+          fieldName: fieldName,
+          position: SQLiteSchema.Records.emptyListPositionValue,
+          typedValue: nil,
+          writtenAt: writtenAt
+        )
+        return
+      }
       for (idx, element) in array.enumerated() {
         try writeElement(
           cacheKey: cacheKey,
@@ -529,11 +555,16 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
   /// every value column from `excluded.*`, so a field changing type
   /// (e.g. Int → String at the same position) also clears its prior
   /// column.
+  ///
+  /// A `nil` `typedValue` binds no value column (unbound parameters
+  /// are NULL) and is valid only for the empty-list marker row at
+  /// `position = -2` — the marker's meaning is carried entirely by
+  /// its `position`.
   private func upsertRow(
     cacheKey: CacheKey,
     fieldName: String,
     position: Int64,
-    typedValue: SQLiteFieldEncoding.TypedValue,
+    typedValue: SQLiteFieldEncoding.TypedValue?,
     writtenAt: Int64
   ) throws {
     let sql = """
@@ -576,6 +607,7 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     case .bool(let v):          sqlite3_bind_int64(stmt, 7, v ? 1 : 0)
     case .childKey(let v):      sqlite3_bind_text(stmt, 8, v, -1, SQLITE_TRANSIENT)
     case .customScalar(let v):  sqlite3_bind_text(stmt, 9, v, -1, SQLITE_TRANSIENT)
+    case nil:                   break  // empty-list marker: all value columns NULL
     }
 
     sqlite3_bind_int64(stmt, 10, writtenAt)
@@ -654,14 +686,21 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
       let cacheKey = String(cString: cacheKeyPtr)
       let fieldName = String(cString: fieldNamePtr)
       let position = sqlite3_column_int64(stmt, 2)
-      let value = try SQLiteFieldEncoding.decode(
-        boolValue: Self.optionalInt64(stmt: stmt, column: 6),
-        intValue: Self.optionalInt64(stmt: stmt, column: 3),
-        floatValue: Self.optionalDouble(stmt: stmt, column: 5),
-        stringValue: Self.optionalText(stmt: stmt, column: 4),
-        childKeyValue: Self.optionalText(stmt: stmt, column: 7),
-        customScalarValue: Self.optionalText(stmt: stmt, column: 8)
-      )
+      let value: Record.Value
+      if position == SQLiteSchema.Records.emptyListPositionValue {
+        // Empty-list marker rows populate no value column; the
+        // position alone carries the meaning.
+        value = ([] as [Record.Value]) as Record.Value
+      } else {
+        value = try SQLiteFieldEncoding.decode(
+          boolValue: Self.optionalInt64(stmt: stmt, column: 6),
+          intValue: Self.optionalInt64(stmt: stmt, column: 3),
+          floatValue: Self.optionalDouble(stmt: stmt, column: 5),
+          stringValue: Self.optionalText(stmt: stmt, column: 4),
+          childKeyValue: Self.optionalText(stmt: stmt, column: 7),
+          customScalarValue: Self.optionalText(stmt: stmt, column: 8)
+        )
+      }
       let writtenAt = sqlite3_column_int64(stmt, 9)
       rawRows.append(DecodedRow(
         cacheKey: cacheKey, fieldName: fieldName, position: position,
@@ -677,10 +716,10 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
   }
 
   /// Groups raw rows by cache_key, then by field_name, distinguishing
-  /// scalar fields (single row at `position = -1`) from list fields
-  /// (rows at `position >= 0`, sorted), and recursively resolves any
-  /// synthetic child_key_value references into their nested-list
-  /// contents.
+  /// scalar fields (single row at `position = -1`), empty lists
+  /// (single marker row at `position = -2`), and list fields (rows at
+  /// `position >= 0`, sorted), and recursively resolves any synthetic
+  /// child_key_value references into their nested-list contents.
   private func assembleRecords(from rows: [DecodedRow]) throws -> [Record] {
     var byKey: [CacheKey: [DecodedRow]] = [:]
     for row in rows {
@@ -698,7 +737,11 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
       for (fieldName, fieldRows) in byField {
         let sorted = fieldRows.sorted { $0.position < $1.position }
 
-        if sorted.count == 1 && sorted[0].position == SQLiteSchema.Records.defaultPositionValue {
+        if sorted.count == 1 && sorted[0].position == SQLiteSchema.Records.emptyListPositionValue {
+          // Empty-list marker row — the value was decoded as `[]`.
+          let row = sorted[0]
+          fields[fieldName] = CachedField(value: row.value, writtenAt: row.writtenAt)
+        } else if sorted.count == 1 && sorted[0].position == SQLiteSchema.Records.defaultPositionValue {
           let row = sorted[0]
           let resolved = try resolveSyntheticIfNeeded(row.value)
           fields[fieldName] = CachedField(value: resolved, writtenAt: row.writtenAt)

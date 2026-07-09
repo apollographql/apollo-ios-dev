@@ -23,7 +23,10 @@ import Foundation
 ///   `NSNull` (the GraphQL null marker)                → `custom_scalar_value`   (`"null"`)
 ///   `[String: Record.Value]` and other JSON shapes    → `custom_scalar_value`   (JSON)
 ///
-/// Exactly one value column is non-null on a well-formed row.
+/// Exactly one value column is non-null on a well-formed row. (The
+/// one exception is the empty-list marker row at `position = -2`,
+/// which populates no value column; it is written and read entirely
+/// at the database layer and never passes through this encoder.)
 ///
 /// **Type-identity on round-trip.** SQLite `INTEGER` is 64-bit; the
 /// decoder returns `Int` (which is 64-bit on every Apple deployment

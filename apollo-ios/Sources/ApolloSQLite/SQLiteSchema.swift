@@ -41,6 +41,15 @@ public enum SQLiteSchema {
     /// writes that omit `position` still land in the right row.
     public static let defaultPositionValue: Int64 = -1
 
+    /// The `position` value for the single marker row written when a
+    /// list-typed field's value is empty (`[]`). An empty list writes
+    /// no element rows, so without a marker it would be
+    /// indistinguishable from a field that was never written — a
+    /// distinction GraphQL cares about (`friends: []` is cached, valid
+    /// data; an absent field is a cache miss). The marker row
+    /// populates no value column; readers decode it back to `[]`.
+    public static let emptyListPositionValue: Int64 = -2
+
     /// The `field_name` column value used for the rows inside a
     /// synthetic sub-record. Synthetic sub-records hold the elements
     /// of a nested list; they don't have multiple named fields, so a
@@ -49,21 +58,32 @@ public enum SQLiteSchema {
     /// cannot collide with any real GraphQL field name.
     public static let syntheticFieldName: String = "$"
 
+    /// The reserved substring that marks a cache key as a synthetic
+    /// sub-record key. Every synthetic key contains this token
+    /// (`<parent>.<field>.$[<position>]`, or `<parent>.$[<position>]`
+    /// for deeper nesting). `insertOrUpdate` rejects user-supplied
+    /// cache keys containing it — the reserved-key audit from
+    /// ADR 0006 — which makes the two classifiers below collision-
+    /// safe by construction: no stored user record can ever match
+    /// them.
+    public static let syntheticKeyToken: String = ".$["
+
     /// Regex matching the trailing `.$[<integer>]` segment of a
     /// synthetic sub-record cache key. Anchored to the end of the
-    /// string. The `$` character cannot appear in a GraphQL Name, so
-    /// this pattern only matches the synthetic keys this database
-    /// produces for nested-list indirection — user-defined cache keys
-    /// will not match unless they deliberately mimic the format.
+    /// string. The `$` character cannot appear in a GraphQL Name, and
+    /// user cache keys containing `syntheticKeyToken` are rejected at
+    /// write time, so this pattern only ever matches the synthetic
+    /// keys this database produces for nested-list indirection.
     public static let syntheticKeySuffixPattern: String = #"\.\$\[[0-9]+\]$"#
 
     /// SQL `LIKE` pattern matching the trailing `.$[<anything>]`
     /// segment of a synthetic sub-record cache key. Less precise than
     /// `syntheticKeySuffixPattern` (SQLite `LIKE` has no character-
-    /// class support for digits), but sufficient for the cascading-
-    /// delete walk: the writer never produces a cache key ending in
-    /// `.$[<non-integer>]`, so a stray match is impossible against
-    /// data we wrote.
+    /// class support for digits), but safe for the same reason as the
+    /// regex: the writer never produces a cache key ending in
+    /// `.$[<non-integer>]`, and user keys containing
+    /// `syntheticKeyToken` are rejected at write time, so a stray
+    /// match is impossible against stored data.
     public static let syntheticKeySuffixLikePattern: String = "%.$[%]"
   }
 
