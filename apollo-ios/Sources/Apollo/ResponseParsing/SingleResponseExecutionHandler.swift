@@ -75,7 +75,7 @@ extension JSONResponseParser {
 
     private func makeResult(
       data: Operation.Data?,
-      dependentKeys: Set<CacheKey>?
+      dependentKeys: Set<CacheDependentKey>?
     ) -> GraphQLResponse<Operation> {      
       return GraphQLResponse<Operation>(
         data: data,

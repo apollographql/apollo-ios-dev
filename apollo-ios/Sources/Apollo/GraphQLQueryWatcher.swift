@@ -30,7 +30,7 @@ public actor GraphQLQueryWatcher<Query: GraphQLQuery>: ApolloStoreSubscriber {
   public private(set) var cancelled: Bool = false
 
   private var lastFetch: FetchContext?
-  private var dependentKeys: Set<CacheKey>? = nil
+  private var dependentKeys: Set<CacheDependentKey>? = nil
 
   private let resultHandler: ResultHandler
   private let contextIdentifier = UUID()
@@ -214,7 +214,7 @@ public actor GraphQLQueryWatcher<Query: GraphQLQuery>: ApolloStoreSubscriber {
 
   public nonisolated func store(
     _ store: ApolloStore,
-    didChangeKeys changedKeys: Set<CacheKey>
+    didChangeKeys changedKeys: Set<CacheDependentKey>
   ) {
     if let incomingIdentifier = QueryWatcherContext.identifier,
       incomingIdentifier == self.contextIdentifier

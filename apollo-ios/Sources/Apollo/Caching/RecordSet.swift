@@ -44,8 +44,8 @@ public struct RecordSet: Sendable, Hashable {
     return Set(storage.keys)
   }
 
-  @discardableResult public mutating func merge(records: RecordSet) -> Set<CacheKey> {
-    var changedKeys: Set<CacheKey> = Set()
+  @discardableResult public mutating func merge(records: RecordSet) -> Set<CacheDependentKey> {
+    var changedKeys: Set<CacheDependentKey> = []
 
     for (_, record) in records.storage {
       changedKeys.formUnion(merge(record: record))
@@ -54,28 +54,30 @@ public struct RecordSet: Sendable, Hashable {
     return changedKeys
   }
 
-  @discardableResult public mutating func merge(record: Record) -> Set<CacheKey> {
+  @discardableResult public mutating func merge(record: Record) -> Set<CacheDependentKey> {
     if let oldRecord = storage[record.key] {
-      var changedKeys: Set<CacheKey> = Set()
+      var changedKeys: Set<CacheDependentKey> = []
       var updatedRecord = oldRecord
 
       // Always take the new `CachedField` so the stored timestamp advances
       // to the latest write. Only notify watchers (via `changedKeys`) when
       // the observable value actually differs from what was stored.
-      for (key, newField) in record.fields {
-        updatedRecord.fields[key] = newField
-        if let oldField = oldRecord.fields[key],
+      for (fieldName, newField) in record.fields {
+        updatedRecord.fields[fieldName] = newField
+        if let oldField = oldRecord.fields[fieldName],
            AnyHashable(oldField.value) == AnyHashable(newField.value) {
           continue
         }
-        changedKeys.insert([record.key, key].joined(separator: "."))
+        changedKeys.insert(CacheDependentKey(cacheKey: record.key, fieldName: fieldName))
       }
 
       storage[record.key] = updatedRecord
       return changedKeys
     } else {
       storage[record.key] = record
-      return Set(record.fields.keys.map { [record.key, $0].joined(separator: ".") })
+      return Set(
+        record.fields.keys.map { CacheDependentKey(cacheKey: record.key, fieldName: $0) }
+      )
     }
   }
 }

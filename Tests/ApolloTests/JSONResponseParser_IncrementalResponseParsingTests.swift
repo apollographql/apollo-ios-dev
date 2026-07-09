@@ -445,6 +445,8 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
     let result = try await iterator.next()
     let dependentKeys = result?.result.dependentKeys
     expect(dependentKeys).toNot(beNil())
-    expect(dependentKeys).to(contain(CacheKey("QUERY_ROOT.animal.genus")))
+    expect(dependentKeys).to(
+      contain(CacheDependentKey(cacheKey: "QUERY_ROOT.animal", fieldName: "genus"))
+    )
   }
 }
