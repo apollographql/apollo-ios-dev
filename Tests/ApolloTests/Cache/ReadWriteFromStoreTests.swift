@@ -266,6 +266,81 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
   }
 
   @MainActor
+  func test_readObject_givenFieldSelectedTwiceWithDivergentSubSelections_loadsMergedChildSelections() async throws {
+    // given
+    struct Types {
+      static let Droid = Object(typename: "Droid", implementedInterfaces: [])
+    }
+
+    MockSchemaMetadata.stub_objectTypeForTypeName({ typename in
+      switch typename {
+      case "Droid": return Types.Droid
+      default: return nil
+      }
+    })
+
+    // `friend` is selected twice at the same level with divergent
+    // sub-selections — directly (selecting `name`) and again inside
+    // `... on Droid` (selecting `primaryFunction`). The executor
+    // merges both fields into one `FieldExecutionInfo` and executes
+    // the union of their sub-selections against the loaded child
+    // record, so the cache read must project that union too;
+    // projecting only the first merged field's selections would turn
+    // this fully-cached read into a spurious `missingValue` miss.
+    class GivenSelectionSet: MockSelectionSet, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] { [
+        .field("__typename", String.self),
+        .field("friend", Friend.self),
+        .inlineFragment(AsDroid.self),
+      ]}
+
+      var asDroid: AsDroid? { _asInlineFragment() }
+
+      class Friend: MockSelectionSet, @unchecked Sendable {
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("name", String.self),
+        ]}
+      }
+
+      class AsDroid: MockTypeCase, @unchecked Sendable {
+        typealias Schema = MockSchemaMetadata
+        override class var __parentType: any ParentType { Types.Droid }
+
+        override class var __selections: [Selection] { [
+          .field("friend", Friend.self),
+        ]}
+
+        class Friend: MockSelectionSet, @unchecked Sendable {
+          override class var __selections: [Selection] { [
+            .field("__typename", String.self),
+            .field("primaryFunction", String.self),
+          ]}
+        }
+      }
+    }
+
+    try await store.publish(records: [
+      "2001": ["__typename": "Droid", "friend": CacheReference("1000")],
+      "1000": ["__typename": "Droid", "name": "C-3PO", "primaryFunction": "Protocol"],
+    ])
+
+    // when
+    try await store.withinReadTransaction { transaction in
+      let droid = try await transaction.readObject(
+        ofType: GivenSelectionSet.self,
+        withKey: "2001"
+      )
+
+      // then
+      XCTAssertEqual(droid.friend?.name, "C-3PO")
+      XCTAssertEqual(droid.asDroid?.friend?.primaryFunction, "Protocol")
+    }
+  }
+
+  @MainActor
   func test_readObject_givenFragmentWithMissingTypeSpecificProperty() async throws {
     // given
     struct Types {

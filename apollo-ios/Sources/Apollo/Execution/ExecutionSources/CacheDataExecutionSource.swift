@@ -115,16 +115,28 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
       return .immediate(.failure(ApolloStore.Error.notWithinReadTransaction))
     }
 
-    // The child's selection set is determined by the field's
-    // declared OutputType. Peel `.nonNull` and `.list` wrappers down
-    // to the `.object` case — that case's RootSelectionSet.Type
-    // carries the selections we need to project on the child cache
-    // key. For non-object output types (e.g. `.scalar` or
-    // `.customScalar`) we don't reach this site, since
-    // `resolveField` only routes through `deferredResolve` when the
-    // resolved value is a `CacheReference`, and only object-typed
-    // fields produce references.
-    guard let childSelections = Self.childSelections(of: info.field.type) else {
+    // The child's selection set is the union of the selections of
+    // every field merged into this `FieldExecutionInfo`, mirroring
+    // `FieldExecutionInfo.computeChildExecutionData` — the executor
+    // executes that union against the loaded record, so projecting
+    // from `info.field` alone would under-collect whenever the same
+    // field is selected more than once with divergent sub-selections
+    // (e.g. directly and again inside a named or inline fragment),
+    // turning fully-cached data into a spurious cache miss. Each
+    // merged field's declared OutputType is peeled (`.nonNull` and
+    // `.list` wrappers) down to its `.object` case; non-object
+    // output types contribute nothing. Reaching this site with no
+    // object-typed merged field at all is a contract violation —
+    // only object-typed fields produce `CacheReference` values — and
+    // is surfaced as an explicit decoding error.
+    var childSelections: [Selection] = []
+    var foundObjectOutputType = false
+    for mergedField in info.mergedFields {
+      guard let selections = Self.childSelections(of: mergedField.type) else { continue }
+      foundObjectOutputType = true
+      childSelections.append(contentsOf: selections)
+    }
+    guard foundObjectOutputType else {
       return .immediate(.failure(JSONDecodingError.wrongType))
     }
 
