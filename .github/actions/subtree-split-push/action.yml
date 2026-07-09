@@ -30,9 +30,8 @@ runs:
       PR_TITLE: ${{ inputs.pr-title }}
     run: |
       echo "git: $(git --version)"
-      # git-subtree is a bash script that can recurse thousands of frames deep
-      # when a subtree's rejoin anchor is stale (its walk grows with repo
-      # history). Remove the stack ceiling so deep walks cost time, never a
+      # git-subtree is a bash script that can recurse thousands of frames
+      # deep. Remove the stack ceiling so deep walks cost time, never a
       # segfault. See claude/ci-subtree-troubleshooting.md (July 2026 incident).
       ulimit -s unlimited 2>/dev/null || ulimit -s "$(ulimit -Hs)" || true
       # Fetch upstream for diagnostic visibility in logs. We do NOT pull —
@@ -42,5 +41,30 @@ runs:
       # See claude/ci-subtree-troubleshooting.md for the "stale upstream" incident
       # that motivated removing the pull.
       git fetch ${{ inputs.remote }} ${{ inputs.target-branch }}
-      splitResult=$(git subtree -P ${{ inputs.subtree }} split --squash --rejoin -m "split: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - $PR_TITLE")
+      # Split with the vendored git-subtree from git v2.53.0 rather than the
+      # runner's `git subtree`: git >= 2.54 removed the multi-subtree walk
+      # optimization, making each split crawl the entire repo history (slow,
+      # growing forever). See scripts/vendor/README.md for provenance and the
+      # full rationale. The script needs GIT_EXEC_PATH to source git-sh-setup.
+      export GIT_EXEC_PATH="$(git --exec-path)"
+      export PATH="$GIT_EXEC_PATH:$PATH"
+      # When the subtree has no new changes, the script prints "Subtree is
+      # already at commit <sha>" to stderr and exits 0 with EMPTY stdout —
+      # that empty split_sha is the action's existing "nothing to push"
+      # contract, honored by the workflow's push step.
+      splitResult=$(bash "$GITHUB_WORKSPACE/scripts/vendor/git-subtree-2.53.0.sh" split --prefix=${{ inputs.subtree }} --squash --rejoin -m "split: ${{ inputs.subtree }} - PR #${{ inputs.pr-number }} - $PR_TITLE")
+      if [ -n "$splitResult" ]; then
+        # Safety net for the v2.53 optimization's known edge cases: the split
+        # commit's tree must exactly equal the subtree directory's tree in
+        # HEAD. A miscomputed split fails here, loudly, before any push.
+        splitTree=$(git rev-parse "$splitResult^{tree}")
+        subtreeTree=$(git rev-parse "HEAD:${{ inputs.subtree }}")
+        if [ "$splitTree" != "$subtreeTree" ]; then
+          echo "::error::Split verification failed for ${{ inputs.subtree }}: split commit tree $splitTree != HEAD:${{ inputs.subtree }} tree $subtreeTree. Not pushing."
+          exit 1
+        fi
+        echo "Split verified: tree $splitTree matches HEAD:${{ inputs.subtree }}"
+      else
+        echo "No new changes for ${{ inputs.subtree }}; nothing to push."
+      fi
       echo "split_sha=$splitResult" >> $GITHUB_OUTPUT

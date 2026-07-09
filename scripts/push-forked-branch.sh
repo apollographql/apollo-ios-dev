@@ -49,4 +49,15 @@ then
 fi
 
 git fetch $remote
-git subtree push -P $package $remote $branch
+
+# Split with the vendored git-subtree (v2.53.0) instead of the system
+# `git subtree` so local splits produce the same hashes as CI regardless of
+# the locally installed git version. See scripts/vendor/README.md.
+export GIT_EXEC_PATH="$(git --exec-path)"
+export PATH="$GIT_EXEC_PATH:$PATH"
+splitSha=$(bash "$SCRIPT_DIR/vendor/git-subtree-2.53.0.sh" split --prefix=$package) || exit $?
+if [ -z "$splitSha" ]; then
+  echo "Split produced no SHA for $package; refusing to push." >&2
+  exit 1
+fi
+git push $remote "$splitSha:refs/heads/$branch"

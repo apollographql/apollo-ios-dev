@@ -38,11 +38,15 @@ During the label rollover, runs landed on either image at random, so failures lo
 
 **Impact:** None to repair. `Push Subtrees` is gated on `if: success()`, so failed runs pushed nothing and no rejoin metadata reached `main`. The missed subtree commits were carried upstream automatically by the next successful run (splits walk full history).
 
-**Fix:** Moved the workflow's jobs to `runs-on: ubuntu-latest` (nothing in them is macOS-specific) and added `ulimit -s unlimited` before the split in the `subtree-split-push` action, which Linux permits — deep crawls now cost minutes, never a segfault. Do not move these jobs back to macOS runners.
+**Fix (PR #1047):** Three layers.
 
-**Residual issue:** the O(full-history) crawl per split is upstream git's intended behavior as of 2.54 — split wall-clock time grows with repo history forever. If runs get too slow, the candidate escape hatch is [`splitsh-lite`](https://github.com/splitsh/lite) (a C/libgit2 splitter that claims hash-compatibility with `git subtree split`, used by Symfony's monorepo, walks full history in seconds and supports a persistent cache). Verify hash-compatibility against the existing upstream heads before switching — a mismatched split SHA would push non-fast-forward.
+1. Moved the workflow's jobs to `runs-on: ubuntu-latest` (nothing in them is macOS-specific). Do not move these jobs back to macOS runners.
+2. Added `ulimit -s unlimited` before the split (Linux permits it) — a deep walk can now cost time, never a segfault.
+3. Vendored `git-subtree.sh` from git v2.53.0 at `scripts/vendor/git-subtree-2.53.0.sh` — the last version with the multi-subtree optimization — and pointed the `subtree-split-push` action at it. Splits are back to ~12s each with a walk that stays flat as history grows. Verified before adoption: it reproduces the exact upstream head SHAs for all three subtrees. The action asserts after every split that the split commit's tree equals `HEAD:<subtree>`, so the optimization's known edge cases (which require merge topologies this repo doesn't produce) would fail loudly before any push. See `scripts/vendor/README.md` for full provenance and rationale.
 
-**⚠️ Local vs CI git divergence:** Apple/Xcode git (2.50.x as of this writing) still contains the removed optimization — the one upstream deleted *because it can compute incorrect split hashes*. Prefer git ≥2.54 (e.g. `brew install git`) when performing any local recovery split intended to be pushed upstream; CI's hashes are the canonical ones.
+**Rejected alternative:** [`splitsh-lite`](https://github.com/splitsh/lite) — unmaintained (archived git2go binding pinned to libgit2 1.5) and empirically NOT hash-compatible with this repo's squash-based history (produced a different apollo-ios split SHA). Do not revisit it.
+
+**⚠️ Local vs CI git divergence:** different git versions implement `subtree split` differently (the optimization was present ≤2.53, removed in 2.54). Both algorithms have so far agreed on this repo's history, but for any local recovery split intended to be pushed upstream, use the vendored script (`scripts/vendor/git-subtree-2.53.0.sh`, with `GIT_EXEC_PATH="$(git --exec-path)"` exported and on `PATH`) — that is exactly what CI runs, so its hashes are the canonical ones.
 
 ## Historical incident: stale-upstream pull conflict (May 2026)
 
