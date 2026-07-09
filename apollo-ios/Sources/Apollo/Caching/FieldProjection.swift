@@ -253,17 +253,22 @@ public struct FieldProjection: Hashable, Sendable {
       return .childKey
     case .nonNull, .list:
       // Unreachable: `peelToNamedType` is the only caller path
-      // and it strips every wrapper. Guard defensively.
-      return .customScalar
+      // and it strips every wrapper before passing the result here.
+      // If this case is ever entered, the invariant has broken — fail
+      // loudly rather than silently routing to `.customScalar`, which
+      // would produce wrong-column reads at runtime.
+      preconditionFailure(
+        "columnShape(ofNamedType:) reached a wrapper type (\(namedType)); peelToNamedType invariant violated"
+      )
     }
   }
 
   /// Maps a built-in `ScalarType` metatype to its column slot. The
   /// five GraphQL primitive scalars route to their typed columns;
-  /// any other type would fall through to `.customScalar`, but
-  /// codegen never emits a non-built-in metatype here (it uses the
-  /// `.customScalar` case for those), so the fallthrough is
-  /// defensive only.
+  /// any other type would be a codegen invariant violation (codegen
+  /// emits non-built-in scalar types through the `.customScalar` case,
+  /// not `.scalar`), so the fallthrough crashes rather than silently
+  /// routing to a wrong column.
   private static func columnShape(
     forBuiltInScalarType scalarType: any ScalarType.Type
   ) -> ColumnShape {
@@ -271,6 +276,8 @@ public struct FieldProjection: Hashable, Sendable {
     if scalarType == Int.self || scalarType == Int32.self { return .int }
     if scalarType == Bool.self { return .bool }
     if scalarType == Float.self || scalarType == Double.self { return .float }
-    return .customScalar
+    preconditionFailure(
+      "columnShape(forBuiltInScalarType:) received an unrecognized ScalarType (\(scalarType)); custom scalars must route through `.customScalar`, not `.scalar`"
+    )
   }
 }
