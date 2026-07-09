@@ -367,9 +367,25 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
   }
 
   public func deleteRecord(forKey cacheKey: CacheKey) throws {
+    // The cascade walk and the direct delete are separate statements;
+    // wrap them in one transaction so a failure between the two can't
+    // leave rows pointing at already-deleted synthetic sub-records
+    // (or vice versa).
     try performSync {
-      try cascadeDeleteSyntheticDescendants(seedCacheKeys: [cacheKey])
-      try directDelete(cacheKey: cacheKey)
+      try exec("BEGIN TRANSACTION", errorMessage: "Failed to begin deleteRecord transaction")
+      do {
+        try cascadeDeleteSyntheticDescendants(seedCacheKeys: [cacheKey])
+        try directDelete(cacheKey: cacheKey)
+      } catch {
+        rollbackTransaction()
+        throw error
+      }
+      do {
+        try exec("COMMIT TRANSACTION", errorMessage: "Failed to commit deleteRecord transaction")
+      } catch {
+        rollbackTransaction()
+        throw error
+      }
     }
   }
 
@@ -385,26 +401,46 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
       .replacingOccurrences(of: "_", with: "\\_")
     let wildcardPattern = "%\(escaped)%"
 
+    // Both the cascade walk and the flat delete match only
+    // non-synthetic (user) record keys. Synthetic sub-record keys
+    // embed parent field names (`User:1.claws.$[0]`), so a substring
+    // pattern could match a synthetic key whose *parent* doesn't
+    // match — deleting the internals of a list the caller never
+    // asked to touch and leaving the parent's rows dangling.
+    // Synthetic rows are removed exclusively via the cascade from
+    // matched user records.
     try performSync {
-      // Cascade walk: synthetic sub-records reachable from any record
-      // whose cache_key matches the pattern. The walk's seed is the
-      // set of matched records, and it follows `child_key_value`
-      // pointers whose value ends with `.$[<integer>]`. The matched
-      // records themselves are then deleted by the direct DELETE
-      // below.
-      try cascadeDeletePatternMatchedSyntheticDescendants(escapedLikePattern: wildcardPattern)
+      try exec("BEGIN TRANSACTION", errorMessage: "Failed to begin pattern-delete transaction")
+      do {
+        // Cascade walk: synthetic sub-records reachable from any
+        // non-synthetic record whose cache_key matches the pattern.
+        // The walk follows `child_key_value` pointers whose value
+        // ends with `.$[<integer>]`. The matched records themselves
+        // are then deleted by the direct DELETE below.
+        try cascadeDeletePatternMatchedSyntheticDescendants(escapedLikePattern: wildcardPattern)
 
-      let sql = """
-      DELETE FROM \(SQLiteSchema.recordsTableName)
-      WHERE \(SQLiteSchema.Records.cacheKey) LIKE ? COLLATE NOCASE ESCAPE '\\'
-      """
-      let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare row-per-element pattern delete")
-      defer { sqlite3_finalize(stmt) }
+        let sql = """
+        DELETE FROM \(SQLiteSchema.recordsTableName)
+        WHERE \(SQLiteSchema.Records.cacheKey) LIKE ? COLLATE NOCASE ESCAPE '\\'
+          AND \(SQLiteSchema.Records.cacheKey) NOT LIKE '\(SQLiteSchema.Records.syntheticKeySuffixLikePattern)' ESCAPE '\\'
+        """
+        let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare row-per-element pattern delete")
+        defer { sqlite3_finalize(stmt) }
 
-      sqlite3_bind_text(stmt, 1, wildcardPattern, -1, SQLITE_TRANSIENT)
-      let result = sqlite3_step(stmt)
-      if result != SQLITE_DONE {
-        throw SQLiteError.step(message: "Row-per-element pattern delete failed: \(sqliteErrorMessage())", resultCode: result)
+        sqlite3_bind_text(stmt, 1, wildcardPattern, -1, SQLITE_TRANSIENT)
+        let result = sqlite3_step(stmt)
+        if result != SQLITE_DONE {
+          throw SQLiteError.step(message: "Row-per-element pattern delete failed: \(sqliteErrorMessage())", resultCode: result)
+        }
+      } catch {
+        rollbackTransaction()
+        throw error
+      }
+      do {
+        try exec("COMMIT TRANSACTION", errorMessage: "Failed to commit pattern-delete transaction")
+      } catch {
+        rollbackTransaction()
+        throw error
       }
     }
   }
@@ -717,9 +753,14 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
   }
 
   /// Pattern-scoped variant. The walk seeds from synthetic children
-  /// of *every record whose cache_key matches the LIKE pattern*, then
-  /// follows the synthetic chain transitively. The matched records
-  /// themselves are deleted by the caller's flat pattern DELETE.
+  /// of *every non-synthetic record whose cache_key matches the LIKE
+  /// pattern*, then follows the synthetic chain transitively. The
+  /// matched records themselves are deleted by the caller's flat
+  /// pattern DELETE. Synthetic keys matching the pattern are excluded
+  /// from the seed for the same reason the caller excludes them from
+  /// the flat delete: a substring pattern may match a synthetic key
+  /// whose parent record doesn't match, and touching that key's
+  /// subtree would corrupt the unmatched parent's list storage.
   private func cascadeDeletePatternMatchedSyntheticDescendants(
     escapedLikePattern: String
   ) throws {
@@ -727,6 +768,7 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     WITH RECURSIVE descendants(cache_key) AS (
       SELECT r.\(SQLiteSchema.Records.childKeyValue) FROM \(SQLiteSchema.recordsTableName) r
       WHERE r.\(SQLiteSchema.Records.cacheKey) LIKE ? COLLATE NOCASE ESCAPE '\\'
+        AND r.\(SQLiteSchema.Records.cacheKey) NOT LIKE '\(SQLiteSchema.Records.syntheticKeySuffixLikePattern)' ESCAPE '\\'
         AND r.\(SQLiteSchema.Records.childKeyValue) IS NOT NULL
         AND r.\(SQLiteSchema.Records.childKeyValue) LIKE '\(SQLiteSchema.Records.syntheticKeySuffixLikePattern)' ESCAPE '\\'
       UNION

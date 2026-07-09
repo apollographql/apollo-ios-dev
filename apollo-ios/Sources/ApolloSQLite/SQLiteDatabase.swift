@@ -137,15 +137,21 @@ public protocol SQLiteDatabase {
   /// row-per-element schema's `cache_key`.
   func deleteRecord(forKey cacheKey: CacheKey) throws
 
-  /// Removes every row whose `cache_key` matches the wildcard
-  /// `pattern`, plus every row of every synthetic sub-record
-  /// reachable from those records via `child_key_value` pointers.
-  /// Comparison is case-insensitive (`COLLATE NOCASE`). `\`, `%`,
-  /// and `_` in `pattern` are escaped so they match literally
-  /// rather than acting as `LIKE` wildcards. The synthetic cascade
-  /// follows the same rule as `deleteRecord(forKey:)` — only
-  /// synthetic-suffix children are removed; real `CacheReference`
-  /// targets are left alone.
+  /// Removes every row of every *non-synthetic* record whose
+  /// `cache_key` matches the wildcard `pattern`, plus every row of
+  /// every synthetic sub-record reachable from those records via
+  /// `child_key_value` pointers. Comparison is case-insensitive
+  /// (`COLLATE NOCASE`). `\`, `%`, and `_` in `pattern` are escaped
+  /// so they match literally rather than acting as `LIKE` wildcards.
+  ///
+  /// Synthetic sub-record keys are never matched by `pattern`
+  /// directly — they embed parent field names, so a substring
+  /// pattern could match a synthetic key whose parent record does
+  /// not match, and deleting it would corrupt the parent's list
+  /// storage. Synthetic rows are removed exclusively through the
+  /// cascade from matched records. The cascade follows the same rule
+  /// as `deleteRecord(forKey:)` — only synthetic-suffix children are
+  /// removed; real `CacheReference` targets are left alone.
   func deleteRecords(matchingKey pattern: CacheKey) throws
 
 }

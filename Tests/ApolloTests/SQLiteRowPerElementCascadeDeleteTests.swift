@@ -292,4 +292,48 @@ class SQLiteRowPerElementCascadeDeleteTests: XCTestCase {
     XCTAssertEqual(try db.rowCount(forCacheKey: "User:1.matrix.$[0]"), 2,
                    "Unmatched record's synthetic sub-record must survive")
   }
+
+  func test__deleteRecords_matchingKey__patternMatchingSyntheticKeyButNotParent_leavesParentsListStorageIntact() throws {
+    let db = try makeDatabase()
+    // Synthetic keys embed the parent field name
+    // (`User:1.claws.$[0]`), so the pattern "claws" matches the
+    // synthetic key while the parent key `User:1` doesn't. The
+    // pattern delete must not touch the synthetic rows in that case —
+    // deleting them would amputate the internals of a list the caller
+    // never asked to remove and leave `User:1`'s rows dangling.
+    let claws: [Record.Value] = [[1, 2] as Record.Value, [3] as Record.Value]
+    try db.insertOrUpdate(records: [record("User:1", field: "claws", value: claws as Record.Value)])
+    XCTAssertEqual(try db.rowCount(forCacheKey: "User:1.claws.$[0]"), 2)
+    XCTAssertEqual(try db.rowCount(forCacheKey: "User:1.claws.$[1]"), 1)
+
+    try db.deleteRecords(matchingKey: "claws")
+
+    XCTAssertEqual(try db.rowCount(forCacheKey: "User:1"), 2,
+                   "Parent record's rows must survive a pattern that only matches its synthetic children")
+    XCTAssertEqual(try db.rowCount(forCacheKey: "User:1.claws.$[0]"), 2,
+                   "Synthetic rows must survive a pattern matching them but not their parent")
+    XCTAssertEqual(try db.rowCount(forCacheKey: "User:1.claws.$[1]"), 1)
+
+    // The nested list still reads back fully intact.
+    let loaded = try db.selectRecords(forKeys: ["User:1"])
+    let outer = loaded[0].fields["claws"]?.value as? [Any]
+    XCTAssertEqual(outer?.count, 2)
+    XCTAssertEqual((outer?[0] as? [Any])?.count, 2)
+    XCTAssertEqual((outer?[1] as? [Any])?.count, 1)
+  }
+
+  func test__deleteRecords_matchingKey__patternMatchingParentAndSyntheticKeys_deletesBothViaCascade() throws {
+    let db = try makeDatabase()
+    // When the pattern matches the parent, the synthetic rows go with
+    // it (via the cascade), even though the flat delete no longer
+    // matches synthetic keys directly.
+    let claws: [Record.Value] = [[1, 2] as Record.Value]
+    try db.insertOrUpdate(records: [record("Animal:cat", field: "claws", value: claws as Record.Value)])
+
+    try db.deleteRecords(matchingKey: "cat")
+
+    XCTAssertEqual(try db.rowCount(forCacheKey: "Animal:cat"), 0)
+    XCTAssertEqual(try db.rowCount(forCacheKey: "Animal:cat.claws.$[0]"), 0,
+                   "Synthetic sub-records of a matched parent must still cascade")
+  }
 }
