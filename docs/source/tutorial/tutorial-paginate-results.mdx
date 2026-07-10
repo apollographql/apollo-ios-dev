@@ -100,7 +100,7 @@ Next, go to `LaunchListView` and update our task to call the newly implemented `
 
 ```swift title="LaunchListView.swift"
 .task {
-    viewModel.loadMoreLaunchesIfTheyExist() // highlight-line
+    await viewModel.loadMoreLaunchesIfTheyExist() // highlight-line
 }
 ```
 
