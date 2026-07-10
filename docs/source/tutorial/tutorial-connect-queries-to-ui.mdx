@@ -32,11 +32,11 @@ do {
 }
 ```
 
-`GraphQLResult` has both a `data` property and an `errors` property. This is because GraphQL allows partial data to be returned if it's non-null. 
+`GraphQLResponse` has both a `data` property and an `errors` property. This is because GraphQL allows partial data to be returned if it's non-null.
 
-In the example we're working with now, we could theoretically obtain a list of launches, and then an error stating that a launch with a particular ID could not be retrieved. 
+In the example we're working with now, we could theoretically obtain a list of launches, and then an error stating that a launch with a particular ID could not be retrieved.
 
-This is why when you get a `GraphQLResult`, you generally want to check both the `data` property (to display any results you got from the server) _and_ the `errors` property (to try to handle any errors you received from the server).
+This is why when you get a `GraphQLResponse`, you generally want to check both the `data` property (to display any results you got from the server) _and_ the `errors` property (to try to handle any errors you received from the server).
 
 As you can see in the code, the sample project has already provided an easy way to display error alerts by simply assigning the desired value to the `appAlert` property.
 
