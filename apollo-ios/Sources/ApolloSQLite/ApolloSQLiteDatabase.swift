@@ -875,14 +875,30 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
           let resolved = try resolveSyntheticIfNeeded(row.value)
           fields[fieldName] = CachedField(value: resolved, writtenAt: row.writtenAt)
         } else {
+          // All element rows of a list field are written atomically
+          // with a single timestamp (clear-then-write in
+          // `writeFieldOrList`), so every row must agree on
+          // `written_at`. Divergence can only mean a writer bug —
+          // and any value chosen from divergent rows would be
+          // meaningless for TTL evaluation — so fail loudly rather
+          // than pick a side.
           var elements: [Record.Value] = []
-          var maxWrittenAt: Int64 = 0
+          var writtenAt: Int64?
           for row in sorted where row.position >= 0 {
             let resolved = try resolveSyntheticIfNeeded(row.value)
             elements.append(resolved)
-            maxWrittenAt = max(maxWrittenAt, row.writtenAt)
+            precondition(
+              writtenAt == nil || writtenAt == row.writtenAt,
+              "List field '\(fieldName)' on record '\(key)' has divergent written_at values (\(writtenAt.map(String.init) ?? "-") vs \(row.writtenAt)); element rows are written atomically with a single timestamp, so divergence indicates a writer bug"
+            )
+            writtenAt = row.writtenAt
           }
-          fields[fieldName] = CachedField(value: elements as Record.Value, writtenAt: maxWrittenAt)
+          guard let writtenAt else {
+            preconditionFailure(
+              "List field '\(fieldName)' on record '\(key)' has rows but none at position >= 0; the writer never produces this shape"
+            )
+          }
+          fields[fieldName] = CachedField(value: elements as Record.Value, writtenAt: writtenAt)
         }
       }
       records.append(Record(key: key, fields: fields))
