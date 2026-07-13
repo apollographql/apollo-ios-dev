@@ -11,22 +11,36 @@ import ApolloInternalTestHelpers
 /// sub-record must be cleaned up so the database doesn't accumulate
 /// unreachable orphan rows.
 ///
-/// The tests in this suite verify orphan removal via the test-only
-/// `rowCount(forCacheKey:)` helper, which bypasses
-/// `selectRecords`'s synthetic-key filter and queries the database
-/// directly. An earlier draft of these tests went through
+/// The tests in this suite verify orphan removal via
+/// `SQLiteTestDatabaseInspector.rowCount(inDatabaseAt:forCacheKey:)`,
+/// which opens its own connection and bypasses `selectRecords`'s
+/// synthetic-key filter. An earlier draft of these tests went through
 /// `selectRecords` and silently passed regardless of cascade behavior
-/// because the filter masked the orphans — `rowCount` makes the
-/// assertions actually load-bearing.
+/// because the filter masked the orphans — the raw row count makes
+/// the assertions actually load-bearing.
 class SQLiteRowPerElementCascadeDeleteTests: XCTestCase {
 
   // MARK: - Fixtures
 
+  /// The file URL of the database created by `makeDatabase()`, used by
+  /// `rowCount(forCacheKey:)` to inspect storage through the test
+  /// inspector's own connection.
+  private var databaseFileURL: URL!
+
   private func makeDatabase() throws -> ApolloSQLiteDatabase {
-    let db = try ApolloSQLiteDatabase(fileURL: SQLiteTestCacheProvider.temporarySQLiteFileURL())
+    let fileURL = SQLiteTestCacheProvider.temporarySQLiteFileURL()
+    databaseFileURL = fileURL
+    let db = try ApolloSQLiteDatabase(fileURL: fileURL)
     try db.createSchemaMetadataTableIfNeeded()
     try db.createNewRecordsTableIfNeeded()
     return db
+  }
+
+  /// Counts stored rows for `cacheKey` via `SQLiteTestDatabaseInspector`,
+  /// bypassing the production read paths and their synthetic-key filter
+  /// so orphan assertions stay load-bearing.
+  private func rowCount(forCacheKey cacheKey: CacheKey) throws -> Int {
+    try SQLiteTestDatabaseInspector.rowCount(inDatabaseAt: databaseFileURL, forCacheKey: cacheKey)
   }
 
   /// Wraps a value into a `Record` with one field. Lets the test
@@ -55,17 +69,17 @@ class SQLiteRowPerElementCascadeDeleteTests: XCTestCase {
     try db.insertOrUpdate(records: [record("Math:1", field: "matrix", value: matrix as Record.Value)])
 
     // Pre-check: synthetic sub-records exist.
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:1.matrix.$[0]"), 2)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:1.matrix.$[1]"), 2)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:1.matrix.$[0]"), 2)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:1.matrix.$[1]"), 2)
 
     try db.deleteRecord(forKey: "Math:1")
 
     // Parent gone.
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:1"), 0)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:1"), 0)
     // Synthetic descendants gone.
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:1.matrix.$[0]"), 0,
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:1.matrix.$[0]"), 0,
                    "Depth-1 synthetic sub-record must cascade")
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:1.matrix.$[1]"), 0,
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:1.matrix.$[1]"), 0,
                    "Depth-1 synthetic sub-record must cascade")
   }
 
@@ -78,16 +92,16 @@ class SQLiteRowPerElementCascadeDeleteTests: XCTestCase {
     try db.insertOrUpdate(records: [record("Math:cube", field: "cube", value: outer as Record.Value)])
 
     // Pre-check: every level exists.
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:cube"), 1)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:cube.cube.$[0]"), 1)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:cube.cube.$[0].$[0]"), 1)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:cube"), 1)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:cube.cube.$[0]"), 1)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:cube.cube.$[0].$[0]"), 1)
 
     try db.deleteRecord(forKey: "Math:cube")
 
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:cube"), 0)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:cube.cube.$[0]"), 0,
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:cube"), 0)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:cube.cube.$[0]"), 0,
                    "Level-2 synthetic sub-record must cascade")
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:cube.cube.$[0].$[0]"), 0,
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:cube.cube.$[0].$[0]"), 0,
                    "Level-3 synthetic sub-record must cascade — recursive walk must reach it")
   }
 
@@ -106,11 +120,11 @@ class SQLiteRowPerElementCascadeDeleteTests: XCTestCase {
     try db.deleteRecord(forKey: "Math:A")
 
     // A is gone with its descendants.
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:A"), 0)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:A.matrix.$[0]"), 0)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:A"), 0)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:A.matrix.$[0]"), 0)
     // B is untouched.
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:B"), 1)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:B.matrix.$[0]"), 2,
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:B"), 1)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:B.matrix.$[0]"), 2,
                    "Sibling record's synthetic sub-records must survive")
   }
 
@@ -127,14 +141,14 @@ class SQLiteRowPerElementCascadeDeleteTests: XCTestCase {
     ]
     try db.insertOrUpdate(records: [Record(key: "Math:multi", fields: fields)])
 
-    XCTAssertGreaterThan(try db.rowCount(forCacheKey: "Math:multi.matrix.$[0]"), 0)
-    XCTAssertGreaterThan(try db.rowCount(forCacheKey: "Math:multi.coords.$[0]"), 0)
+    XCTAssertGreaterThan(try rowCount(forCacheKey: "Math:multi.matrix.$[0]"), 0)
+    XCTAssertGreaterThan(try rowCount(forCacheKey: "Math:multi.coords.$[0]"), 0)
 
     try db.deleteRecord(forKey: "Math:multi")
 
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:multi.matrix.$[0]"), 0,
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:multi.matrix.$[0]"), 0,
                    "First nested-list field's sub-record must cascade")
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:multi.coords.$[0]"), 0,
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:multi.coords.$[0]"), 0,
                    "Second nested-list field's sub-record must cascade")
   }
 
@@ -157,10 +171,10 @@ class SQLiteRowPerElementCascadeDeleteTests: XCTestCase {
 
     try db.deleteRecord(forKey: "QUERY_ROOT")
 
-    XCTAssertEqual(try db.rowCount(forCacheKey: "QUERY_ROOT"), 0)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "User:1"), 1,
+    XCTAssertEqual(try rowCount(forCacheKey: "QUERY_ROOT"), 0)
+    XCTAssertEqual(try rowCount(forCacheKey: "User:1"), 1,
                    "Real CacheReference target must not be cascade-deleted")
-    XCTAssertEqual(try db.rowCount(forCacheKey: "User:2"), 1)
+    XCTAssertEqual(try rowCount(forCacheKey: "User:2"), 1)
   }
 
   func test__deleteRecord_forKey__doesNotFollowRealCacheReferenceInsideSyntheticSubRecord() throws {
@@ -182,16 +196,16 @@ class SQLiteRowPerElementCascadeDeleteTests: XCTestCase {
       Record(key: "User:2", fields: ["name": CachedField(value: "B" as Record.Value, writtenAt: 100)]),
     ])
 
-    XCTAssertGreaterThan(try db.rowCount(forCacheKey: "Org:1.teams.$[0]"), 0)
+    XCTAssertGreaterThan(try rowCount(forCacheKey: "Org:1.teams.$[0]"), 0)
 
     try db.deleteRecord(forKey: "Org:1")
 
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Org:1"), 0)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Org:1.teams.$[0]"), 0,
+    XCTAssertEqual(try rowCount(forCacheKey: "Org:1"), 0)
+    XCTAssertEqual(try rowCount(forCacheKey: "Org:1.teams.$[0]"), 0,
                    "Synthetic sub-record under Org:1.teams must cascade")
-    XCTAssertEqual(try db.rowCount(forCacheKey: "User:1"), 1,
+    XCTAssertEqual(try rowCount(forCacheKey: "User:1"), 1,
                    "Real CacheReference inside a synthetic sub-record must NOT be cascaded")
-    XCTAssertEqual(try db.rowCount(forCacheKey: "User:2"), 1)
+    XCTAssertEqual(try rowCount(forCacheKey: "User:2"), 1)
   }
 
   // MARK: - insertOrUpdate atomic-rewrite cascade
@@ -200,16 +214,16 @@ class SQLiteRowPerElementCascadeDeleteTests: XCTestCase {
     let db = try makeDatabase()
     let matrix: [Record.Value] = [[1, 2] as Record.Value, [3, 4] as Record.Value]
     try db.insertOrUpdate(records: [record("Math:1", field: "matrix", value: matrix as Record.Value)])
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:1.matrix.$[0]"), 2)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:1.matrix.$[1]"), 2)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:1.matrix.$[0]"), 2)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:1.matrix.$[1]"), 2)
 
     // Rewrite as a scalar — the prior synthetic sub-records must be
     // cleaned up, not orphaned.
     try db.insertOrUpdate(records: [record("Math:1", field: "matrix", value: "rewritten" as Record.Value, writtenAt: 200)])
 
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:1.matrix.$[0]"), 0,
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:1.matrix.$[0]"), 0,
                    "Atomic list→scalar rewrite must cascade synthetic sub-records")
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:1.matrix.$[1]"), 0)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:1.matrix.$[1]"), 0)
   }
 
   func test__insertOrUpdate__atomicRewriteOfDeeplyNestedList_cleansAllSyntheticDescendants() throws {
@@ -217,14 +231,14 @@ class SQLiteRowPerElementCascadeDeleteTests: XCTestCase {
     // 3D first, then a single-element scalar.
     let cube: [Record.Value] = [[[5] as Record.Value] as Record.Value]
     try db.insertOrUpdate(records: [record("Math:cube", field: "cube", value: cube as Record.Value)])
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:cube.cube.$[0]"), 1)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:cube.cube.$[0].$[0]"), 1)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:cube.cube.$[0]"), 1)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:cube.cube.$[0].$[0]"), 1)
 
     try db.insertOrUpdate(records: [record("Math:cube", field: "cube", value: "flat" as Record.Value, writtenAt: 200)])
 
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:cube.cube.$[0]"), 0,
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:cube.cube.$[0]"), 0,
                    "Level-2 synthetic sub-record must cascade on rewrite")
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:cube.cube.$[0].$[0]"), 0,
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:cube.cube.$[0].$[0]"), 0,
                    "Level-3 synthetic sub-record must cascade — recursive walk must reach it on rewrite too")
   }
 
@@ -239,15 +253,15 @@ class SQLiteRowPerElementCascadeDeleteTests: XCTestCase {
       "coords": CachedField(value: coords as Record.Value, writtenAt: 100),
     ]
     try db.insertOrUpdate(records: [Record(key: "Math:multi", fields: fields)])
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:multi.matrix.$[0]"), 2)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:multi.coords.$[0]"), 2)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:multi.matrix.$[0]"), 2)
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:multi.coords.$[0]"), 2)
 
     // Rewrite only `matrix`.
     try db.insertOrUpdate(records: [record("Math:multi", field: "matrix", value: "rewritten" as Record.Value, writtenAt: 200)])
 
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:multi.matrix.$[0]"), 0,
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:multi.matrix.$[0]"), 0,
                    "Rewritten field's synthetic sub-record must cascade")
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Math:multi.coords.$[0]"), 2,
+    XCTAssertEqual(try rowCount(forCacheKey: "Math:multi.coords.$[0]"), 2,
                    "Untouched field's synthetic sub-record must survive")
   }
 
@@ -262,16 +276,16 @@ class SQLiteRowPerElementCascadeDeleteTests: XCTestCase {
       record("Animal:cat", field: "claws", value: matrixA as Record.Value),
       record("Animal:dog", field: "claws", value: matrixB as Record.Value),
     ])
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Animal:cat.claws.$[0]"), 2)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Animal:dog.claws.$[0]"), 2)
+    XCTAssertEqual(try rowCount(forCacheKey: "Animal:cat.claws.$[0]"), 2)
+    XCTAssertEqual(try rowCount(forCacheKey: "Animal:dog.claws.$[0]"), 2)
 
     try db.deleteRecords(matchingKey: "Animal:")
 
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Animal:cat"), 0)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Animal:dog"), 0)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Animal:cat.claws.$[0]"), 0,
+    XCTAssertEqual(try rowCount(forCacheKey: "Animal:cat"), 0)
+    XCTAssertEqual(try rowCount(forCacheKey: "Animal:dog"), 0)
+    XCTAssertEqual(try rowCount(forCacheKey: "Animal:cat.claws.$[0]"), 0,
                    "Pattern-deleted record's synthetic sub-record must cascade")
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Animal:dog.claws.$[0]"), 0,
+    XCTAssertEqual(try rowCount(forCacheKey: "Animal:dog.claws.$[0]"), 0,
                    "Pattern-deleted record's synthetic sub-record must cascade")
   }
 
@@ -286,10 +300,10 @@ class SQLiteRowPerElementCascadeDeleteTests: XCTestCase {
 
     try db.deleteRecords(matchingKey: "Animal:")
 
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Animal:cat.matrix.$[0]"), 0,
+    XCTAssertEqual(try rowCount(forCacheKey: "Animal:cat.matrix.$[0]"), 0,
                    "Matched record's synthetic sub-record must cascade")
-    XCTAssertEqual(try db.rowCount(forCacheKey: "User:1"), 1)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "User:1.matrix.$[0]"), 2,
+    XCTAssertEqual(try rowCount(forCacheKey: "User:1"), 1)
+    XCTAssertEqual(try rowCount(forCacheKey: "User:1.matrix.$[0]"), 2,
                    "Unmatched record's synthetic sub-record must survive")
   }
 
@@ -303,16 +317,16 @@ class SQLiteRowPerElementCascadeDeleteTests: XCTestCase {
     // never asked to remove and leave `User:1`'s rows dangling.
     let claws: [Record.Value] = [[1, 2] as Record.Value, [3] as Record.Value]
     try db.insertOrUpdate(records: [record("User:1", field: "claws", value: claws as Record.Value)])
-    XCTAssertEqual(try db.rowCount(forCacheKey: "User:1.claws.$[0]"), 2)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "User:1.claws.$[1]"), 1)
+    XCTAssertEqual(try rowCount(forCacheKey: "User:1.claws.$[0]"), 2)
+    XCTAssertEqual(try rowCount(forCacheKey: "User:1.claws.$[1]"), 1)
 
     try db.deleteRecords(matchingKey: "claws")
 
-    XCTAssertEqual(try db.rowCount(forCacheKey: "User:1"), 2,
+    XCTAssertEqual(try rowCount(forCacheKey: "User:1"), 2,
                    "Parent record's rows must survive a pattern that only matches its synthetic children")
-    XCTAssertEqual(try db.rowCount(forCacheKey: "User:1.claws.$[0]"), 2,
+    XCTAssertEqual(try rowCount(forCacheKey: "User:1.claws.$[0]"), 2,
                    "Synthetic rows must survive a pattern matching them but not their parent")
-    XCTAssertEqual(try db.rowCount(forCacheKey: "User:1.claws.$[1]"), 1)
+    XCTAssertEqual(try rowCount(forCacheKey: "User:1.claws.$[1]"), 1)
 
     // The nested list still reads back fully intact.
     let loaded = try db.selectRecords(forKeys: ["User:1"])
@@ -332,8 +346,8 @@ class SQLiteRowPerElementCascadeDeleteTests: XCTestCase {
 
     try db.deleteRecords(matchingKey: "cat")
 
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Animal:cat"), 0)
-    XCTAssertEqual(try db.rowCount(forCacheKey: "Animal:cat.claws.$[0]"), 0,
+    XCTAssertEqual(try rowCount(forCacheKey: "Animal:cat"), 0)
+    XCTAssertEqual(try rowCount(forCacheKey: "Animal:cat.claws.$[0]"), 0,
                    "Synthetic sub-records of a matched parent must still cascade")
   }
 }

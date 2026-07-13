@@ -445,28 +445,6 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     }
   }
 
-  /// Test-only: returns the number of rows whose `cache_key` exactly
-  /// matches the given key. Bypasses `selectRecords`'s synthetic-key
-  /// filter so cascade-correctness tests can verify whether synthetic
-  /// sub-record rows still exist in the database after a delete or
-  /// rewrite. Production code should not depend on this helper.
-  internal func rowCount(forCacheKey cacheKey: CacheKey) throws -> Int {
-    try performSync {
-      let sql = """
-      SELECT COUNT(*) FROM \(SQLiteSchema.recordsTableName)
-      WHERE \(SQLiteSchema.Records.cacheKey) = ?
-      """
-      let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare rowCount probe")
-      defer { sqlite3_finalize(stmt) }
-      sqlite3_bind_text(stmt, 1, cacheKey, -1, SQLITE_TRANSIENT)
-      let stepResult = sqlite3_step(stmt)
-      guard stepResult == SQLITE_ROW else {
-        throw SQLiteError.step(message: "rowCount probe failed: \(sqliteErrorMessage())", resultCode: stepResult)
-      }
-      return Int(sqlite3_column_int64(stmt, 0))
-    }
-  }
-
   /// Test-only read path: loads every row for the given cache keys,
   /// reassembles them into `Record` instances, and follows synthetic
   /// sub-record `child_key_value` pointers to materialize nested lists.
