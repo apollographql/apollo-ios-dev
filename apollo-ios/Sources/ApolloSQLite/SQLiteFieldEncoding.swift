@@ -55,25 +55,15 @@ internal enum SQLiteFieldEncoding {
   ///
   /// Numeric values (whether native Swift `Int` / `Double` or
   /// `NSNumber`-bridged from JSON) all reach the `as NSNumber` case
-  /// first via Foundation's implicit bridging. `CFGetTypeID` then
-  /// distinguishes booleans (`CFBooleanGetTypeID`) from numeric kinds,
-  /// keeping `NSNumber(value: 1)` in `int_value` and
+  /// first via Foundation's implicit bridging;
+  /// `encode(bridgedNumber:)` then distinguishes booleans from
+  /// numeric kinds, keeping `NSNumber(value: 1)` in `int_value` and
   /// `NSNumber(value: true)` in `bool_value` — they would otherwise
   /// both satisfy `as Bool`.
   static func encode(_ value: Record.Value) throws -> TypedValue {
     switch value {
     case let n as NSNumber:
-      if CFGetTypeID(n) == CFBooleanGetTypeID() {
-        return .bool(n.boolValue)
-      }
-      switch CFNumberGetType(n) {
-      case .sInt8Type, .sInt16Type, .sInt32Type, .sInt64Type,
-           .charType, .shortType, .intType, .longType, .longLongType,
-           .nsIntegerType, .cfIndexType:
-        return .int(n.int64Value)
-      default:
-        return .float(n.doubleValue)
-      }
+      return encode(bridgedNumber: n)
     case let v as String:
       return .string(v)
     case let ref as CacheReference:
@@ -97,6 +87,48 @@ internal enum SQLiteFieldEncoding {
       }
       return .customScalar(try Self.encodeJSON(value))
     }
+  }
+
+  /// Classifies an `NSNumber`-boxed value into its column slot.
+  ///
+  /// `JSONSerialization` — the response-parsing path — boxes every
+  /// JSON boolean and number as `NSNumber`, and Swift's bridging is
+  /// loose in both directions (`NSNumber(value: 1) as? Bool`
+  /// succeeds), so the boxed kind must be inspected directly rather
+  /// than through conditional casts.
+  ///
+  /// On Darwin, `CFGetTypeID`/`CFNumberGetType` give an exact answer
+  /// (`CFBoolean` is a distinct CF type from `CFNumber`).
+  /// CoreFoundation is not part of the portable Foundation surface,
+  /// so the non-Darwin branch classifies via `objCType`, which both
+  /// Foundation implementations preserve. The `objCType` encoding
+  /// for `Bool` (`"c"`) collides with an explicitly-boxed
+  /// `NSNumber(value: Int8)`; nothing in the JSON pipeline produces
+  /// `Int8` numbers, so on non-Darwin platforms that collision is
+  /// only reachable by hand-boxed cache writes and is accepted.
+  private static func encode(bridgedNumber n: NSNumber) -> TypedValue {
+    #if canImport(Darwin)
+    if CFGetTypeID(n) == CFBooleanGetTypeID() {
+      return .bool(n.boolValue)
+    }
+    switch CFNumberGetType(n) {
+    case .sInt8Type, .sInt16Type, .sInt32Type, .sInt64Type,
+         .charType, .shortType, .intType, .longType, .longLongType,
+         .nsIntegerType, .cfIndexType:
+      return .int(n.int64Value)
+    default:
+      return .float(n.doubleValue)
+    }
+    #else
+    switch String(cString: n.objCType) {
+    case "c", "B":
+      return .bool(n.boolValue)
+    case "f", "d":
+      return .float(n.doubleValue)
+    default:
+      return .int(n.int64Value)
+    }
+    #endif
   }
 
   /// Reconstructs a value from a fetched row. Exactly one of the
