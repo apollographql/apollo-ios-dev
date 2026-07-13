@@ -98,8 +98,10 @@ public enum FieldProjectionCollector {
     //    passes `includeAllInlineFragments: true`, which selects
     //    `.includeAll`. The resulting projection set over-fetches every
     //    type case's fields; the executor's later, type-aware traversal
-    //    surfaces only the matching type case to the response. PR-009g
-    //    will narrow this at the SQL layer.
+    //    surfaces only the matching type case to the response. The
+    //    over-fetch is an accepted cost per ADR 0007; narrowing it at
+    //    the SQL layer (a `__typename`-aware filter) is a deferred
+    //    optimization gated on the Phase 1A performance results.
     //
     //  - `deferredFragmentPolicy: .eager` because the cache path has no
     //    incremental delivery channel — `CacheDataExecutionSource` sets
@@ -156,8 +158,7 @@ public enum FieldProjectionCollector {
     case .parentRecordField(let name):
       projections.insert(FieldProjection(
         cacheKey: cacheKey,
-        fieldName: name,
-        outputType: field.type
+        fieldName: name
       ))
     case .policyReference, .policyReferenceList:
       // No parent-record projection: the field's value is a direct

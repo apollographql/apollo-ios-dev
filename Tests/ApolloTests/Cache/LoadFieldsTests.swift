@@ -32,8 +32,7 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     let (cache, _) = await cacheType.makeNormalizedCache()
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "name",
-                      columnShape: .string, cardinality: .scalar)
+      FieldProjection(cacheKey: "User:1", fieldName: "name")
     ])
     expect(result.isEmpty) == true
   }
@@ -45,10 +44,8 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:2", fieldName: "name",
-                      columnShape: .string, cardinality: .scalar),
-      FieldProjection(cacheKey: "User:3", fieldName: "name",
-                      columnShape: .string, cardinality: .scalar),
+      FieldProjection(cacheKey: "User:2", fieldName: "name"),
+      FieldProjection(cacheKey: "User:3", fieldName: "name"),
     ])
     expect(result.isEmpty) == true
   }
@@ -66,8 +63,7 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "name",
-                      columnShape: .string, cardinality: .scalar)
+      FieldProjection(cacheKey: "User:1", fieldName: "name")
     ])
 
     expect(result.count) == 1
@@ -87,10 +83,8 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "name",
-                      columnShape: .string, cardinality: .scalar),
-      FieldProjection(cacheKey: "User:1", fieldName: "age",
-                      columnShape: .int, cardinality: .scalar),
+      FieldProjection(cacheKey: "User:1", fieldName: "name"),
+      FieldProjection(cacheKey: "User:1", fieldName: "age"),
     ])
 
     expect(result.count) == 1
@@ -116,10 +110,8 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "name",
-                      columnShape: .string, cardinality: .scalar),
-      FieldProjection(cacheKey: "User:2", fieldName: "email",
-                      columnShape: .string, cardinality: .scalar),
+      FieldProjection(cacheKey: "User:1", fieldName: "name"),
+      FieldProjection(cacheKey: "User:2", fieldName: "email"),
     ])
 
     expect(result.count) == 2
@@ -141,10 +133,8 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "name",
-                      columnShape: .string, cardinality: .scalar),
-      FieldProjection(cacheKey: "User:99", fieldName: "name",
-                      columnShape: .string, cardinality: .scalar),
+      FieldProjection(cacheKey: "User:1", fieldName: "name"),
+      FieldProjection(cacheKey: "User:99", fieldName: "name"),
     ])
 
     expect(result.count) == 1
@@ -166,8 +156,7 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "nonExistentField",
-                      columnShape: .string, cardinality: .scalar)
+      FieldProjection(cacheKey: "User:1", fieldName: "nonExistentField")
     ])
 
     expect(result.count) == 1
@@ -182,10 +171,8 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "name",
-                      columnShape: .string, cardinality: .scalar),
-      FieldProjection(cacheKey: "User:1", fieldName: "missing",
-                      columnShape: .string, cardinality: .scalar),
+      FieldProjection(cacheKey: "User:1", fieldName: "name"),
+      FieldProjection(cacheKey: "User:1", fieldName: "missing"),
     ])
 
     let record = try XCTUnwrap(result["User:1"])
@@ -204,8 +191,7 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let projection = FieldProjection(
-      cacheKey: "User:1", fieldName: "name",
-      columnShape: .string, cardinality: .scalar
+      cacheKey: "User:1", fieldName: "name"
     )
 
     let result = try await cache.loadFields([projection, projection, projection])
@@ -227,8 +213,7 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "tags",
-                      columnShape: .string, cardinality: .list)
+      FieldProjection(cacheKey: "User:1", fieldName: "tags")
     ])
 
     let record = try XCTUnwrap(result["User:1"])
@@ -245,8 +230,7 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "Query.viewer", fieldName: "user",
-                      columnShape: .childKey, cardinality: .scalar)
+      FieldProjection(cacheKey: "Query.viewer", fieldName: "user")
     ])
 
     let record = try XCTUnwrap(result["Query.viewer"])

@@ -18,16 +18,11 @@ final class ProjectionLoaderTests: XCTestCase {
 
   // MARK: - Helpers
 
-  /// `FieldProjection.init(cacheKey:fieldName:columnShape:cardinality:)`
-  /// shorthand — these tests don't care about column shape / cardinality
-  /// (they verify the loader's batching contract, not the cache backend's
-  /// column projection). `.string` / `.scalar` are arbitrary placeholders.
+  /// `FieldProjection.init(cacheKey:fieldName:)` shorthand.
   private func projection(_ cacheKey: CacheKey, _ fieldName: String) -> FieldProjection {
     FieldProjection(
       cacheKey: cacheKey,
-      fieldName: fieldName,
-      columnShape: .string,
-      cardinality: .scalar
+      fieldName: fieldName
     )
   }
 

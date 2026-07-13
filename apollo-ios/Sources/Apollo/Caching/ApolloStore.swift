@@ -296,8 +296,10 @@ public final class ApolloStore: Sendable {
     /// `__typename` is not yet loaded at projection time. The
     /// executor's later selection-set traversal uses the loaded
     /// `__typename` to pick the matching type case; the unmatched
-    /// type-case fields are an over-fetch that PR-009g will narrow
-    /// once SQL-level projection lands on the SQLite backend.
+    /// type-case fields are an over-fetch accepted per ADR 0007.
+    /// Narrowing it at the SQL layer (a `__typename`-aware filter) is
+    /// a deferred optimization gated on the Phase 1A performance
+    /// results.
     final func loadObject(
       forKey key: CacheKey,
       selections: [Selection],

@@ -173,12 +173,10 @@ public protocol SQLiteDatabase {
   /// surface as top-level cache keys.
   ///
   /// Duplicate projections (same `cacheKey` and `fieldName`) are
-  /// tolerated and coalesce to a single SQL bind. Projections whose
-  /// `columnShape`/`cardinality` differ but share `(cacheKey, fieldName)`
-  /// is a programmer error per the
-  /// ``ReadOnlyNormalizedCache/loadFields(_:)`` precondition; this
-  /// implementation does not detect or report the conflict — it reads
-  /// whichever row exists and returns its actual stored shape.
+  /// tolerated and coalesce to a single SQL bind. The read returns
+  /// each field's actual stored shape; scalar-vs-list is inferred
+  /// from the stored rows' `position` values, not from the
+  /// projection.
   ///
   /// Requires the row-per-element records table (see
   /// `createNewRecordsTableIfNeeded()`).
