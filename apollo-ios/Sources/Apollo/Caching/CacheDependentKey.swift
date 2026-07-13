@@ -22,15 +22,10 @@
 /// # See Also
 ///
 /// - [ADR 0007 — Selection-set-aware cache reads](../Design/adr/0007-selection-aware-cache-reads.md)
-///   PR-009f: "Dirty `(cacheKey, fieldName)` entries become
-///   `FieldProjection`s via the direct `(columnShape, cardinality)`
-///   initializer." This type is the public, shape-agnostic surface;
-///   shape info is supplied by the consumer that converts it.
-/// - ``FieldProjection`` — the selection-set-aware sibling that
-///   adds `columnShape` / `cardinality`. The dependency tracker
-///   does not need the shape, so the dirty-set carries the slim
-///   `(cacheKey, fieldName)` form and shape is reconstituted at
-///   re-read time from the watcher's known projection set.
+/// - ``FieldProjection`` — the read-request sibling. Both types
+///   carry the same `(cacheKey, fieldName)` pair; this one names a
+///   field a result *depends on* (watcher dirty-set matching), while
+///   `FieldProjection` names a field a read *requests*.
 public struct CacheDependentKey: Hashable, Sendable {
 
   /// The cache key of the record carrying the field.

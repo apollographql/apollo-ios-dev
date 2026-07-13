@@ -34,15 +34,11 @@ final class SQLiteSelectFieldsTests: XCTestCase {
 
   private func projection(
     _ cacheKey: CacheKey,
-    _ fieldName: String,
-    columnShape: FieldProjection.ColumnShape = .string,
-    cardinality: FieldProjection.Cardinality = .scalar
+    _ fieldName: String
   ) -> FieldProjection {
     FieldProjection(
       cacheKey: cacheKey,
-      fieldName: fieldName,
-      columnShape: columnShape,
-      cardinality: cardinality
+      fieldName: fieldName
     )
   }
 
@@ -84,7 +80,7 @@ final class SQLiteSelectFieldsTests: XCTestCase {
 
     let result = try db.selectFields([
       projection("User:1", "name"),
-      projection("User:1", "age", columnShape: .int),
+      projection("User:1", "age"),
     ])
 
     let record = try XCTUnwrap(result["User:1"])
@@ -105,7 +101,7 @@ final class SQLiteSelectFieldsTests: XCTestCase {
 
     let result = try db.selectFields([
       projection("User:1", "name"),
-      projection("User:2", "age", columnShape: .int),
+      projection("User:2", "age"),
     ])
 
     XCTAssertEqual(result.count, 2)
@@ -159,8 +155,8 @@ final class SQLiteSelectFieldsTests: XCTestCase {
     try db.insertOrUpdate(records: [record("User:1", fields: ["name": "Anthony"])])
 
     let result = try db.selectFields([
-      projection("User:1", "name", columnShape: .string, cardinality: .scalar),
-      projection("User:1", "name", columnShape: .int, cardinality: .scalar),
+      projection("User:1", "name"),
+      projection("User:1", "name"),
     ])
 
     XCTAssertEqual(result["User:1"]?.fields["name"]?.value as? String, "Anthony")
@@ -177,7 +173,7 @@ final class SQLiteSelectFieldsTests: XCTestCase {
     )])
 
     let result = try db.selectFields([
-      projection("User:1", "colors", columnShape: .string, cardinality: .list),
+      projection("User:1", "colors"),
     ])
 
     let assembled = result["User:1"]?.fields["colors"]?.value as? [Any]
@@ -204,7 +200,7 @@ final class SQLiteSelectFieldsTests: XCTestCase {
     )])
 
     let result = try db.selectFields([
-      projection("Grid:1", "rows", columnShape: .childKey, cardinality: .list),
+      projection("Grid:1", "rows"),
     ])
 
     let outerLoaded = result["Grid:1"]?.fields["rows"]?.value as? [Any]

@@ -65,37 +65,14 @@ public protocol ReadOnlyNormalizedCache: AnyObject {
   /// Loads the field values described by `projections`, returning each
   /// requested record's fields as a partial `Record` containing only the
   /// fields the caller asked for. Per ADR 0007 this is the projection-
-  /// aware replacement for ``loadRecords(forKeys:)``; the executor
-  /// (PR-009d) and `ApolloStore` (PR-009e) migrate to this method
-  /// during sub-phase 1A.5, and PR-009g lands SQL-level column
-  /// projection on the SQLite backend.
+  /// aware read path used by the executor and `ApolloStore`.
   ///
   /// - Parameters:
   ///   - projections: The set of fields to read. Each
   ///     ``FieldProjection`` identifies one `(cacheKey, fieldName)`
-  ///     pair plus its storage shape. Multiple projections may share
-  ///     a `cacheKey` to request different fields on the same record.
-  ///     Duplicate projections are tolerated; their results coalesce.
-  ///
-  ///     **Precondition:** the caller must not supply two projections
-  ///     with the same `(cacheKey, fieldName)` but a different
-  ///     `columnShape` or `cardinality`. The cache backend stores each
-  ///     field under a single column-shape (determined at write time
-  ///     by the field's GraphQL type) and cannot answer two
-  ///     incompatible projections for the same row. ``FieldProjection``'s
-  ///     `Hashable` conformance hashes by the full tuple, so the
-  ///     pending set in `ProjectionLoader` won't dedupe such conflicts
-  ///     — they will reach the backend as two separate projections
-  ///     that ask for inconsistent answers. The
-  ///     `FieldProjectionCollector` path derives `columnShape` /
-  ///     `cardinality` from `Selection.Field.OutputType`, which GraphQL
-  ///     validation guarantees is identical for every selection of the
-  ///     same `(cacheKey, fieldName)`, so this can only happen when
-  ///     callers hand-construct projections via the direct
-  ///     ``FieldProjection/init(cacheKey:fieldName:columnShape:cardinality:)``
-  ///     initializer. PR-009g's SQL projection path enforces the
-  ///     precondition implicitly by picking one storage column per
-  ///     field.
+  ///     pair. Multiple projections may share a `cacheKey` to request
+  ///     different fields on the same record. Duplicate projections
+  ///     are tolerated; their results coalesce.
   ///
   /// - Returns: A dictionary of cache keys to partial records. A cache
   ///   key appears in the result if and only if the *record* exists in
@@ -121,14 +98,14 @@ extension ReadOnlyNormalizedCache {
   /// fetch the full records for the projections' cache keys, then
   /// filters each record's `fields` to the requested field names.
   ///
-  /// This is the "fallback" path the ADR 0007 table references for the
-  /// SQLite backend during the 1A.5 transition: until PR-009g lands
-  /// SQL-level column projection, every backend that conforms to
-  /// ``ReadOnlyNormalizedCache`` automatically inherits a correct (if
-  /// unoptimized) `loadFields` implementation by reading whole records
-  /// and filtering in Swift. Custom cache implementors get the same
-  /// behavior without a forced API migration; they may override the
-  /// method with a projection-aware path when they're ready.
+  /// Every backend that conforms to ``ReadOnlyNormalizedCache``
+  /// automatically inherits a correct (if unoptimized) `loadFields`
+  /// implementation by reading whole records and filtering in Swift.
+  /// The SQLite backend relies on this default until PR-009h switches
+  /// it to the row-level `selectFields` read path. Custom cache
+  /// implementors get the same behavior without a forced API
+  /// migration; they may override the method with a projection-aware
+  /// path when they're ready.
   ///
   /// **Performance:** this default is `O(records.count * filteredFields.count)`
   /// with one new dict allocation per surfaced record (the `record.fields.filter`

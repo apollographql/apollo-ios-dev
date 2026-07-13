@@ -421,15 +421,8 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
   public func selectFields(_ projections: [FieldProjection]) throws -> [CacheKey: Record] {
     guard !projections.isEmpty else { return [:] }
 
-    // Dedupe `(cacheKey, fieldName)` early — `FieldProjection`'s
-    // `Hashable` conformance hashes by the full tuple including shape
-    // info, so two projections that differ only in `columnShape` /
-    // `cardinality` won't collapse via `Set<FieldProjection>`. The
-    // SQL doesn't read shape info, only the storage pair, so we
-    // dedupe on that.
-    let uniqueProjections = Set(projections.map {
-      ProjectionKey(cacheKey: $0.cacheKey, fieldName: $0.fieldName)
-    })
+    // Dedupe early so duplicate projections coalesce to one SQL bind.
+    let uniqueProjections = Set(projections)
     let requestedKeys = Set(uniqueProjections.map(\.cacheKey))
 
     return try performSync {
@@ -501,7 +494,7 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
   /// IN (VALUES (?, ?), (?, ?), …)`. Returns the raw rows; assembly
   /// happens in the caller via the shared `assembleRecords` helper.
   private func selectProjectedRows<C: Collection>(_ projections: C) throws -> [DecodedRow]
-  where C.Element == ProjectionKey {
+  where C.Element == FieldProjection {
     guard !projections.isEmpty else { return [] }
 
     let valuesClause = Array(repeating: "(?, ?)", count: projections.count).joined(separator: ", ")
@@ -948,14 +941,6 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     let writtenAt: Int64
   }
 
-  /// Storage-shape-agnostic key for deduping projections before
-  /// issuing the SQL. `FieldProjection`'s `Hashable` hashes the full
-  /// tuple (including `columnShape` and `cardinality`), but the row-
-  /// filter SQL only consults `cacheKey` and `fieldName`.
-  private struct ProjectionKey: Hashable {
-    let cacheKey: CacheKey
-    let fieldName: String
-  }
 }
 
 // MARK: - Extensions

@@ -23,14 +23,12 @@ final class FieldProjectionCollectorTests: XCTestCase {
     )
 
     expect(projections) == Set([
-      FieldProjection(cacheKey: "User:1", fieldName: "name",
-                      columnShape: .string, cardinality: .scalar),
-      FieldProjection(cacheKey: "User:1", fieldName: "age",
-                      columnShape: .int, cardinality: .scalar),
+      FieldProjection(cacheKey: "User:1", fieldName: "name"),
+      FieldProjection(cacheKey: "User:1", fieldName: "age"),
     ])
   }
 
-  func test__collect__givenListField__emitsListCardinalityProjection() throws {
+  func test__collect__givenListField__emitsProjectionForListField() throws {
     let selections: [Selection] = [
       .field("tags", [String].self),
     ]
@@ -43,12 +41,11 @@ final class FieldProjectionCollectorTests: XCTestCase {
     )
 
     expect(projections) == Set([
-      FieldProjection(cacheKey: "User:1", fieldName: "tags",
-                      columnShape: .string, cardinality: .list)
+      FieldProjection(cacheKey: "User:1", fieldName: "tags")
     ])
   }
 
-  func test__collect__givenObjectField__emitsChildKeyColumnShape() throws {
+  func test__collect__givenObjectField__emitsProjectionForObjectField() throws {
     class FriendSelectionSet: MockSelectionSet, @unchecked Sendable {
       override class var __selections: [Selection] { [
         .field("name", String.self)
@@ -67,8 +64,7 @@ final class FieldProjectionCollectorTests: XCTestCase {
     )
 
     expect(projections) == Set([
-      FieldProjection(cacheKey: "User:1", fieldName: "bestFriend",
-                      columnShape: .childKey, cardinality: .scalar)
+      FieldProjection(cacheKey: "User:1", fieldName: "bestFriend")
     ])
   }
 
