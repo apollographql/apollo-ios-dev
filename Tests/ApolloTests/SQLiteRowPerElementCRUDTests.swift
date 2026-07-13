@@ -571,6 +571,23 @@ class SQLiteRowPerElementCRUDTests: XCTestCase {
     XCTAssertNil(loaded[0].fields["payload"]?.value as? CacheReference)
   }
 
+  func test__decode__givenCorruptCustomScalarText__throwsInsteadOfReturningValue() throws {
+    // `custom_scalar_value` rows are only ever written by the
+    // encoder's own JSON serialization, so unparseable stored text
+    // means corruption. It must surface as an error rather than
+    // materialize as a stringified stand-in for the cached value.
+    expect {
+      try SQLiteFieldEncoding.decode(
+        boolValue: nil,
+        intValue: nil,
+        floatValue: nil,
+        stringValue: nil,
+        childKeyValue: nil,
+        customScalarValue: "not valid json"
+      )
+    }.to(throwError())
+  }
+
   // MARK: - NSNumber Bool/numeric routing
 
   func test__roundTrip__nsNumberWrappedBool_staysBool() throws {

@@ -160,10 +160,7 @@ internal enum SQLiteFieldEncoding {
     }
     if let customText = customScalarValue {
       let parsed = try Self.decodeJSON(customText)
-      guard let value = Self.recordValueFromJSON(parsed) else {
-        throw SQLiteFieldEncodingError.malformedCustomScalar
-      }
-      return value
+      return try Self.recordValueFromJSON(parsed)
     }
     throw SQLiteFieldEncodingError.noValueColumnPopulated
   }
@@ -201,9 +198,15 @@ internal enum SQLiteFieldEncoding {
 
   /// Narrows a `JSONSerialization` output (`NSNumber`/`NSString`/
   /// `NSArray`/`NSDictionary`/`NSNull` and their Swift bridges) into a
-  /// concrete `Record.Value`. Returns `nil` only for shapes that don't
-  /// map — in practice this means types `JSONSerialization` itself
-  /// can't produce.
+  /// concrete `Record.Value`, recursing through dicts and arrays.
+  ///
+  /// Throws `malformedCustomScalar` for shapes that don't map. Since
+  /// `JSONSerialization` can only produce the types listed above —
+  /// all of which map — a well-formed `custom_scalar_value` written
+  /// by this layer can never throw; reaching the error means the
+  /// stored text was corrupted or hand-edited, and surfacing that
+  /// loudly beats materializing a stringified description of the
+  /// unmappable value as if it were legitimate cached data.
   ///
   /// `NSNull` is the documented GraphQL null marker and is preserved
   /// as-is so it survives a write/read round-trip.
@@ -216,7 +219,7 @@ internal enum SQLiteFieldEncoding {
   ///
   /// `Bool` is checked before `Int` because `NSNumber` boolean
   /// bridging satisfies `as? Int`; ordering keeps booleans as booleans.
-  private static func recordValueFromJSON(_ json: Any) -> Record.Value? {
+  private static func recordValueFromJSON(_ json: Any) throws -> Record.Value {
     if json is NSNull {
       return NSNull()
     }
@@ -224,21 +227,17 @@ internal enum SQLiteFieldEncoding {
       if dict.count == 1, let key = dict[referenceWrapperKey] as? String {
         return CacheReference(key)
       }
-      let narrowed = dict.mapValues { Self.deserializeJSONValue($0) }
+      let narrowed = try dict.mapValues { try Self.recordValueFromJSON($0) }
       return narrowed as Record.Value
     }
     if let array = json as? [Any] {
-      return array.map { Self.deserializeJSONValue($0) } as Record.Value
+      return try array.map { try Self.recordValueFromJSON($0) } as Record.Value
     }
     if let v = json as? Bool { return v }
     if let v = json as? Int { return v }
     if let v = json as? Double { return v }
     if let v = json as? String { return v }
-    return nil
-  }
-
-  private static func deserializeJSONValue(_ json: Any) -> Record.Value {
-    Self.recordValueFromJSON(json) ?? String(describing: json)
+    throw SQLiteFieldEncodingError.malformedCustomScalar
   }
 }
 
