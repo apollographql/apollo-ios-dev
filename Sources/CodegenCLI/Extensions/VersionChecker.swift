@@ -51,8 +51,18 @@ enum VersionChecker {
       packagePath: String,
       excludeFilePathComponents: [String] = []
     ) -> PackageResolvedModel? {
-      let projectEnumerator = fileManager.base.enumerator(atPath: projectRootURL?.path ?? ".")
-      enumeratorLoop: while let file = projectEnumerator?.nextObject() as? String {
+      // Skip hidden directories (e.g. `.git`, `.build`, `.swiftpm`) and the contents of
+      // package bundles (e.g. the `.xcodeproj`/`.xcworkspace`/`.framework` we don't need to
+      // descend into). Without this, the enumerator recursively walks every file under the
+      // project root — which is catastrophic in checkouts that nest large trees such as build
+      // artifacts or git worktrees, costing tens of seconds before the first match is found.
+      let enumeratorURL = projectRootURL ?? URL(fileURLWithPath: fileManager.base.currentDirectoryPath)
+      let projectEnumerator = fileManager.base.enumerator(
+        at: enumeratorURL,
+        includingPropertiesForKeys: nil,
+        options: [.skipsHiddenFiles, .skipsPackageDescendants, .producesRelativePathURLs]
+      )
+      enumeratorLoop: while let file = (projectEnumerator?.nextObject() as? URL)?.relativePath {
         if file.hasSuffix(fileSuffix) {
           //check if this file should be ignored
           for component in excludeFilePathComponents {
