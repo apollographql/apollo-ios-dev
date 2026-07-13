@@ -17,7 +17,10 @@ on:
 jobs:
   split-subtrees:
     if: ${{ github.event.pull_request.merged }}
-    runs-on: macos-latest
+    # This job only needs git + ssh — do NOT use macos-latest. The macos-26
+    # image (July 2026 rollover) segfaults in `git subtree split` (Homebrew
+    # git-subtree bash script, exit 139). See claude/ci-subtree-troubleshooting.md.
+    runs-on: ubuntu-latest
     name: Split and Push Subtrees
     outputs:
       releaseVersion: ${{ steps.getVersion.outputs.RELEASE_VERSION }}
@@ -93,7 +96,7 @@ jobs:
   publish-release:
     if: success('split-subtrees') && startsWith(github.ref, 'refs/heads/release/')
     needs: split-subtrees
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     name: Publish Release
     steps:
       - name: Checkout Repo

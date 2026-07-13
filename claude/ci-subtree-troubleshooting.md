@@ -20,6 +20,34 @@ If any step fails, the runner exits without ever pushing the broken rejoin metad
 
 The action used to run `git subtree pull --squash` before `split`. That step existed to defensively bring upstream commits into dev — but in our setup, upstream never has commits dev doesn't, so the pull was always either a no-op or a problem. The May 2026 incident (below) showed it was a self-perpetuating failure source. Removed in PR #990 (or whatever).
 
+## Historical incident: macos-26 runner segfault in `git subtree split` (July 2026)
+
+**How it happened:** Two independent changes intersected.
+
+1. **git 2.54.0 removed the multi-subtree walk optimization.** Upstream commit [`1f70684b51`](https://github.com/git/git/commit/1f70684b51) (Feb 2026) deliberately removed `should_ignore_subtree_split_commit` — the logic that skipped *other* subtrees' split/squash commits during a split — because it could incorrectly exclude commits and alter split hashes (an API contract violation). The consequence for multi-subtree repos like this one: each split now crawls essentially the **entire repo history** as "extra" commits, every run, and that crawl grows with every merged PR. Measured on a July 2026 run (git 2.55, ~5,500 commits on main): apollo-ios walked ~300 commits, codegen ~3,500, pagination ~3,900. On git ≤2.53 (including Apple/Xcode git 2.50) the same pagination split walks ~130 commits with zero extras. This crawl is deep bash recursion in the `git-subtree` script — one stack frame chain per uncached ancestry run.
+2. **GitHub rolled `macos-latest` over to `macos-26-arm64`** (June 2026). Same Bash 3.2.57 and git 2.55.0 as macos-15, but the recompiled system bash and/or default stack rlimit on the new image tolerates less recursion depth. The ~1,900-frame-deep crawl that (barely) fit on macos-15 segfaulted on macos-26:
+
+```
+/opt/homebrew/opt/git/libexec/git-core/git-subtree: line 925: 12196 Done    eval "$grl"
+     12197 Segmentation fault: 11  | while read rev parents; do
+    process_split_commit "$rev" "$parents";
+done
+```
+
+During the label rollover, runs landed on either image at random, so failures looked flaky — two PRs failed while one in between succeeded (it happened to get a macos-15 runner).
+
+**Impact:** None to repair. `Push Subtrees` is gated on `if: success()`, so failed runs pushed nothing and no rejoin metadata reached `main`. The missed subtree commits were carried upstream automatically by the next successful run (splits walk full history).
+
+**Fix (PR #1047):** Three layers.
+
+1. Moved the workflow's jobs to `runs-on: ubuntu-latest` (nothing in them is macOS-specific). Do not move these jobs back to macOS runners.
+2. Added `ulimit -s unlimited` before the split (Linux permits it) — a deep walk can now cost time, never a segfault.
+3. Vendored `git-subtree.sh` from git v2.53.0 at `scripts/vendor/git-subtree-2.53.0.sh` — the last version with the multi-subtree optimization — and pointed the `subtree-split-push` action at it. Splits are back to ~12s each with a walk that stays flat as history grows. Verified before adoption: it reproduces the exact upstream head SHAs for all three subtrees. The action asserts after every split that the split commit's tree equals `HEAD:<subtree>`, so the optimization's known edge cases (which require merge topologies this repo doesn't produce) would fail loudly before any push. See `scripts/vendor/README.md` for full provenance and rationale.
+
+**Rejected alternative:** [`splitsh-lite`](https://github.com/splitsh/lite) — unmaintained (archived git2go binding pinned to libgit2 1.5) and empirically NOT hash-compatible with this repo's squash-based history (produced a different apollo-ios split SHA). Do not revisit it.
+
+**⚠️ Local vs CI git divergence:** different git versions implement `subtree split` differently (the optimization was present ≤2.53, removed in 2.54). Both algorithms have so far agreed on this repo's history, but for any local recovery split intended to be pushed upstream, use the vendored script (`scripts/vendor/git-subtree-2.53.0.sh`, with `GIT_EXEC_PATH="$(git --exec-path)"` exported and on `PATH`) — that is exactly what CI runs, so its hashes are the canonical ones.
+
 ## Historical incident: stale-upstream pull conflict (May 2026)
 
 Fixed in PR #989; root cause prevention in PR #990 (approx — match by date).
