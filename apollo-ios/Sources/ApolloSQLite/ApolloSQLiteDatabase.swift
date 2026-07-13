@@ -367,17 +367,25 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
   }
 
   public func deleteRecord(forKey cacheKey: CacheKey) throws {
-    // Direct delete only — synthetic sub-records (`<parent>.<field>.$[N]`)
-    // produced by nested-list writes are not cascaded here. If the
-    // record being deleted has list-typed fields with depth ≥ 2, the
-    // corresponding synthetic sub-record rows remain in the database
-    // as orphans. They are unreachable from any cache key after this
-    // delete (the parent's `child_key_value` pointers are gone) but
-    // they take up storage until a follow-up cascade-delete PR cleans
-    // them up. Reads are unaffected — orphans never surface through
-    // `selectRecords`.
+    // The cascade walk and the direct delete are separate statements;
+    // wrap them in one transaction so a failure between the two can't
+    // leave rows pointing at already-deleted synthetic sub-records
+    // (or vice versa).
     try performSync {
-      try directDelete(cacheKey: cacheKey)
+      try exec("BEGIN TRANSACTION", errorMessage: "Failed to begin deleteRecord transaction")
+      do {
+        try cascadeDeleteSyntheticDescendants(seedCacheKeys: [cacheKey])
+        try directDelete(cacheKey: cacheKey)
+      } catch {
+        rollbackTransaction()
+        throw error
+      }
+      do {
+        try exec("COMMIT TRANSACTION", errorMessage: "Failed to commit deleteRecord transaction")
+      } catch {
+        rollbackTransaction()
+        throw error
+      }
     }
   }
 
@@ -393,18 +401,46 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
       .replacingOccurrences(of: "_", with: "\\_")
     let wildcardPattern = "%\(escaped)%"
 
+    // Both the cascade walk and the flat delete match only
+    // non-synthetic (user) record keys. Synthetic sub-record keys
+    // embed parent field names (`User:1.claws.$[0]`), so a substring
+    // pattern could match a synthetic key whose *parent* doesn't
+    // match — deleting the internals of a list the caller never
+    // asked to touch and leaving the parent's rows dangling.
+    // Synthetic rows are removed exclusively via the cascade from
+    // matched user records.
     try performSync {
-      let sql = """
-      DELETE FROM \(SQLiteSchema.recordsTableName)
-      WHERE \(SQLiteSchema.Records.cacheKey) LIKE ? COLLATE NOCASE ESCAPE '\\'
-      """
-      let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare row-per-element pattern delete")
-      defer { sqlite3_finalize(stmt) }
+      try exec("BEGIN TRANSACTION", errorMessage: "Failed to begin pattern-delete transaction")
+      do {
+        // Cascade walk: synthetic sub-records reachable from any
+        // non-synthetic record whose cache_key matches the pattern.
+        // The walk follows `child_key_value` pointers whose value
+        // ends with `.$[<integer>]`. The matched records themselves
+        // are then deleted by the direct DELETE below.
+        try cascadeDeletePatternMatchedSyntheticDescendants(escapedLikePattern: wildcardPattern)
 
-      sqlite3_bind_text(stmt, 1, wildcardPattern, -1, SQLITE_TRANSIENT)
-      let result = sqlite3_step(stmt)
-      if result != SQLITE_DONE {
-        throw SQLiteError.step(message: "Row-per-element pattern delete failed: \(sqliteErrorMessage())", resultCode: result)
+        let sql = """
+        DELETE FROM \(SQLiteSchema.recordsTableName)
+        WHERE \(SQLiteSchema.Records.cacheKey) LIKE ? COLLATE NOCASE ESCAPE '\\'
+          AND \(SQLiteSchema.Records.cacheKey) NOT LIKE '\(SQLiteSchema.Records.syntheticKeySuffixLikePattern)' ESCAPE '\\'
+        """
+        let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare row-per-element pattern delete")
+        defer { sqlite3_finalize(stmt) }
+
+        sqlite3_bind_text(stmt, 1, wildcardPattern, -1, SQLITE_TRANSIENT)
+        let result = sqlite3_step(stmt)
+        if result != SQLITE_DONE {
+          throw SQLiteError.step(message: "Row-per-element pattern delete failed: \(sqliteErrorMessage())", resultCode: result)
+        }
+      } catch {
+        rollbackTransaction()
+        throw error
+      }
+      do {
+        try exec("COMMIT TRANSACTION", errorMessage: "Failed to commit pattern-delete transaction")
+      } catch {
+        rollbackTransaction()
+        throw error
       }
     }
   }
@@ -442,23 +478,20 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
   ///   never-written field
   /// - nested-list elements recurse via a synthetic sub-record
   ///
-  /// Any prior rows for `(cacheKey, fieldName)` are cleared first so
-  /// shape transitions (scalar → list, list → scalar, longer-list →
-  /// shorter-list) leave no in-field orphans. The clear-then-write
-  /// happens inside the caller's transaction so partial states are
-  /// never observable to readers.
-  ///
-  /// Note: this implementation does NOT cascade-clean synthetic sub-
-  /// records pointed to by the previous rows. If the prior value was
-  /// a list with depth ≥ 2, those synthetic sub-record rows remain
-  /// in the database as orphans (unreachable but persistent). A
-  /// follow-up cascade-delete PR handles that cleanup.
+  /// Any prior rows for `(cacheKey, fieldName)` are cleared first —
+  /// along with any reachable synthetic sub-records — so shape
+  /// transitions (scalar → list, list → scalar, longer-list →
+  /// shorter-list, nested-list → anything) leave no orphans. The
+  /// full cascade-then-direct-then-write sequence runs inside the
+  /// caller's transaction so partial states are never observable to
+  /// readers.
   private func writeFieldOrList(
     cacheKey: CacheKey,
     fieldName: String,
     value: Record.Value,
     writtenAt: Int64
   ) throws {
+    try cascadeDeleteSyntheticDescendantsOfField(cacheKey: cacheKey, fieldName: fieldName)
     try directDelete(cacheKey: cacheKey, fieldName: fieldName)
 
     if let array = value as? [Record.Value] {
@@ -618,8 +651,126 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     }
   }
 
+  // MARK: - Cascading delete walks
+
+  /// Recursive-CTE walk from one or more seed `cache_key`s, following
+  /// `child_key_value` pointers that end with the synthetic-key suffix
+  /// (`.$[<integer>]`). Deletes every synthetic descendant in one SQL
+  /// statement. The seed records themselves are *not* deleted — the
+  /// caller issues a separate `directDelete` for those.
+  ///
+  /// Real (non-synthetic) `CacheReference` targets are *not* followed
+  /// — those point to independent records that may be reachable from
+  /// other cache keys and have their own lifecycle.
+  private func cascadeDeleteSyntheticDescendants(seedCacheKeys: [CacheKey]) throws {
+    guard !seedCacheKeys.isEmpty else { return }
+    let placeholders = Array(repeating: "?", count: seedCacheKeys.count).joined(separator: ", ")
+    let sql = """
+    WITH RECURSIVE descendants(cache_key) AS (
+      SELECT r.\(SQLiteSchema.Records.childKeyValue) FROM \(SQLiteSchema.recordsTableName) r
+      WHERE r.\(SQLiteSchema.Records.cacheKey) IN (\(placeholders))
+        AND r.\(SQLiteSchema.Records.childKeyValue) IS NOT NULL
+        AND r.\(SQLiteSchema.Records.childKeyValue) LIKE '\(SQLiteSchema.Records.syntheticKeySuffixLikePattern)' ESCAPE '\\'
+      UNION
+      SELECT r.\(SQLiteSchema.Records.childKeyValue) FROM \(SQLiteSchema.recordsTableName) r
+      JOIN descendants d ON r.\(SQLiteSchema.Records.cacheKey) = d.cache_key
+      WHERE r.\(SQLiteSchema.Records.childKeyValue) IS NOT NULL
+        AND r.\(SQLiteSchema.Records.childKeyValue) LIKE '\(SQLiteSchema.Records.syntheticKeySuffixLikePattern)' ESCAPE '\\'
+    )
+    DELETE FROM \(SQLiteSchema.recordsTableName)
+    WHERE \(SQLiteSchema.Records.cacheKey) IN (SELECT cache_key FROM descendants)
+    """
+    let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare cascade-delete walk")
+    defer { sqlite3_finalize(stmt) }
+
+    for (index, key) in seedCacheKeys.enumerated() {
+      sqlite3_bind_text(stmt, Int32(index + 1), key, -1, SQLITE_TRANSIENT)
+    }
+    let result = sqlite3_step(stmt)
+    if result != SQLITE_DONE {
+      throw SQLiteError.step(message: "Cascade-delete walk failed: \(sqliteErrorMessage())", resultCode: result)
+    }
+  }
+
+  /// Field-scoped variant of `cascadeDeleteSyntheticDescendants`. Seeds
+  /// the walk from the synthetic children of `(cacheKey, fieldName)`'s
+  /// own rows rather than from the whole record. Used by atomic list
+  /// rewrites to clean up synthetic sub-records left over from the
+  /// prior list before writing new elements. The `(cacheKey, fieldName)`
+  /// rows themselves are not deleted here — the caller issues a
+  /// scoped `directDelete` for those.
+  private func cascadeDeleteSyntheticDescendantsOfField(
+    cacheKey: CacheKey,
+    fieldName: String
+  ) throws {
+    let sql = """
+    WITH RECURSIVE descendants(cache_key) AS (
+      SELECT r.\(SQLiteSchema.Records.childKeyValue) FROM \(SQLiteSchema.recordsTableName) r
+      WHERE r.\(SQLiteSchema.Records.cacheKey) = ?
+        AND r.\(SQLiteSchema.Records.fieldName) = ?
+        AND r.\(SQLiteSchema.Records.childKeyValue) IS NOT NULL
+        AND r.\(SQLiteSchema.Records.childKeyValue) LIKE '\(SQLiteSchema.Records.syntheticKeySuffixLikePattern)' ESCAPE '\\'
+      UNION
+      SELECT r.\(SQLiteSchema.Records.childKeyValue) FROM \(SQLiteSchema.recordsTableName) r
+      JOIN descendants d ON r.\(SQLiteSchema.Records.cacheKey) = d.cache_key
+      WHERE r.\(SQLiteSchema.Records.childKeyValue) IS NOT NULL
+        AND r.\(SQLiteSchema.Records.childKeyValue) LIKE '\(SQLiteSchema.Records.syntheticKeySuffixLikePattern)' ESCAPE '\\'
+    )
+    DELETE FROM \(SQLiteSchema.recordsTableName)
+    WHERE \(SQLiteSchema.Records.cacheKey) IN (SELECT cache_key FROM descendants)
+    """
+    let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare field cascade-delete walk")
+    defer { sqlite3_finalize(stmt) }
+
+    sqlite3_bind_text(stmt, 1, cacheKey, -1, SQLITE_TRANSIENT)
+    sqlite3_bind_text(stmt, 2, fieldName, -1, SQLITE_TRANSIENT)
+    let result = sqlite3_step(stmt)
+    if result != SQLITE_DONE {
+      throw SQLiteError.step(message: "Field cascade-delete walk failed: \(sqliteErrorMessage())", resultCode: result)
+    }
+  }
+
+  /// Pattern-scoped variant. The walk seeds from synthetic children
+  /// of *every non-synthetic record whose cache_key matches the LIKE
+  /// pattern*, then follows the synthetic chain transitively. The
+  /// matched records themselves are deleted by the caller's flat
+  /// pattern DELETE. Synthetic keys matching the pattern are excluded
+  /// from the seed for the same reason the caller excludes them from
+  /// the flat delete: a substring pattern may match a synthetic key
+  /// whose parent record doesn't match, and touching that key's
+  /// subtree would corrupt the unmatched parent's list storage.
+  private func cascadeDeletePatternMatchedSyntheticDescendants(
+    escapedLikePattern: String
+  ) throws {
+    let sql = """
+    WITH RECURSIVE descendants(cache_key) AS (
+      SELECT r.\(SQLiteSchema.Records.childKeyValue) FROM \(SQLiteSchema.recordsTableName) r
+      WHERE r.\(SQLiteSchema.Records.cacheKey) LIKE ? COLLATE NOCASE ESCAPE '\\'
+        AND r.\(SQLiteSchema.Records.cacheKey) NOT LIKE '\(SQLiteSchema.Records.syntheticKeySuffixLikePattern)' ESCAPE '\\'
+        AND r.\(SQLiteSchema.Records.childKeyValue) IS NOT NULL
+        AND r.\(SQLiteSchema.Records.childKeyValue) LIKE '\(SQLiteSchema.Records.syntheticKeySuffixLikePattern)' ESCAPE '\\'
+      UNION
+      SELECT r.\(SQLiteSchema.Records.childKeyValue) FROM \(SQLiteSchema.recordsTableName) r
+      JOIN descendants d ON r.\(SQLiteSchema.Records.cacheKey) = d.cache_key
+      WHERE r.\(SQLiteSchema.Records.childKeyValue) IS NOT NULL
+        AND r.\(SQLiteSchema.Records.childKeyValue) LIKE '\(SQLiteSchema.Records.syntheticKeySuffixLikePattern)' ESCAPE '\\'
+    )
+    DELETE FROM \(SQLiteSchema.recordsTableName)
+    WHERE \(SQLiteSchema.Records.cacheKey) IN (SELECT cache_key FROM descendants)
+    """
+    let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare pattern cascade-delete walk")
+    defer { sqlite3_finalize(stmt) }
+
+    sqlite3_bind_text(stmt, 1, escapedLikePattern, -1, SQLITE_TRANSIENT)
+    let result = sqlite3_step(stmt)
+    if result != SQLITE_DONE {
+      throw SQLiteError.step(message: "Pattern cascade-delete walk failed: \(sqliteErrorMessage())", resultCode: result)
+    }
+  }
+
   /// Deletes the rows for a given cache key (and optional field). Does
-  /// not cascade synthetic sub-records — that's a follow-up PR.
+  /// not cascade — callers run the appropriate `cascadeDelete…` first
+  /// if synthetic sub-records need cleanup.
   private func directDelete(cacheKey: CacheKey, fieldName: String? = nil) throws {
     let sql: String
     if fieldName == nil {
