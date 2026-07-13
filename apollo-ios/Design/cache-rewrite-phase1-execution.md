@@ -300,6 +300,14 @@ Goal: ship 3.0-beta. Full feature visible to consumers.
 | PR-030 | feat(samples): demonstrate `@cacheControl` usage in `TestCodeGenConfigurations` | ⬜ | PR-029 | ~250 | Codegen regression: existing test code generation continues to succeed with new samples |
 | PR-031 | chore: tag 3.0-beta; final changelog; release announcement draft | ⬜ | PR-030 | ~150 | Internal beta cycle (1 week); zero P0/P1 issues open |
 
+### Pre-3.0 investigations
+
+Tracked items that must be **decided before the 3.0 final tag** but are not yet scheduled into a phase:
+
+| ID | Item | Motivation | Decision gate |
+|---|---|---|---|
+| INV-001 | Swift-native JSON response parsing (replace `JSONSerialization` behind `JSONSerializationFormat.deserialize`) | (1) Linux portability — `JSONSerialization`/`NSNumber` are the main Foundation coupling on the response path; (2) removes per-scalar `NSNumber` boxing, letting `SQLiteFieldEncoding` retire its bridged-number classification (currently Darwin-CF with an `objCType` fallback for non-Darwin). Changes the runtime type of every `JSONValue` in the system (DataDict equality, `AnyHashable` comparisons, executor casts), so it is a coordinated project, not a drop-in. | Investigate and decide go/no-go before the 3.0 final tag; if go, schedule as its own PR series. |
+
 ### Total
 
 - **36 PRs** across 4 phases (Phase 0: 6; Phase 1A: 10; Phase 1B: 7; Phase 1C: 8; Phase 1D: 5).
