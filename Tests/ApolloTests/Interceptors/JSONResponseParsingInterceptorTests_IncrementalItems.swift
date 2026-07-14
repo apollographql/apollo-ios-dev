@@ -544,9 +544,6 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
 
   typealias AnimalQuery = MockDeferredAnimalQuery
 
-  /// Like ``MockDeferredAnimalQuery`` but selects `id` on `animal` so it normalizes by an id-based
-  /// cache key when `cacheKeyInfo` is configured. Used to verify deferred paths resolve to the real
-  /// record key rather than the naive `QUERY_ROOT.<path>` join.
   struct AnimalWithIDQuery: GraphQLQuery, @unchecked Sendable {
     static var operationName: String { "AnimalWithIDQuery" }
 
