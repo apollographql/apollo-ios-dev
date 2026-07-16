@@ -163,6 +163,22 @@ Rollback after merge: the design is not reversible without another major version
 
 The retention question left open by the 2026-07-13 amendment is resolved: the final 3.0 `NormalizedCache`/`ReadOnlyNormalizedCache` protocols expose **only** the projection-aware `loadFields(_:)` read. `loadRecords(forKeys:)` is removed at PR-009h, not kept alongside — supporting both read shapes indefinitely would preserve the whole-record contract ADR 0007 exists to retire. Consequences, all landing in PR-009h: the delegating default `loadFields` implementation is deleted (it has nothing left to delegate to), `loadFields` becomes a hard requirement and — together with `FieldProjection` — graduates from `@_spi(Execution)` to public (an SPI-only requirement on a public protocol would be unimplementable by third parties), and `InMemoryNormalizedCache` implements `loadFields` natively. `SQLiteNormalizedCache` may keep a whole-record read as a private implementation detail of the legacy-blob migration path, but it is no longer protocol surface.
 
+### 2026-07-16 — Projections grouped per record
+
+`FieldProjection(cacheKey, fieldName)` is reshaped into
+`RecordProjection(cacheKey, fieldNames: Set<String>)` (PR-009g-iii). The
+pairwise type denormalized data that is born grouped: the collector walks one
+record's selections per call (its `cacheKey` parameter existed only to build
+the pairs and is now gone), every backend's first move was regrouping by cache
+key, and `ProjectionLoader`'s state was already per-key. `RecordProjection`
+is a transfer type, not an accumulator — repeated cache keys in a
+`loadFields(_:)` call merge to the union of their field names, and
+accumulation code uses `[CacheKey: Set<String>]`. `CacheDependentKey`
+deliberately stays pairwise (a changed field is one pair), so the
+projection/dependency types now differ structurally as well as in role. The
+future `requiredTypename` metadata, if the deferred `__typename` filter is
+ever justified, attaches per field within the group — still additive.
+
 ## References
 
 - [Cache rewrite Phase 1 plan](../cache-rewrite-phase1-plan.md), §7 (SQLite schema — rewritten per ADR 0006)
