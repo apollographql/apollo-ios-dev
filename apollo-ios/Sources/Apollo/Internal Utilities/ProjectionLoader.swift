@@ -1,21 +1,21 @@
 @_spi(Execution) import ApolloAPI
 
-/// Batches `FieldProjection` reads against a `NormalizedCache` for the
+/// Batches `RecordProjection` reads against a `NormalizedCache` for the
 /// duration of one `ReadTransaction`. Projections enqueued across
 /// multiple deferred call sites coalesce into a single
 /// `loadFields(_:)` call when the first deferred value is forced —
 /// the deferred-then-batched pattern that the 2.x `DataLoader<CacheKey,
 /// Record>` previously provided at whole-record granularity, now
-/// expressed at field-projection granularity.
+/// expressed at field granularity.
 ///
 /// This is the "phase 2 resolve" half of ADR 0007 Principle 5's
-/// two-phase pattern. `FieldProjectionCollector` (PR-009d-i) drives
-/// "phase 1 collect" at each selection-set recursion entry; the
-/// cache execution source enqueues those projections here, then
-/// returns a `PossiblyDeferred<Record?>` to the executor. The
-/// executor's existing `lazilyEvaluateAll` forcing pattern triggers
-/// the flush at level boundaries, preserving the cross-sibling
-/// batching the pre-3.0 implementation relied on.
+/// two-phase pattern. `ProjectionCollector` drives "phase 1 collect"
+/// at each selection-set recursion entry; the cache execution source
+/// enqueues those projections here, then returns a
+/// `PossiblyDeferred<Record?>` to the executor. The executor's
+/// existing `lazilyEvaluateAll` forcing pattern triggers the flush at
+/// level boundaries, preserving the cross-sibling batching the pre-3.0
+/// implementation relied on.
 ///
 /// # Lifecycle
 ///
@@ -24,7 +24,7 @@
 /// pending and per-key state — called after a write so subsequent
 /// reads within the same transaction observe fresh data.
 final class ProjectionLoader {
-  typealias BatchLoad = ([FieldProjection]) async throws -> [CacheKey: Record]
+  typealias BatchLoad = ([RecordProjection]) async throws -> [CacheKey: Record]
 
   /// Per-cacheKey state machine for everything the loader needs to
   /// remember after a flush. Collapses the prior two-dictionary
@@ -86,8 +86,12 @@ final class ProjectionLoader {
 
   private let batchLoad: BatchLoad
 
-  /// Projections waiting to be flushed on the next force.
-  private var pending: Set<FieldProjection> = []
+  /// Field names waiting to be flushed on the next force, accumulated
+  /// per cache key. `RecordProjection` is a transfer type — same-key
+  /// requests from different call sites must *merge*, so accumulation
+  /// happens in a dictionary and converts to `[RecordProjection]` at
+  /// the `batchLoad` boundary.
+  private var pending: [CacheKey: Set<String>] = [:]
 
   /// Per-cacheKey post-flush state. See ``KeyState`` for the four
   /// states this map encodes and how they replace the prior
@@ -98,13 +102,26 @@ final class ProjectionLoader {
     self.batchLoad = batchLoad
   }
 
-  /// Enqueues the given projections for the next flush. Projections
-  /// whose `(cacheKey, fieldName)` is already loaded are skipped —
-  /// the field's value is in the result cache and doesn't need to be
+  /// Enqueues the given projection for the next flush. Fields whose
+  /// `(cacheKey, fieldName)` has already been attempted are skipped —
+  /// the field's outcome is in the result cache and doesn't need to be
   /// re-read.
-  func enqueue<S: Sequence>(_ projections: S) where S.Element == FieldProjection {
-    for projection in projections where !isAlreadyLoaded(projection) {
-      pending.insert(projection)
+  func enqueue(_ projection: RecordProjection) {
+    let newFields: Set<String>
+    if let keyState = state[projection.cacheKey] {
+      newFields = projection.fieldNames.filter { !keyState.hasAttempted($0) }
+    } else {
+      newFields = projection.fieldNames
+    }
+    guard !newFields.isEmpty else { return }
+    pending[projection.cacheKey, default: []].formUnion(newFields)
+  }
+
+  /// Convenience: enqueues several projections. Same-key projections
+  /// merge into one pending field-name set.
+  func enqueue<S: Sequence>(_ projections: S) where S.Element == RecordProjection {
+    for projection in projections {
+      enqueue(projection)
     }
   }
 
@@ -136,7 +153,7 @@ final class ProjectionLoader {
     state.removeAll()
   }
 
-  /// Drops per-key state and pending projections for `keys` only.
+  /// Drops per-key state and pending field names for `keys` only.
   /// Other keys keep whatever they last observed.
   ///
   /// Called by `ReadWriteTransaction.write(_:withKey:variables:)`
@@ -146,13 +163,9 @@ final class ProjectionLoader {
   /// changed — but reads for *unrelated* keys keep their warm
   /// `.loaded`/`.absent` state and do not re-batch on the next ask.
   func invalidate<S: Sequence>(keys: S) where S.Element == CacheKey {
-    let toInvalidate = Set(keys)
-    guard !toInvalidate.isEmpty else { return }
-    for key in toInvalidate {
+    for key in keys {
       state.removeValue(forKey: key)
-    }
-    if !pending.isEmpty {
-      pending = pending.filter { !toInvalidate.contains($0.cacheKey) }
+      pending.removeValue(forKey: key)
     }
   }
 
@@ -173,33 +186,6 @@ final class ProjectionLoader {
 
   // MARK: - Private
 
-  /// True iff a prior flush has already *attempted* to load this
-  /// projection's `(cacheKey, fieldName)` pair — covering all
-  /// post-flush states for the field:
-  ///
-  /// - **Found:** the cache returned a record containing this field.
-  ///   The state is `.loaded(record, attempted: { fieldName, … })`.
-  /// - **Known missing:** the cache returned a record for this key
-  ///   but without this field. The state is
-  ///   `.loaded(record, attempted: { fieldName, … })` and the field
-  ///   is absent from `record.fields`.
-  /// - **Absent record:** the cache had no record for this key at
-  ///   all. The state is `.absent`, which short-circuits every field
-  ///   on the key — same field, different field, doesn't matter.
-  /// - **Sticky failure:** a prior flush threw for this key. The
-  ///   state is `.failed(error)` and every subsequent projection on
-  ///   this key short-circuits as the same failure via
-  ///   `loadResult(forKey:)`.
-  ///
-  /// Short-circuiting in every post-attempt case avoids re-batching
-  /// known-missing fields and known-absent records on repeated
-  /// enqueue — a behavior the pre-3.0 whole-record `DataLoader`
-  /// provided implicitly via `cache[key] = .success(nil)` for absent
-  /// keys.
-  private func isAlreadyLoaded(_ projection: FieldProjection) -> Bool {
-    state[projection.cacheKey]?.hasAttempted(projection.fieldName) ?? false
-  }
-
   /// Returns the `Result<Record?, Error>` for the given key, lifting
   /// a missing key or an `.absent` state to `.success(nil)`. A failure
   /// short-circuits as the recorded error.
@@ -213,7 +199,7 @@ final class ProjectionLoader {
 
   /// Fires one `batchLoad` covering every currently-pending
   /// projection, then updates `state` to reflect the outcome for each
-  /// attempted `(cacheKey, fieldName)` pair.
+  /// attempted key and its field names.
   ///
   /// Each returned `Record`'s `fields` is *merged* into any existing
   /// `.loaded` entry under the same key — a prior flush may have
@@ -222,37 +208,36 @@ final class ProjectionLoader {
   ///
   /// `.absent` and `.failed` are sticky and never updated — a key
   /// that landed in either state during a prior flush short-circuits
-  /// at `enqueue` so its projections never reach this loop.
+  /// at `enqueue` so its fields never reach this loop.
   private func flush() async throws {
     guard !pending.isEmpty else { return }
-    let toLoad = Array(pending)
+    let toLoad = pending.map { RecordProjection(cacheKey: $0.key, fieldNames: $0.value) }
     pending.removeAll()
 
     do {
       let newRecords = try await batchLoad(toLoad)
       for projection in toLoad {
         let cacheKey = projection.cacheKey
-        let fieldName = projection.fieldName
         let newRecord = newRecords[cacheKey]
 
         switch state[cacheKey] {
         case .some(.failed), .some(.absent):
           // Sticky states — should not reach this branch in practice
-          // (the projection would have short-circuited at `enqueue`),
-          // but coexisting with an already-sticky state is harmless:
-          // we just don't update it.
+          // (the fields would have short-circuited at `enqueue`), but
+          // coexisting with an already-sticky state is harmless: we
+          // just don't update it.
           continue
 
         case .some(.loaded(var existing, var attempted)):
           if let newRecord {
             existing.fields.merge(newRecord.fields) { _, new in new }
           }
-          attempted.insert(fieldName)
+          attempted.formUnion(projection.fieldNames)
           state[cacheKey] = .loaded(existing, attempted: attempted)
 
         case .none:
           if let newRecord {
-            state[cacheKey] = .loaded(newRecord, attempted: [fieldName])
+            state[cacheKey] = .loaded(newRecord, attempted: projection.fieldNames)
           } else {
             state[cacheKey] = .absent
           }

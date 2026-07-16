@@ -418,12 +418,20 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
   /// `resolveSyntheticIfNeeded`, so nested-list fields materialize
   /// in their assembled form.
   @_spi(Execution)
-  public func selectFields(_ projections: [FieldProjection]) throws -> [CacheKey: Record] {
+  public func selectFields(_ projections: [RecordProjection]) throws -> [CacheKey: Record] {
     guard !projections.isEmpty else { return [:] }
 
-    // Dedupe early so duplicate projections coalesce to one SQL bind.
-    let uniqueProjections = Set(projections)
-    let requestedKeys = Set(uniqueProjections.map(\.cacheKey))
+    // Repeated cache keys merge to the union of their field names;
+    // the merged map then flattens to (cacheKey, fieldName) pairs for
+    // the row-filter SQL, deduplicated by construction.
+    let fieldNamesByKey = Dictionary(
+      projections.map { ($0.cacheKey, $0.fieldNames) },
+      uniquingKeysWith: { $0.union($1) }
+    )
+    let requestedKeys = Set(fieldNamesByKey.keys)
+    let requestedPairs = fieldNamesByKey.flatMap { key, fieldNames in
+      fieldNames.map { (cacheKey: key, fieldName: $0) }
+    }
 
     return try performSync {
       let existingKeys = try selectExistingKeys(requestedKeys)
@@ -434,7 +442,7 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
       // would be empty regardless).
       guard !existingKeys.isEmpty else { return [:] }
 
-      let projectedRows = try selectProjectedRows(Array(uniqueProjections))
+      let projectedRows = try selectProjectedRows(requestedPairs)
       let assembled = try assembleRecords(from: projectedRows)
       let assembledByKey = Dictionary(uniqueKeysWithValues: assembled.map { ($0.key, $0) })
 
@@ -493,11 +501,12 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
   /// Runs the projection SQL: `SELECT … WHERE (cache_key, field_name)
   /// IN (VALUES (?, ?), (?, ?), …)`. Returns the raw rows; assembly
   /// happens in the caller via the shared `assembleRecords` helper.
-  private func selectProjectedRows<C: Collection>(_ projections: C) throws -> [DecodedRow]
-  where C.Element == FieldProjection {
-    guard !projections.isEmpty else { return [] }
+  private func selectProjectedRows(
+    _ pairs: [(cacheKey: CacheKey, fieldName: String)]
+  ) throws -> [DecodedRow] {
+    guard !pairs.isEmpty else { return [] }
 
-    let valuesClause = Array(repeating: "(?, ?)", count: projections.count).joined(separator: ", ")
+    let valuesClause = Array(repeating: "(?, ?)", count: pairs.count).joined(separator: ", ")
     let sql = """
     SELECT
       \(SQLiteSchema.Records.cacheKey),
@@ -521,9 +530,9 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     defer { sqlite3_finalize(stmt) }
 
     var bindIdx: Int32 = 1
-    for projection in projections {
-      sqlite3_bind_text(stmt, bindIdx, projection.cacheKey, -1, SQLITE_TRANSIENT)
-      sqlite3_bind_text(stmt, bindIdx + 1, projection.fieldName, -1, SQLITE_TRANSIENT)
+    for pair in pairs {
+      sqlite3_bind_text(stmt, bindIdx, pair.cacheKey, -1, SQLITE_TRANSIENT)
+      sqlite3_bind_text(stmt, bindIdx + 1, pair.fieldName, -1, SQLITE_TRANSIENT)
       bindIdx += 2
     }
 

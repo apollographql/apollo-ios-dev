@@ -35,10 +35,10 @@ final class SQLiteSelectFieldsTests: XCTestCase {
   private func projection(
     _ cacheKey: CacheKey,
     _ fieldName: String
-  ) -> FieldProjection {
-    FieldProjection(
+  ) -> RecordProjection {
+    RecordProjection(
       cacheKey: cacheKey,
-      fieldName: fieldName
+      fieldNames: [fieldName]
     )
   }
 
@@ -146,11 +146,10 @@ final class SQLiteSelectFieldsTests: XCTestCase {
   // MARK: - Dedupe
 
   func test__selectFields__givenDuplicateProjections__readsRowOnce() throws {
-    // Two `FieldProjection`s that differ only in declared shape but
-    // share `(cacheKey, fieldName)` should coalesce at the SQL bind
-    // layer. The test asserts the read still succeeds and returns the
-    // single stored value — the shape conflict is a programmer error
-    // documented in `loadFields(_:)`'s precondition.
+    // Repeated projections of the same record merge to the union of
+    // their field names, coalescing to one SQL bind per
+    // (cacheKey, fieldName) pair. The read succeeds and returns the
+    // single stored value.
     let db = try makeDatabase()
     try db.insertOrUpdate(records: [record("User:1", fields: ["name": "Anthony"])])
 

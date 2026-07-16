@@ -103,7 +103,7 @@ public struct DefaultFieldSelectionCollector: FieldSelectionCollector {
     info: ObjectExecutionInfo
   ) throws {
     // Selection-case dispatch is delegated to `SelectionWalker` so this
-    // collector and `FieldProjectionCollector` share one walk
+    // collector and `ProjectionCollector` share one walk
     // implementation. Per the Apollo Router + Server's deferSpec=20220824
     // implementation, every `@defer` is honored — deferred selection
     // fields are only collected when parsed with the incremental

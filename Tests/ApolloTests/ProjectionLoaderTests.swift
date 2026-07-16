@@ -18,11 +18,11 @@ final class ProjectionLoaderTests: XCTestCase {
 
   // MARK: - Helpers
 
-  /// `FieldProjection.init(cacheKey:fieldName:)` shorthand.
-  private func projection(_ cacheKey: CacheKey, _ fieldName: String) -> FieldProjection {
-    FieldProjection(
+  /// Single-field `RecordProjection` shorthand.
+  private func projection(_ cacheKey: CacheKey, _ fieldName: String) -> RecordProjection {
+    RecordProjection(
       cacheKey: cacheKey,
-      fieldName: fieldName
+      fieldNames: [fieldName]
     )
   }
 
@@ -31,9 +31,9 @@ final class ProjectionLoaderTests: XCTestCase {
   /// `batchLoads` tracker. The actor isolation keeps the counter race-
   /// free under concurrent `.get()` forces.
   private actor BatchRecorder {
-    private(set) var calls: [[FieldProjection]] = []
+    private(set) var calls: [[RecordProjection]] = []
 
-    func record(_ projections: [FieldProjection]) {
+    func record(_ projections: [RecordProjection]) {
       calls.append(projections)
     }
   }
@@ -124,8 +124,10 @@ final class ProjectionLoaderTests: XCTestCase {
       // should only carry the *new* projection.
       var result: [CacheKey: Record] = [:]
       for projection in projections {
-        result[projection.cacheKey, default: Record(key: projection.cacheKey)]
-          .fields[projection.fieldName] = CachedField(value: "v_\(projection.fieldName)", writtenAt: 0)
+        for fieldName in projection.fieldNames {
+          result[projection.cacheKey, default: Record(key: projection.cacheKey)]
+            .fields[fieldName] = CachedField(value: "v_\(fieldName)", writtenAt: 0)
+        }
       }
       return result
     }
@@ -152,7 +154,9 @@ final class ProjectionLoaderTests: XCTestCase {
       await recorder.record(projections)
       var fields: Record.Fields = [:]
       for projection in projections where projection.cacheKey == "A" {
-        fields[projection.fieldName] = CachedField(value: "v_\(projection.fieldName)", writtenAt: 0)
+        for fieldName in projection.fieldNames {
+          fields[fieldName] = CachedField(value: "v_\(fieldName)", writtenAt: 0)
+        }
       }
       return ["A": Record(key: "A", fields: fields)]
     }

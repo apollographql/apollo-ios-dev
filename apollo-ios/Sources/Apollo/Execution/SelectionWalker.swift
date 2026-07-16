@@ -2,12 +2,12 @@
 
 /// Shared dispatch over a `[Selection]` tree, parameterized by per-case
 /// policies. Both `DefaultFieldSelectionCollector` (the resolve path)
-/// and `FieldProjectionCollector` (the projection path) traverse the
+/// and `ProjectionCollector` (the projection path) traverse the
 /// same `Selection` shape with the same conditional/fragment/inline-
 /// fragment/deferred branches — they differ only in:
 ///
 /// 1. What they do per `.field` (append to a grouping vs emit a
-///    `FieldProjection`).
+///    `RecordProjection`).
 /// 2. Whether `.inlineFragment` requires runtime-type matching
 ///    (`byRuntimeType`) or enters unconditionally (`includeAll`, the
 ///    cache projection's over-fetch strategy — the executor's later

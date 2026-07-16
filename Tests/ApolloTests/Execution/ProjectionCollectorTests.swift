@@ -5,7 +5,7 @@ import Foundation
 import Nimble
 import XCTest
 
-final class FieldProjectionCollectorTests: XCTestCase {
+final class ProjectionCollectorTests: XCTestCase {
 
   // MARK: - Field selections
 
@@ -15,16 +15,15 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .field("age", Int.self),
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "User:1",
       variables: nil,
       resolveRuntimeType: { nil }
     )
 
     expect(projections) == Set([
-      FieldProjection(cacheKey: "User:1", fieldName: "name"),
-      FieldProjection(cacheKey: "User:1", fieldName: "age"),
+      "name",
+      "age",
     ])
   }
 
@@ -33,15 +32,14 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .field("tags", [String].self),
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "User:1",
       variables: nil,
       resolveRuntimeType: { nil }
     )
 
     expect(projections) == Set([
-      FieldProjection(cacheKey: "User:1", fieldName: "tags")
+      "tags"
     ])
   }
 
@@ -56,15 +54,14 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .field("bestFriend", FriendSelectionSet.self)
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "User:1",
       variables: nil,
       resolveRuntimeType: { nil }
     )
 
     expect(projections) == Set([
-      FieldProjection(cacheKey: "User:1", fieldName: "bestFriend")
+      "bestFriend"
     ])
   }
 
@@ -85,9 +82,8 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .field("bestFriend", FriendSelectionSet.self),
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "User:1",
       variables: nil,
       resolveRuntimeType: { nil }
     )
@@ -95,9 +91,9 @@ final class FieldProjectionCollectorTests: XCTestCase {
     // Friend's `name` and `age` are NOT in the projection set — only
     // the top-level fields are.
     expect(projections.count) == 2
-    expect(projections.contains(where: { $0.fieldName == "name" })) == true
-    expect(projections.contains(where: { $0.fieldName == "bestFriend" })) == true
-    expect(projections.contains(where: { $0.fieldName == "age" })) == false
+    expect(projections.contains("name")) == true
+    expect(projections.contains("bestFriend")) == true
+    expect(projections.contains("age")) == false
   }
 
   func test__collect__givenFieldWithArguments__usesCacheKeyForField() throws {
@@ -109,16 +105,13 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .field("hero", String.self, arguments: ["episode": "JEDI"])
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "Query.viewer",
       variables: nil,
       resolveRuntimeType: { nil }
     )
 
-    expect(projections.count) == 1
-    let projection = try XCTUnwrap(projections.first)
-    expect(projection.fieldName) == "hero(episode:JEDI)"
+    expect(projections) == ["hero(episode:JEDI)"]
   }
 
   // MARK: - Conditional selections (@include / @skip)
@@ -129,14 +122,13 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .include(if: "showAge", .field("age", Int.self)),
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "User:1",
       variables: ["showAge": true],
       resolveRuntimeType: { nil }
     )
 
-    expect(projections.contains(where: { $0.fieldName == "age" })) == true
+    expect(projections.contains("age")) == true
   }
 
   func test__collect__givenConditionalIncludeFalse__skipsConditional() throws {
@@ -145,16 +137,15 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .include(if: "showAge", .field("age", Int.self)),
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "User:1",
       variables: ["showAge": false],
       resolveRuntimeType: { nil }
     )
 
-    expect(projections.contains(where: { $0.fieldName == "age" })) == false
+    expect(projections.contains("age")) == false
     // The unconditional field still appears.
-    expect(projections.contains(where: { $0.fieldName == "__typename" })) == true
+    expect(projections.contains("__typename")) == true
   }
 
   func test__collect__givenConditionalSkipTrue__skipsConditional() throws {
@@ -166,18 +157,17 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .include(if: !"skipAge", .field("age", Int.self)),
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "User:1",
       variables: ["skipAge": true],
       resolveRuntimeType: { nil }
     )
 
-    expect(projections.contains(where: { $0.fieldName == "age" })) == false
+    expect(projections.contains("age")) == false
     // The unconditional sibling proves the walk ran and produced output
     // — the conditional's `age` field was specifically dropped, not
     // accidentally short-circuited along with everything else.
-    expect(projections.contains(where: { $0.fieldName == "__typename" })) == true
+    expect(projections.contains("__typename")) == true
   }
 
   // MARK: - Fragment selections
@@ -195,16 +185,15 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .fragment(GivenFragment.self),
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "User:1",
       variables: nil,
       resolveRuntimeType: { nil }
     )
 
-    expect(projections.contains(where: { $0.fieldName == "name" })) == true
-    expect(projections.contains(where: { $0.fieldName == "age" })) == true
-    expect(projections.contains(where: { $0.fieldName == "__typename" })) == true
+    expect(projections.contains("name")) == true
+    expect(projections.contains("age")) == true
+    expect(projections.contains("__typename")) == true
   }
 
   func test__collect__givenSameFieldInOuterAndFragment__dedupesViaSet() throws {
@@ -222,15 +211,13 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .fragment(GivenFragment.self),
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "User:1",
       variables: nil,
       resolveRuntimeType: { nil }
     )
 
-    expect(projections.count) == 1
-    expect(projections.first?.fieldName) == "name"
+    expect(projections) == ["name"]
   }
 
   // MARK: - Inline fragment selections (type cases)
@@ -256,15 +243,14 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .inlineFragment(AsDroid.self),
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "Droid:2001",
       variables: nil,
       resolveRuntimeType: { droidType }
     )
 
-    expect(projections.contains(where: { $0.fieldName == "primaryFunction" })) == true
-    expect(projections.contains(where: { $0.fieldName == "name" })) == true
+    expect(projections.contains("primaryFunction")) == true
+    expect(projections.contains("name")) == true
   }
 
   @MainActor
@@ -285,15 +271,14 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .inlineFragment(AsDroid.self),
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "Human:1",
       variables: nil,
       resolveRuntimeType: { humanType }
     )
 
-    expect(projections.contains(where: { $0.fieldName == "primaryFunction" })) == false
-    expect(projections.contains(where: { $0.fieldName == "name" })) == true
+    expect(projections.contains("primaryFunction")) == false
+    expect(projections.contains("name")) == true
   }
 
   @MainActor
@@ -316,15 +301,14 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .inlineFragment(AsDroid.self),
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "User:1",
       variables: nil,
       resolveRuntimeType: { nil }
     )
 
-    expect(projections.contains(where: { $0.fieldName == "primaryFunction" })) == false
-    expect(projections.contains(where: { $0.fieldName == "name" })) == true
+    expect(projections.contains("primaryFunction")) == false
+    expect(projections.contains("name")) == true
   }
 
   // MARK: - Deferred selections
@@ -345,15 +329,14 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .deferred(AsDroid.self, label: "AsDroid"),
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "Droid:2001",
       variables: nil,
       resolveRuntimeType: { nil }
     )
 
-    expect(projections.contains(where: { $0.fieldName == "primaryFunction" })) == true
-    expect(projections.contains(where: { $0.fieldName == "name" })) == true
+    expect(projections.contains("primaryFunction")) == true
+    expect(projections.contains("name")) == true
   }
 
   func test__collect__givenDeferredWithConditionFalse__entersFragmentSelections() throws {
@@ -369,14 +352,13 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .deferred(if: "doDefer", AsDroid.self, label: "AsDroid")
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "Droid:2001",
       variables: ["doDefer": false],
       resolveRuntimeType: { nil }
     )
 
-    expect(projections.contains(where: { $0.fieldName == "primaryFunction" })) == true
+    expect(projections.contains("primaryFunction")) == true
   }
 
   func test__collect__givenDeferredWithConditionTrue__entersFragmentSelections() throws {
@@ -392,22 +374,20 @@ final class FieldProjectionCollectorTests: XCTestCase {
       .deferred(if: "doDefer", AsDroid.self, label: "AsDroid")
     ]
 
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
-      cacheKey: "Droid:2001",
       variables: ["doDefer": true],
       resolveRuntimeType: { nil }
     )
 
-    expect(projections.contains(where: { $0.fieldName == "primaryFunction" })) == true
+    expect(projections.contains("primaryFunction")) == true
   }
 
   // MARK: - Empty input
 
   func test__collect__givenEmptySelections__returnsEmptySet() throws {
-    let projections = try FieldProjectionCollector.collect(
+    let projections = try ProjectionCollector.collectFieldNames(
       selections: [],
-      cacheKey: "User:1",
       variables: nil,
       resolveRuntimeType: { nil }
     )

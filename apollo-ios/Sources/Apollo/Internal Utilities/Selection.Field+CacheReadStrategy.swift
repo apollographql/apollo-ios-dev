@@ -53,7 +53,7 @@ extension Selection.Field {
   /// Determines how the cache reader should resolve this field's value.
   /// Centralizes the policy-resolution rules so the resolver
   /// (`CacheDataExecutionSource.resolveCacheKey(with:on:)`) and the
-  /// projection collector (`FieldProjectionCollector`) agree by
+  /// projection collector (`ProjectionCollector`) agree by
   /// construction on the read strategy for each field.
   ///
   /// Resolution order:
