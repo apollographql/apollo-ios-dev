@@ -18,11 +18,11 @@ final class ProjectionLoaderTests: XCTestCase {
 
   // MARK: - Helpers
 
-  /// `FieldProjection.init(cacheKey:fieldName:)` shorthand.
-  private func projection(_ cacheKey: CacheKey, _ fieldName: String) -> FieldProjection {
-    FieldProjection(
+  /// Single-field `RecordProjection` shorthand.
+  private func projection(_ cacheKey: CacheKey, _ fieldName: String) -> RecordProjection {
+    RecordProjection(
       cacheKey: cacheKey,
-      fieldName: fieldName
+      fieldNames: [fieldName]
     )
   }
 
@@ -31,9 +31,9 @@ final class ProjectionLoaderTests: XCTestCase {
   /// `batchLoads` tracker. The actor isolation keeps the counter race-
   /// free under concurrent `.get()` forces.
   private actor BatchRecorder {
-    private(set) var calls: [[FieldProjection]] = []
+    private(set) var calls: [[RecordProjection]] = []
 
-    func record(_ projections: [FieldProjection]) {
+    func record(_ projections: [RecordProjection]) {
       calls.append(projections)
     }
   }
@@ -52,7 +52,7 @@ final class ProjectionLoaderTests: XCTestCase {
       return ["A": recordA]
     }
 
-    loader.enqueue([projection("A", "name")])
+    loader.enqueue(projection("A", "name"))
     let result = try await loader.deferredRecord(forKey: "A").get()
 
     expect(result?.key) == "A"
@@ -73,10 +73,9 @@ final class ProjectionLoaderTests: XCTestCase {
       ]
     }
 
-    loader.enqueue([
-      projection("A", "name"),
-      projection("B", "name"),
-    ])
+    loader.enqueue(projection("A", "name"))
+
+    loader.enqueue(projection("B", "name"))
 
     // Force both deferreds — first force triggers the flush; second
     // finds its key in `loaded` and returns immediately.
@@ -106,7 +105,9 @@ final class ProjectionLoaderTests: XCTestCase {
     // Same projection enqueued multiple times — the loader's `pending`
     // set must dedupe so the batch carries only one copy.
     let same = projection("A", "name")
-    loader.enqueue([same, same, same])
+    loader.enqueue(same)
+    loader.enqueue(same)
+    loader.enqueue(same)
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     let calls = await recorder.calls
@@ -124,19 +125,23 @@ final class ProjectionLoaderTests: XCTestCase {
       // should only carry the *new* projection.
       var result: [CacheKey: Record] = [:]
       for projection in projections {
-        result[projection.cacheKey, default: Record(key: projection.cacheKey)]
-          .fields[projection.fieldName] = CachedField(value: "v_\(projection.fieldName)", writtenAt: 0)
+        for fieldName in projection.fieldNames {
+          result[projection.cacheKey, default: Record(key: projection.cacheKey)]
+            .fields[fieldName] = CachedField(value: "v_\(fieldName)", writtenAt: 0)
+        }
       }
       return result
     }
 
     // Round 1: enqueue A.name + B.name, force flush.
-    loader.enqueue([projection("A", "name"), projection("B", "name")])
+    loader.enqueue(projection("A", "name"))
+    loader.enqueue(projection("B", "name"))
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     // Round 2: enqueue A.name again + C.name. A.name is already loaded
     // and must be skipped; only C.name should reach the batch.
-    loader.enqueue([projection("A", "name"), projection("C", "name")])
+    loader.enqueue(projection("A", "name"))
+    loader.enqueue(projection("C", "name"))
     _ = try await loader.deferredRecord(forKey: "C").get()
 
     let calls = await recorder.calls
@@ -152,19 +157,21 @@ final class ProjectionLoaderTests: XCTestCase {
       await recorder.record(projections)
       var fields: Record.Fields = [:]
       for projection in projections where projection.cacheKey == "A" {
-        fields[projection.fieldName] = CachedField(value: "v_\(projection.fieldName)", writtenAt: 0)
+        for fieldName in projection.fieldNames {
+          fields[fieldName] = CachedField(value: "v_\(fieldName)", writtenAt: 0)
+        }
       }
       return ["A": Record(key: "A", fields: fields)]
     }
 
     // Round 1: load A.name only.
-    loader.enqueue([projection("A", "name")])
+    loader.enqueue(projection("A", "name"))
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     // Round 2: load A.age — same record key, different field. The
     // record's `loaded` entry holds only `name`; `age` is NOT
     // already-loaded and must be re-batched.
-    loader.enqueue([projection("A", "age")])
+    loader.enqueue(projection("A", "age"))
     let result = try await loader.deferredRecord(forKey: "A").get()
 
     let calls = await recorder.calls
@@ -185,7 +192,7 @@ final class ProjectionLoaderTests: XCTestCase {
       throw failure
     }
 
-    loader.enqueue([projection("A", "name")])
+    loader.enqueue(projection("A", "name"))
 
     // First ask: should throw the batch-load failure.
     await expect { _ = try await loader.deferredRecord(forKey: "A").get() }
@@ -210,13 +217,13 @@ final class ProjectionLoaderTests: XCTestCase {
     }
 
     // Round 1: enqueue + flush populates the `loaded` cache.
-    loader.enqueue([projection("A", "name")])
+    loader.enqueue(projection("A", "name"))
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     // Wipe. Subsequent enqueue + ask must re-batch.
     loader.removeAll()
 
-    loader.enqueue([projection("A", "name")])
+    loader.enqueue(projection("A", "name"))
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     let calls = await recorder.calls
@@ -241,7 +248,8 @@ final class ProjectionLoaderTests: XCTestCase {
     }
 
     // Round 1: load both A and B into `.loaded` state.
-    loader.enqueue([projection("A", "name"), projection("B", "name")])
+    loader.enqueue(projection("A", "name"))
+    loader.enqueue(projection("B", "name"))
     _ = try await loader.deferredRecord(forKey: "A").get()
     _ = try await loader.deferredRecord(forKey: "B").get()
 
@@ -251,7 +259,8 @@ final class ProjectionLoaderTests: XCTestCase {
     // Round 2: re-asks must re-batch A (state was cleared) but NOT B
     // (state is still warm). The recorded batch must contain *only*
     // the A projection.
-    loader.enqueue([projection("A", "name"), projection("B", "name")])
+    loader.enqueue(projection("A", "name"))
+    loader.enqueue(projection("B", "name"))
     _ = try await loader.deferredRecord(forKey: "A").get()
     _ = try await loader.deferredRecord(forKey: "B").get()
 
@@ -277,13 +286,13 @@ final class ProjectionLoaderTests: XCTestCase {
       return callCount == 0 ? [:] : [:]
     }
 
-    loader.enqueue([projection("MISSING", "name")])
+    loader.enqueue(projection("MISSING", "name"))
     _ = try await loader.deferredRecord(forKey: "MISSING").get()
 
     // Without invalidation, this would short-circuit via `.absent`.
     loader.invalidate(keys: ["MISSING"])
 
-    loader.enqueue([projection("MISSING", "name")])
+    loader.enqueue(projection("MISSING", "name"))
     _ = try await loader.deferredRecord(forKey: "MISSING").get()
 
     let calls = await recorder.calls
@@ -298,12 +307,12 @@ final class ProjectionLoaderTests: XCTestCase {
       return ["A": Record(key: "A", ["name": "Alice"])]
     }
 
-    loader.enqueue([projection("A", "name")])
+    loader.enqueue(projection("A", "name"))
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     loader.invalidate(keys: [] as [CacheKey])
 
-    loader.enqueue([projection("A", "name")])
+    loader.enqueue(projection("A", "name"))
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     let calls = await recorder.calls
@@ -322,7 +331,9 @@ final class ProjectionLoaderTests: XCTestCase {
       return ["B": Record(key: "B", ["name": "Bob"])]
     }
 
-    loader.enqueue([projection("A", "name"), projection("B", "name")])
+    loader.enqueue(projection("A", "name"))
+
+    loader.enqueue(projection("B", "name"))
     loader.invalidate(keys: ["A"])
 
     // The next force should flush only B's projection.
@@ -348,11 +359,11 @@ final class ProjectionLoaderTests: XCTestCase {
       ]
     }
 
-    loader.enqueue([
-      projection("User:1", "name"),
-      projection("User:2", "name"),
-      projection("Post:1", "title"),
-    ])
+    loader.enqueue(projection("User:1", "name"))
+
+    loader.enqueue(projection("User:2", "name"))
+
+    loader.enqueue(projection("Post:1", "title"))
     _ = try await loader.deferredRecord(forKey: "User:1").get()
     _ = try await loader.deferredRecord(forKey: "User:2").get()
     _ = try await loader.deferredRecord(forKey: "Post:1").get()
@@ -362,11 +373,9 @@ final class ProjectionLoaderTests: XCTestCase {
 
     // Re-ask all three. Only User:1 and User:2 should re-batch; Post:1
     // stays warm.
-    loader.enqueue([
-      projection("User:1", "name"),
-      projection("User:2", "name"),
-      projection("Post:1", "title"),
-    ])
+    loader.enqueue(projection("User:1", "name"))
+    loader.enqueue(projection("User:2", "name"))
+    loader.enqueue(projection("Post:1", "title"))
     _ = try await loader.deferredRecord(forKey: "User:1").get()
     _ = try await loader.deferredRecord(forKey: "User:2").get()
     _ = try await loader.deferredRecord(forKey: "Post:1").get()
@@ -390,12 +399,12 @@ final class ProjectionLoaderTests: XCTestCase {
       return ["A": Record(key: "A", ["name": "Alice"])]
     }
 
-    loader.enqueue([projection("A", "name")])
+    loader.enqueue(projection("A", "name"))
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     loader.invalidate(matching: "")
 
-    loader.enqueue([projection("A", "name")])
+    loader.enqueue(projection("A", "name"))
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     let calls = await recorder.calls
@@ -411,7 +420,7 @@ final class ProjectionLoaderTests: XCTestCase {
       return [:]
     }
 
-    loader.enqueue([projection("MISSING", "name")])
+    loader.enqueue(projection("MISSING", "name"))
     let result = try await loader.deferredRecord(forKey: "MISSING").get()
 
     // Absent record surfaces as nil, distinct from a thrown error.
@@ -421,7 +430,7 @@ final class ProjectionLoaderTests: XCTestCase {
     // so a second enqueue must NOT trigger another batch. This is the
     // semantic the pre-3.0 whole-record loader provided implicitly
     // via `cache[key] = .success(nil)` for absent keys.
-    loader.enqueue([projection("MISSING", "name")])
+    loader.enqueue(projection("MISSING", "name"))
     let secondResult = try await loader.deferredRecord(forKey: "MISSING").get()
 
     expect(secondResult).to(beNil())
@@ -444,15 +453,15 @@ final class ProjectionLoaderTests: XCTestCase {
     }
 
     // Round 1: load `name` (found).
-    loader.enqueue([projection("A", "name")])
+    loader.enqueue(projection("A", "name"))
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     // Round 2: load `age` (known-missing — record present but field absent).
-    loader.enqueue([projection("A", "age")])
+    loader.enqueue(projection("A", "age"))
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     // Round 3: ask `age` again. Must NOT re-batch.
-    loader.enqueue([projection("A", "age")])
+    loader.enqueue(projection("A", "age"))
     _ = try await loader.deferredRecord(forKey: "A").get()
 
     let calls = await recorder.calls
@@ -472,12 +481,12 @@ final class ProjectionLoaderTests: XCTestCase {
 
     // Round 1: load `MISSING.name` — absent record. The loader records
     // the attempt even though `loaded[MISSING]` stays nil.
-    loader.enqueue([projection("MISSING", "name")])
+    loader.enqueue(projection("MISSING", "name"))
     _ = try await loader.deferredRecord(forKey: "MISSING").get()
 
     // Round 2: ask the same `(cacheKey, fieldName)` again. Must NOT
     // re-batch — repeated probes of an absent key are wasteful.
-    loader.enqueue([projection("MISSING", "name")])
+    loader.enqueue(projection("MISSING", "name"))
     _ = try await loader.deferredRecord(forKey: "MISSING").get()
 
     let calls = await recorder.calls
@@ -501,10 +510,10 @@ final class ProjectionLoaderTests: XCTestCase {
       return [:]
     }
 
-    loader.enqueue([projection("MISSING", "name")])
+    loader.enqueue(projection("MISSING", "name"))
     _ = try await loader.deferredRecord(forKey: "MISSING").get()
 
-    loader.enqueue([projection("MISSING", "age")])
+    loader.enqueue(projection("MISSING", "age"))
     let secondResult = try await loader.deferredRecord(forKey: "MISSING").get()
 
     // Different field on absent record still surfaces as nil.
@@ -524,12 +533,15 @@ final class ProjectionLoaderTests: XCTestCase {
       return ["A": Record(key: "A", ["name": "Alice"])]
     }
 
-    loader.enqueue([projection("A", "name"), projection("B", "name")])
+    loader.enqueue(projection("A", "name"))
+
+    loader.enqueue(projection("B", "name"))
     _ = try await loader.deferredRecord(forKey: "A").get()
     _ = try await loader.deferredRecord(forKey: "B").get()
 
     // Both attempts memoized. Re-enqueueing either must not re-batch.
-    loader.enqueue([projection("A", "name"), projection("B", "name")])
+    loader.enqueue(projection("A", "name"))
+    loader.enqueue(projection("B", "name"))
     _ = try await loader.deferredRecord(forKey: "A").get()
     _ = try await loader.deferredRecord(forKey: "B").get()
 
@@ -557,13 +569,13 @@ final class ProjectionLoaderTests: XCTestCase {
     }
 
     // Round 1: successful load of A.
-    loader.enqueue([projection("A", "name")])
+    loader.enqueue(projection("A", "name"))
     let firstA = try await loader.deferredRecord(forKey: "A").get()
     expect(firstA?["name"] as? String) == "Alice"
 
     // Round 2: failed load of B. A's success must persist; B becomes
     // a sticky failure.
-    loader.enqueue([projection("B", "name")])
+    loader.enqueue(projection("B", "name"))
     await expect { _ = try await loader.deferredRecord(forKey: "B").get() }
       .to(throwError(errorType: TestError.self))
 

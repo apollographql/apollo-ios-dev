@@ -9,7 +9,7 @@ import XCTest
 /// that distinguish the resolve path (`.byRuntimeType` /
 /// `.respectDeferCondition`) from the projection path (`.includeAll` /
 /// `.eager`). The walker is the shared dispatch surface for both
-/// `DefaultFieldSelectionCollector` and `FieldProjectionCollector`
+/// `DefaultFieldSelectionCollector` and `ProjectionCollector`
 /// (extracted in PR-009d-iv); these tests cover behaviors the two
 /// collectors share at the policy layer rather than at their own
 /// case-handling layer.
@@ -52,7 +52,7 @@ final class SelectionWalkerTests: XCTestCase {
 
   // MARK: - DeferredFragmentPolicy.respectDeferCondition
 
-  /// Closes the review-flagged gap: `FieldProjectionCollectorTests`'
+  /// Closes the review-flagged gap: `ProjectionCollectorTests`'
   /// deferred tests all use the `.eager` policy and therefore can't
   /// verify the `@defer(if:)` condition is actually evaluated. This
   /// test uses `.respectDeferCondition` and confirms the condition
@@ -138,7 +138,7 @@ final class SelectionWalkerTests: XCTestCase {
   /// `.eager` ignores `@defer(if:)` entirely — every deferred fragment's
   /// selections are walked. Confirms the cache path's projection
   /// behavior at the policy layer (vs. the indirect tests in
-  /// `FieldProjectionCollectorTests`).
+  /// `ProjectionCollectorTests`).
   func test__walk__withEagerDeferredPolicy__entersEveryDeferredFragment_regardlessOfCondition() throws {
     class GivenDeferred: MockTypeCase, @unchecked Sendable {
       override class var __selections: [Selection] { [

@@ -307,11 +307,10 @@ public final class ApolloStore: Sendable {
       schema: (any SchemaMetadata.Type)? = nil,
       responsePath: ResponsePath = []
     ) -> PossiblyDeferred<Record> {
-      let projections: Set<FieldProjection>
+      let fieldNames: Set<String>
       do {
-        projections = try FieldProjectionCollector.collect(
+        fieldNames = try ProjectionCollector.collectFieldNames(
           selections: selections,
-          cacheKey: key,
           variables: variables,
           resolveRuntimeType: { nil },
           includeAllInlineFragments: true,
@@ -321,19 +320,19 @@ public final class ApolloStore: Sendable {
       } catch {
         return .immediate(.failure(error))
       }
-      // Empty projection set means every selected field on this record
-      // resolves without consulting the parent's storage — typically
-      // because all fields are `@fieldPolicy`-redirected and produce
-      // their own `CacheReference`s directly. Skip the parent load and
-      // hand the executor an empty `Record` to dispatch against; each
-      // field's `resolveCacheKey` will derive its value from the
-      // strategy alone. Matches Apollo Kotlin's
+      // An empty field-name set means every selected field on this
+      // record resolves without consulting the parent's storage —
+      // typically because all fields are `@fieldPolicy`-redirected and
+      // produce their own `CacheReference`s directly. Skip the parent
+      // load and hand the executor an empty `Record` to dispatch
+      // against; each field's `resolveCacheKey` will derive its value
+      // from the strategy alone. Matches Apollo Kotlin's
       // `FieldPolicyCacheResolver`: a policy-resolved field does not
       // require the parent record to exist.
-      guard !projections.isEmpty else {
+      guard !fieldNames.isEmpty else {
         return .immediate(.success(Record(key: key, fields: [:])))
       }
-      projectionLoader.enqueue(projections)
+      projectionLoader.enqueue(RecordProjection(cacheKey: key, fieldNames: fieldNames))
       return projectionLoader.deferredRecord(forKey: key).map { record in
         // `nil` here means the record is *absent* from the cache. The
         // projection-aware `loadFields(_:)` contract preserves the
