@@ -117,14 +117,6 @@ final class ProjectionLoader {
     pending[projection.cacheKey, default: []].formUnion(newFields)
   }
 
-  /// Convenience: enqueues several projections. Same-key projections
-  /// merge into one pending field-name set.
-  func enqueue<S: Sequence>(_ projections: S) where S.Element == RecordProjection {
-    for projection in projections {
-      enqueue(projection)
-    }
-  }
-
   /// Returns a `PossiblyDeferred` that, when forced, ensures all
   /// `pending` projections have been flushed and then returns the
   /// `Record` for `cacheKey`. If the cache had nothing stored for
