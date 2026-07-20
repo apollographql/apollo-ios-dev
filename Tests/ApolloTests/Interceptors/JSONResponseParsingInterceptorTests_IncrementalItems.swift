@@ -859,6 +859,70 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
     expect(result3?.cacheRecords?["QUERY_ROOT.animal.friend"]).to(beNil())
   }
 
+  func test__intercept__givenAmbiguousPathField_whenIncludingCacheRecords_shouldThrowAmbiguousPathField()
+    async throws
+  {
+    // given
+    // `friend` is selected twice with differing arguments, so the response key `friend` maps to two
+    // fields with different cache keys. When the deferred path steps through `friend`, its real cache
+    // key is ambiguous — that must throw rather than silently fall back to a phantom record.
+    let operation = AmbiguousFriendAnimalQuery()
+    let streamMocker = AsyncStreamMocker<Data>()
+
+    let urlResponse = HTTPURLResponse.deferResponseMock()
+
+    // when
+    var actualResultsIterator = try await subject.parse(
+      response: HTTPResponse(
+        response: urlResponse,
+        chunks: streamMocker.getStream()
+      ),
+      for: JSONRequest.mock(operation: operation, fetchBehavior: .NetworkOnly),
+      includeCacheRecords: true
+    )
+    .getStream()
+    .makeAsyncIterator()
+
+    streamMocker.emit(
+      """
+      {
+        "data": {
+          "animal": {
+            "__typename": "Animal",
+            "friend": { "__typename": "Friend", "id": "10" }
+          }
+        },
+        "hasNext": true
+      }
+      """.data(using: .utf8)!
+    )
+
+    _ = try await actualResultsIterator.next()
+
+    streamMocker.emit(
+      """
+      {
+        "incremental": [
+          {
+            "label": "deferredNickname",
+            "data": { "nickname": "Buster" },
+            "path": ["animal", "friend"]
+          }
+        ],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    // then
+    do {
+      _ = try await actualResultsIterator.next()
+      fail("Expected IncrementalResponseError.ambiguousPathField to be thrown")
+    } catch {
+      expect(error as? IncrementalResponseError).to(equal(.ambiguousPathField("friend")))
+    }
+  }
+
   // MARK: Mock Query Helpers
 
   typealias AnimalQuery = MockDeferredAnimalQuery
@@ -1106,6 +1170,58 @@ final class JSONResponseParsingInterceptorTests_IncrementalItems: XCTestCase {
               .field("__typename", String.self),
               .field("id", String.self),
               .field("name", String.self),
+              .deferred(DeferredNickname.self, label: "deferredNickname"),
+            ]
+          }
+
+          final class DeferredNickname: MockTypeCase, @unchecked Sendable {
+            override class var __selections: [Selection] {
+              [.field("nickname", String.self)]
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /// Selects `friend` twice with differing arguments, so the response key `friend` maps to two
+  /// fields with different cache keys — an ambiguous deferred path container.
+  struct AmbiguousFriendAnimalQuery: GraphQLQuery, @unchecked Sendable {
+    static var operationName: String { "AmbiguousFriendAnimalQuery" }
+
+    static var operationDocument: OperationDocument {
+      .init(definition: .init("Mock Operation Definition"))
+    }
+
+    static var responseFormat: IncrementalDeferredResponseFormat {
+      IncrementalDeferredResponseFormat(deferredFragments: [
+        DeferredFragmentIdentifier(label: "deferredNickname", fieldPath: ["animal", "friend"]):
+          AnAnimal.Animal.Friend.DeferredNickname.self
+      ])
+    }
+
+    typealias Data = AnAnimal
+    final class AnAnimal: MockSelectionSet, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {
+        [.field("animal", Animal.self)]
+      }
+
+      final class Animal: MockSelectionSet, @unchecked Sendable {
+        override class var __selections: [Selection] {
+          [
+            .field("__typename", String.self),
+            .field("friend", Friend?.self, arguments: ["kind": "dog"]),
+            .field("friend", Friend?.self, arguments: ["kind": "cat"]),
+          ]
+        }
+
+        final class Friend: MockSelectionSet, @unchecked Sendable {
+          override class var __selections: [Selection] {
+            [
+              .field("__typename", String.self),
+              .field("id", String.self),
               .deferred(DeferredNickname.self, label: "deferredNickname"),
             ]
           }
