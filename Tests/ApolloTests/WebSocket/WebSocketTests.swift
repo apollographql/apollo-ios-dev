@@ -1615,6 +1615,38 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     _ = try await subscription.getAllValues()
   }
 
+  /// Regression test for https://github.com/apollographql/apollo-ios/issues/3649.
+  ///
+  /// When `disconnectAndReconnect()` replaces the connection, it must first close the old
+  /// connection. Otherwise the old `WebSocketConnection` is still strongly held by its
+  /// receive loop's Task (which stays parked in `receive()`), so the loop never completes,
+  /// `WebSocketConnection.deinit` never fires, and the underlying WebSocket task is never
+  /// cancelled — leaking the connection and its receive loop.
+  func testUpdateHeaderValues__whenReconnectIfConnected__shouldCloseOldConnection() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    setUpTransport(tasks: [task1, task2])
+
+    // Connect and subscribe on task1.
+    task1.emit(.connectionAck(payload: nil))
+    let (subscription, _) = try await subscribe(on: task1, using: client)
+
+    // Sanity: the old connection's underlying task has not been cancelled yet.
+    expect(task1.cancelCode).to(beNil())
+
+    // Update headers with reconnect — this replaces the connection.
+    await networkTransport.updateHeaderValues(
+      ["Authorization": "Bearer token123"],
+      reconnectIfConnected: true
+    )
+
+    // The OLD connection's underlying WebSocket task must be cancelled so its receive loop
+    // terminates and the connection is not leaked.
+    await expect(task1.cancelCode).toEventually(equal(.goingAway))
+
+    _ = subscription
+  }
+
   // MARK: - updateConnectingPayload
 
   func testUpdateConnectingPayload__whenReconnectIfConnected__whenConnected__shouldReconnect() async throws {
@@ -1731,6 +1763,53 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Complete the subscription so it doesn't block.
     task2.emit(.complete(id: operationID))
     _ = try await subscription.getAllValues()
+  }
+
+  /// Regression test for https://github.com/apollographql/apollo-ios/issues/3649.
+  ///
+  /// When `disconnectAndReconnect()` replaces the connection without closing the old one, the
+  /// old connection's receive loop stays alive and keeps routing incoming messages into the
+  /// subscriber registry. Since active subscriptions are re-subscribed under the same operation
+  /// IDs on the new connection, a late `next` arriving on the stale connection would be
+  /// delivered to the subscriber as a duplicate. After the fix, the old connection is closed
+  /// and its receive loop is torn down, so stale messages never reach the subscriber.
+  func testUpdateConnectingPayload__whenReconnectIfConnected__shouldNotDeliverFromStaleConnection() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    setUpTransport(tasks: [task1, task2])
+
+    // Connect and subscribe on task1.
+    task1.emit(.connectionAck(payload: nil))
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+
+    // Trigger a reconnect that replaces the connection with task2.
+    await networkTransport.updateConnectingPayload(
+      ["authToken": "new-token"],
+      reconnectIfConnected: true
+    )
+
+    // The new connection acks and re-subscribes the still-active subscription under the same ID.
+    task2.emit(.connectionAck(payload: nil))
+    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+    expect(task2.subscribeOperationID(at: 0)).to(equal(operationID))
+
+    // The stale (old) connection delivers a `next` for the same operation ID. If its receive
+    // loop is still alive, this is routed to the subscriber as a duplicate.
+    task1.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 1, commentary: "STALE from old connection")))
+
+    // Give the stale connection's receive loop time to (incorrectly) route the message.
+    try await Task.sleep(nanoseconds: 200_000_000)
+
+    // The new connection delivers the real result and completes the subscription.
+    task2.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 5, commentary: "From new connection")))
+    task2.emit(.complete(id: operationID))
+
+    let results = try await subscription.getAllValues()
+
+    // Only the new connection's result should be delivered — the stale connection's message
+    // must never reach the subscriber.
+    let commentaries: [String] = results.compactMap { $0.data?.reviewAdded?.commentary }
+    expect(commentaries).to(equal(["From new connection"]))
   }
 
   // MARK: - Pause / Resume
