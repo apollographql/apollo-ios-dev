@@ -447,4 +447,61 @@ final class JSONResponseParser_IncrementalResponseParsingTests: XCTestCase {
     expect(dependentKeys).toNot(beNil())
     expect(dependentKeys).to(contain(CacheKey("QUERY_ROOT.animal.genus")))
   }
+
+  func
+    test__parsing__givenUnresolvablePath_whenIncludingCacheRecords__shouldThrowUnresolvablePath()
+    async throws
+  {
+    // With cache records available, a deferred path that cannot be walked to a real record must
+    // throw rather than silently fall back to the naive `QUERY_ROOT.<path>` join. Falling back would
+    // write the deferred fields onto a phantom record — the exact bug the resolution exists to fix.
+    // Here the path steps into the `species` scalar, so it cannot terminate on a record reference.
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse(includeCacheRecords: true)
+
+    mocker.emit(
+      """
+      {
+        "incremental": [{
+          "label": "deferredGenus",
+          "data": { "genus": "Canis" },
+          "path": ["animal", "species"]
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    do {
+      _ = try await iterator.next()
+      fail("Expected IncrementalResponseError.unresolvablePath to be thrown")
+    } catch {
+      expect(error as? IncrementalResponseError).to(equal(.unresolvablePath("animal.species")))
+    }
+  }
+
+  func test__parsing__givenResolvablePath_whenOmittingCacheRecords__shouldNotThrow()
+    async throws
+  {
+    // When cache records are not being produced, the root key never reaches the cache, so the naive
+    // path join is harmless and the resolution-against-records path (and its throw) is skipped
+    // entirely. Parsing must still succeed.
+    var (iterator, mocker) = try await setUpIteratorWithInitialResponse(includeCacheRecords: false)
+
+    mocker.emit(
+      """
+      {
+        "incremental": [{
+          "label": "deferredGenus",
+          "data": { "genus": "Canis" },
+          "path": ["animal"]
+        }],
+        "hasNext": false
+      }
+      """.data(using: .utf8)!
+    )
+
+    let result = try await iterator.next()
+    expect(result?.result.data?.animal.fragments.deferredGenus?.genus).to(equal("Canis"))
+    expect(result?.cacheRecords).to(beNil())
+  }
 }
