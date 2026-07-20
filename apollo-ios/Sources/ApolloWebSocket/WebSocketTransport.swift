@@ -433,13 +433,9 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
 
   /// Disconnects the current WebSocket connection and immediately starts a new one.
   ///
-  /// Closes the old connection before replacing it. Closing cancels the underlying task, which
-  /// ends the old receive loop's stream — the loop then sees that `self.connection` no longer
-  /// matches `loopConnection` and exits without triggering reconnection. Without this close,
-  /// the old connection's `receive()` would block indefinitely, so its receive loop's `Task`
-  /// would never complete (leaking the task and connection) and the stale connection would keep
-  /// routing incoming messages to subscribers. Active subscribers will be resubscribed when the
-  /// new `connection_ack` arrives.
+  /// Closes the old connection before replacing it, which invalidates the old receive loop
+  /// (it will see that `self.connection` no longer matches and exit). Active subscribers will
+  /// be resubscribed when the new `connection_ack` arrives.
   private func disconnectAndReconnect() {
     connection.close()
     connection = WebSocketConnection(task: urlSession.webSocketTask(with: request))
