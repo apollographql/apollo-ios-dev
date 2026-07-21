@@ -48,6 +48,22 @@ During the label rollover, runs landed on either image at random, so failures lo
 
 **⚠️ Local vs CI git divergence:** different git versions implement `subtree split` differently (the optimization was present ≤2.53, removed in 2.54). Both algorithms have so far agreed on this repo's history, but for any local recovery split intended to be pushed upstream, use the vendored script (`scripts/vendor/git-subtree-2.53.0.sh`, with `GIT_EXEC_PATH="$(git --exec-path)"` exported and on `PATH`) — that is exactly what CI runs, so its hashes are the canonical ones.
 
+## Historical incident: missing committer email in split (July 2026)
+
+**Symptoms:** Every subtree split step failed at the same point:
+
+```
+Author identity unknown
+
+*** Please tell me who you are.
+...
+fatal: unable to auto-detect email address (got 'runner@runnervm3jd5f.(none)')
+```
+
+**How it happened:** `git subtree split --squash --rejoin` writes commits (the squash commit and the rejoin), which need a committer identity. The `configure-git` action only ever set `user.name`, never `user.email`. Historically git filled the email in by auto-detecting `runner@<hostname>` — but a newer `ubuntu-latest` runner image resolves the hostname to `(none)`, and git refuses an auto-detected `...(none)` address rather than committing with it. No `user.email` was configured to fall back on, so the split aborted before producing a SHA. `Push Subtrees` is gated on `if: success()`, so nothing was pushed and no rejoin metadata reached `main`.
+
+**Fix:** Added an explicit `user.email` (input `email`, default `gh-action-runner@users.noreply.github.com`) to `.github/actions/configure-git`. All five workflows that use `configure-git` inherit the fix. Do not rely on git's hostname auto-detection in CI — always set `user.email` explicitly.
+
 ## Historical incident: stale-upstream pull conflict (May 2026)
 
 Fixed in PR #989; root cause prevention in PR #990 (approx — match by date).
