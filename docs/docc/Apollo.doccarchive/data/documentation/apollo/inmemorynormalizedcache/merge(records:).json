@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "NormalizedCache.merge(records:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Merges a set of records into the cache.",
       "type" : "text"
     }
   ],
@@ -183,6 +175,39 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A set of keys corresponding to ",
+              "type" : "text"
+            },
+            {
+              "inlineContent" : [
+                {
+                  "text" : "fields",
+                  "type" : "text"
+                }
+              ],
+              "type" : "emphasis"
+            },
+            {
+              "text" : " that have changed (i.e. QUERY_ROOT.Foo.myField). These are the same type of keys as are returned by RecordSet.merge(records:).",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -288,7 +313,10 @@
 },
 "doc://Apollo/documentation/Apollo/InMemoryNormalizedCache/merge(records:)": {
   "abstract" : [
-
+    {
+      "text" : "Merges a set of records into the cache.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

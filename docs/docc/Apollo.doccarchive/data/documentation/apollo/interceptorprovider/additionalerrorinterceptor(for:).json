@@ -395,7 +395,18 @@
 },
 "doc://Apollo/documentation/Apollo/InterceptorProvider/additionalErrorInterceptor(for:)-5p7fr": {
   "abstract" : [
-
+    {
+      "text" : "Provides an additional error interceptor for any additional handling of errors",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "before returning to the UI, such as logging.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

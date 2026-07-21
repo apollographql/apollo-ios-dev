@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "WebSocketClient.write(string:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Writes a string to the websocket.",
       "type" : "text"
     }
   ],
@@ -213,7 +205,10 @@
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocket/write(string:)": {
   "abstract" : [
-
+    {
+      "text" : "Writes a string to the websocket.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

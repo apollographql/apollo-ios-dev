@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "InterceptorProvider.interceptors(for:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Creates a new array of interceptors when called",
       "type" : "text"
     }
   ],
@@ -183,6 +175,25 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The operation to provide interceptors for",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "operation"
+        }
+      ]
     }
   ],
   "schemaVersion" : {
@@ -291,7 +302,10 @@
 },
 "doc://Apollo/documentation/Apollo/DefaultInterceptorProvider/interceptors(for:)": {
   "abstract" : [
-
+    {
+      "text" : "Creates a new array of interceptors when called",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

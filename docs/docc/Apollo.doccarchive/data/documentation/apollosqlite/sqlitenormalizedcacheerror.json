@@ -76,7 +76,8 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloSQLite\/s5ErrorP",
-        "doc:\/\/ApolloSQLite\/s8SendableP"
+        "doc:\/\/ApolloSQLite\/s8SendableP",
+        "doc:\/\/ApolloSQLite\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -299,6 +300,11 @@
   "title" : "SQLiteNormalizedCacheError.invalidRecordShape(object:)",
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/sqlitenormalizedcacheerror\/invalidrecordshape(object:)"
+},
+"doc://ApolloSQLite/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloSQLite\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://ApolloSQLite/s5ErrorP": {
   "identifier" : "doc:\/\/ApolloSQLite\/s5ErrorP",

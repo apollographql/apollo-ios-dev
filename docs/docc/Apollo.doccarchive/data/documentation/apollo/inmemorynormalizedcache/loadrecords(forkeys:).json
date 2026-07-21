@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "NormalizedCache.loadRecords(forKeys:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Loads records corresponding to the given keys.",
       "type" : "text"
     }
   ],
@@ -202,6 +194,26 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "A dictionary of cache keys to records containing the records that have been found.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -307,7 +319,10 @@
 },
 "doc://Apollo/documentation/Apollo/InMemoryNormalizedCache/loadRecords(forKeys:)": {
   "abstract" : [
-
+    {
+      "text" : "Loads records corresponding to the given keys.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

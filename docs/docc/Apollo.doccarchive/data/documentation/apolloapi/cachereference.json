@@ -167,6 +167,7 @@
         "doc:\/\/ApolloAPI\/s8CopyableP",
         "doc:\/\/ApolloAPI\/s23CustomStringConvertibleP",
         "doc:\/\/ApolloAPI\/SQ",
+        "doc:\/\/ApolloAPI\/s9EscapableP",
         "doc:\/\/ApolloAPI\/SH"
       ],
       "kind" : "relationships",
@@ -687,6 +688,11 @@
 "doc://ApolloAPI/s8CopyableP": {
   "identifier" : "doc:\/\/ApolloAPI\/s8CopyableP",
   "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s9EscapableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s9EscapableP",
+  "title" : "Swift.Escapable",
   "type" : "unresolvable"
 }
 }

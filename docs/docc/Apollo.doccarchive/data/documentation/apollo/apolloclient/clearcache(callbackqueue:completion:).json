@@ -1,15 +1,15 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
+      "text" : "Clears the underlying cache.",
       "type" : "text"
     },
     {
-      "code" : "ApolloClientProtocol.clearCache(callbackQueue:completion:)",
-      "type" : "codeVoice"
+      "text" : " ",
+      "type" : "text"
     },
     {
-      "text" : ".",
+      "text" : "Be aware: In more complex setups, the same underlying cache can be used across multiple instances, so if you call this on one instance, it’ll clear that cache across all instances which share that cache.",
       "type" : "text"
     }
   ],
@@ -210,6 +210,39 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The queue to fall back on. Should default to the main queue.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "callbackQueue"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "[Optional] A completion closure to execute when clearing has completed. Should default to nil.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "completion"
+        }
+      ]
     }
   ],
   "schemaVersion" : {
@@ -300,7 +333,18 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/clearCache(callbackQueue:completion:)": {
   "abstract" : [
-
+    {
+      "text" : "Clears the underlying cache.",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "Be aware: In more complex setups, the same underlying cache can be used across multiple instances, so if you call this on one instance, it’ll clear that cache across all instances which share that cache.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

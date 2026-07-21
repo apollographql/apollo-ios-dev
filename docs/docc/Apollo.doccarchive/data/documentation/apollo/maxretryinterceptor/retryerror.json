@@ -78,7 +78,8 @@
       "identifiers" : [
         "doc:\/\/Apollo\/10Foundation14LocalizedErrorP",
         "doc:\/\/Apollo\/s5ErrorP",
-        "doc:\/\/Apollo\/s8SendableP"
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -348,6 +349,11 @@
   "title" : "MaxRetryInterceptor.RetryError.hitMaxRetryCount(count:operationName:)",
   "type" : "topic",
   "url" : "\/documentation\/apollo\/maxretryinterceptor\/retryerror\/hitmaxretrycount(count:operationname:)"
+},
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://Apollo/s5ErrorP": {
   "identifier" : "doc:\/\/Apollo\/s5ErrorP",

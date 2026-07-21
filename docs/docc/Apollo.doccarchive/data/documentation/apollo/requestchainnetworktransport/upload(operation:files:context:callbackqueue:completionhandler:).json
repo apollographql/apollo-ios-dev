@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "UploadingNetworkTransport.upload(operation:files:context:callbackQueue:completionHandler:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Uploads the given files with the given operation.",
       "type" : "text"
     }
   ],
@@ -311,12 +303,12 @@
               "text" : ": "
             },
             {
-              "kind" : "keyword",
-              "text" : "@escaping"
+              "kind" : "attribute",
+              "text" : "@escaping "
             },
             {
               "kind" : "text",
-              "text" : " ("
+              "text" : "("
             },
             {
               "kind" : "typeIdentifier",
@@ -407,6 +399,117 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The operation to send",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "operation"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "An array of ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "GraphQLFile",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " objects to send.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "files"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "[Optional] A context that is being passed through the request chain.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "context"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The queue to call back on with the results. Should default to ",
+                  "type" : "text"
+                },
+                {
+                  "code" : ".main",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : ".",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "callbackQueue"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The completion handler to execute when the request completes or errors",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "completionHandler"
+        }
+      ]
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "An object that can be used to cancel an in progress request.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -607,7 +710,10 @@
 },
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/upload(operation:files:context:callbackQueue:completionHandler:)": {
   "abstract" : [
-
+    {
+      "text" : "Uploads the given files with the given operation.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

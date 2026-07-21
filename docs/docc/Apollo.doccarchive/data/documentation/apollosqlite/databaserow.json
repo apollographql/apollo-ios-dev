@@ -88,6 +88,15 @@
         "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/DatabaseRow\/init(cacheKey:storedInfo:)"
       ],
       "title" : "Initializers"
+    },
+    {
+      "anchor" : "Instance-Properties",
+      "generated" : true,
+      "identifiers" : [
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/DatabaseRow\/cacheKey",
+        "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/DatabaseRow\/storedInfo"
+      ],
+      "title" : "Instance Properties"
     }
   ],
   "variants" : [
@@ -178,6 +187,40 @@
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/databaserow"
 },
+"doc://ApolloSQLite/documentation/ApolloSQLite/DatabaseRow/cacheKey": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "cacheKey"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:6Apollo8CacheKeya",
+      "text" : "CacheKey"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/DatabaseRow\/cacheKey",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "cacheKey",
+  "type" : "topic",
+  "url" : "\/documentation\/apollosqlite\/databaserow\/cachekey"
+},
 "doc://ApolloSQLite/documentation/ApolloSQLite/DatabaseRow/init(cacheKey:storedInfo:)": {
   "abstract" : [
 
@@ -232,6 +275,40 @@
   "title" : "init(cacheKey:storedInfo:)",
   "type" : "topic",
   "url" : "\/documentation\/apollosqlite\/databaserow\/init(cachekey:storedinfo:)"
+},
+"doc://ApolloSQLite/documentation/ApolloSQLite/DatabaseRow/storedInfo": {
+  "abstract" : [
+
+  ],
+  "fragments" : [
+    {
+      "kind" : "keyword",
+      "text" : "let"
+    },
+    {
+      "kind" : "text",
+      "text" : " "
+    },
+    {
+      "kind" : "identifier",
+      "text" : "storedInfo"
+    },
+    {
+      "kind" : "text",
+      "text" : ": "
+    },
+    {
+      "kind" : "typeIdentifier",
+      "preciseIdentifier" : "s:SS",
+      "text" : "String"
+    }
+  ],
+  "identifier" : "doc:\/\/ApolloSQLite\/documentation\/ApolloSQLite\/DatabaseRow\/storedInfo",
+  "kind" : "symbol",
+  "role" : "symbol",
+  "title" : "storedInfo",
+  "type" : "topic",
+  "url" : "\/documentation\/apollosqlite\/databaserow\/storedinfo"
 }
 }
 }

@@ -1,15 +1,11 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "WebSocketClient.callbackQueue",
+      "code" : "DispatchQueue",
       "type" : "codeVoice"
     },
     {
-      "text" : ".",
+      "text" : " where the websocket client should call all delegate callbacks.",
       "type" : "text"
     }
   ],
@@ -189,7 +185,14 @@
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocket/callbackQueue": {
   "abstract" : [
-
+    {
+      "code" : "DispatchQueue",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " where the websocket client should call all delegate callbacks.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

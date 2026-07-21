@@ -139,7 +139,18 @@
 },
 "doc://ApolloAPI/documentation/ApolloAPI/MutableSelectionSet/fragments": {
   "abstract" : [
-
+    {
+      "text" : "Contains accessors for all of the fragments the ",
+      "type" : "text"
+    },
+    {
+      "code" : "SelectionSet",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " can be converted to.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [

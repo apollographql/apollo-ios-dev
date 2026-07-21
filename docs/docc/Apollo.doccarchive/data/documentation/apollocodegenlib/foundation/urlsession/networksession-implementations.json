@@ -114,7 +114,10 @@
 },
 "doc://ApolloCodegenLib/documentation/ApolloCodegenLib/Foundation/URLSession/loadData(with:completionHandler:)": {
   "abstract" : [
-
+    {
+      "text" : "Load data via the abstracted network provider",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

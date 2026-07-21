@@ -88,7 +88,8 @@
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/JSONEncodable",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/OutputTypeConvertible",
         "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/SelectionSetEntityValue",
-        "doc:\/\/ApolloAPI\/s8CopyableP"
+        "doc:\/\/ApolloAPI\/s8CopyableP",
+        "doc:\/\/ApolloAPI\/s9EscapableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -449,7 +450,7 @@
         "type" : "text"
       },
       {
-        "code" : "AnyScalarType",
+        "code" : "JSONEncodable",
         "type" : "codeVoice"
       },
       {
@@ -778,6 +779,11 @@
 "doc://ApolloAPI/s8CopyableP": {
   "identifier" : "doc:\/\/ApolloAPI\/s8CopyableP",
   "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://ApolloAPI/s9EscapableP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s9EscapableP",
+  "title" : "Swift.Escapable",
   "type" : "unresolvable"
 }
 }

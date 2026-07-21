@@ -1,15 +1,15 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
+      "text" : "Contains accessors for all of the fragments the ",
       "type" : "text"
     },
     {
-      "code" : "SelectionSet.fragments",
+      "code" : "SelectionSet",
       "type" : "codeVoice"
     },
     {
-      "text" : ".",
+      "text" : " can be converted to.",
       "type" : "text"
     }
   ],
@@ -276,7 +276,18 @@
 },
 "doc://ApolloAPI/documentation/ApolloAPI/MutableSelectionSet/fragments": {
   "abstract" : [
-
+    {
+      "text" : "Contains accessors for all of the fragments the ",
+      "type" : "text"
+    },
+    {
+      "code" : "SelectionSet",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " can be converted to.",
+      "type" : "text"
+    }
   ],
   "conformance" : {
     "availabilityPrefix" : [

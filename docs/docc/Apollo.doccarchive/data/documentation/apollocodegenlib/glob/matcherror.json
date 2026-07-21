@@ -85,7 +85,8 @@
         "doc:\/\/ApolloCodegenLib\/10Foundation14LocalizedErrorP",
         "doc:\/\/ApolloCodegenLib\/SQ",
         "doc:\/\/ApolloCodegenLib\/s5ErrorP",
-        "doc:\/\/ApolloCodegenLib\/s8SendableP"
+        "doc:\/\/ApolloCodegenLib\/s8SendableP",
+        "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -496,6 +497,11 @@
   "title" : "Glob.MatchError.unknown(code:)",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/glob\/matcherror\/unknown(code:)"
+},
+"doc://ApolloCodegenLib/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://ApolloCodegenLib/s5ErrorP": {
   "identifier" : "doc:\/\/ApolloCodegenLib\/s5ErrorP",

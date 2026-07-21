@@ -66,12 +66,7 @@
       }
     ],
     "platforms" : [
-      {
-        "beta" : false,
-        "deprecated" : true,
-        "message" : "Moved to ApolloCodegenConfiguration.OperationManifestConfiguration.OperationManifest.path",
-        "unavailable" : false
-      }
+
     ],
     "role" : "symbol",
     "roleHeading" : "Instance Property",

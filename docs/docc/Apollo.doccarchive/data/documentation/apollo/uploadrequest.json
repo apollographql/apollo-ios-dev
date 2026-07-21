@@ -823,7 +823,14 @@
 },
 "doc://Apollo/documentation/Apollo/UploadRequest/toURLRequest()": {
   "abstract" : [
-
+    {
+      "text" : "Converts this object to a fully fleshed-out ",
+      "type" : "text"
+    },
+    {
+      "code" : "URLRequest",
+      "type" : "codeVoice"
+    }
   ],
   "fragments" : [
     {

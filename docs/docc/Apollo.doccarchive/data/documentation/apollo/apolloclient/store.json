@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "ApolloClientProtocol.store",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "A store used as a local cache.",
       "type" : "text"
     }
   ],
@@ -188,7 +180,10 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/store": {
   "abstract" : [
-
+    {
+      "text" : "A store used as a local cache.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "ApolloStoreSubscriber.store(_:didChangeKeys:contextIdentifier:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "A callback that can be received by subscribers when keys are changed within the database",
       "type" : "text"
     }
   ],
@@ -217,6 +209,53 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The store which made the changes",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "store"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The list of changed keys",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "changedKeys"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "[Optional] A unique identifier for the request that kicked off this change, to assist in de-duping cache hits for watchers.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "contextIdentifier"
+        }
+      ]
     }
   ],
   "schemaVersion" : {
@@ -399,7 +438,10 @@
 },
 "doc://Apollo/documentation/Apollo/GraphQLQueryWatcher/store(_:didChangeKeys:contextIdentifier:)": {
   "abstract" : [
-
+    {
+      "text" : "A callback that can be received by subscribers when keys are changed within the database",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

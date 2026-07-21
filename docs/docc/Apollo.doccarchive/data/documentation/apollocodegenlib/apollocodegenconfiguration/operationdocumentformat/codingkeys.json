@@ -83,7 +83,8 @@
         "doc:\/\/ApolloCodegenLib\/SQ",
         "doc:\/\/ApolloCodegenLib\/SH",
         "doc:\/\/ApolloCodegenLib\/SY",
-        "doc:\/\/ApolloCodegenLib\/s8SendableP"
+        "doc:\/\/ApolloCodegenLib\/s8SendableP",
+        "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -464,6 +465,11 @@
   "title" : "ApolloCodegenConfiguration.OperationDocumentFormat.CodingKeys.operationId",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegenconfiguration\/operationdocumentformat\/codingkeys\/operationid"
+},
+"doc://ApolloCodegenLib/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://ApolloCodegenLib/s23CustomStringConvertibleP": {
   "identifier" : "doc:\/\/ApolloCodegenLib\/s23CustomStringConvertibleP",

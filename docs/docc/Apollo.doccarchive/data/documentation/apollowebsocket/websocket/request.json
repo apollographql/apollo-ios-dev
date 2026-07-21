@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "WebSocketClient.request",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "The URLRequest used on connection.",
       "type" : "text"
     }
   ],
@@ -189,7 +181,10 @@
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocket/request": {
   "abstract" : [
-
+    {
+      "text" : "The URLRequest used on connection.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

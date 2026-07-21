@@ -224,7 +224,10 @@
 },
 "doc://Apollo/documentation/Apollo/NetworkTransport/clientName-3npzv": {
   "abstract" : [
-
+    {
+      "text" : "The name of the client to send as a header value.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

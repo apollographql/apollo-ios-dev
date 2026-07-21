@@ -236,7 +236,10 @@
 },
 "doc://Apollo/documentation/Apollo/EmptyCancellable/cancel()": {
   "abstract" : [
-
+    {
+      "text" : "Cancel an in progress action.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

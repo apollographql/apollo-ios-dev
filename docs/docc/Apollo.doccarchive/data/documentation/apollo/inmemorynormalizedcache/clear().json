@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "NormalizedCache.clear()",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Clears all records.",
       "type" : "text"
     }
   ],
@@ -158,7 +150,10 @@
 },
 "doc://Apollo/documentation/Apollo/InMemoryNormalizedCache/clear()": {
   "abstract" : [
-
+    {
+      "text" : "Clears all records.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

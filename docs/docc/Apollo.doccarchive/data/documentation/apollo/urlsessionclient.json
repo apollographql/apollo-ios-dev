@@ -167,7 +167,8 @@
         "doc:\/\/Apollo\/s23CustomStringConvertibleP",
         "doc:\/\/Apollo\/SQ",
         "doc:\/\/Apollo\/SH",
-        "doc:\/\/Apollo\/s8SendableP"
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -2275,6 +2276,11 @@
 "doc://Apollo/objc(pl)NSURLSessionTaskDelegate": {
   "identifier" : "doc:\/\/Apollo\/objc(pl)NSURLSessionTaskDelegate",
   "title" : "Foundation.URLSessionTaskDelegate",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
   "type" : "unresolvable"
 },
 "doc://Apollo/s23CustomStringConvertibleP": {

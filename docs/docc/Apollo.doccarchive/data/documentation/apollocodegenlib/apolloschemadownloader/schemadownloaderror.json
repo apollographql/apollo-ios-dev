@@ -78,7 +78,8 @@
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/10Foundation14LocalizedErrorP",
         "doc:\/\/ApolloCodegenLib\/s5ErrorP",
-        "doc:\/\/ApolloCodegenLib\/s8SendableP"
+        "doc:\/\/ApolloCodegenLib\/s8SendableP",
+        "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -657,6 +658,11 @@
   "title" : "ApolloSchemaDownloader.SchemaDownloadError.unexpectedRegistryJSONType",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apolloschemadownloader\/schemadownloaderror\/unexpectedregistryjsontype"
+},
+"doc://ApolloCodegenLib/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://ApolloCodegenLib/s5ErrorP": {
   "identifier" : "doc:\/\/ApolloCodegenLib\/s5ErrorP",

@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "NetworkTransport.clientName",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "The name of the client to send as a header value.",
       "type" : "text"
     }
   ],
@@ -184,7 +176,10 @@
 },
 "doc://Apollo/documentation/Apollo/NetworkTransport/clientName-3npzv": {
   "abstract" : [
-
+    {
+      "text" : "The name of the client to send as a header value.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

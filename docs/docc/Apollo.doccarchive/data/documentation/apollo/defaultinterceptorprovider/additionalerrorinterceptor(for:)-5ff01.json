@@ -1,15 +1,15 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
+      "text" : "Provides an additional error interceptor for any additional handling of errors",
       "type" : "text"
     },
     {
-      "code" : "InterceptorProvider.additionalErrorInterceptor(for:)",
-      "type" : "codeVoice"
+      "text" : " ",
+      "type" : "text"
     },
     {
-      "text" : ".",
+      "text" : "before returning to the UI, such as logging.",
       "type" : "text"
     }
   ],
@@ -184,6 +184,25 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The operation to provide an additional error interceptor for",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "operation"
+        }
+      ]
     }
   ],
   "schemaVersion" : {
@@ -292,7 +311,18 @@
 },
 "doc://Apollo/documentation/Apollo/DefaultInterceptorProvider/additionalErrorInterceptor(for:)-5ff01": {
   "abstract" : [
-
+    {
+      "text" : "Provides an additional error interceptor for any additional handling of errors",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "before returning to the UI, such as logging.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

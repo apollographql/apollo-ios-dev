@@ -99,7 +99,8 @@
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/6Apollo16NetworkTransportP",
         "doc:\/\/ApolloWebSocket\/6Apollo25UploadingNetworkTransportP",
-        "doc:\/\/ApolloWebSocket\/s8CopyableP"
+        "doc:\/\/ApolloWebSocket\/s8CopyableP",
+        "doc:\/\/ApolloWebSocket\/s9EscapableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -402,6 +403,11 @@
 "doc://ApolloWebSocket/s8CopyableP": {
   "identifier" : "doc:\/\/ApolloWebSocket\/s8CopyableP",
   "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://ApolloWebSocket/s9EscapableP": {
+  "identifier" : "doc:\/\/ApolloWebSocket\/s9EscapableP",
+  "title" : "Swift.Escapable",
   "type" : "unresolvable"
 }
 }

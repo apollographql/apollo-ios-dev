@@ -83,7 +83,8 @@
     {
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/documentation\/ApolloCodegenLib\/NetworkSession",
-        "doc:\/\/ApolloCodegenLib\/s8CopyableP"
+        "doc:\/\/ApolloCodegenLib\/s8CopyableP",
+        "doc:\/\/ApolloCodegenLib\/s9EscapableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -227,6 +228,11 @@
 "doc://ApolloCodegenLib/s8CopyableP": {
   "identifier" : "doc:\/\/ApolloCodegenLib\/s8CopyableP",
   "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://ApolloCodegenLib/s9EscapableP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s9EscapableP",
+  "title" : "Swift.Escapable",
   "type" : "unresolvable"
 }
 }

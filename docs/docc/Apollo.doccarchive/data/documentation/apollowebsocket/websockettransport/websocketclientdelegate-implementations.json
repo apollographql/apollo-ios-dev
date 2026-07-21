@@ -128,7 +128,10 @@
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransport/websocketDidConnect(socket:)": {
   "abstract" : [
-
+    {
+      "text" : "The websocket client has started a connection to the server.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -174,7 +177,10 @@
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransport/websocketDidDisconnect(socket:error:)": {
   "abstract" : [
-
+    {
+      "text" : "The websocket client has disconnected from the server.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -237,7 +243,10 @@
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransport/websocketDidReceiveData(socket:data:)": {
   "abstract" : [
-
+    {
+      "text" : "The websocket client received data from the server",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -300,7 +309,10 @@
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransport/websocketDidReceiveMessage(socket:text:)": {
   "abstract" : [
-
+    {
+      "text" : "The websocket client received message text from the server",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

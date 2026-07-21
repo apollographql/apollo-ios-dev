@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "WebSocketClientDelegate.websocketDidConnect(socket:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "The websocket client has started a connection to the server.",
       "type" : "text"
     }
   ],
@@ -123,6 +115,33 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "WebSocketClient",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " that sent the delegate event.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "socket"
+        }
+      ]
     }
   ],
   "schemaVersion" : {
@@ -260,7 +279,10 @@
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransport/websocketDidConnect(socket:)": {
   "abstract" : [
-
+    {
+      "text" : "The websocket client has started a connection to the server.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
