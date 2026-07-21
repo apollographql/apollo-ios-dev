@@ -13,6 +13,8 @@ Context is distributed across multiple files rather than kept in one large root 
 
 When working in a nested subdirectory within a subtree (e.g., `apollo-ios/Sources/Apollo/Caching/`), also check for and read any matching deeper context files in `claude/` (e.g., `claude/apollo-ios/Sources/Apollo/Execution/*.md`).
 
+**When writing or editing code anywhere in this repository, follow the conventions in `claude/code-style.md`.**
+
 These files live in `claude/` instead of inside the subtree directories because anything inside a subtree directory gets pushed to the upstream repo. The `claude/` directory is not auto-discovered, so you must read these files yourself.
 
 **Non-subtree context** (Tests, Sources, scripts, etc.) can use CLAUDE.md files directly in those directories since they are not affected by subtree pushes. For example, `Tests/CLAUDE.md` or `Sources/AnimalKingdomAPI/CLAUDE.md`. These are auto-discovered normally.
