@@ -4,6 +4,10 @@ inputs:
     description: "The user name to use for commits."
     required: false
     default: gh-action-runner
+  email:
+    description: "The email address to use for commits."
+    required: false
+    default: gh-action-runner@users.noreply.github.com
 description: Configures appropriate git settings for the github action workflows.
 runs:
   using: "composite"
@@ -12,3 +16,4 @@ runs:
     shell: bash
     run: |
       git config --global user.name "${{ inputs.user }}"
+      git config --global user.email "${{ inputs.email }}"
