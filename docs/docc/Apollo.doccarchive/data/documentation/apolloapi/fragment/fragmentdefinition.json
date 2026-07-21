@@ -295,7 +295,10 @@
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Fragment/fragmentDefinition-4x2cs": {
   "abstract" : [
-
+    {
+      "text" : "The definition of the fragment in GraphQL syntax.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

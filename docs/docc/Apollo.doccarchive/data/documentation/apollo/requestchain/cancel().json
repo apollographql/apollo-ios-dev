@@ -1,4 +1,10 @@
 {
+  "abstract" : [
+    {
+      "text" : "Cancel an in progress action.",
+      "type" : "text"
+    }
+  ],
   "hierarchy" : {
     "paths" : [
       [
@@ -153,7 +159,10 @@
 },
 "doc://Apollo/documentation/Apollo/RequestChain/cancel()": {
   "abstract" : [
-
+    {
+      "text" : "Cancel an in progress action.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

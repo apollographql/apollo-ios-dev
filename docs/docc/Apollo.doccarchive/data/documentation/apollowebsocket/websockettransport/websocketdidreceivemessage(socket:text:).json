@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "WebSocketClientDelegate.websocketDidReceiveMessage(socket:text:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "The websocket client received message text from the server",
       "type" : "text"
     }
   ],
@@ -157,6 +149,47 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "WebSocketClient",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " that sent the delegate event.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "socket"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The text received from the server.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "text"
+        }
+      ]
     }
   ],
   "schemaVersion" : {
@@ -294,7 +327,10 @@
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransport/websocketDidReceiveMessage(socket:text:)": {
   "abstract" : [
-
+    {
+      "text" : "The websocket client received message text from the server",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

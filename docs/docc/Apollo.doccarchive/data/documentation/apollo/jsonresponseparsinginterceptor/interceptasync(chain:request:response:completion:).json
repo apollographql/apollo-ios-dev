@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "ApolloInterceptor.interceptAsync(chain:request:response:completion:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Called when this interceptor should do its work.",
       "type" : "text"
     }
   ],
@@ -306,12 +298,12 @@
               "text" : ": "
             },
             {
-              "kind" : "keyword",
-              "text" : "@escaping"
+              "kind" : "attribute",
+              "text" : "@escaping "
             },
             {
               "kind" : "text",
-              "text" : " ("
+              "text" : "("
             },
             {
               "kind" : "typeIdentifier",
@@ -392,6 +384,67 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The chain the interceptor is a part of.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "chain"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The request, as far as it has been constructed",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "request"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "[Optional] The response, if received",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "response"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The completion block to fire when data needs to be returned to the UI.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "completion"
+        }
+      ]
     }
   ],
   "schemaVersion" : {
@@ -584,7 +637,10 @@
 },
 "doc://Apollo/documentation/Apollo/JSONResponseParsingInterceptor/interceptAsync(chain:request:response:completion:)": {
   "abstract" : [
-
+    {
+      "text" : "Called when this interceptor should do its work.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

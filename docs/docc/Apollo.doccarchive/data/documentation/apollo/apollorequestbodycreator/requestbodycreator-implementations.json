@@ -39,6 +39,18 @@
       ],
       "title" : "Instance Methods"
     }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/apollorequestbodycreator\/requestbodycreator-implementations"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
   ]
 , 
 "references": {
@@ -89,7 +101,18 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloRequestBodyCreator/requestBody(for:sendQueryDocument:autoPersistQuery:)": {
   "abstract" : [
-
+    {
+      "text" : "Creates a ",
+      "type" : "text"
+    },
+    {
+      "code" : "JSONEncodableDictionary",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " out of the passed-in operation",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

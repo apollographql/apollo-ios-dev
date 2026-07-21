@@ -261,7 +261,10 @@
 },
 "doc://Apollo/documentation/Apollo/RequestChain/cancel()": {
   "abstract" : [
-
+    {
+      "text" : "Cancel an in progress action.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

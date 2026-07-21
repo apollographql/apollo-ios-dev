@@ -46,6 +46,18 @@
       ],
       "title" : "Instance Methods"
     }
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/apollo\/apolloclient\/apolloclientprotocol-implementations"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
   ]
 , 
 "references": {
@@ -115,7 +127,18 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/clearCache(callbackQueue:completion:)": {
   "abstract" : [
-
+    {
+      "text" : "Clears the underlying cache.",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "Be aware: In more complex setups, the same underlying cache can be used across multiple instances, so if you call this on one instance, it’ll clear that cache across all instances which share that cache.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -351,7 +374,10 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/fetch(query:cachePolicy:contextIdentifier:context:queue:resultHandler:)": {
   "abstract" : [
-
+    {
+      "text" : "Fetches a query from the server or from the local cache, depending on the current contents of the cache and the specified cache policy.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -657,7 +683,10 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/perform(mutation:publishResultToStore:contextIdentifier:context:queue:resultHandler:)": {
   "abstract" : [
-
+    {
+      "text" : "Performs a mutation by sending it to the server.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -817,7 +846,10 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/subscribe(subscription:context:queue:resultHandler:)": {
   "abstract" : [
-
+    {
+      "text" : "Subscribe to a subscription",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -943,7 +975,10 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/upload(operation:files:context:queue:resultHandler:)": {
   "abstract" : [
-
+    {
+      "text" : "Uploads the given files with the given operation.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1086,7 +1121,10 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/watch(query:cachePolicy:context:callbackQueue:resultHandler:)": {
   "abstract" : [
-
+    {
+      "text" : "Watches a query by first fetching an initial result from the server or from the local cache, depending on the current contents of the cache and the specified cache policy. After the initial fetch, the returned query watcher object will get notified whenever any of the data the query result depends on changes in the local cache, and calls the result handler again with the new result.",
+      "type" : "text"
+    }
   ],
   "deprecated" : true,
   "fragments" : [

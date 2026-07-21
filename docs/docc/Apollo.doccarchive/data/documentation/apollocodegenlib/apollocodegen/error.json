@@ -93,7 +93,8 @@
       "identifiers" : [
         "doc:\/\/ApolloCodegenLib\/10Foundation14LocalizedErrorP",
         "doc:\/\/ApolloCodegenLib\/s5ErrorP",
-        "doc:\/\/ApolloCodegenLib\/s8SendableP"
+        "doc:\/\/ApolloCodegenLib\/s8SendableP",
+        "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -700,6 +701,11 @@
   "title" : "ApolloCodegen.Error.testMocksInvalidSwiftPackageConfiguration",
   "type" : "topic",
   "url" : "\/documentation\/apollocodegenlib\/apollocodegen\/error\/testmocksinvalidswiftpackageconfiguration"
+},
+"doc://ApolloCodegenLib/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloCodegenLib\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://ApolloCodegenLib/s5ErrorP": {
   "identifier" : "doc:\/\/ApolloCodegenLib\/s5ErrorP",

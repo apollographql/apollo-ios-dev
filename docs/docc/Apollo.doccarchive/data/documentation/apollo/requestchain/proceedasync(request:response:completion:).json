@@ -157,12 +157,7 @@
       }
     ],
     "platforms" : [
-      {
-        "beta" : false,
-        "deprecated" : true,
-        "renamed" : "proceedAsync(request:response:interceptor:completion:)",
-        "unavailable" : false
-      }
+
     ],
     "required" : true,
     "role" : "symbol",
@@ -266,12 +261,12 @@
               "text" : ": "
             },
             {
-              "kind" : "keyword",
-              "text" : "@escaping"
+              "kind" : "attribute",
+              "text" : "@escaping "
             },
             {
               "kind" : "text",
-              "text" : " ("
+              "text" : "("
             },
             {
               "kind" : "typeIdentifier",

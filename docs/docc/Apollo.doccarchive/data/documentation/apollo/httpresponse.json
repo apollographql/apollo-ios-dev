@@ -116,6 +116,7 @@
       "identifiers" : [
         "doc:\/\/Apollo\/s8CopyableP",
         "doc:\/\/Apollo\/SQ",
+        "doc:\/\/Apollo\/s9EscapableP",
         "doc:\/\/Apollo\/SH"
       ],
       "kind" : "relationships",
@@ -627,6 +628,11 @@
 "doc://Apollo/s8CopyableP": {
   "identifier" : "doc:\/\/Apollo\/s8CopyableP",
   "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s9EscapableP": {
+  "identifier" : "doc:\/\/Apollo\/s9EscapableP",
+  "title" : "Swift.Escapable",
   "type" : "unresolvable"
 }
 }

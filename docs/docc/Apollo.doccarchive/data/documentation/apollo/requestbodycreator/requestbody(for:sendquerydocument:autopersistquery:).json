@@ -519,7 +519,18 @@
 },
 "doc://Apollo/documentation/Apollo/RequestBodyCreator/requestBody(for:sendQueryDocument:autoPersistQuery:)-79e0u": {
   "abstract" : [
-
+    {
+      "text" : "Creates a ",
+      "type" : "text"
+    },
+    {
+      "code" : "JSONEncodableDictionary",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " out of the passed-in operation",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

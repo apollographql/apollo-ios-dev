@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "NetworkTransport.clientVersion",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "The version of the client to send as a header value.",
       "type" : "text"
     }
   ],
@@ -195,7 +187,10 @@
 },
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/clientVersion": {
   "abstract" : [
-
+    {
+      "text" : "The version of the client to send as a header value.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -77,7 +77,8 @@
       "identifiers" : [
         "doc:\/\/ApolloWebSocket\/10Foundation14LocalizedErrorP",
         "doc:\/\/ApolloWebSocket\/s5ErrorP",
-        "doc:\/\/ApolloWebSocket\/s8SendableP"
+        "doc:\/\/ApolloWebSocket\/s8SendableP",
+        "doc:\/\/ApolloWebSocket\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -255,6 +256,11 @@
   "title" : "errorDescription",
   "type" : "topic",
   "url" : "\/documentation\/apollowebsocket\/sslclientcertificateerror\/errordescription"
+},
+"doc://ApolloWebSocket/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloWebSocket\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://ApolloWebSocket/s5ErrorP": {
   "identifier" : "doc:\/\/ApolloWebSocket\/s5ErrorP",

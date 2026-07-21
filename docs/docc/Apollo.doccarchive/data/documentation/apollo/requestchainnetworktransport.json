@@ -107,6 +107,7 @@
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/NetworkTransport",
         "doc:\/\/Apollo\/s8CopyableP",
+        "doc:\/\/Apollo\/s9EscapableP",
         "doc:\/\/Apollo\/documentation\/Apollo\/UploadingNetworkTransport"
       ],
       "kind" : "relationships",
@@ -418,7 +419,10 @@
 },
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/clientName": {
   "abstract" : [
-
+    {
+      "text" : "The name of the client to send as a header value.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -452,7 +456,10 @@
 },
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/clientVersion": {
   "abstract" : [
-
+    {
+      "text" : "The version of the client to send as a header value.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -993,7 +1000,10 @@
 },
 "doc://Apollo/documentation/Apollo/RequestChainNetworkTransport/send(operation:cachePolicy:contextIdentifier:context:callbackQueue:completionHandler:)": {
   "abstract" : [
-
+    {
+      "text" : "Send a GraphQL operation to a server and return a response.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1337,6 +1347,11 @@
 "doc://Apollo/s8CopyableP": {
   "identifier" : "doc:\/\/Apollo\/s8CopyableP",
   "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s9EscapableP": {
+  "identifier" : "doc:\/\/Apollo\/s9EscapableP",
+  "title" : "Swift.Escapable",
   "type" : "unresolvable"
 }
 }

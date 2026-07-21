@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Cancellable.cancel()",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "Cancel an in progress action.",
       "type" : "text"
     }
   ],
@@ -169,7 +161,10 @@
 },
 "doc://Apollo/documentation/Apollo/EmptyCancellable/cancel()": {
   "abstract" : [
-
+    {
+      "text" : "Cancel an in progress action.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -98,7 +98,8 @@
     {
       "identifiers" : [
         "doc:\/\/Apollo\/documentation\/Apollo\/ApolloClientProtocol",
-        "doc:\/\/Apollo\/s8CopyableP"
+        "doc:\/\/Apollo\/s8CopyableP",
+        "doc:\/\/Apollo\/s9EscapableP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -427,7 +428,10 @@
 },
 "doc://Apollo/documentation/Apollo/ApolloClient/store": {
   "abstract" : [
-
+    {
+      "text" : "A store used as a local cache.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -679,6 +683,11 @@
 "doc://Apollo/s8CopyableP": {
   "identifier" : "doc:\/\/Apollo\/s8CopyableP",
   "title" : "Swift.Copyable",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s9EscapableP": {
+  "identifier" : "doc:\/\/Apollo\/s9EscapableP",
+  "title" : "Swift.Escapable",
   "type" : "unresolvable"
 }
 }

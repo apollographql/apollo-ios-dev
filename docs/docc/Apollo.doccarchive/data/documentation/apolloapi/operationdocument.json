@@ -213,7 +213,8 @@
   "relationshipsSections" : [
     {
       "identifiers" : [
-        "doc:\/\/ApolloAPI\/s8SendableP"
+        "doc:\/\/ApolloAPI\/s8SendableP",
+        "doc:\/\/ApolloAPI\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -550,6 +551,11 @@
   "title" : "operationIdentifier",
   "type" : "topic",
   "url" : "\/documentation\/apolloapi\/operationdocument\/operationidentifier"
+},
+"doc://ApolloAPI/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/ApolloAPI\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
 },
 "doc://ApolloAPI/s8SendableP": {
   "identifier" : "doc:\/\/ApolloAPI\/s8SendableP",

@@ -118,8 +118,10 @@
         "doc:\/\/Apollo\/s23CustomStringConvertibleP",
         "doc:\/\/Apollo\/SQ",
         "doc:\/\/Apollo\/s5ErrorP",
+        "doc:\/\/Apollo\/s9EscapableP",
         "doc:\/\/Apollo\/SH",
-        "doc:\/\/Apollo\/s8SendableP"
+        "doc:\/\/Apollo\/s8SendableP",
+        "doc:\/\/Apollo\/s16SendableMetatypeP"
       ],
       "kind" : "relationships",
       "title" : "Conforms To",
@@ -637,6 +639,11 @@
   "type" : "topic",
   "url" : "\/documentation\/apollo\/graphqlerror\/subscript(_:)"
 },
+"doc://Apollo/s16SendableMetatypeP": {
+  "identifier" : "doc:\/\/Apollo\/s16SendableMetatypeP",
+  "title" : "Swift.SendableMetatype",
+  "type" : "unresolvable"
+},
 "doc://Apollo/s23CustomStringConvertibleP": {
   "identifier" : "doc:\/\/Apollo\/s23CustomStringConvertibleP",
   "title" : "Swift.CustomStringConvertible",
@@ -655,6 +662,11 @@
 "doc://Apollo/s8SendableP": {
   "identifier" : "doc:\/\/Apollo\/s8SendableP",
   "title" : "Swift.Sendable",
+  "type" : "unresolvable"
+},
+"doc://Apollo/s9EscapableP": {
+  "identifier" : "doc:\/\/Apollo\/s9EscapableP",
+  "title" : "Swift.Escapable",
   "type" : "unresolvable"
 },
 "https://facebook.github.io/graphql/#sec-Response-Format": {

@@ -304,6 +304,18 @@
   },
   "sections" : [
 
+  ],
+  "variants" : [
+    {
+      "paths" : [
+        "\/documentation\/index"
+      ],
+      "traits" : [
+        {
+          "interfaceLanguage" : "swift"
+        }
+      ]
+    }
   ]
 , 
 "references": {

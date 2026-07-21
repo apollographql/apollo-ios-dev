@@ -198,7 +198,18 @@
 },
 "doc://Apollo/documentation/Apollo/DefaultInterceptorProvider/additionalErrorInterceptor(for:)": {
   "abstract" : [
-
+    {
+      "text" : "Provides an additional error interceptor for any additional handling of errors",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "before returning to the UI, such as logging.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -335,7 +346,10 @@
 },
 "doc://Apollo/documentation/Apollo/DefaultInterceptorProvider/interceptors(for:)": {
   "abstract" : [
-
+    {
+      "text" : "Creates a new array of interceptors when called",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "Fragment.fragmentDefinition",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "The definition of the fragment in GraphQL syntax.",
       "type" : "text"
     }
   ],
@@ -247,7 +239,10 @@
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Fragment/fragmentDefinition-4x2cs": {
   "abstract" : [
-
+    {
+      "text" : "The definition of the fragment in GraphQL syntax.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

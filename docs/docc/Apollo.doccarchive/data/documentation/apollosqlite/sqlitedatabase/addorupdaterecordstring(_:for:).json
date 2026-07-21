@@ -77,12 +77,7 @@
       }
     ],
     "platforms" : [
-      {
-        "beta" : false,
-        "deprecated" : true,
-        "renamed" : "addOrUpdate(records:)",
-        "unavailable" : false
-      }
+
     ],
     "required" : true,
     "role" : "symbol",

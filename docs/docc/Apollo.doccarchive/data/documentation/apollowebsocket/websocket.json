@@ -402,7 +402,14 @@
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocket/callbackQueue": {
   "abstract" : [
-
+    {
+      "code" : "DispatchQueue",
+      "type" : "codeVoice"
+    },
+    {
+      "text" : " where the websocket client should call all delegate callbacks.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1453,7 +1460,10 @@
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocket/request": {
   "abstract" : [
-
+    {
+      "text" : "The URLRequest used on connection.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -1700,7 +1710,10 @@
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocket/write(string:)": {
   "abstract" : [
-
+    {
+      "text" : "Writes a string to the websocket.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

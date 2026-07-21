@@ -150,7 +150,27 @@
 },
 "doc://ApolloAPI/documentation/ApolloAPI/Object/canBeConverted(from:)": {
   "abstract" : [
-
+    {
+      "text" : "A helper function to determine if an ",
+      "type" : "text"
+    },
+    {
+      "identifier" : "doc:\/\/ApolloAPI\/documentation\/ApolloAPI\/Object",
+      "isActive" : true,
+      "type" : "reference"
+    },
+    {
+      "text" : " of the given type can be converted to",
+      "type" : "text"
+    },
+    {
+      "text" : " ",
+      "type" : "text"
+    },
+    {
+      "text" : "the receiver type.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

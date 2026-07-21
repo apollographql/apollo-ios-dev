@@ -1,16 +1,12 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
+      "text" : "Converts this object to a fully fleshed-out ",
       "type" : "text"
     },
     {
-      "code" : "HTTPRequest.toURLRequest()",
+      "code" : "URLRequest",
       "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
-      "type" : "text"
     }
   ],
   "hierarchy" : {
@@ -121,6 +117,53 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "return-value",
+          "level" : 2,
+          "text" : "Return Value",
+          "type" : "heading"
+        },
+        {
+          "inlineContent" : [
+            {
+              "text" : "The URL request, ready to send to your server.",
+              "type" : "text"
+            }
+          ],
+          "type" : "paragraph"
+        }
+      ],
+      "kind" : "content"
+    },
+    {
+      "content" : [
+        {
+          "anchor" : "discussion",
+          "level" : 2,
+          "text" : "Discussion",
+          "type" : "heading"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "Any error in creating the request",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "Throws",
+          "style" : "note",
+          "type" : "aside"
+        }
+      ],
+      "kind" : "content"
     }
   ],
   "schemaVersion" : {
@@ -195,7 +238,14 @@
 },
 "doc://Apollo/documentation/Apollo/JSONRequest/toURLRequest()": {
   "abstract" : [
-
+    {
+      "text" : "Converts this object to a fully fleshed-out ",
+      "type" : "text"
+    },
+    {
+      "code" : "URLRequest",
+      "type" : "codeVoice"
+    }
   ],
   "fragments" : [
     {

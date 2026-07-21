@@ -1,15 +1,7 @@
 {
   "abstract" : [
     {
-      "text" : "Inherited from ",
-      "type" : "text"
-    },
-    {
-      "code" : "WebSocketClientDelegate.websocketDidDisconnect(socket:error:)",
-      "type" : "codeVoice"
-    },
-    {
-      "text" : ".",
+      "text" : "The websocket client has disconnected from the server.",
       "type" : "text"
     }
   ],
@@ -157,6 +149,47 @@
         }
       ],
       "kind" : "declarations"
+    },
+    {
+      "kind" : "parameters",
+      "parameters" : [
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "The ",
+                  "type" : "text"
+                },
+                {
+                  "code" : "WebSocketClient",
+                  "type" : "codeVoice"
+                },
+                {
+                  "text" : " that sent the delegate event.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "socket"
+        },
+        {
+          "content" : [
+            {
+              "inlineContent" : [
+                {
+                  "text" : "An optional error if an error occured.",
+                  "type" : "text"
+                }
+              ],
+              "type" : "paragraph"
+            }
+          ],
+          "name" : "error"
+        }
+      ]
     }
   ],
   "schemaVersion" : {
@@ -294,7 +327,10 @@
 },
 "doc://ApolloWebSocket/documentation/ApolloWebSocket/WebSocketTransport/websocketDidDisconnect(socket:error:)": {
   "abstract" : [
-
+    {
+      "text" : "The websocket client has disconnected from the server.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -256,7 +256,10 @@
 },
 "doc://Apollo/documentation/Apollo/NetworkFetchInterceptor/cancel()": {
   "abstract" : [
-
+    {
+      "text" : "Cancel an in progress action.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -285,7 +288,10 @@
 },
 "doc://Apollo/documentation/Apollo/NetworkFetchInterceptor/id": {
   "abstract" : [
-
+    {
+      "text" : "Used to uniquely identify this interceptor from other interceptors in a request chain.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -360,7 +366,10 @@
 },
 "doc://Apollo/documentation/Apollo/NetworkFetchInterceptor/interceptAsync(chain:request:response:completion:)": {
   "abstract" : [
-
+    {
+      "text" : "Called when this interceptor should do its work.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

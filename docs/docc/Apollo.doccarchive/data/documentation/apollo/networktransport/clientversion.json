@@ -224,7 +224,10 @@
 },
 "doc://Apollo/documentation/Apollo/NetworkTransport/clientVersion-8yya": {
   "abstract" : [
-
+    {
+      "text" : "The version of the client to send as a header value.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

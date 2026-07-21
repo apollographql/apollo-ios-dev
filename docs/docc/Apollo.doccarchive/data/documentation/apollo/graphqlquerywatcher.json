@@ -748,7 +748,10 @@
 },
 "doc://Apollo/documentation/Apollo/GraphQLQueryWatcher/store(_:didChangeKeys:contextIdentifier:)": {
   "abstract" : [
-
+    {
+      "text" : "A callback that can be received by subscribers when keys are changed within the database",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {

@@ -259,7 +259,10 @@
 },
 "doc://Apollo/documentation/Apollo/MultipartResponseParsingInterceptor/id": {
   "abstract" : [
-
+    {
+      "text" : "Used to uniquely identify this interceptor from other interceptors in a request chain.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
@@ -314,7 +317,10 @@
 },
 "doc://Apollo/documentation/Apollo/MultipartResponseParsingInterceptor/interceptAsync(chain:request:response:completion:)": {
   "abstract" : [
-
+    {
+      "text" : "Called when this interceptor should do its work.",
+      "type" : "text"
+    }
   ],
   "fragments" : [
     {
