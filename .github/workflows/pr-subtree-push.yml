@@ -17,7 +17,10 @@ on:
 jobs:
   split-subtrees:
     if: ${{ github.event.pull_request.merged }}
-    runs-on: macos-latest
+    # This job only needs git + ssh — do NOT use macos-latest. The macos-26
+    # image (July 2026 rollover) segfaults in `git subtree split` (Homebrew
+    # git-subtree bash script, exit 139). See claude/ci-subtree-troubleshooting.md.
+    runs-on: ubuntu-latest
     name: Split and Push Subtrees
     outputs:
       releaseVersion: ${{ steps.getVersion.outputs.RELEASE_VERSION }}
@@ -37,14 +40,8 @@ jobs:
           ${{ secrets.APOLLO_IOS_PAGINATION_DEPLOY_KEY }}
     - name: Configure Git
       uses: ./.github/actions/configure-git
-    - name: Update Merge Commit Message
-      shell: bash
-      env:
-        PR_TITLE: ${{ github.event.pull_request.title }}
-      run: |
-        git commit --allow-empty --amend -m "$PR_TITLE (apollographql/apollo-ios-dev#${{ github.event.pull_request.number }})"
-        git push --force-with-lease
     - name: Subtree - Apollo iOS
+      id: split-ios
       uses: ./.github/actions/subtree-split-push
       with:
         subtree: apollo-ios
@@ -53,6 +50,7 @@ jobs:
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Subtree - Apollo iOS Codegen
+      id: split-codegen
       if: always()
       uses: ./.github/actions/subtree-split-push
       with:
@@ -62,6 +60,7 @@ jobs:
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
     - name: Subtree - Apollo iOS Pagination
+      id: split-pagination
       if: always()
       uses: ./.github/actions/subtree-split-push
       with:
@@ -70,17 +69,34 @@ jobs:
         target-branch: ${{ github.event.pull_request.base.ref }}
         pr-number: ${{ github.event.pull_request.number }}
         pr-title: ${{ github.event.pull_request.title }}
+    - name: Push Subtrees
+      if: success()
+      shell: bash
+      run: |
+        if [ -n "${{ steps.split-ios.outputs.split-sha }}" ]; then
+          git push git@github.com:apollographql/apollo-ios.git ${{ steps.split-ios.outputs.split-sha }}:refs/heads/${{ github.event.pull_request.base.ref }}
+        fi
+        if [ -n "${{ steps.split-codegen.outputs.split-sha }}" ]; then
+          git push git@github.com:apollographql/apollo-ios-codegen.git ${{ steps.split-codegen.outputs.split-sha }}:refs/heads/${{ github.event.pull_request.base.ref }}
+        fi
+        if [ -n "${{ steps.split-pagination.outputs.split-sha }}" ]; then
+          git push git@github.com:apollographql/apollo-ios-pagination.git ${{ steps.split-pagination.outputs.split-sha }}:refs/heads/${{ github.event.pull_request.base.ref }}
+        fi
     - name: Push Updated History
-      if: always()
+      if: success()
       shell: bash
       run: |
         git fetch
-        git push
+        if [ "$(git rev-list origin/${{ github.event.pull_request.base.ref }}..HEAD --count)" -eq 0 ]; then
+          echo "No local commits to push, skipping."
+          exit 0
+        fi
+        git push || echo "::warning::Failed to push updated history. This is non-fatal — the next successful run will re-sync subtree metadata."
 
   publish-release:
     if: success('split-subtrees') && startsWith(github.ref, 'refs/heads/release/')
     needs: split-subtrees
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     name: Publish Release
     steps:
       - name: Checkout Repo
