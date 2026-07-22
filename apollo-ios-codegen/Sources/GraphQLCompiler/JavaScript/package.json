@@ -13,7 +13,7 @@
     "node": ">=22.16.0"
   },
   "dependencies": {
-    "graphql": "17.0.1",
+    "graphql": "17.0.2",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
