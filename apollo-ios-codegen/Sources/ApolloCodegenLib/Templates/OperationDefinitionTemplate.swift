@@ -71,7 +71,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
   private func OperationDeclaration() -> TemplateString {
     return """
     \(config.nonisolatedModifier)\(accessControl.parent.render())\
-    struct \(operation.generatedDefinitionName): \
+    struct \(operation.generatedDefinitionName(capitalizer: config.capitalizer)): \
     \(operation.definition.operationType.renderedProtocolName) {
       \(accessControl.member.render())\
     static let operationName: String = "\(operation.definition.name)"
@@ -96,7 +96,7 @@ struct OperationDefinitionTemplate: OperationTemplateRenderer {
           \(operation.definition.source.formattedSource())\(if: includeFragments, ",")
           \(if: includeFragments, """
             fragments: [\(operation.referencedFragments.map {
-              "\($0.name.asFragmentName).self"
+              "\($0.name.asFragmentName(capitalizer: config.capitalizer)).self"
             }, separator: ", ")]
             """
           )

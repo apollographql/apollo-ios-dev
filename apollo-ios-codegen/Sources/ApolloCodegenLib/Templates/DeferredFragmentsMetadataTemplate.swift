@@ -117,7 +117,8 @@ struct DeferredFragmentsMetadataTemplate {
         let selectionSetName = SelectionSetNameGenerator.generatedSelectionSetName(
           for: fragment.typeInfo,
           format: .omittingRoot,
-          pluralizer: config.pluralizer
+          pluralizer: config.pluralizer,
+          capitalizer: config.capitalizer
         )
 
         deferredPathTypeInfo.append(DeferredPathTypeInfo(
@@ -137,7 +138,7 @@ struct DeferredFragmentsMetadataTemplate {
         deferredPathTypeInfo.append(DeferredPathTypeInfo(
           path: path,
           deferCondition: deferCondition,
-          typeName: fragment.definition.name.asFragmentName
+          typeName: fragment.definition.name.asFragmentName(capitalizer: config.capitalizer)
         ))
       }
 

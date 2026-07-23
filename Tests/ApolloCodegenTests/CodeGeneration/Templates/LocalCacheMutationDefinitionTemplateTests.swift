@@ -100,6 +100,38 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equal(["ModuleA"]))
   }
 
+  // MARK: - Capitalization Rules
+
+  func test__generate__givenLocalCacheMutationWithCapitalizationRules_capitalizesTypeName() async throws {
+    // given
+    document = """
+      query TestOperationById @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
+      }
+      """
+
+    config = .mock(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("id"), strategy: .upper)],
+      schemaDocumentation: .exclude,
+      markTypesNonisolated: false
+    ))
+
+    let expected =
+      """
+      struct TestOperationByIDLocalCacheMutation: LocalCacheMutation {
+      """
+
+    // when
+    try await buildSubjectAndOperation(named: "TestOperationById")
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
   // MARK: - Access Level Tests
 
   func

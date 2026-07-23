@@ -650,10 +650,16 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     /// Any non-default rules for capitalization you wish to include.
     ///
     /// Rules are applied to the names of generated field accessors, initializer parameters,
-    /// enum cases, input object fields, and test mock fields, following SwiftFormat's
-    /// `acronyms` convention: an acronym is only capitalized when its first character is
-    /// already uppercase, so the leading `id` in `idToken` is preserved while the `Id` in
-    /// `userId` becomes `ID`. Schema and selection set *type* names are not affected.
+    /// enum cases, input object fields, test mock fields, and the generated Swift *type* names
+    /// of GraphQL operations and fragments (e.g. `…ByIdSubscription` → `…ByIDSubscription`),
+    /// following SwiftFormat's `acronyms` convention: an acronym is only capitalized when its
+    /// first character is already uppercase, so the leading `id` in `idToken` is preserved while
+    /// the `Id` in `userId` becomes `ID`.
+    ///
+    /// An operation's `operationName`, the GraphQL document sent to the server, and the
+    /// persisted-query/operation-manifest identifiers are *never* changed — only the generated
+    /// Swift identifiers are. Schema type names and field-derived nested selection set type names
+    /// are not affected.
     public let additionalCapitalizationRules: [CapitalizationRule]
     /// Any non-default rules for pluralization or singularization you wish to include.
     public let additionalInflectionRules: [InflectionRule]

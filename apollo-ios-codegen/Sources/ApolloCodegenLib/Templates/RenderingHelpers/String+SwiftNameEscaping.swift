@@ -17,7 +17,11 @@ extension String {
     return SwiftKeywords.TypeNamesToSuffix.contains(uppercasedName) ?
             "\(uppercasedName)_Fragment" : uppercasedName
   }
-  
+
+  func asFragmentName(capitalizer: Capitalizer) -> String {
+    capitalizer.apply(to: asFragmentName)
+  }
+
   var asTestMockFieldPropertyName: String {
     escapeIf(in: SwiftKeywords.TestMockFieldNamesToEscape)
   }

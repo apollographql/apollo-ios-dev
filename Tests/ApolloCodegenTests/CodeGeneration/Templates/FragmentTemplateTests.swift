@@ -99,6 +99,41 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     expect(String(actual.reversed())).to(equalLineByLine("\n}", ignoringExtraLines: true))
   }
 
+  func test__render__givenFragmentWithCapitalizationRules_capitalizesTypeNameButNotSource() async throws {
+    // given
+    let document = """
+      fragment TestFragmentById on Query {
+        allAnimals {
+          species
+        }
+      }
+      """
+
+    let expected =
+      """
+      struct TestFragmentByID: TestSchema.SelectionSet, Fragment {
+        static var fragmentDefinition: StaticString {
+          #"fragment TestFragmentById on Query { __typename allAnimals { __typename species } }"#
+        }
+      """
+
+    // when
+    let (_, template) = try await buildFragmentTemplate(
+      named: "TestFragmentById",
+      config: .mock(options: .init(
+        additionalCapitalizationRules: [.init(term: .string("id"), strategy: .upper)],
+        schemaDocumentation: .exclude,
+        markTypesNonisolated: false
+      )),
+      document: document
+    )
+
+    let actual = render(template)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
   func test__render__givenFragment_generatesFragmentDeclarationWithoutDefinition() async throws {
     // given
     let expected =
