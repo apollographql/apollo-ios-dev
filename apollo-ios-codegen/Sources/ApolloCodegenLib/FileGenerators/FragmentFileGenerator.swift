@@ -13,5 +13,5 @@ struct FragmentFileGenerator: FileGenerator {
     config: config
   ) }
   var target: FileTarget { .fragment(irFragment.definition) }
-  var fileName: String { irFragment.definition.name }
+  var fileName: String { config.capitalizer.apply(to: irFragment.definition.name) }
 }

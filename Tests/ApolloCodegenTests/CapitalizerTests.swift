@@ -252,6 +252,30 @@ class CapitalizerTests: XCTestCase {
     expect("userId".renderAsTestMockFieldPropertyName(config: config)).to(equal("userId"))
   }
 
+  // MARK: - Type Name Rendering Integration
+
+  func test__asFragmentName__midWordAcronym__isCapitalized() {
+    let capitalizer = Capitalizer(rules: [.init(term: .string("id"), strategy: .upper)])
+
+    expect("testFragmentById".asFragmentName(capitalizer: capitalizer))
+      .to(equal("TestFragmentByID"))
+  }
+
+  func test__asFragmentName__leadingAcronym__isCapitalizedForTypeName() {
+    // Unlike property names, a type name is `firstUppercased` before the capitalizer runs, so a
+    // leading acronym is fully capitalized (e.g. `idLookup` → `IDLookup`).
+    let capitalizer = Capitalizer(rules: [.init(term: .string("id"), strategy: .upper)])
+
+    expect("idLookup".asFragmentName(capitalizer: capitalizer)).to(equal("IDLookup"))
+  }
+
+  func test__asFragmentName__noRules__isUnchanged() {
+    let capitalizer = Capitalizer(rules: [])
+
+    expect("testFragmentById".asFragmentName(capitalizer: capitalizer))
+      .to(equal("TestFragmentById"))
+  }
+
   // MARK: - CapitalizationRule Codable
 
   func test__capitalizationRule__roundTrips() throws {

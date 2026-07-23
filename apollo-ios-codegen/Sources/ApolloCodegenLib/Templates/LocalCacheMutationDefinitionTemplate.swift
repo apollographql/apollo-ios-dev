@@ -21,7 +21,7 @@ struct LocalCacheMutationDefinitionTemplate: OperationTemplateRenderer {
     return TemplateString(
     """
     \(config.nonisolatedModifier)\(accessControlRenderer(for: .parent).render())\
-    struct \(operation.generatedDefinitionName): LocalCacheMutation {
+    struct \(operation.generatedDefinitionName(capitalizer: config.capitalizer)): LocalCacheMutation {
       \(memberAccessControl)static let operationType: GraphQLOperationType = .\(operation.definition.operationType.rawValue)
 
       \(section: VariableProperties(operation.definition.variables))

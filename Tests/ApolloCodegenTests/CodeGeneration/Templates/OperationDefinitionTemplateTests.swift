@@ -325,6 +325,93 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
+  func test__generate__givenSubscriptionWithCapitalizationRules_capitalizesTypeNameButNotOperationNameOrSource() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      type Subscription {
+        streamAnimals: [Animal!]
+      }
+
+      type Animal {
+        species: String!
+      }
+      """
+
+    document = """
+      subscription TestOperationById {
+        streamAnimals {
+          species
+        }
+      }
+      """
+
+    config = .mock(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("id"), strategy: .upper)],
+      schemaDocumentation: .exclude,
+      markTypesNonisolated: false
+    ))
+
+    let expected =
+      """
+      struct TestOperationByIDSubscription: GraphQLSubscription {
+        static let operationName: String = "TestOperationById"
+        static let operationDocument: ApolloAPI.OperationDocument = .init(
+          definition: .init(
+            #\"subscription TestOperationById { streamAnimals { __typename species } }\"#
+      """
+
+    // when
+    try await buildSubjectAndOperation(named: "TestOperationById")
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test__generate__givenSubscriptionWithoutCapitalizationRules_doesNotCapitalizeTypeName() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      type Subscription {
+        streamAnimals: [Animal!]
+      }
+
+      type Animal {
+        species: String!
+      }
+      """
+
+    document = """
+      subscription TestOperationById {
+        streamAnimals {
+          species
+        }
+      }
+      """
+
+    let expected =
+      """
+      struct TestOperationByIdSubscription: GraphQLSubscription {
+        static let operationName: String = "TestOperationById"
+      """
+
+    // when
+    try await buildSubjectAndOperation(named: "TestOperationById")
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
   // MARK: - Selection Set Declaration
 
   func test__generate__givenOperationSelectionSet_rendersDeclaration() async throws {

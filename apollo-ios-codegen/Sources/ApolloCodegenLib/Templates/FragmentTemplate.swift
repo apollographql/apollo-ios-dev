@@ -22,7 +22,7 @@ struct FragmentTemplate: TemplateRenderer {
     return TemplateString(
     """
     \(config.nonisolatedModifier)\(accessControlRenderer(for: .parent).render())\
-    struct \(fragment.generatedDefinitionName.asFragmentName): \
+    struct \(fragment.generatedDefinitionName.asFragmentName(capitalizer: config.capitalizer)): \
     \(fragment.renderedSelectionSetType(config)), Fragment\
     \(if: fragment.isIdentifiable, ", Identifiable")\
      {

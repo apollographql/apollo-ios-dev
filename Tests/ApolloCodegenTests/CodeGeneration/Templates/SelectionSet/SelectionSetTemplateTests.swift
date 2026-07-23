@@ -30,6 +30,7 @@ class SelectionSetTemplateTests: XCTestCase {
   func buildSubjectAndOperation(
     named operationName: String = "TestOperation",
     configOutput: ApolloCodegenConfiguration.FileOutput = .mock(),
+    capitalizationRules: [ApolloCodegenLib.CapitalizationRule] = [],
     inflectionRules: [ApolloCodegenLib.InflectionRule] = [],
     schemaDocumentation: ApolloCodegenConfiguration.Composition = .exclude,
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude,
@@ -42,6 +43,7 @@ class SelectionSetTemplateTests: XCTestCase {
       schemaNamespace: "TestSchema",
       output: configOutput,
       options: .init(
+        additionalCapitalizationRules: capitalizationRules,
         additionalInflectionRules: inflectionRules,
         schemaDocumentation: schemaDocumentation,
         warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
@@ -11683,6 +11685,48 @@ class SelectionSetTemplateTests: XCTestCase {
     )
 
     let actual = subject.test_render(inlineFragment: predators_asPet.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
+  }
+
+  func test__render_conditionalFragmentOnQueryRoot__givenCapitalizationRules_rendersRootEntityTypeWithCapitalizedOperationName() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      name: String!
+    }
+    """
+
+    document = """
+    query TestOperationById($a: Boolean!) {
+      ...Details @include(if: $a)
+    }
+
+    fragment Details on Query {
+      name
+    }
+    """
+
+    let expected = """
+    /// IfA
+    public struct IfA: TestSchema.InlineFragment {
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
+
+      public typealias RootEntityType = TestOperationByIDQuery.Data
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      named: "TestOperationById",
+      capitalizationRules: [.init(term: .string("id"), strategy: .upper)]
+    )
+    let query_ifA = try XCTUnwrap(
+      operation[field: "query"]?[if: "a"]
+    )
+
+    let actual = subject.test_render(inlineFragment: query_ifA.computed)
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))

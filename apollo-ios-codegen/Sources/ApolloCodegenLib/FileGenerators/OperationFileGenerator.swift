@@ -24,5 +24,5 @@ struct OperationFileGenerator: FileGenerator {
   }
 
   var target: FileTarget { .operation(irOperation.definition) }
-  var fileName: String { irOperation.definition.generatedDefinitionName }
+  var fileName: String { irOperation.definition.generatedDefinitionName(capitalizer: config.capitalizer) }
 }
