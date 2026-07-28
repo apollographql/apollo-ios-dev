@@ -33,7 +33,7 @@ final class ProjectionLoader {
   /// possible states are exhaustive in the type system rather than
   /// enforced by hand at every read site.
   ///
-  /// Four legal states, mapping back to the documented post-flush
+  /// Three legal states, mapping back to the documented post-flush
   /// triage:
   ///
   /// - ``loaded(_:knownMissing:)`` — the cache returned a record for
@@ -56,31 +56,29 @@ final class ProjectionLoader {
   ///   same field or different — must short-circuit to the same
   ///   "absent" answer, so tracking which fields were attempted
   ///   would add no information.
-  /// - ``failed(_:)`` — a prior flush threw for this key. Sticky
-  ///   for the same reason as `.absent`: no concurrent mutation can
-  ///   change the recorded outcome under us, and any explicit
-  ///   in-transaction mutation routes through `invalidate(keys:)`
-  ///   to clear the entry first. While the entry survives, every
-  ///   subsequent projection on this key short-circuits as the
-  ///   same failure via `loadResult(forKey:)`.
   ///
   /// Absence of an entry (`state[key] == nil`) is the "never attempted"
-  /// fourth state: the key has not been seen this transaction.
+  /// third state: the key has not been seen this transaction.
+  ///
+  /// A batch-load *failure* deliberately records no state. The error
+  /// propagates to the caller that forced the flush (terminating that
+  /// read), and the failed projections re-enter `pending` — so a later
+  /// ask within the same transaction retries the load instead of
+  /// replaying a stale error.
   private enum KeyState {
     case loaded(Record, knownMissing: Set<String>)
     case absent
-    case failed(any Error)
 
     /// True iff this state already has an answer for `fieldName` —
     /// present in the loaded record, or known missing from it. For
-    /// `.absent` and `.failed` the answer is always `true` — both are
-    /// sticky states whose answer for any field is the recorded
-    /// outcome of the key as a whole.
+    /// `.absent` the answer is always `true` — it is a sticky state
+    /// whose answer for any field is the recorded outcome of the key
+    /// as a whole.
     func hasAttempted(_ fieldName: String) -> Bool {
       switch self {
       case .loaded(let record, let knownMissing):
         return record.fields[fieldName] != nil || knownMissing.contains(fieldName)
-      case .absent, .failed:
+      case .absent:
         return true
       }
     }
@@ -128,8 +126,14 @@ final class ProjectionLoader {
   /// `batchLoad` call — every other sibling's force finds its key in
   /// `state` and returns immediately. Single flush per level, matching
   /// the pre-3.0 whole-record loader's batching shape.
+  ///
+  /// The short-circuit is per-key: a key with no *own* pending fields
+  /// answers immediately from `state`, even while other keys are
+  /// pending. This matters after a batch-load failure re-pends the
+  /// failed projections — a warm key's answer must not be held
+  /// hostage to (or poisoned by) an unrelated key's retry.
   func deferredRecord(forKey cacheKey: CacheKey) -> PossiblyDeferred<Record?> {
-    if pending.isEmpty {
+    if pending[cacheKey] == nil {
       return .immediate(loadResult(forKey: cacheKey))
     }
     return .deferred {
@@ -181,13 +185,11 @@ final class ProjectionLoader {
   // MARK: - Private
 
   /// Returns the `Result<Record?, Error>` for the given key, lifting
-  /// a missing key or an `.absent` state to `.success(nil)`. A failure
-  /// short-circuits as the recorded error.
+  /// a missing key or an `.absent` state to `.success(nil)`.
   private func loadResult(forKey cacheKey: CacheKey) -> Result<Record?, any Error> {
     switch state[cacheKey] {
     case .none, .some(.absent):           return .success(nil)
     case .some(.loaded(let record, _)):   return .success(record)
-    case .some(.failed(let error)):       return .failure(error)
     }
   }
 
@@ -200,9 +202,9 @@ final class ProjectionLoader {
   /// populated a subset of the fields a subsequent projection
   /// requests, and the caller wants to see the union.
   ///
-  /// `.absent` and `.failed` are sticky and never updated — a key
-  /// that landed in either state during a prior flush short-circuits
-  /// at `enqueue` so its fields never reach this loop.
+  /// `.absent` is sticky and never updated — a key that landed in
+  /// that state during a prior flush short-circuits at `enqueue` so
+  /// its fields never reach this loop.
   private func flush() async throws {
     guard !pending.isEmpty else { return }
     let toLoad = pending.map { RecordProjection(cacheKey: $0.key, fieldNames: $0.value) }
@@ -215,8 +217,8 @@ final class ProjectionLoader {
         let newRecord = newRecords[cacheKey]
 
         switch state[cacheKey] {
-        case .some(.failed), .some(.absent):
-          // Sticky states — should not reach this branch in practice
+        case .some(.absent):
+          // Sticky state — should not reach this branch in practice
           // (the fields would have short-circuited at `enqueue`), but
           // coexisting with an already-sticky state is harmless: we
           // just don't update it.
@@ -245,14 +247,14 @@ final class ProjectionLoader {
         }
       }
     } catch {
-      // Record the failure for every key that was in this batch so
-      // subsequent reads see a consistent error. A key that already
-      // has a `.loaded` entry keeps it — only previously un-attempted
-      // keys are marked failed.
+      // The error propagates to the caller that forced this flush,
+      // terminating that read. Failures are not memoized: the batch's
+      // projections re-enter `pending` (through `enqueue`, so fields
+      // that already have an answer in `state` are filtered out) and
+      // the next ask within this transaction retries the load instead
+      // of replaying a stale error.
       for projection in toLoad {
-        if state[projection.cacheKey] == nil {
-          state[projection.cacheKey] = .failed(error)
-        }
+        enqueue(projection)
       }
       throw error
     }

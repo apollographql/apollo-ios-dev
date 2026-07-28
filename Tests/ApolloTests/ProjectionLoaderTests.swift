@@ -12,7 +12,7 @@ import XCTest
 /// - sibling loads collapse into one batch
 /// - duplicate projections coalesce within one batch
 /// - already-loaded projections short-circuit (no re-fetch)
-/// - sticky failures (a failed key fails consistently on repeat asks)
+/// - batch failures propagate but are not memoized (repeat asks retry)
 /// - `removeAll()` resets pending and loaded state
 final class ProjectionLoaderTests: XCTestCase {
 
@@ -184,7 +184,39 @@ final class ProjectionLoaderTests: XCTestCase {
     expect(result?["age"] as? String) == "v_age"
   }
 
-  func test__deferredRecord__givenBatchLoadFailure__returnsSameFailureOnRepeatedAsk() async throws {
+  func test__deferredRecord__givenBatchLoadFailure__retriesOnNextAsk() async throws {
+    let recorder = BatchRecorder()
+    let failure = TestError(message: "boom")
+    let callCount = Atomic<Int>(wrappedValue: 0)
+    let loader = ProjectionLoader { projections in
+      await recorder.record(projections)
+      // First call fails (transient error); the retry succeeds.
+      if callCount.increment() == 1 {
+        throw failure
+      }
+      return ["A": Record(key: "A", ["name": "Alice"])]
+    }
+
+    loader.enqueue(projection("A", "name"))
+
+    // First ask: throws the batch-load failure to the caller that
+    // forced the flush.
+    await expect { _ = try await loader.deferredRecord(forKey: "A").get() }
+      .to(throwError(errorType: TestError.self))
+
+    // Second ask for the same key: failures are not memoized — the
+    // failed projection re-entered `pending`, so this ask re-batches
+    // and observes the now-healthy load.
+    let retried = try await loader.deferredRecord(forKey: "A").get()
+    expect(retried?["name"] as? String) == "Alice"
+
+    let calls = await recorder.calls
+    expect(calls).to(haveCount(2))
+    // The retry batch re-requests the same projection.
+    expect(calls.last?.first?.fieldNames).to(equal(["name"]))
+  }
+
+  func test__deferredRecord__givenPersistentBatchLoadFailure__throwsFreshErrorOnEachAsk() async throws {
     let recorder = BatchRecorder()
     let failure = TestError(message: "boom")
     let loader = ProjectionLoader { projections in
@@ -194,19 +226,17 @@ final class ProjectionLoaderTests: XCTestCase {
 
     loader.enqueue(projection("A", "name"))
 
-    // First ask: should throw the batch-load failure.
     await expect { _ = try await loader.deferredRecord(forKey: "A").get() }
       .to(throwError(errorType: TestError.self))
 
-    // Second ask for the same key: should also throw the *same* failure
-    // — sticky, no re-batch. `pending` is empty after the flush, so
-    // `deferredRecord` returns immediately with the recorded failure.
+    // A persistently failing backend throws on every ask — each ask is
+    // a genuine retry (observable as a new batch call), not a replay
+    // of recorded state.
     await expect { _ = try await loader.deferredRecord(forKey: "A").get() }
       .to(throwError(errorType: TestError.self))
 
     let calls = await recorder.calls
-    // No re-batch after a recorded failure for the key.
-    expect(calls).to(haveCount(1))
+    expect(calls).to(haveCount(2))
   }
 
   func test__removeAll__clearsPendingAndLoadedState__allowsRefetch() async throws {
@@ -550,7 +580,7 @@ final class ProjectionLoaderTests: XCTestCase {
     expect(calls).to(haveCount(1))
   }
 
-  // MARK: - Sticky failure isolation
+  // MARK: - Failure isolation
 
   func test__deferredRecord__givenBatchFailure__doesNotPoisonPriorSuccessfulKeyLoads() async throws {
     let recorder = BatchRecorder()
@@ -573,23 +603,26 @@ final class ProjectionLoaderTests: XCTestCase {
     let firstA = try await loader.deferredRecord(forKey: "A").get()
     expect(firstA?["name"] as? String) == "Alice"
 
-    // Round 2: failed load of B. A's success must persist; B becomes
-    // a sticky failure.
+    // Round 2: failed load of B. B's projection re-enters `pending`
+    // for a later retry.
     loader.enqueue(projection("B", "name"))
     await expect { _ = try await loader.deferredRecord(forKey: "B").get() }
       .to(throwError(errorType: TestError.self))
 
-    // A's prior success survives the unrelated failure for B.
+    // A's prior success survives the unrelated failure: the ask
+    // answers immediately from A's warm state — it is neither held
+    // hostage to nor poisoned by B's re-pended retry.
     let secondA = try await loader.deferredRecord(forKey: "A").get()
     expect(secondA?["name"] as? String) == "Alice"
+    await expect { await recorder.calls }.to(haveCount(2))
 
-    // B's failure is sticky; no re-batch on repeated ask.
+    // B's next ask is a genuine retry — a third batch fires for B
+    // alone, and its failure propagates to B's asker only.
     await expect { _ = try await loader.deferredRecord(forKey: "B").get() }
       .to(throwError(errorType: TestError.self))
 
     let calls = await recorder.calls
-    // Two flushes total — A's repeat ask short-circuits, B's repeat
-    // ask hits the sticky failure.
-    expect(calls).to(haveCount(2))
+    expect(calls).to(haveCount(3))
+    expect(calls.last?.map(\.cacheKey)).to(equal(["B"]))
   }
 }
