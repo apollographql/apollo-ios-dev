@@ -2432,6 +2432,88 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     ))
   }
 
+  func test_removeObject_readAfterRemoveWithinSameTransaction_throwsMissingValueError() async throws {
+    // given
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("hero", Hero.self)
+      ]}
+
+      class Hero: MockSelectionSet, @unchecked Sendable {
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+          .field("name", String.self)
+        ]}
+
+        var name: String { __data["name"] }
+      }
+    }
+
+    let query = MockQuery<HeroNameSelectionSet>()
+
+    try await store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("2001")],
+      "2001": ["__typename": "Droid", "name": "R2-D2"]
+    ])
+
+    // The first read warms the transaction's loader state for the hero
+    // record; the remove must invalidate it so the second read observes
+    // the deletion instead of the stale loaded record.
+    await expect {
+      try await self.store.withinReadWriteTransaction { transaction in
+        let data = try await transaction.read(query: query)
+        expect(data.hero?.name).to(equal("R2-D2"))
+
+        try await transaction.removeObject(for: "2001")
+
+        _ = try await transaction.read(query: query)
+      }
+    }.to(throwError(
+      GraphQLExecutionError(path: ["hero"], underlying: JSONDecodingError.missingValue)
+    ))
+  }
+
+  func test_removeObjectsMatchingPattern_readAfterRemoveWithinSameTransaction_throwsMissingValueError() async throws {
+    // given
+    class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("hero", Hero.self)
+      ]}
+
+      class Hero: MockSelectionSet, @unchecked Sendable {
+        override class var __selections: [Selection] {[
+          .field("__typename", String.self),
+          .field("name", String.self)
+        ]}
+
+        var name: String { __data["name"] }
+      }
+    }
+
+    let query = MockQuery<HeroNameSelectionSet>()
+
+    try await store.publish(records: [
+      "QUERY_ROOT": ["hero": CacheReference("2001")],
+      "2001": ["__typename": "Droid", "name": "R2-D2"]
+    ])
+
+    // Same shape as the single-key variant, but through the pattern-
+    // matching remove, which routes through the loader's pattern-based
+    // invalidation.
+    await expect {
+      try await self.store.withinReadWriteTransaction { transaction in
+        let data = try await transaction.read(query: query)
+        expect(data.hero?.name).to(equal("R2-D2"))
+
+        try await transaction.removeObjects(matching: "200")
+
+        _ = try await transaction.read(query: query)
+      }
+    }.to(throwError(
+      GraphQLExecutionError(path: ["hero"], underlying: JSONDecodingError.missingValue)
+    ))
+  }
+
   func test_removeObjectsMatchingPattern_givenPatternNotMatchingKeyCase_deletesCaseInsensitiveMatchingRecords() async throws {
     // given
     class HeroNameSelectionSet: MockSelectionSet, @unchecked Sendable {
