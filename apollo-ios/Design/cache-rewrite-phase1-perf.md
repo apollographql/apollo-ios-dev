@@ -37,17 +37,21 @@ Public `ApolloClient` API is stable across 2.x and 3.0 for the first four scenar
 
 ### Tier 2 — `NormalizedCache` protocol level
 
-The cache API surface that custom-cache implementors and direct cache consumers see. Exercises `loadRecords(forKeys:)`, `merge(records:)`, `removeRecord(for:)`, `removeRecords(matching:)`, and `clear()`.
+The cache API surface that custom-cache implementors and direct cache consumers see. Exercises `loadRecords(forKeys:)`, `loadFields(_:)` (the ADR 0007 projection-aware read), `merge(records:)`, `removeRecord(for:)`, `removeRecords(matching:)`, and `clear()`.
 
 | Scenario | Workload | Measures |
 |---|---|---|
 | Single-key load | One record of 10 fields | `loadRecords` latency, deserialization cost |
 | Batch load | 100 records loaded by key set | Batched load throughput |
+| Projected load | 3 of 10 fields on one record via `loadFields` | Projection-read latency vs whole-record `loadRecords` on the same record |
+| Projected batch load | 3 of 10 fields across 100 records via `loadFields` | Row-filter throughput; the headline ADR 0007 scenario |
+| Projected list load | One record with a 100-element list field via `loadFields` | Multi-row field assembly cost |
+| Inline-fragment over-fetch | Record with 5 type cases of 8 fields each; selection matches 1 type case; projected with `includeAllInlineFragments` semantics (all 40 fields requested, 8 used) | Over-fetch cost of unmatched type-case rows. **This scenario is the decision gate for the deferred `__typename` SQL filter and PR-009g-bis (ADR 0007 Amendments, 2026-07-13): neither lands unless this measures as a meaningful regression against the matched-type-case-only baseline.** |
 | Single-record merge | Add 10 new fields to one record | `merge` latency, serialization cost |
 | Many-record merge | 1,000 records into a fresh cache | Bulk-write throughput |
 | Pattern delete | `removeRecords(matching: "User_")` against 10k records | Pattern-match and delete cost |
 
-Run against both `InMemoryNormalizedCache` and `SQLiteNormalizedCache`.
+Run against both `InMemoryNormalizedCache` and `SQLiteNormalizedCache`. The projected-load scenarios run `loadFields` through the protocol surface, so on SQLite they measure whichever backing path is wired at measurement time (the `loadRecords`-and-filter default before PR-009h, row-filter `selectFields` after) — capture both sides of the PR-009h switch so the delta is attributable.
 
 ### Tier 3 — SQLite raw operations
 
