@@ -200,13 +200,16 @@ final class ProjectionLoaderTests: XCTestCase {
     loader.enqueue(projection("A", "name"))
 
     // First ask: throws the batch-load failure to the caller that
-    // forced the flush.
+    // forced the flush. The failed projection is dropped, not
+    // memoized.
     await expect { _ = try await loader.deferredRecord(forKey: "A").get() }
       .to(throwError(errorType: TestError.self))
 
-    // Second ask for the same key: failures are not memoized — the
-    // failed projection re-entered `pending`, so this ask re-batches
-    // and observes the now-healthy load.
+    // Second ask for the same key (each ask enqueues, as
+    // `ApolloStore.loadObject` does): no failure state was recorded,
+    // so the fields re-enter `pending` and this ask re-batches,
+    // observing the now-healthy load.
+    loader.enqueue(projection("A", "name"))
     let retried = try await loader.deferredRecord(forKey: "A").get()
     expect(retried?["name"] as? String) == "Alice"
 
@@ -214,6 +217,34 @@ final class ProjectionLoaderTests: XCTestCase {
     expect(calls).to(haveCount(2))
     // The retry batch re-requests the same projection.
     expect(calls.last?.first?.fieldNames).to(equal(["name"]))
+  }
+
+  func test__deferredRecord__givenBatchLoadFailure__unrelatedLaterFlushDoesNotReloadDroppedProjections() async throws {
+    let recorder = BatchRecorder()
+    let failure = TestError(message: "boom")
+    let callCount = Atomic<Int>(wrappedValue: 0)
+    let loader = ProjectionLoader { projections in
+      await recorder.record(projections)
+      if callCount.increment() == 1 {
+        throw failure
+      }
+      return ["B": Record(key: "B", ["name": "Bob"])]
+    }
+
+    // A's load fails; its projection is dropped with it.
+    loader.enqueue(projection("A", "name"))
+    await expect { _ = try await loader.deferredRecord(forKey: "A").get() }
+      .to(throwError(errorType: TestError.self))
+
+    // A later unrelated read must not drag A's dead projection into
+    // its batch — nobody is waiting on A's answer anymore.
+    loader.enqueue(projection("B", "name"))
+    let recordB = try await loader.deferredRecord(forKey: "B").get()
+    expect(recordB?["name"] as? String) == "Bob"
+
+    let calls = await recorder.calls
+    expect(calls).to(haveCount(2))
+    expect(calls.last?.map(\.cacheKey)).to(equal(["B"]))
   }
 
   func test__deferredRecord__givenPersistentBatchLoadFailure__throwsFreshErrorOnEachAsk() async throws {
@@ -229,9 +260,11 @@ final class ProjectionLoaderTests: XCTestCase {
     await expect { _ = try await loader.deferredRecord(forKey: "A").get() }
       .to(throwError(errorType: TestError.self))
 
-    // A persistently failing backend throws on every ask — each ask is
-    // a genuine retry (observable as a new batch call), not a replay
-    // of recorded state.
+    // A persistently failing backend throws on every ask — each ask
+    // (which enqueues, as `ApolloStore.loadObject` does) is a genuine
+    // retry, observable as a new batch call, not a replay of recorded
+    // state.
+    loader.enqueue(projection("A", "name"))
     await expect { _ = try await loader.deferredRecord(forKey: "A").get() }
       .to(throwError(errorType: TestError.self))
 
@@ -603,21 +636,22 @@ final class ProjectionLoaderTests: XCTestCase {
     let firstA = try await loader.deferredRecord(forKey: "A").get()
     expect(firstA?["name"] as? String) == "Alice"
 
-    // Round 2: failed load of B. B's projection re-enters `pending`
-    // for a later retry.
+    // Round 2: failed load of B. B's projection is dropped with the
+    // failure.
     loader.enqueue(projection("B", "name"))
     await expect { _ = try await loader.deferredRecord(forKey: "B").get() }
       .to(throwError(errorType: TestError.self))
 
     // A's prior success survives the unrelated failure: the ask
-    // answers immediately from A's warm state — it is neither held
-    // hostage to nor poisoned by B's re-pended retry.
+    // answers immediately from A's warm state.
     let secondA = try await loader.deferredRecord(forKey: "A").get()
     expect(secondA?["name"] as? String) == "Alice"
     await expect { await recorder.calls }.to(haveCount(2))
 
-    // B's next ask is a genuine retry — a third batch fires for B
-    // alone, and its failure propagates to B's asker only.
+    // B's next ask (enqueue + force, as `ApolloStore.loadObject` does)
+    // is a genuine retry — a third batch fires for B alone, and its
+    // failure propagates to B's asker only.
+    loader.enqueue(projection("B", "name"))
     await expect { _ = try await loader.deferredRecord(forKey: "B").get() }
       .to(throwError(errorType: TestError.self))
 

@@ -60,11 +60,12 @@ final class ProjectionLoader {
   /// Absence of an entry (`state[key] == nil`) is the "never attempted"
   /// third state: the key has not been seen this transaction.
   ///
-  /// A batch-load *failure* deliberately records no state. The error
-  /// propagates to the caller that forced the flush (terminating that
-  /// read), and the failed projections re-enter `pending` — so a later
-  /// ask within the same transaction retries the load instead of
-  /// replaying a stale error.
+  /// A batch-load *failure* deliberately records no state and drops
+  /// the failed projections. The error propagates to the caller that
+  /// forced the flush (terminating that read); because no state was
+  /// recorded, a later ask within the same transaction re-enqueues
+  /// the fields and retries the load instead of replaying a stale
+  /// error.
   private enum KeyState {
     case loaded(Record, knownMissing: Set<String>)
     case absent
@@ -129,9 +130,8 @@ final class ProjectionLoader {
   ///
   /// The short-circuit is per-key: a key with no *own* pending fields
   /// answers immediately from `state`, even while other keys are
-  /// pending. This matters after a batch-load failure re-pends the
-  /// failed projections — a warm key's answer must not be held
-  /// hostage to (or poisoned by) an unrelated key's retry.
+  /// pending — a warm key's answer is neither delayed by an unrelated
+  /// key's load nor poisoned if that load fails.
   func deferredRecord(forKey cacheKey: CacheKey) -> PossiblyDeferred<Record?> {
     if pending[cacheKey] == nil {
       return .immediate(loadResult(forKey: cacheKey))
@@ -248,14 +248,13 @@ final class ProjectionLoader {
       }
     } catch {
       // The error propagates to the caller that forced this flush,
-      // terminating that read. Failures are not memoized: the batch's
-      // projections re-enter `pending` (through `enqueue`, so fields
-      // that already have an answer in `state` are filtered out) and
-      // the next ask within this transaction retries the load instead
-      // of replaying a stale error.
-      for projection in toLoad {
-        enqueue(projection)
-      }
+      // terminating that read, and the failed batch's projections are
+      // simply dropped — their askers are gone, so carrying them
+      // forward would only make a future unrelated flush load records
+      // nobody will consume. Failures are not memoized either, so a
+      // later ask for the same keys re-enqueues them fresh (no state
+      // answer exists) and retries the load instead of replaying a
+      // stale error.
       throw error
     }
   }
