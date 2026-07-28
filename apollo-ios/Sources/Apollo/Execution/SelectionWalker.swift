@@ -94,6 +94,37 @@ enum SelectionWalker {
     onDeferredFragmentEntered: (any Deferrable.Type) throws -> Void = { _ in },
     onDeferredFragmentSkipped: (any Deferrable.Type) throws -> Void = { _ in }
   ) throws {
+    // The receiving object's runtime type is constant for the whole
+    // walk, so `.byRuntimeType`'s resolver runs at most once even
+    // when multiple inline fragments are encountered.
+    // `.some(nil)` = resolved to nil; `nil` = not yet resolved.
+    var resolvedRuntimeType: Object?? = nil
+    try walk(
+      selections,
+      variables: variables,
+      typeCases: typeCases,
+      deferredFragmentPolicy: deferredFragmentPolicy,
+      resolvedRuntimeType: &resolvedRuntimeType,
+      onField: onField,
+      onFragmentEntered: onFragmentEntered,
+      onInlineFragmentEntered: onInlineFragmentEntered,
+      onDeferredFragmentEntered: onDeferredFragmentEntered,
+      onDeferredFragmentSkipped: onDeferredFragmentSkipped
+    )
+  }
+
+  private static func walk(
+    _ selections: [Selection],
+    variables: GraphQLOperation.Variables?,
+    typeCases: TypeCaseProjection,
+    deferredFragmentPolicy: DeferredFragmentPolicy,
+    resolvedRuntimeType: inout Object??,
+    onField: (Selection.Field) throws -> Void,
+    onFragmentEntered: (any Fragment.Type) throws -> Void,
+    onInlineFragmentEntered: (any InlineFragment.Type) throws -> Void,
+    onDeferredFragmentEntered: (any Deferrable.Type) throws -> Void,
+    onDeferredFragmentSkipped: (any Deferrable.Type) throws -> Void
+  ) throws {
     for selection in selections {
       switch selection {
       case let .field(field):
@@ -106,6 +137,7 @@ enum SelectionWalker {
             variables: variables,
             typeCases: typeCases,
             deferredFragmentPolicy: deferredFragmentPolicy,
+            resolvedRuntimeType: &resolvedRuntimeType,
             onField: onField,
             onFragmentEntered: onFragmentEntered,
             onInlineFragmentEntered: onInlineFragmentEntered,
@@ -121,6 +153,7 @@ enum SelectionWalker {
           variables: variables,
           typeCases: typeCases,
           deferredFragmentPolicy: deferredFragmentPolicy,
+          resolvedRuntimeType: &resolvedRuntimeType,
           onField: onField,
           onFragmentEntered: onFragmentEntered,
           onInlineFragmentEntered: onInlineFragmentEntered,
@@ -134,7 +167,14 @@ enum SelectionWalker {
         case .allTypeCases:
           shouldEnter = true
         case .byRuntimeType(let resolveRuntimeType):
-          if let runtimeType = resolveRuntimeType(),
+          let runtimeType: Object?
+          if let resolved = resolvedRuntimeType {
+            runtimeType = resolved
+          } else {
+            runtimeType = resolveRuntimeType()
+            resolvedRuntimeType = .some(runtimeType)
+          }
+          if let runtimeType,
              typeCase.__parentType.canBeConverted(from: runtimeType) {
             shouldEnter = true
           } else {
@@ -148,6 +188,7 @@ enum SelectionWalker {
             variables: variables,
             typeCases: typeCases,
             deferredFragmentPolicy: deferredFragmentPolicy,
+            resolvedRuntimeType: &resolvedRuntimeType,
             onField: onField,
             onFragmentEntered: onFragmentEntered,
             onInlineFragmentEntered: onInlineFragmentEntered,
@@ -183,6 +224,7 @@ enum SelectionWalker {
             variables: variables,
             typeCases: typeCases,
             deferredFragmentPolicy: deferredFragmentPolicy,
+            resolvedRuntimeType: &resolvedRuntimeType,
             onField: onField,
             onFragmentEntered: onFragmentEntered,
             onInlineFragmentEntered: onInlineFragmentEntered,

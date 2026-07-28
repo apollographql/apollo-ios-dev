@@ -325,6 +325,63 @@ final class SelectionWalkerTests: XCTestCase {
   /// `.includeAll` enters every inline fragment regardless of
   /// `resolveRuntimeType` (the closure is never even called under this
   /// policy).
+  func test__walk__withByRuntimeType__givenMultipleInlineFragments__resolvesRuntimeTypeOnce() throws {
+    // The receiving object's runtime type is constant for the whole
+    // walk, so the resolver is memoized: multiple inline fragments —
+    // including fragments nested inside an entered type case — must
+    // trigger at most one resolution.
+    let droidType = Object(typename: "Droid", implementedInterfaces: [])
+
+    class AsDroid: MockTypeCase, @unchecked Sendable {
+      override class var __parentType: any ParentType {
+        Object(typename: "Droid", implementedInterfaces: [])
+      }
+      override class var __selections: [Selection] { [
+        .field("primaryFunction", String.self),
+        .inlineFragment(AsDroidNested.self),
+      ]}
+    }
+    class AsDroidNested: MockTypeCase, @unchecked Sendable {
+      override class var __parentType: any ParentType {
+        Object(typename: "Droid", implementedInterfaces: [])
+      }
+      override class var __selections: [Selection] { [
+        .field("serialNumber", String.self)
+      ]}
+    }
+    class AsHuman: MockTypeCase, @unchecked Sendable {
+      override class var __parentType: any ParentType {
+        Object(typename: "Human", implementedInterfaces: [])
+      }
+      override class var __selections: [Selection] { [
+        .field("height", Double.self)
+      ]}
+    }
+
+    let selections: [Selection] = [
+      .field("name", String.self),
+      .inlineFragment(AsDroid.self),
+      .inlineFragment(AsHuman.self),
+    ]
+
+    var resolveCount = 0
+    var fields: [String] = []
+    try SelectionWalker.walk(
+      selections,
+      variables: nil,
+      typeCases: .byRuntimeType {
+        resolveCount += 1
+        return droidType
+      },
+      deferredFragmentPolicy: .respectDeferCondition,
+      onField: { fields.append($0.name) }
+    )
+
+    expect(resolveCount) == 1
+    expect(fields).to(contain("name", "primaryFunction", "serialNumber"))
+    expect(fields).toNot(contain("height"))
+  }
+
   func test__walk__withIncludeAll__entersEveryInlineFragment_regardlessOfRuntimeType() throws {
     class AsDroid: MockTypeCase, @unchecked Sendable {
       override class var __parentType: any ParentType {
