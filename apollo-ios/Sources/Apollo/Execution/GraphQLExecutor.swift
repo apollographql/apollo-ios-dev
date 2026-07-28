@@ -26,7 +26,7 @@ public class ObjectExecutionInfo {
     self.fulfilledFragments = [ObjectIdentifier(rootType)]
   }
 
-  fileprivate init(
+  init(
     rootType: any SelectionSet.Type,
     variables: GraphQLOperation.Variables?,
     schema: (any SchemaMetadata.Type),

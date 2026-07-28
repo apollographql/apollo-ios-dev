@@ -1810,6 +1810,8 @@ class FieldPolicySchemaMetadata: SchemaMetadata {
   private static let testObserver = TestObserver() { _ in
     stub_objectTypeForTypeName(nil)
     stub_cacheKeyInfoForType_Object(nil)
+    stub_cacheKeyForField_SingleReturn(nil)
+    stub_cacheKeyForField_ListReturn(nil)
   }
 
   private nonisolated(unsafe) static var _objectTypeForTypeName: ((String) -> Object?)?
