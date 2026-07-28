@@ -5,6 +5,7 @@ public protocol NormalizedCache: AnyObject, ReadOnlyNormalizedCache {
   /// - Parameters:
   ///   - key: The cache keys to load data for
   /// - Returns: A dictionary of cache keys to records containing the records that have been found.
+  @available(*, deprecated, message: "Will be removed before Apollo iOS 3.0 ships. loadFields(_:) is becoming the sole read requirement of NormalizedCache.")
   func loadRecords(forKeys keys: Set<CacheKey>) async throws -> [CacheKey: Record]
 
   /// Merges a set of records into the cache.
@@ -60,6 +61,7 @@ public protocol ReadOnlyNormalizedCache: AnyObject {
   /// - Parameters:
   ///   - key: The cache keys to load data for
   /// - Returns: A dictionary of cache keys to records containing the records that have been found.
+  @available(*, deprecated, message: "Will be removed before Apollo iOS 3.0 ships. loadFields(_:) is becoming the sole read requirement of NormalizedCache.")
   func loadRecords(forKeys keys: Set<CacheKey>) async throws -> [CacheKey: Record]
 
   /// Loads the field values described by `projections`, returning each
@@ -101,11 +103,11 @@ extension ReadOnlyNormalizedCache {
   /// Every backend that conforms to ``ReadOnlyNormalizedCache``
   /// automatically inherits a correct (if unoptimized) `loadFields`
   /// implementation by reading whole records and filtering in Swift.
-  /// The SQLite backend relies on this default until PR-009h switches
-  /// it to the row-level `selectFields` read path. Custom cache
-  /// implementors get the same behavior without a forced API
-  /// migration; they may override the method with a projection-aware
-  /// path when they're ready.
+  /// The SQLite backend relies on this default until it switches to
+  /// its row-level `selectFields` read path. Custom cache implementors
+  /// get the same behavior without a forced API migration; they may
+  /// override the method with a projection-aware path when they're
+  /// ready.
   ///
   /// **Performance:** this default is `O(records.count * filteredFields.count)`
   /// with one new dict allocation per surfaced record (the `record.fields.filter`
