@@ -91,7 +91,7 @@ public class FieldExecutionInfo {
   }
 
   fileprivate func computeCacheKeyAndPath() throws {
-    cachePath = try parentInfo.cachePath.appending(normalizedFieldName())
+    cachePath = try parentInfo.cachePath.appending(normalizedFieldName)
   }
 
   /// The field's name in a normalized cache record: the GraphQL field
@@ -101,19 +101,21 @@ public class FieldExecutionInfo {
   /// machinery uses it as a path segment when synthesizing a child
   /// record key in the absence of an explicit `@typePolicy`.
   ///
-  /// Distinct from [`cacheReadStrategy()`](`FieldExecutionInfo`), which
+  /// Distinct from ``cacheReadStrategy``, which
   /// describes how the *reader* resolves this field — including
   /// `@fieldPolicy` redirections that bypass the parent-record subscript
   /// entirely. For fields with no policy the two compute the same name;
   /// for policy fields they intentionally diverge (see
   /// [`CacheReadStrategy`](`Selection.Field+CacheReadStrategy.swift`)).
-  func normalizedFieldName() throws -> String {
-    guard let _normalizedFieldName else {
-      let cacheKey = try field.cacheKey(with: parentInfo.variables)
-      _normalizedFieldName = cacheKey
-      return cacheKey
+  var normalizedFieldName: String {
+    get throws {
+      guard let _normalizedFieldName else {
+        let cacheKey = try field.cacheKey(with: parentInfo.variables)
+        _normalizedFieldName = cacheKey
+        return cacheKey
+      }
+      return _normalizedFieldName
     }
-    return _normalizedFieldName
   }
 
   /// How the cache reader resolves this field — either by subscripting
@@ -124,17 +126,19 @@ public class FieldExecutionInfo {
   /// so the projection-collection path and the per-field resolve path
   /// share one policy evaluation per `(field, info)`. Mirrors the
   /// `_normalizedFieldName` memo pattern.
-  func cacheReadStrategy() throws -> CacheReadStrategy {
-    guard let _cacheReadStrategy else {
-      let strategy = try field.cacheReadStrategy(
-        variables: parentInfo.variables,
-        schema: parentInfo.schema,
-        responsePath: responsePath
-      )
-      _cacheReadStrategy = strategy
-      return strategy
+  var cacheReadStrategy: CacheReadStrategy {
+    get throws {
+      guard let _cacheReadStrategy else {
+        let strategy = try field.cacheReadStrategy(
+          variables: parentInfo.variables,
+          schema: parentInfo.schema,
+          responsePath: responsePath
+        )
+        _cacheReadStrategy = strategy
+        return strategy
+      }
+      return _cacheReadStrategy
     }
-    return _cacheReadStrategy
   }
 
   /// Computes the `ObjectExecutionInfo` and selections that should be used for

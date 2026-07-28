@@ -53,7 +53,7 @@ final class GraphQLDependencyTracker: GraphQLResultAccumulator {
   private func insert(_ info: FieldExecutionInfo) {
     let recordKey = info.parentInfo.cachePath.joined
     let fieldName: String
-    if let normalizedName = try? info.normalizedFieldName() {
+    if let normalizedName = try? info.normalizedFieldName {
       fieldName = normalizedName
     } else {
       // Should not happen — `normalizedFieldName` only throws when the

@@ -53,13 +53,13 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     with info: FieldExecutionInfo,
     on object: Record
   ) throws -> JSONValue? {
-    // `info.cacheReadStrategy()` centralizes the field-policy
+    // `info.cacheReadStrategy` centralizes the field-policy
     // resolution rules (programmatic `FieldPolicy.Provider` first,
     // `@fieldPolicy` directive second, plain field name last) and
     // memoizes the result on the `FieldExecutionInfo` so the
     // projection-time and resolve-time paths share a single
     // computation per `(field, info)`.
-    let strategy = try info.cacheReadStrategy()
+    let strategy = try info.cacheReadStrategy
 
     switch strategy {
     case .parentRecordField(let name):
