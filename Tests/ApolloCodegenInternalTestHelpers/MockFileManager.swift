@@ -10,6 +10,7 @@ public class MockApolloFileManager: ApolloFileManager {
     case removeItem(_ handler: @Sendable (String) throws -> Void)
     case createFile(_ handler: @Sendable (String, Data?, FileAttributes?) -> Bool)
     case createDirectory(_ handler: @Sendable (String, Bool, FileAttributes?) throws -> Void)
+    case moveItem(_ handler: @Sendable (String, String) throws -> Void)
 
     // These are based on the return string from the #function macro. They are used in overriden
     // functions to lookup the provided closure. Be aware that if the function signature changes
@@ -20,6 +21,7 @@ public class MockApolloFileManager: ApolloFileManager {
       case .removeItem(_): return "removeItem(atPath:)"
       case .createFile(_): return "createFile(atPath:contents:attributes:)"
       case .createDirectory(_): return "createDirectory(atPath:withIntermediateDirectories:attributes:)"
+      case .moveItem(_): return "moveItem(atPath:toPath:)"
       }
     }
   }
@@ -58,6 +60,23 @@ public class MockApolloFileManager: ApolloFileManager {
   /// - Parameter closure: The mocked function closure.
   public func mock(closure: Closure) {
     _base.mock(closure: closure)
+  }
+
+  // MARK: Case sensitivity mocking
+
+  /// Mocks the case sensitivity of the volume reported for all paths.
+  ///
+  /// When not mocked, the volume's case sensitivity for the mock's fictitious paths cannot be
+  /// determined, so file name case adoption performs no additional file system calls unless a
+  /// test opts in.
+  public func mock(volumeIsCaseSensitive: Bool) {
+    volumeCaseSensitivityProvider = { _ in volumeIsCaseSensitive }
+  }
+
+  /// Mocks the on-disk casing reported for a path.
+  public func mock(onDiskCasedPath: String, forPath path: String) {
+    let fallback = onDiskCasedPathProvider
+    onDiskCasedPathProvider = { $0 == path ? onDiskCasedPath : fallback($0) }
   }
 
   private func didCall(closure: Closure) {
@@ -209,6 +228,27 @@ public class MockApolloFileManager: ApolloFileManager {
       }
 
       try handler(path, createIntermediates, attributes)
+    }
+
+    public override func moveItem(atPath srcPath: String, toPath dstPath: String) throws {
+      let key = #function
+
+      guard
+        let closure = closures[key],
+        case let .moveItem(handler) = closure else {
+        if strict {
+          XCTFail(missingClosureMessage(key))
+          return
+        } else {
+          return try super.moveItem(atPath: srcPath, toPath: dstPath)
+        }
+      }
+
+      defer {
+        didCall(closure: closure)
+      }
+
+      try handler(srcPath, dstPath)
     }
   }
 }

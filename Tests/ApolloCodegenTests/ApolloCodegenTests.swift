@@ -2096,6 +2096,230 @@ class ApolloCodegenTests: XCTestCase {
     await expect { await ApolloFileManager.default.doesFileExist(atPath: testInTestMocksFolderUserFile) }.to(beTrue())
   }
 
+  func test__fileDeletion__givenCapitalizationRuleChangesGeneratedFileNameCase_onCaseInsensitiveVolume_shouldNotDeleteRegeneratedFile() async throws {
+    // given
+    let isCaseSensitive = await ApolloFileManager.default.volumeSupportsCaseSensitiveNames(
+      forPath: directoryURL.path
+    )
+    try XCTSkipIf(isCaseSensitive != false, "This test requires a case-insensitive volume.")
+
+    try await createFile(containing: schemaData, named: "schema.graphqls")
+
+    try await createOperationFile(
+      type: .query,
+      named: "TestOperationById",
+      filename: "TestOperationById.graphql"
+    )
+
+    let queriesDirectory = "SchemaModule/Sources/Operations/Queries"
+
+    try await createFile(
+      filename: "TestOperationByIdQuery.graphql.swift",
+      inDirectory: queriesDirectory
+    )
+    let testFile = try await createFile(
+      filename: "TestGeneratedA.graphql.swift",
+      inDirectory: "SchemaModule"
+    )
+
+    // when
+    let config = ApolloCodegenConfiguration.mock(
+      input: .init(
+        schemaSearchPaths: ["schema*.graphqls"],
+        operationSearchPaths: ["*.graphql"]
+      ),
+      output: .init(
+        schemaTypes: .init(path: "SchemaModule",
+                           moduleType: .swiftPackage()),
+        operations: .inSchemaModule
+      ),
+      options: .init(
+        additionalCapitalizationRules: [
+          .init(term: .string("id"), strategy: .upper)
+        ],
+        markTypesNonisolated: false
+      )
+    )
+
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
+
+    // then
+    let regeneratedFile = directoryURL
+      .appendingPathComponent("\(queriesDirectory)/TestOperationByIDQuery.graphql.swift").path
+
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: regeneratedFile) }.to(beTrue())
+
+    let regeneratedFileContents = try XCTUnwrap(
+      FileManager.default.contents(atPath: regeneratedFile)
+        .flatMap { String(data: $0, encoding: .utf8) }
+    )
+    expect(regeneratedFileContents).to(contain("TestOperationByIDQuery"))
+
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testFile) }.to(beFalse())
+  }
+
+  func test__fileDeletion__givenCapitalizationRuleChangesGeneratedFileNameCase_onCaseInsensitiveVolume_shouldRenameFileToNewCasing() async throws {
+    // given
+    let isCaseSensitive = await ApolloFileManager.default.volumeSupportsCaseSensitiveNames(
+      forPath: directoryURL.path
+    )
+    try XCTSkipIf(isCaseSensitive != false, "This test requires a case-insensitive volume.")
+
+    try await createFile(containing: schemaData, named: "schema.graphqls")
+
+    try await createOperationFile(
+      type: .query,
+      named: "TestOperationById",
+      filename: "TestOperationById.graphql"
+    )
+
+    let queriesDirectory = "SchemaModule/Sources/Operations/Queries"
+
+    try await createFile(
+      filename: "TestOperationByIdQuery.graphql.swift",
+      inDirectory: queriesDirectory
+    )
+
+    // when
+    let config = ApolloCodegenConfiguration.mock(
+      input: .init(
+        schemaSearchPaths: ["schema*.graphqls"],
+        operationSearchPaths: ["*.graphql"]
+      ),
+      output: .init(
+        schemaTypes: .init(path: "SchemaModule",
+                           moduleType: .swiftPackage()),
+        operations: .inSchemaModule
+      ),
+      options: .init(
+        additionalCapitalizationRules: [
+          .init(term: .string("id"), strategy: .upper)
+        ],
+        markTypesNonisolated: false
+      )
+    )
+
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
+
+    // then
+    // `doesFileExist(atPath:)` cannot distinguish paths differing only by case on a
+    // case-insensitive volume, so the directory entry name is asserted instead.
+    let directoryContents = try FileManager.default.contentsOfDirectory(
+      atPath: directoryURL.appendingPathComponent(queriesDirectory).path
+    )
+    expect(directoryContents).to(contain("TestOperationByIDQuery.graphql.swift"))
+    expect(directoryContents).notTo(contain("TestOperationByIdQuery.graphql.swift"))
+  }
+
+  func test__deleteExtraneousGeneratedFiles__givenOldPathMatchingWrittenFileCaseInsensitively_onCaseInsensitiveVolume_shouldNotDeleteFile() async throws {
+    // given
+    let subject = ApolloCodegen(
+      config: ApolloCodegen.ConfigurationContext(config: .mock(), rootURL: nil),
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
+    let fileManager = MockApolloFileManager(strict: true)
+
+    await fileManager.mock(closure: .fileExists({ path, isDirectory in
+      isDirectory?.pointee = ObjCBool(!path.hasSuffix(".swift"))
+      return true
+    }))
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
+      return true
+    }))
+
+    try await fileManager.createFile(
+      atPath: "/A/TestOperationByIDQuery.graphql.swift",
+      data: nil
+    )
+    await fileManager.mock(volumeIsCaseSensitive: false)
+
+    // when
+    // The mock is strict and `removeItem` is not mocked, so any deletion would fail the test.
+    try await subject.deleteExtraneousGeneratedFiles(
+      from: ["/A/TestOperationByIdQuery.graphql.swift"],
+      afterCodeGenerationUsing: fileManager
+    )
+
+    // then
+    await expect { await fileManager.allClosuresCalled }.to(beTrue())
+  }
+
+  func test__deleteExtraneousGeneratedFiles__givenOldPathMatchingWrittenFileCaseInsensitively_onCaseSensitiveVolume_shouldDeleteFile() async throws {
+    // given
+    let subject = ApolloCodegen(
+      config: ApolloCodegen.ConfigurationContext(config: .mock(), rootURL: nil),
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
+    let fileManager = MockApolloFileManager(strict: true)
+
+    await fileManager.mock(closure: .fileExists({ path, isDirectory in
+      isDirectory?.pointee = ObjCBool(!path.hasSuffix(".swift"))
+      return true
+    }))
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
+      return true
+    }))
+    await fileManager.mock(closure: .removeItem({ path in
+      expect(path).to(equal("/A/TestOperationByIdQuery.graphql.swift"))
+    }))
+
+    try await fileManager.createFile(
+      atPath: "/A/TestOperationByIDQuery.graphql.swift",
+      data: nil
+    )
+    await fileManager.mock(volumeIsCaseSensitive: true)
+
+    // when
+    try await subject.deleteExtraneousGeneratedFiles(
+      from: ["/A/TestOperationByIdQuery.graphql.swift"],
+      afterCodeGenerationUsing: fileManager
+    )
+
+    // then
+    await expect { await fileManager.allClosuresCalled }.to(beTrue())
+  }
+
+  func test__deleteExtraneousGeneratedFiles__givenOldPathNotMatchingAnyWrittenFile_onCaseInsensitiveVolume_shouldDeleteFile() async throws {
+    // given
+    let subject = ApolloCodegen(
+      config: ApolloCodegen.ConfigurationContext(config: .mock(), rootURL: nil),
+      operationIdentifierFactory: OperationIdentifierFactory(),
+      itemsToGenerate: .code
+    )
+
+    let fileManager = MockApolloFileManager(strict: true)
+
+    await fileManager.mock(closure: .fileExists({ path, isDirectory in
+      isDirectory?.pointee = ObjCBool(!path.hasSuffix(".swift"))
+      return true
+    }))
+    await fileManager.mock(closure: .createFile({ path, data, attributes in
+      return true
+    }))
+    await fileManager.mock(closure: .removeItem({ path in
+      expect(path).to(equal("/A/SomethingElse.graphql.swift"))
+    }))
+
+    try await fileManager.createFile(
+      atPath: "/A/TestOperationByIDQuery.graphql.swift",
+      data: nil
+    )
+    await fileManager.mock(volumeIsCaseSensitive: false)
+
+    // when
+    try await subject.deleteExtraneousGeneratedFiles(
+      from: ["/A/SomethingElse.graphql.swift"],
+      afterCodeGenerationUsing: fileManager
+    )
+
+    // then
+    await expect { await fileManager.allClosuresCalled }.to(beTrue())
+  }
+
   // MARK: Suffix Renaming Tests
 
   func test__fileRenaming__givenGeneratedPreSuffixFilesExist_withAppendSchemaFilenameSuffix_true_shouldRenameFileWithSuffix() async throws {
