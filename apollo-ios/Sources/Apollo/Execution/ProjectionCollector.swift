@@ -30,14 +30,16 @@
 ///   case contributes.
 /// - ``RecordProjection`` — the value type composed from this
 ///   collector's output.
+/// How a `Selection`-tree walk treats `.inlineFragment` type cases.
+/// Modeled as an explicit policy because the choice encodes a real
+/// cost trade-off, not just a traversal detail. Shared by
+/// `ProjectionCollector` (the projection path) and
+/// `DefaultFieldSelectionCollector` (the resolve path) via
+/// `SelectionWalker`, so both passes express type-case gating in the
+/// same vocabulary.
 @_spi(Execution)
-public enum ProjectionCollector {
-
-  /// How the collector treats `.inlineFragment` type cases while
-  /// walking. Modeled as an explicit policy because the choice
-  /// encodes a real cost trade-off, not just a traversal detail.
-  public enum TypeCaseProjection {
-    /// Project every type case's fields, regardless of the record's
+public enum TypeCaseProjection {
+  /// Project every type case's fields, regardless of the record's
     /// runtime type. Used when the record hasn't been loaded yet and
     /// its `__typename` is unknown — the pre-load projection pass in
     /// `ApolloStore.ReadTransaction.loadObject` — where walking by
@@ -63,7 +65,10 @@ public enum ProjectionCollector {
     /// fragment. Used when the caller already has the record (and
     /// its `__typename`) in hand.
     case byRuntimeType(() -> Object?)
-  }
+}
+
+@_spi(Execution)
+public enum ProjectionCollector {
 
   /// Collects the storage field names for one record at one level of a
   /// selection set. Duplicate selections of the same field across
@@ -104,25 +109,13 @@ public enum ProjectionCollector {
     schema: (any SchemaMetadata.Type)? = nil,
     responsePath: ResponsePath = []
   ) throws -> Set<String> {
-    let inlineFragmentPolicy: SelectionWalker.InlineFragmentPolicy
-    let resolveRuntimeType: () -> Object?
-    switch typeCases {
-    case .allTypeCases:
-      inlineFragmentPolicy = .includeAll
-      resolveRuntimeType = { nil }
-    case .byRuntimeType(let resolver):
-      inlineFragmentPolicy = .byRuntimeType
-      resolveRuntimeType = resolver
-    }
-
     var fieldNames: Set<String> = []
     // `SelectionWalker` owns the case dispatch. The projection path
     // differs from `DefaultFieldSelectionCollector` only in the
     // per-field action and the policy choices:
     //
-    //  - `inlineFragmentPolicy`: derived from `typeCases` above; see
-    //    `TypeCaseProjection` for the over-fetch trade-off that
-    //    `.allTypeCases` accepts.
+    //  - `typeCases`: passed through; see `TypeCaseProjection` for
+    //    the over-fetch trade-off that `.allTypeCases` accepts.
     //
     //  - `deferredFragmentPolicy: .eager` because the cache path has no
     //    incremental delivery channel — `CacheDataExecutionSource` sets
@@ -135,8 +128,7 @@ public enum ProjectionCollector {
     try SelectionWalker.walk(
       selections,
       variables: variables,
-      resolveRuntimeType: resolveRuntimeType,
-      inlineFragmentPolicy: inlineFragmentPolicy,
+      typeCases: typeCases,
       deferredFragmentPolicy: .eager,
       onField: { field in
         try collectField(

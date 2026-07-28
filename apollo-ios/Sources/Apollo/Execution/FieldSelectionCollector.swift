@@ -99,7 +99,7 @@ public struct DefaultFieldSelectionCollector: FieldSelectionCollector {
   public static func collectFields(
     from selections: [Selection],
     into groupedFields: inout FieldSelectionGrouping,
-    resolveRuntimeType: () -> Object?,
+    resolveRuntimeType: @escaping () -> Object?,
     info: ObjectExecutionInfo
   ) throws {
     // Selection-case dispatch is delegated to `SelectionWalker` so this
@@ -116,8 +116,7 @@ public struct DefaultFieldSelectionCollector: FieldSelectionCollector {
     try SelectionWalker.walk(
       selections,
       variables: info.variables,
-      resolveRuntimeType: resolveRuntimeType,
-      inlineFragmentPolicy: .byRuntimeType,
+      typeCases: .byRuntimeType(resolveRuntimeType),
       deferredFragmentPolicy: .respectDeferCondition,
       onField: { groupedFields.append(field: $0, withInfo: info) },
       onFragmentEntered: { groupedFields.addFulfilledFragment($0) },

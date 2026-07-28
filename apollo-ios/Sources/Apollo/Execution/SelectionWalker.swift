@@ -9,10 +9,9 @@
 /// 1. What they do per `.field` (append to a grouping vs emit a
 ///    `RecordProjection`).
 /// 2. Whether `.inlineFragment` requires runtime-type matching
-///    (`byRuntimeType`) or enters unconditionally (`includeAll`, the
-///    cache projection's over-fetch strategy — the executor's later
-///    selection-set traversal still uses the loaded `__typename` to
-///    pick the matching type case).
+///    (`TypeCaseProjection.byRuntimeType`) or enters unconditionally
+///    (`.allTypeCases`, the cache projection's over-fetch strategy —
+///    see `TypeCaseProjection` for the trade-off).
 /// 3. Whether `.deferred` honors its `@defer(if:)` condition
 ///    (`respectDeferCondition`, the normal resolve path) or always
 ///    enters (`eager`, the cache path where there's no incremental
@@ -34,22 +33,6 @@
 ///   PR-009d-iv (this extraction); lands before PR-009f so the
 ///   dependency tracker's invalidation walk can use the unified helper.
 enum SelectionWalker {
-
-  /// Gating policy for `.inlineFragment` cases.
-  enum InlineFragmentPolicy {
-    /// Enter the inline fragment only when the receiving object's
-    /// runtime type can be converted to the fragment's parent type.
-    /// `resolveRuntimeType()` is called lazily once an inline fragment
-    /// is encountered; if it returns `nil`, the fragment is skipped.
-    case byRuntimeType
-
-    /// Enter every inline fragment unconditionally. Used by the cache
-    /// projection path when the receiving object's `__typename` is not
-    /// yet loaded: every type case's fields are projected. The
-    /// executor's later, type-aware traversal still picks the matching
-    /// type case from the loaded data.
-    case includeAll
-  }
 
   /// Gating policy for `.deferred` cases.
   enum DeferredFragmentPolicy {
@@ -78,10 +61,11 @@ enum SelectionWalker {
   ///   - variables: Operation variables. Used to evaluate
   ///     `.conditional`'s `@include`/`@skip` and `.deferred`'s
   ///     `@defer(if:)` conditions.
-  ///   - resolveRuntimeType: Lazily resolves the receiving object's
-  ///     runtime `Object` type, used by `.byRuntimeType` to gate
-  ///     `.inlineFragment` entry. Not called under `.includeAll`.
-  ///   - inlineFragmentPolicy: See ``InlineFragmentPolicy``.
+  ///   - typeCases: Gating policy for `.inlineFragment` entry — see
+  ///     ``TypeCaseProjection``. Under `.byRuntimeType`, the case's
+  ///     resolver is called lazily the first time an inline fragment
+  ///     is encountered; under `.allTypeCases`, every inline fragment
+  ///     is entered.
   ///   - deferredFragmentPolicy: See ``DeferredFragmentPolicy``.
   ///   - onField: Called once per `.field` selection reached.
   ///   - onFragmentEntered: Called immediately before recursing into
@@ -102,8 +86,7 @@ enum SelectionWalker {
   static func walk(
     _ selections: [Selection],
     variables: GraphQLOperation.Variables?,
-    resolveRuntimeType: () -> Object?,
-    inlineFragmentPolicy: InlineFragmentPolicy,
+    typeCases: TypeCaseProjection,
     deferredFragmentPolicy: DeferredFragmentPolicy,
     onField: (Selection.Field) throws -> Void,
     onFragmentEntered: (any Fragment.Type) throws -> Void = { _ in },
@@ -121,8 +104,7 @@ enum SelectionWalker {
           try walk(
             nested,
             variables: variables,
-            resolveRuntimeType: resolveRuntimeType,
-            inlineFragmentPolicy: inlineFragmentPolicy,
+            typeCases: typeCases,
             deferredFragmentPolicy: deferredFragmentPolicy,
             onField: onField,
             onFragmentEntered: onFragmentEntered,
@@ -137,8 +119,7 @@ enum SelectionWalker {
         try walk(
           fragment.__selections,
           variables: variables,
-          resolveRuntimeType: resolveRuntimeType,
-          inlineFragmentPolicy: inlineFragmentPolicy,
+          typeCases: typeCases,
           deferredFragmentPolicy: deferredFragmentPolicy,
           onField: onField,
           onFragmentEntered: onFragmentEntered,
@@ -149,10 +130,10 @@ enum SelectionWalker {
 
       case let .inlineFragment(typeCase):
         let shouldEnter: Bool
-        switch inlineFragmentPolicy {
-        case .includeAll:
+        switch typeCases {
+        case .allTypeCases:
           shouldEnter = true
-        case .byRuntimeType:
+        case .byRuntimeType(let resolveRuntimeType):
           if let runtimeType = resolveRuntimeType(),
              typeCase.__parentType.canBeConverted(from: runtimeType) {
             shouldEnter = true
@@ -165,8 +146,7 @@ enum SelectionWalker {
           try walk(
             typeCase.__selections,
             variables: variables,
-            resolveRuntimeType: resolveRuntimeType,
-            inlineFragmentPolicy: inlineFragmentPolicy,
+            typeCases: typeCases,
             deferredFragmentPolicy: deferredFragmentPolicy,
             onField: onField,
             onFragmentEntered: onFragmentEntered,
@@ -201,8 +181,7 @@ enum SelectionWalker {
           try walk(
             typeCase.__selections,
             variables: variables,
-            resolveRuntimeType: resolveRuntimeType,
-            inlineFragmentPolicy: inlineFragmentPolicy,
+            typeCases: typeCases,
             deferredFragmentPolicy: deferredFragmentPolicy,
             onField: onField,
             onFragmentEntered: onFragmentEntered,

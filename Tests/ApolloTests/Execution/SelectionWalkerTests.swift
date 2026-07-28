@@ -30,16 +30,14 @@ final class SelectionWalkerTests: XCTestCase {
   private func runWalker(
     selections: [Selection],
     variables: GraphQLOperation.Variables? = nil,
-    runtimeType: Object? = nil,
-    inlineFragmentPolicy: SelectionWalker.InlineFragmentPolicy = .byRuntimeType,
+    typeCases: TypeCaseProjection = .byRuntimeType({ nil }),
     deferredFragmentPolicy: SelectionWalker.DeferredFragmentPolicy = .respectDeferCondition
   ) throws -> EventLog {
     var log = EventLog()
     try SelectionWalker.walk(
       selections,
       variables: variables,
-      resolveRuntimeType: { runtimeType },
-      inlineFragmentPolicy: inlineFragmentPolicy,
+      typeCases: typeCases,
       deferredFragmentPolicy: deferredFragmentPolicy,
       onField: { field in log.fields.append(field.name) },
       onFragmentEntered: { type in log.fragmentsEntered.append(String(describing: type)) },
@@ -185,8 +183,7 @@ final class SelectionWalkerTests: XCTestCase {
 
     let log = try runWalker(
       selections: selections,
-      runtimeType: droidType,
-      inlineFragmentPolicy: .byRuntimeType
+      typeCases: .byRuntimeType { droidType }
     )
 
     expect(log.fields) == ["primaryFunction"]
@@ -213,8 +210,7 @@ final class SelectionWalkerTests: XCTestCase {
 
     let log = try runWalker(
       selections: selections,
-      runtimeType: humanType,
-      inlineFragmentPolicy: .byRuntimeType
+      typeCases: .byRuntimeType { humanType }
     )
 
     expect(log.fields).to(beEmpty())
@@ -240,8 +236,7 @@ final class SelectionWalkerTests: XCTestCase {
 
     let log = try runWalker(
       selections: selections,
-      runtimeType: nil,
-      inlineFragmentPolicy: .byRuntimeType
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(log.fields).to(beEmpty())
@@ -282,8 +277,7 @@ final class SelectionWalkerTests: XCTestCase {
 
     let log = try runWalker(
       selections: selections,
-      runtimeType: droidType,
-      inlineFragmentPolicy: .byRuntimeType
+      typeCases: .byRuntimeType { droidType }
     )
 
     expect(log.fields) == ["name"]
@@ -319,8 +313,7 @@ final class SelectionWalkerTests: XCTestCase {
 
     let log = try runWalker(
       selections: selections,
-      runtimeType: vehicleType,
-      inlineFragmentPolicy: .byRuntimeType
+      typeCases: .byRuntimeType { vehicleType }
     )
 
     expect(log.fields).to(beEmpty())
@@ -357,8 +350,7 @@ final class SelectionWalkerTests: XCTestCase {
 
     let log = try runWalker(
       selections: selections,
-      runtimeType: nil,  // never consulted under .includeAll
-      inlineFragmentPolicy: .includeAll
+      typeCases: .allTypeCases  // runtime type never consulted
     )
 
     expect(log.fields).to(contain(["primaryFunction", "homePlanet"]))
