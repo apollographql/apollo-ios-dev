@@ -32,7 +32,8 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
     named operationName: String = "TestOperation",
     schemaNamespace: String = "TestSchema",
     moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackage(),
-    operations: ApolloCodegenConfiguration.OperationsFileOutput = .inSchemaModule
+    operations: ApolloCodegenConfiguration.OperationsFileOutput = .inSchemaModule,
+    capitalizationRules: [ApolloCodegenLib.CapitalizationRule] = []
   ) async throws {
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
@@ -40,7 +41,10 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
       output: .mock(moduleType: moduleType, operations: operations),
-      options: .init(markTypesNonisolated: false)
+      options: .init(
+        additionalCapitalizationRules: capitalizationRules,
+        markTypesNonisolated: false
+      )
     )
     let mockTemplateRenderer = MockTemplateRenderer(
       target: .operationFile(),
@@ -338,6 +342,56 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     // when
     try await buildSubjectAndOperation()
+
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
+  }
+
+  func test__render_givenNamedFragmentSelectionWithCapitalizationRules_fulfilledFragmentsIncludeCapitalizedTypeNames()
+    async throws
+  {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        species: String!
+      }
+      """
+
+    document = """
+      query IDLookup {
+        allAnimals {
+          ...IDDetails
+        }
+      }
+
+      fragment IDDetails on Animal {
+        species
+      }
+      """
+
+    let expected =
+      """
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          IdLookupQuery.Data.AllAnimal.self,
+          IdDetails.self
+        ] }
+      """
+
+    // when
+    try await buildSubjectAndOperation(
+      named: "IDLookup",
+      capitalizationRules: [.init(term: .string("id"), strategy: .lower)]
+    )
 
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?.selectionSet
@@ -1486,5 +1540,87 @@ class SelectionSetTemplate_FulfilledAndDeferredFragment_Tests: XCTestCase {
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
+  }
+
+  func test__render__givenDeferredNamedFragmentWithCapitalizationRules_rendersCapitalizedDeferredFragmentTypeName()
+    async throws
+  {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String!
+        species: String!
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...IDDetails @defer(label: "details")
+        }
+      }
+
+      fragment IDDetails on Animal {
+        species
+      }
+      """
+
+    // when
+    try await buildSubjectAndOperation(
+      capitalizationRules: [.init(term: .string("id"), strategy: .lower)]
+    )
+
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(
+      """
+        @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .deferred(IdDetails.self, label: "details"),
+        ] }
+      """,
+      atLine: 9,
+      ignoringExtraLines: true
+    ))
+
+    expect(actual).to(equalLineByLine(
+      """
+        @_spi(Execution) public static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+          TestOperationQuery.Data.AllAnimal.self
+        ] }
+        @_spi(Execution) public static var __deferredFragments: [any ApolloAPI.Deferrable.Type] { [
+          IdDetails.self
+        ] }
+      """,
+      atLine: 14,
+      ignoringExtraLines: true
+    ))
+
+    expect(actual).to(equalLineByLine(
+      """
+        public struct Fragments: FragmentContainer {
+          @_spi(Unsafe) public let __data: DataDict
+          @_spi(Unsafe) public init(_dataDict: DataDict) {
+            __data = _dataDict
+            _iDDetails = Deferred(_dataDict: _dataDict)
+          }
+
+          @Deferred public var iDDetails: IdDetails?
+        }
+      """,
+      forSection: .selectionSet.namedFragmentAccessors
+    ))
   }
 }

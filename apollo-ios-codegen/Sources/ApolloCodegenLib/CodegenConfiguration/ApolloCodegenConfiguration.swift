@@ -660,6 +660,12 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     /// persisted-query/operation-manifest identifiers are *never* changed — only the generated
     /// Swift identifiers are. Schema type names and field-derived nested selection set type names
     /// are not affected.
+    ///
+    /// Generated type names always begin with a capital letter: after the rules are applied, the
+    /// first character of an operation or fragment type name is re-capitalized, so a `lower` or
+    /// `replace` rule matching the leading word segment affects only the remainder of that
+    /// segment (e.g. a `lower` rule on `id` renders fragment `IDDetails` as `IdDetails`, not
+    /// `idDetails`).
     public let additionalCapitalizationRules: [CapitalizationRule]
     /// Any non-default rules for pluralization or singularization you wish to include.
     public let additionalInflectionRules: [InflectionRule]

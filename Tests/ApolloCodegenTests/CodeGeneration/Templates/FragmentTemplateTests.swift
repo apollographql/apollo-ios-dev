@@ -134,6 +134,108 @@ final class FragmentTemplateTests: XCTestCase, @unchecked Sendable {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
+  func test__render__givenFragmentWithLowerCapitalizationRule_lowercasesTypeNameButNotSource() async throws {
+    // given
+    let document = """
+      fragment IDDetails on Query {
+        allAnimals {
+          species
+        }
+      }
+      """
+
+    let expected =
+      """
+      struct IdDetails: TestSchema.SelectionSet, Fragment {
+        static var fragmentDefinition: StaticString {
+          #"fragment IDDetails on Query { __typename allAnimals { __typename species } }"#
+        }
+      """
+
+    // when
+    let (_, template) = try await buildFragmentTemplate(
+      named: "IDDetails",
+      config: .mock(options: .init(
+        additionalCapitalizationRules: [.init(term: .string("id"), strategy: .lower)],
+        schemaDocumentation: .exclude,
+        markTypesNonisolated: false
+      )),
+      document: document
+    )
+
+    let actual = render(template)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test__render__givenFragmentWithReplaceCapitalizationRule_replacesTypeNameSegment() async throws {
+    // given
+    let document = """
+      fragment GraphqlConfig on Query {
+        allAnimals {
+          species
+        }
+      }
+      """
+
+    let expected =
+      """
+      struct GraphQLConfig: TestSchema.SelectionSet, Fragment {
+        static var fragmentDefinition: StaticString {
+          #"fragment GraphqlConfig on Query { __typename allAnimals { __typename species } }"#
+        }
+      """
+
+    // when
+    let (_, template) = try await buildFragmentTemplate(
+      named: "GraphqlConfig",
+      config: .mock(options: .init(
+        additionalCapitalizationRules: [.init(term: .string("graphql"), strategy: .replace("graphQL"))],
+        schemaDocumentation: .exclude,
+        markTypesNonisolated: false
+      )),
+      document: document
+    )
+
+    let actual = render(template)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test__render__givenFragmentWithCapitalizationRuleResultingInReservedName_rendersEscapedName() async throws {
+    // given
+    let document = """
+      fragment Id on Query {
+        allAnimals {
+          species
+        }
+      }
+      """
+
+    let expected =
+      """
+      struct ID_Fragment: TestSchema.SelectionSet, Fragment {
+      """
+
+    // when
+    let (_, template) = try await buildFragmentTemplate(
+      named: "Id",
+      config: .mock(options: .init(
+        additionalCapitalizationRules: [.init(term: .string("id"), strategy: .upper)],
+        schemaDocumentation: .exclude,
+        markTypesNonisolated: false
+      )),
+      document: document
+    )
+
+    let actual = render(template)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
   func test__render__givenFragment_generatesFragmentDeclarationWithoutDefinition() async throws {
     // given
     let expected =

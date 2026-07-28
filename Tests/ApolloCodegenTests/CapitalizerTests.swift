@@ -1,5 +1,6 @@
 import XCTest
 import Nimble
+import GraphQLCompiler
 import ApolloCodegenInternalTestHelpers
 @testable import ApolloCodegenLib
 
@@ -262,11 +263,45 @@ class CapitalizerTests: XCTestCase {
   }
 
   func test__asFragmentName__leadingAcronym__isCapitalizedForTypeName() {
-    // Unlike property names, a type name is `firstUppercased` before the capitalizer runs, so a
-    // leading acronym is fully capitalized (e.g. `idLookup` → `IDLookup`).
+    // Unlike property names, a type name is `firstUppercased` both before the capitalizer runs
+    // (so rules see the type-name form of each word segment) and after (so the leading capital
+    // is always restored) — a leading acronym is fully capitalized (e.g. `idLookup` → `IDLookup`).
     let capitalizer = Capitalizer(rules: [.init(term: .string("id"), strategy: .upper)])
 
     expect("idLookup".asFragmentName(capitalizer: capitalizer)).to(equal("IDLookup"))
+  }
+
+  func test__asFragmentName__lowerRule__leadingAcronymIsLowercased() {
+    // A `.lower` rule lowercases the leading acronym, then the trailing `firstUppercased`
+    // restores the leading capital: `IDDetails` → `idDetails` → `IdDetails`.
+    let capitalizer = Capitalizer(rules: [.init(term: .string("id"), strategy: .lower)])
+
+    expect("IDDetails".asFragmentName(capitalizer: capitalizer)).to(equal("IdDetails"))
+  }
+
+  func test__asFragmentName__replaceRule__appliesRegardlessOfSourceCasing() {
+    let capitalizer = Capitalizer(rules: [
+      .init(term: .string("graphql"), strategy: .replace("graphQL"))
+    ])
+
+    expect("GraphqlConfig".asFragmentName(capitalizer: capitalizer)).to(equal("GraphQLConfig"))
+    expect("graphqlConfig".asFragmentName(capitalizer: capitalizer)).to(equal("GraphQLConfig"))
+  }
+
+  func test__asFragmentName__ruleResultCollidesWithReservedTypeName__isSuffixed() {
+    // The reserved-type-name check runs on the final post-rule name: `Id` → `ID` collides with
+    // the reserved `ID` type name, so the fragment is suffixed.
+    let capitalizer = Capitalizer(rules: [.init(term: .string("id"), strategy: .upper)])
+
+    expect("Id".asFragmentName(capitalizer: capitalizer)).to(equal("ID_Fragment"))
+  }
+
+  func test__asFragmentName__ruleResultAvoidsReservedTypeName__isNotSuffixed() {
+    // Conversely, a rule that renames away from a reserved type name avoids a stale suffix:
+    // `ID` → `Id` no longer collides, so no `_Fragment` suffix is added.
+    let capitalizer = Capitalizer(rules: [.init(term: .string("id"), strategy: .lower)])
+
+    expect("ID".asFragmentName(capitalizer: capitalizer)).to(equal("Id"))
   }
 
   func test__asFragmentName__noRules__isUnchanged() {
@@ -274,6 +309,45 @@ class CapitalizerTests: XCTestCase {
 
     expect("testFragmentById".asFragmentName(capitalizer: capitalizer))
       .to(equal("TestFragmentById"))
+  }
+
+  func test__generatedDefinitionName__operationWithLowerRule__lowercasesLeadingAcronym() {
+    let capitalizer = Capitalizer(rules: [.init(term: .string("id"), strategy: .lower)])
+    let operation = CompilationResult.OperationDefinition.mock(name: "IDLookup", type: .query)
+
+    expect(operation.generatedDefinitionName(capitalizer: capitalizer))
+      .to(equal("IdLookupQuery"))
+  }
+
+  func test__generatedDefinitionName__operationWithReplaceRule__replacesLeadingSegment() {
+    let capitalizer = Capitalizer(rules: [
+      .init(term: .string("graphql"), strategy: .replace("graphQL"))
+    ])
+    let operation = CompilationResult.OperationDefinition.mock(
+      name: "GraphqlSettings",
+      type: .mutation
+    )
+
+    expect(operation.generatedDefinitionName(capitalizer: capitalizer))
+      .to(equal("GraphQLSettingsMutation"))
+  }
+
+  func test__generatedDefinitionName__fragmentWithLowerRule__matchesAsFragmentName() {
+    let capitalizer = Capitalizer(rules: [.init(term: .string("id"), strategy: .lower)])
+    let fragment = CompilationResult.FragmentDefinition.mock("IDDetails")
+
+    expect(fragment.generatedDefinitionName(capitalizer: capitalizer)).to(equal("IdDetails"))
+  }
+
+  func test__generatedDefinitionName__ruleMatchingOperationTypeSuffix__appliesToAppendedSuffix() {
+    // The operation-type suffix is appended before the rules run, so a rule can match it.
+    let capitalizer = Capitalizer(rules: [
+      .init(term: .string("query"), strategy: .replace("QUERY"))
+    ])
+    let operation = CompilationResult.OperationDefinition.mock(name: "TestOperation", type: .query)
+
+    expect(operation.generatedDefinitionName(capitalizer: capitalizer))
+      .to(equal("TestOperationQUERY"))
   }
 
   // MARK: - CapitalizationRule Codable

@@ -19,10 +19,14 @@ extension CompilationResult.OperationDefinition {
 
   /// The generated type name with any configured capitalization rules applied.
   ///
+  /// The result always begins with a capital letter: the name is `firstUppercased` again after
+  /// the rules run, so a rule that lowercases the leading word segment affects only the rest of
+  /// that segment.
+  ///
   /// Only the generated Swift type name is affected — the operation's ``name`` (used for the
   /// `operationName` literal and everything sent to the server) is never changed.
   func generatedDefinitionName(capitalizer: Capitalizer) -> String {
-    capitalizer.apply(to: generatedDefinitionName)
+    capitalizer.apply(to: generatedDefinitionName).firstUppercased
   }
 
   private var nameWithSuffix: String {
@@ -65,8 +69,13 @@ extension CompilationResult.FragmentDefinition {
     name.firstUppercased
   }
 
+  /// The generated type name with any configured capitalization rules applied.
+  ///
+  /// Equivalent to `asFragmentName(capitalizer:)` on ``name``: the result always begins with a
+  /// capital letter, and names that collide with reserved type names are suffixed with
+  /// `_Fragment`.
   func generatedDefinitionName(capitalizer: Capitalizer) -> String {
-    capitalizer.apply(to: generatedDefinitionName)
+    name.asFragmentName(capitalizer: capitalizer)
   }
 }
 

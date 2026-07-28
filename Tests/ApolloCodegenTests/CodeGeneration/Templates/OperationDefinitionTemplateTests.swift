@@ -412,6 +412,88 @@ class OperationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
   }
 
+  func test__generate__givenQueryWithLowerRuleOnLeadingSegmentOfName_typeNameKeepsLeadingCapitalAndOperationNameUnchanged() async throws {
+    // given
+    document = """
+      query IDLookup {
+        allAnimals {
+          species
+        }
+      }
+      """
+
+    config = .mock(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("id"), strategy: .lower)],
+      schemaDocumentation: .exclude,
+      markTypesNonisolated: false
+    ))
+
+    let expected =
+      """
+      struct IdLookupQuery: GraphQLQuery {
+        static let operationName: String = "IDLookup"
+        static let operationDocument: ApolloAPI.OperationDocument = .init(
+          definition: .init(
+            #\"query IDLookup { allAnimals { __typename species } }\"#
+      """
+
+    // when
+    try await buildSubjectAndOperation(named: "IDLookup")
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test__generate__givenMutationWithReplaceRuleLowercaseLeadingReplacement_typeNameKeepsLeadingCapitalAndOperationNameUnchanged() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      type Mutation {
+        addAnimal: Animal!
+      }
+
+      type Animal {
+        species: String!
+      }
+      """
+
+    document = """
+      mutation GraphqlFeed {
+        addAnimal {
+          species
+        }
+      }
+      """
+
+    config = .mock(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("graphql"), strategy: .replace("graphQL"))],
+      schemaDocumentation: .exclude,
+      markTypesNonisolated: false
+    ))
+
+    let expected =
+      """
+      struct GraphQLFeedMutation: GraphQLMutation {
+        static let operationName: String = "GraphqlFeed"
+        static let operationDocument: ApolloAPI.OperationDocument = .init(
+          definition: .init(
+            #\"mutation GraphqlFeed { addAnimal { __typename species } }\"#
+      """
+
+    // when
+    try await buildSubjectAndOperation(named: "GraphqlFeed")
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
   // MARK: - Selection Set Declaration
 
   func test__generate__givenOperationSelectionSet_rendersDeclaration() async throws {

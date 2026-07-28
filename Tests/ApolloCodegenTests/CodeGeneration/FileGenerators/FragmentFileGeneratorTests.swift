@@ -34,7 +34,7 @@ class FragmentFileGeneratorTests: XCTestCase {
 
   // MARK: Test Helpers
 
-  private func buildSubject() async throws {
+  private func buildSubject(config: ApolloCodegenConfiguration = .mock()) async throws {
     let schemaSDL = """
     type Animal {
       species: String
@@ -47,10 +47,10 @@ class FragmentFileGeneratorTests: XCTestCase {
 
     let ir = try await IRBuilder.mock(schema: schemaSDL, document: operationDocument)
     irFragment = await ir.build(fragment: ir.compilationResult.fragments[0])
-    
+
     subject = FragmentFileGenerator(
       irFragment: irFragment,
-      config: ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock())
+      config: ApolloCodegen.ConfigurationContext(config: config)
     )
   }
 
@@ -74,6 +74,56 @@ class FragmentFileGeneratorTests: XCTestCase {
 
     // then
     expect(self.subject.fileName).to(equal(expected))
+  }
+
+  func test__properties__givenGraphQLFragmentWithCapitalizationRules_shouldReturnFileName_withRulesApplied() async throws {
+    // given
+    operationDocument = """
+    query AllAnimals {
+      animals {
+        ...IDDetails
+      }
+    }
+
+    fragment IDDetails on Animal {
+      species
+    }
+    """
+
+    try await buildSubject(config: .mock(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("id"), strategy: .lower)],
+      schemaDocumentation: .exclude,
+      markTypesNonisolated: false
+    )))
+
+    // then
+    // File names apply the rules to the raw fragment name (no leading-capital normalization),
+    // so the lowercased leading segment stays lowercase, unlike the generated type name `IdDetails`.
+    expect(self.subject.fileName).to(equal("idDetails"))
+  }
+
+  func test__properties__givenGraphQLFragmentWithReplaceCapitalizationRule_shouldReturnFileName_withReplacementApplied() async throws {
+    // given
+    operationDocument = """
+    query AllAnimals {
+      animals {
+        ...GraphqlConfig
+      }
+    }
+
+    fragment GraphqlConfig on Animal {
+      species
+    }
+    """
+
+    try await buildSubject(config: .mock(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("graphql"), strategy: .replace("graphQL"))],
+      schemaDocumentation: .exclude,
+      markTypesNonisolated: false
+    )))
+
+    // then
+    expect(self.subject.fileName).to(equal("graphQLConfig"))
   }
 
   func test__properties__givenGraphQLFragment_shouldOverwrite() async throws {
