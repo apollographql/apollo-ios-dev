@@ -326,6 +326,15 @@ public final class ApolloStore: Sendable {
       // from the strategy alone. Matches Apollo Kotlin's
       // `FieldPolicyCacheResolver`: a policy-resolved field does not
       // require the parent record to exist.
+      //
+      // The set is also empty when every field at this level is gated
+      // behind a false `@include`/`@skip` condition. That case
+      // succeeds vacuously too — an object nothing was requested from
+      // reads back as an empty object, even if it was never cached —
+      // where the pre-projection read path consulted the cache and
+      // reported a miss for an absent record. A selection set that
+      // requests nothing has nothing to miss on, so the vacuous
+      // success is intentional.
       guard !fieldNames.isEmpty else {
         return .immediate(.success(Record(key: key, fields: [:])))
       }
