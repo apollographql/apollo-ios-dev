@@ -36,17 +36,16 @@ final class ProjectionLoader {
   /// Four legal states, mapping back to the documented post-flush
   /// triage:
   ///
-  /// - ``loaded(_:attempted:)`` — the cache returned a record for the
-  ///   key (the `Record`), and every `attempted` field has been
-  ///   asked about. Some attempted fields are present in
-  ///   `record.fields` (found); the rest were asked about but came
-  ///   back missing (known-missing). The reader merges new fields
-  ///   into the existing record and unions new field names into
-  ///   `attempted` on subsequent flushes. The `attempted` set is the
-  ///   load-bearing distinction in this case: `loadFields(_:)` only
-  ///   returns the fields the caller asked about, so an un-attempted
-  ///   field on a `.loaded` record might still exist in the cache and
-  ///   warrants a re-batch.
+  /// - ``loaded(_:knownMissing:)`` — the cache returned a record for
+  ///   the key. The record itself is the positive memo: because
+  ///   `loadFields(_:)` only returns requested fields, every field in
+  ///   `record.fields` was necessarily asked about and found. The
+  ///   `knownMissing` set is the negative memo: fields that were
+  ///   asked about and came back absent. A field in neither place
+  ///   has never been asked about this transaction — it may still
+  ///   exist in the cache and warrants a re-batch. The reader merges
+  ///   new fields into the existing record and adds newly-absent
+  ///   field names to `knownMissing` on subsequent flushes.
   /// - ``absent`` — the cache had no record for this key. Sticky
   ///   until something explicitly invalidates the entry: the
   ///   store's read/write lock guarantees no concurrent writer can
@@ -68,18 +67,21 @@ final class ProjectionLoader {
   /// Absence of an entry (`state[key] == nil`) is the "never attempted"
   /// fourth state: the key has not been seen this transaction.
   private enum KeyState {
-    case loaded(Record, attempted: Set<String>)
+    case loaded(Record, knownMissing: Set<String>)
     case absent
     case failed(any Error)
 
-    /// True iff this state has already attempted `fieldName`. For
+    /// True iff this state already has an answer for `fieldName` —
+    /// present in the loaded record, or known missing from it. For
     /// `.absent` and `.failed` the answer is always `true` — both are
     /// sticky states whose answer for any field is the recorded
     /// outcome of the key as a whole.
     func hasAttempted(_ fieldName: String) -> Bool {
       switch self {
-      case .loaded(_, let attempted): return attempted.contains(fieldName)
-      case .absent, .failed:           return true
+      case .loaded(let record, let knownMissing):
+        return record.fields[fieldName] != nil || knownMissing.contains(fieldName)
+      case .absent, .failed:
+        return true
       }
     }
   }
@@ -220,16 +222,23 @@ final class ProjectionLoader {
           // just don't update it.
           continue
 
-        case .some(.loaded(var existing, var attempted)):
+        case .some(.loaded(var existing, var knownMissing)):
+          // Requested fields the batch did not return are known
+          // missing; fields it did return live in the record itself.
           if let newRecord {
             existing.fields.merge(newRecord.fields) { _, new in new }
+            knownMissing.formUnion(projection.fieldNames.subtracting(newRecord.fields.keys))
+          } else {
+            knownMissing.formUnion(projection.fieldNames)
           }
-          attempted.formUnion(projection.fieldNames)
-          state[cacheKey] = .loaded(existing, attempted: attempted)
+          state[cacheKey] = .loaded(existing, knownMissing: knownMissing)
 
         case .none:
           if let newRecord {
-            state[cacheKey] = .loaded(newRecord, attempted: projection.fieldNames)
+            state[cacheKey] = .loaded(
+              newRecord,
+              knownMissing: projection.fieldNames.subtracting(newRecord.fields.keys)
+            )
           } else {
             state[cacheKey] = .absent
           }
