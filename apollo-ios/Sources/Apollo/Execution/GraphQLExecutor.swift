@@ -70,7 +70,14 @@ public class FieldExecutionInfo {
 
   var mergedFields: [Selection.Field]
 
-  var responsePath: ResponsePath
+  /// Invalidates the ``cacheReadStrategy`` memo on mutation: the
+  /// strategy is computed from `(field, variables, schema,
+  /// responsePath)`, and this is the only one of those inputs that can
+  /// change after initialization (the executor's list-element
+  /// traversal appends the element index to a copy's path).
+  var responsePath: ResponsePath {
+    didSet { _cacheReadStrategy = nil }
+  }
   let responseKeyForField: String
 
   var cachePath: ResponsePath = []
@@ -206,22 +213,14 @@ public class FieldExecutionInfo {
     self.responsePath = info.responsePath
     self.responseKeyForField = info.responseKeyForField
     self.cachePath = info.cachePath
-    // `_normalizedFieldName` doesn't depend on `responsePath`, so copying
-    // it is safe.
     self._normalizedFieldName = info._normalizedFieldName
-    // `_cacheReadStrategy` is deliberately NOT copied. The strategy is
-    // computed from `(field, variables, schema, responsePath)`; the only
-    // caller of `copy()` is the executor's list-element traversal in
-    // `GraphQLExecutor.complete(fields:withValue:asType:)`, which appends
-    // the element index to the copy's `responsePath` after construction.
-    // Carrying the parent's memo would silently return a stale strategy
-    // for any future `FieldPolicy.Provider` implementation that consults
-    // its `path:` argument. Today no provider uses path nontrivially, so
-    // this is preventive; the cost is one extra evaluation per copy on
-    // first call, which is amortized to zero since the memo is currently
-    // only ever queried once per info (see ADR 0007 PR-009g-bis for the
-    // cross-phase sharing that would actually exercise re-queries).
-    self._cacheReadStrategy = nil
+    // A true copy, memos included. `_cacheReadStrategy` is valid for
+    // the copied `responsePath`; if the caller diverges the path (the
+    // list-element traversal appends the element index), the
+    // property's `didSet` invalidates the memo at that moment.
+    // Property observers don't fire during `init`, so this assignment
+    // itself can't clobber the copied value.
+    self._cacheReadStrategy = info._cacheReadStrategy
   }
 
 }
