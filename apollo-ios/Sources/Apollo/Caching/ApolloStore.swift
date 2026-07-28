@@ -291,15 +291,13 @@ public final class ApolloStore: Sendable {
     /// `NormalizedCache.loadFields(_:)` call when the first
     /// `PossiblyDeferred` is forced.
     ///
-    /// Inline fragments are projected unconditionally
-    /// (`includeAllInlineFragments: true`) because the child record's
-    /// `__typename` is not yet loaded at projection time. The
-    /// executor's later selection-set traversal uses the loaded
-    /// `__typename` to pick the matching type case; the unmatched
-    /// type-case fields are an over-fetch accepted per ADR 0007.
-    /// Narrowing it at the SQL layer (a `__typename`-aware filter) is
-    /// a deferred optimization gated on the Phase 1A performance
-    /// results.
+    /// Inline fragments are projected with `typeCases: .allTypeCases`
+    /// because the child record's `__typename` is not yet loaded at
+    /// projection time — the unmatched type cases' fields ARE fetched
+    /// and then discarded by the executor's type-aware traversal. See
+    /// `ProjectionCollector.TypeCaseProjection.allTypeCases` for the
+    /// full trade-off; SQL-level narrowing is a deferred optimization
+    /// gated on the Phase 1A performance results.
     final func loadObject(
       forKey key: CacheKey,
       selections: [Selection],
@@ -312,8 +310,7 @@ public final class ApolloStore: Sendable {
         fieldNames = try ProjectionCollector.collectFieldNames(
           selections: selections,
           variables: variables,
-          resolveRuntimeType: { nil },
-          includeAllInlineFragments: true,
+          typeCases: .allTypeCases,
           schema: schema,
           responsePath: responsePath
         )

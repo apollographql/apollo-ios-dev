@@ -18,7 +18,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: nil,
-      resolveRuntimeType: { nil }
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(projections) == Set([
@@ -35,7 +35,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: nil,
-      resolveRuntimeType: { nil }
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(projections) == Set([
@@ -57,7 +57,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: nil,
-      resolveRuntimeType: { nil }
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(projections) == Set([
@@ -85,7 +85,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: nil,
-      resolveRuntimeType: { nil }
+      typeCases: .byRuntimeType { nil }
     )
 
     // Friend's `name` and `age` are NOT in the projection set — only
@@ -108,7 +108,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: nil,
-      resolveRuntimeType: { nil }
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(projections) == ["hero(episode:JEDI)"]
@@ -125,7 +125,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: ["showAge": true],
-      resolveRuntimeType: { nil }
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(projections.contains("age")) == true
@@ -140,7 +140,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: ["showAge": false],
-      resolveRuntimeType: { nil }
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(projections.contains("age")) == false
@@ -160,7 +160,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: ["skipAge": true],
-      resolveRuntimeType: { nil }
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(projections.contains("age")) == false
@@ -188,7 +188,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: nil,
-      resolveRuntimeType: { nil }
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(projections.contains("name")) == true
@@ -214,7 +214,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: nil,
-      resolveRuntimeType: { nil }
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(projections) == ["name"]
@@ -246,7 +246,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: nil,
-      resolveRuntimeType: { droidType }
+      typeCases: .byRuntimeType { droidType }
     )
 
     expect(projections.contains("primaryFunction")) == true
@@ -274,7 +274,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: nil,
-      resolveRuntimeType: { humanType }
+      typeCases: .byRuntimeType { humanType }
     )
 
     expect(projections.contains("primaryFunction")) == false
@@ -304,11 +304,51 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: nil,
-      resolveRuntimeType: { nil }
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(projections.contains("primaryFunction")) == false
     expect(projections.contains("name")) == true
+  }
+
+  func test__collect__givenAllTypeCasesProjection__projectsEveryTypeCasesFields() throws {
+    // The pre-load path: the record's runtime type is unknown, so
+    // every type case's fields are projected — the documented
+    // over-fetch. The executor's type-aware resolve discards the
+    // unmatched cases; the SQL-level narrowing is deferred behind
+    // the perf gate.
+    class AsDroid: MockTypeCase, @unchecked Sendable {
+      override class var __parentType: any ParentType {
+        Object(typename: "Droid", implementedInterfaces: [])
+      }
+      override class var __selections: [Selection] { [
+        .field("primaryFunction", String.self)
+      ]}
+    }
+    class AsHuman: MockTypeCase, @unchecked Sendable {
+      override class var __parentType: any ParentType {
+        Object(typename: "Human", implementedInterfaces: [])
+      }
+      override class var __selections: [Selection] { [
+        .field("height", Double.self)
+      ]}
+    }
+
+    let selections: [Selection] = [
+      .field("name", String.self),
+      .inlineFragment(AsDroid.self),
+      .inlineFragment(AsHuman.self),
+    ]
+
+    let projections = try ProjectionCollector.collectFieldNames(
+      selections: selections,
+      variables: nil,
+      typeCases: .allTypeCases
+    )
+
+    expect(projections.contains("name")) == true
+    expect(projections.contains("primaryFunction")) == true
+    expect(projections.contains("height")) == true
   }
 
   // MARK: - Deferred selections
@@ -332,7 +372,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: nil,
-      resolveRuntimeType: { nil }
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(projections.contains("primaryFunction")) == true
@@ -355,7 +395,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: ["doDefer": false],
-      resolveRuntimeType: { nil }
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(projections.contains("primaryFunction")) == true
@@ -377,7 +417,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: selections,
       variables: ["doDefer": true],
-      resolveRuntimeType: { nil }
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(projections.contains("primaryFunction")) == true
@@ -389,7 +429,7 @@ final class ProjectionCollectorTests: XCTestCase {
     let projections = try ProjectionCollector.collectFieldNames(
       selections: [],
       variables: nil,
-      resolveRuntimeType: { nil }
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(projections.isEmpty) == true
