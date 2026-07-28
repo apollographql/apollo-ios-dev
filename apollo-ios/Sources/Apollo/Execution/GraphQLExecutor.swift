@@ -163,15 +163,32 @@ public class FieldExecutionInfo {
     )
     var childSelections: [Selection] = []
 
-    mergedFields.forEach { field in
-      guard case let .object(selectionSet) = field.type.namedType else {
-        return
-      }
+    for selectionSet in mergedChildSelectionSetTypes {
       childExecutionInfo.fulfilledFragments.insert(ObjectIdentifier(selectionSet.self))
       childSelections.append(contentsOf: selectionSet.__selections)
     }
 
     return (childExecutionInfo, childSelections)
+  }
+
+  /// The `RootSelectionSet` types of every merged field whose declared
+  /// output type is object-typed (after peeling `.nonNull`/`.list`
+  /// wrappers). Empty when no merged field is object-typed — i.e. the
+  /// field can never legitimately hold a `CacheReference`.
+  ///
+  /// This is the single source of truth for "which selections execute
+  /// against this field's child object": `computeChildExecutionData`
+  /// builds the executed union from it, and
+  /// `CacheDataExecutionSource.deferredResolve` builds the projected
+  /// union from it, so the two passes agree by construction rather
+  /// than by mirrored implementations.
+  var mergedChildSelectionSetTypes: [any RootSelectionSet.Type] {
+    mergedFields.compactMap { field in
+      guard case let .object(selectionSet) = field.type.namedType else {
+        return nil
+      }
+      return selectionSet
+    }
   }
 
   func copy() -> FieldExecutionInfo {

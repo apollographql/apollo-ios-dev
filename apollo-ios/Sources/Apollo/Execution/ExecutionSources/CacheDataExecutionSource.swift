@@ -123,29 +123,23 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     }
 
     // The child's selection set is the union of the selections of
-    // every field merged into this `FieldExecutionInfo`, mirroring
-    // `FieldExecutionInfo.computeChildExecutionData` — the executor
-    // executes that union against the loaded record, so projecting
-    // from `info.field` alone would under-collect whenever the same
-    // field is selected more than once with divergent sub-selections
-    // (e.g. directly and again inside a named or inline fragment),
-    // turning fully-cached data into a spurious cache miss. Each
-    // merged field's declared OutputType is peeled (`.nonNull` and
-    // `.list` wrappers) down to its `.object` case; non-object
-    // output types contribute nothing. Reaching this site with no
+    // every merged field, sourced from the same
+    // `mergedChildSelectionSetTypes` helper the executor's
+    // `computeChildExecutionData` builds its executed union from —
+    // so the projected fields and the executed fields agree by
+    // construction. Projecting from `info.field` alone would
+    // under-collect whenever the same field is selected more than
+    // once with divergent sub-selections (e.g. directly and again
+    // inside a named or inline fragment), turning fully-cached data
+    // into a spurious cache miss. Reaching this site with no
     // object-typed merged field at all is a contract violation —
     // only object-typed fields produce `CacheReference` values — and
     // is surfaced as an explicit decoding error.
-    var childSelections: [Selection] = []
-    var foundObjectOutputType = false
-    for mergedField in info.mergedFields {
-      guard let selections = Self.childSelections(of: mergedField.type) else { continue }
-      foundObjectOutputType = true
-      childSelections.append(contentsOf: selections)
-    }
-    guard foundObjectOutputType else {
+    let childSelectionSetTypes = info.mergedChildSelectionSetTypes
+    guard !childSelectionSetTypes.isEmpty else {
       return .immediate(.failure(JSONDecodingError.wrongType))
     }
+    let childSelections = childSelectionSetTypes.flatMap { $0.__selections }
 
     return transaction.loadObject(
       forKey: reference.key,
@@ -154,26 +148,6 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
       schema: info.parentInfo.schema,
       responsePath: info.responsePath
     )
-  }
-
-  /// Peels `.nonNull` and `.list` wrappers off `outputType` to find
-  /// the inner `.object(RootSelectionSetType)` and returns that type's
-  /// `__selections`. Returns `nil` if there is no object case
-  /// (scalar or customScalar), in which case the caller is asking us
-  /// to resolve a reference for a non-object-typed field — a contract
-  /// violation we surface as an explicit decoding error rather than
-  /// silently no-op.
-  private static func childSelections(
-    of outputType: Selection.Field.OutputType
-  ) -> [Selection]? {
-    switch outputType {
-    case .nonNull(let inner), .list(let inner):
-      return childSelections(of: inner)
-    case .object(let selectionSetType):
-      return selectionSetType.__selections
-    case .scalar, .customScalar:
-      return nil
-    }
   }
 
   func computeCacheKey(
