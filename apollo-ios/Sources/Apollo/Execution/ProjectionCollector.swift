@@ -50,7 +50,11 @@ public enum ProjectionCollector {
     /// Accepted per ADR 0007's amended decision; a SQL-level
     /// `__typename` filter that would drop the unmatched rows before
     /// they cross the wire is a deferred optimization gated on the
-    /// Phase 1A performance results (ADR 0007 § Amendments).
+    /// Phase 1A performance results (ADR 0007 § Amendments). If that
+    /// filter lands, it changes *this collector's output*: each
+    /// type-case field gains a `requiredTypename` tag for the backend
+    /// to filter on, and this over-fetch note is superseded by that
+    /// structure.
     case allTypeCases
 
     /// Enter only the type cases matching the record's runtime type,
