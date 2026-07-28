@@ -186,7 +186,7 @@ public protocol SQLiteDatabase {
   /// - Returns: A dictionary of cache keys to partial records as
   ///   described above.
   @_spi(Execution)
-  func selectFields(_ projections: [FieldProjection]) throws -> [CacheKey: Record]
+  func selectFields(_ projections: [RecordProjection]) throws -> [CacheKey: Record]
 
 }
 

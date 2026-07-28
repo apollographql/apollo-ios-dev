@@ -22,10 +22,13 @@
 /// # See Also
 ///
 /// - [ADR 0007 — Selection-set-aware cache reads](../Design/adr/0007-selection-aware-cache-reads.md)
-/// - ``FieldProjection`` — the read-request sibling. Both types
-///   carry the same `(cacheKey, fieldName)` pair; this one names a
-///   field a result *depends on* (watcher dirty-set matching), while
-///   `FieldProjection` names a field a read *requests*.
+/// - ``RecordProjection`` — the read-request sibling. A dependent key
+///   names a single `(cacheKey, fieldName)` pair a result *depends
+///   on* (watcher dirty-set matching); a projection names the field
+///   set a read *requests* for one record. They are separate types
+///   because their identities evolve differently: a projection may
+///   later gain request-only metadata that must never participate in
+///   dependency matching.
 public struct CacheDependentKey: Hashable, Sendable {
 
   /// The cache key of the record carrying the field.

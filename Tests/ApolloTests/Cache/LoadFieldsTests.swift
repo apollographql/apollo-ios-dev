@@ -32,7 +32,7 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     let (cache, _) = await cacheType.makeNormalizedCache()
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "name")
+      RecordProjection(cacheKey: "User:1", fieldNames: ["name"])
     ])
     expect(result.isEmpty) == true
   }
@@ -44,8 +44,8 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:2", fieldName: "name"),
-      FieldProjection(cacheKey: "User:3", fieldName: "name"),
+      RecordProjection(cacheKey: "User:2", fieldNames: ["name"]),
+      RecordProjection(cacheKey: "User:3", fieldNames: ["name"]),
     ])
     expect(result.isEmpty) == true
   }
@@ -63,7 +63,7 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "name")
+      RecordProjection(cacheKey: "User:1", fieldNames: ["name"])
     ])
 
     expect(result.count) == 1
@@ -83,8 +83,8 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "name"),
-      FieldProjection(cacheKey: "User:1", fieldName: "age"),
+      RecordProjection(cacheKey: "User:1", fieldNames: ["name"]),
+      RecordProjection(cacheKey: "User:1", fieldNames: ["age"]),
     ])
 
     expect(result.count) == 1
@@ -110,8 +110,8 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "name"),
-      FieldProjection(cacheKey: "User:2", fieldName: "email"),
+      RecordProjection(cacheKey: "User:1", fieldNames: ["name"]),
+      RecordProjection(cacheKey: "User:2", fieldNames: ["email"]),
     ])
 
     expect(result.count) == 2
@@ -133,8 +133,8 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "name"),
-      FieldProjection(cacheKey: "User:99", fieldName: "name"),
+      RecordProjection(cacheKey: "User:1", fieldNames: ["name"]),
+      RecordProjection(cacheKey: "User:99", fieldNames: ["name"]),
     ])
 
     expect(result.count) == 1
@@ -156,7 +156,7 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "nonExistentField")
+      RecordProjection(cacheKey: "User:1", fieldNames: ["nonExistentField"])
     ])
 
     expect(result.count) == 1
@@ -171,8 +171,8 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "name"),
-      FieldProjection(cacheKey: "User:1", fieldName: "missing"),
+      RecordProjection(cacheKey: "User:1", fieldNames: ["name"]),
+      RecordProjection(cacheKey: "User:1", fieldNames: ["missing"]),
     ])
 
     let record = try XCTUnwrap(result["User:1"])
@@ -190,9 +190,7 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
       Record(key: "User:1", fields: ["name": CachedField(value: "Alice", writtenAt: 0)])
     ])
 
-    let projection = FieldProjection(
-      cacheKey: "User:1", fieldName: "name"
-    )
+    let projection = RecordProjection(cacheKey: "User:1", fieldNames: ["name"])
 
     let result = try await cache.loadFields([projection, projection, projection])
 
@@ -213,7 +211,7 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "User:1", fieldName: "tags")
+      RecordProjection(cacheKey: "User:1", fieldNames: ["tags"])
     ])
 
     let record = try XCTUnwrap(result["User:1"])
@@ -230,7 +228,7 @@ class LoadFieldsTests: XCTestCase, CacheDependentTesting {
     ])
 
     let result = try await cache.loadFields([
-      FieldProjection(cacheKey: "Query.viewer", fieldName: "user")
+      RecordProjection(cacheKey: "Query.viewer", fieldNames: ["user"])
     ])
 
     let record = try XCTUnwrap(result["Query.viewer"])

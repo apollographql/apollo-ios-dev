@@ -99,11 +99,11 @@ public struct DefaultFieldSelectionCollector: FieldSelectionCollector {
   public static func collectFields(
     from selections: [Selection],
     into groupedFields: inout FieldSelectionGrouping,
-    resolveRuntimeType: () -> Object?,
+    resolveRuntimeType: @escaping () -> Object?,
     info: ObjectExecutionInfo
   ) throws {
     // Selection-case dispatch is delegated to `SelectionWalker` so this
-    // collector and `FieldProjectionCollector` share one walk
+    // collector and `ProjectionCollector` share one walk
     // implementation. Per the Apollo Router + Server's deferSpec=20220824
     // implementation, every `@defer` is honored — deferred selection
     // fields are only collected when parsed with the incremental
@@ -116,8 +116,7 @@ public struct DefaultFieldSelectionCollector: FieldSelectionCollector {
     try SelectionWalker.walk(
       selections,
       variables: info.variables,
-      resolveRuntimeType: resolveRuntimeType,
-      inlineFragmentPolicy: .byRuntimeType,
+      typeCases: .byRuntimeType(resolveRuntimeType),
       deferredFragmentPolicy: .respectDeferCondition,
       onField: { groupedFields.append(field: $0, withInfo: info) },
       onFragmentEntered: { groupedFields.addFulfilledFragment($0) },

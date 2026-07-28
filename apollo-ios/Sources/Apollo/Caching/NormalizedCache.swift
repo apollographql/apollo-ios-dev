@@ -5,6 +5,7 @@ public protocol NormalizedCache: AnyObject, ReadOnlyNormalizedCache {
   /// - Parameters:
   ///   - key: The cache keys to load data for
   /// - Returns: A dictionary of cache keys to records containing the records that have been found.
+  @available(*, deprecated, message: "Will be removed before Apollo iOS 3.0 ships. loadFields(_:) is becoming the sole read requirement of NormalizedCache.")
   func loadRecords(forKeys keys: Set<CacheKey>) async throws -> [CacheKey: Record]
 
   /// Merges a set of records into the cache.
@@ -60,6 +61,7 @@ public protocol ReadOnlyNormalizedCache: AnyObject {
   /// - Parameters:
   ///   - key: The cache keys to load data for
   /// - Returns: A dictionary of cache keys to records containing the records that have been found.
+  @available(*, deprecated, message: "Will be removed before Apollo iOS 3.0 ships. loadFields(_:) is becoming the sole read requirement of NormalizedCache.")
   func loadRecords(forKeys keys: Set<CacheKey>) async throws -> [CacheKey: Record]
 
   /// Loads the field values described by `projections`, returning each
@@ -68,11 +70,11 @@ public protocol ReadOnlyNormalizedCache: AnyObject {
   /// aware read path used by the executor and `ApolloStore`.
   ///
   /// - Parameters:
-  ///   - projections: The set of fields to read. Each
-  ///     ``FieldProjection`` identifies one `(cacheKey, fieldName)`
-  ///     pair. Multiple projections may share a `cacheKey` to request
-  ///     different fields on the same record. Duplicate projections
-  ///     are tolerated; their results coalesce.
+  ///   - projections: The records and field names to read. Each
+  ///     ``RecordProjection`` identifies one record's cache key and
+  ///     the set of field names requested on it. Repeated cache keys
+  ///     across projections are tolerated and treated as a request
+  ///     for the union of their field names.
   ///
   /// - Returns: A dictionary of cache keys to partial records. A cache
   ///   key appears in the result if and only if the *record* exists in
@@ -87,7 +89,7 @@ public protocol ReadOnlyNormalizedCache: AnyObject {
   ///   names that were present; unrequested fields on the same record
   ///   are excluded.
   @_spi(Execution)
-  func loadFields(_ projections: [FieldProjection]) async throws -> [CacheKey: Record]
+  func loadFields(_ projections: [RecordProjection]) async throws -> [CacheKey: Record]
 
 }
 
@@ -101,11 +103,11 @@ extension ReadOnlyNormalizedCache {
   /// Every backend that conforms to ``ReadOnlyNormalizedCache``
   /// automatically inherits a correct (if unoptimized) `loadFields`
   /// implementation by reading whole records and filtering in Swift.
-  /// The SQLite backend relies on this default until PR-009h switches
-  /// it to the row-level `selectFields` read path. Custom cache
-  /// implementors get the same behavior without a forced API
-  /// migration; they may override the method with a projection-aware
-  /// path when they're ready.
+  /// The SQLite backend relies on this default until it switches to
+  /// its row-level `selectFields` read path. Custom cache implementors
+  /// get the same behavior without a forced API migration; they may
+  /// override the method with a projection-aware path when they're
+  /// ready.
   ///
   /// **Performance:** this default is `O(records.count * filteredFields.count)`
   /// with one new dict allocation per surfaced record (the `record.fields.filter`
@@ -114,17 +116,19 @@ extension ReadOnlyNormalizedCache {
   /// where the inherited behavior would surface as a regression versus a
   /// hand-rolled `loadRecords`-backed path (e.g. when a partial-row read is
   /// significantly cheaper than a full-row read) should override.
-  public func loadFields(_ projections: [FieldProjection]) async throws -> [CacheKey: Record] {
+  public func loadFields(_ projections: [RecordProjection]) async throws -> [CacheKey: Record] {
     guard !projections.isEmpty else { return [:] }
 
-    let projectionsByKey = Dictionary(grouping: projections, by: \.cacheKey)
-    let keys = Set(projectionsByKey.keys)
-    let records = try await loadRecords(forKeys: keys)
+    // Repeated cache keys merge to the union of their field names.
+    let fieldNamesByKey = Dictionary(
+      projections.map { ($0.cacheKey, $0.fieldNames) },
+      uniquingKeysWith: { $0.union($1) }
+    )
+    let records = try await loadRecords(forKeys: Set(fieldNamesByKey.keys))
 
     var result: [CacheKey: Record] = [:]
-    for (key, fieldProjections) in projectionsByKey {
+    for (key, requestedFieldNames) in fieldNamesByKey {
       guard let record = records[key] else { continue }
-      let requestedFieldNames = Set(fieldProjections.map(\.fieldName))
       let filteredFields = record.fields.filter { requestedFieldNames.contains($0.key) }
       // Keep the key in the result even when `filteredFields` is empty
       // (record exists, but the requested fields don't). The caller

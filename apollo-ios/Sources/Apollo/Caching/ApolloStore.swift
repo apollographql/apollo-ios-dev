@@ -291,15 +291,13 @@ public final class ApolloStore: Sendable {
     /// `NormalizedCache.loadFields(_:)` call when the first
     /// `PossiblyDeferred` is forced.
     ///
-    /// Inline fragments are projected unconditionally
-    /// (`includeAllInlineFragments: true`) because the child record's
-    /// `__typename` is not yet loaded at projection time. The
-    /// executor's later selection-set traversal uses the loaded
-    /// `__typename` to pick the matching type case; the unmatched
-    /// type-case fields are an over-fetch accepted per ADR 0007.
-    /// Narrowing it at the SQL layer (a `__typename`-aware filter) is
-    /// a deferred optimization gated on the Phase 1A performance
-    /// results.
+    /// Inline fragments are projected with `typeCases: .allTypeCases`
+    /// because the child record's `__typename` is not yet loaded at
+    /// projection time — the unmatched type cases' fields ARE fetched
+    /// and then discarded by the executor's type-aware traversal. See
+    /// `ProjectionCollector.TypeCaseProjection.allTypeCases` for the
+    /// full trade-off; SQL-level narrowing is a deferred optimization
+    /// gated on the Phase 1A performance results.
     final func loadObject(
       forKey key: CacheKey,
       selections: [Selection],
@@ -307,33 +305,40 @@ public final class ApolloStore: Sendable {
       schema: (any SchemaMetadata.Type)? = nil,
       responsePath: ResponsePath = []
     ) -> PossiblyDeferred<Record> {
-      let projections: Set<FieldProjection>
+      let fieldNames: Set<String>
       do {
-        projections = try FieldProjectionCollector.collect(
+        fieldNames = try ProjectionCollector.collectFieldNames(
           selections: selections,
-          cacheKey: key,
           variables: variables,
-          resolveRuntimeType: { nil },
-          includeAllInlineFragments: true,
+          typeCases: .allTypeCases,
           schema: schema,
           responsePath: responsePath
         )
       } catch {
         return .immediate(.failure(error))
       }
-      // Empty projection set means every selected field on this record
-      // resolves without consulting the parent's storage — typically
-      // because all fields are `@fieldPolicy`-redirected and produce
-      // their own `CacheReference`s directly. Skip the parent load and
-      // hand the executor an empty `Record` to dispatch against; each
-      // field's `resolveCacheKey` will derive its value from the
-      // strategy alone. Matches Apollo Kotlin's
+      // An empty field-name set means every selected field on this
+      // record resolves without consulting the parent's storage —
+      // typically because all fields are `@fieldPolicy`-redirected and
+      // produce their own `CacheReference`s directly. Skip the parent
+      // load and hand the executor an empty `Record` to dispatch
+      // against; each field's `resolveCacheKey` will derive its value
+      // from the strategy alone. Matches Apollo Kotlin's
       // `FieldPolicyCacheResolver`: a policy-resolved field does not
       // require the parent record to exist.
-      guard !projections.isEmpty else {
+      //
+      // The set is also empty when every field at this level is gated
+      // behind a false `@include`/`@skip` condition. That case
+      // succeeds vacuously too — an object nothing was requested from
+      // reads back as an empty object, even if it was never cached —
+      // where the pre-projection read path consulted the cache and
+      // reported a miss for an absent record. A selection set that
+      // requests nothing has nothing to miss on, so the vacuous
+      // success is intentional.
+      guard !fieldNames.isEmpty else {
         return .immediate(.success(Record(key: key, fields: [:])))
       }
-      projectionLoader.enqueue(projections)
+      projectionLoader.enqueue(RecordProjection(cacheKey: key, fieldNames: fieldNames))
       return projectionLoader.deferredRecord(forKey: key).map { record in
         // `nil` here means the record is *absent* from the cache. The
         // projection-aware `loadFields(_:)` contract preserves the

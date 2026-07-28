@@ -26,7 +26,7 @@ public class ObjectExecutionInfo {
     self.fulfilledFragments = [ObjectIdentifier(rootType)]
   }
 
-  fileprivate init(
+  init(
     rootType: any SelectionSet.Type,
     variables: GraphQLOperation.Variables?,
     schema: (any SchemaMetadata.Type),
@@ -70,7 +70,14 @@ public class FieldExecutionInfo {
 
   var mergedFields: [Selection.Field]
 
-  var responsePath: ResponsePath
+  /// Invalidates the ``cacheReadStrategy`` memo on mutation: the
+  /// strategy is computed from `(field, variables, schema,
+  /// responsePath)`, and this is the only one of those inputs that can
+  /// change after initialization (the executor's list-element
+  /// traversal appends the element index to a copy's path).
+  var responsePath: ResponsePath {
+    didSet { _cacheReadStrategy = nil }
+  }
   let responseKeyForField: String
 
   var cachePath: ResponsePath = []
@@ -91,7 +98,7 @@ public class FieldExecutionInfo {
   }
 
   fileprivate func computeCacheKeyAndPath() throws {
-    cachePath = try parentInfo.cachePath.appending(normalizedFieldName())
+    cachePath = try parentInfo.cachePath.appending(normalizedFieldName)
   }
 
   /// The field's name in a normalized cache record: the GraphQL field
@@ -101,19 +108,21 @@ public class FieldExecutionInfo {
   /// machinery uses it as a path segment when synthesizing a child
   /// record key in the absence of an explicit `@typePolicy`.
   ///
-  /// Distinct from [`cacheReadStrategy()`](`FieldExecutionInfo`), which
+  /// Distinct from ``cacheReadStrategy``, which
   /// describes how the *reader* resolves this field — including
   /// `@fieldPolicy` redirections that bypass the parent-record subscript
   /// entirely. For fields with no policy the two compute the same name;
   /// for policy fields they intentionally diverge (see
   /// [`CacheReadStrategy`](`Selection.Field+CacheReadStrategy.swift`)).
-  func normalizedFieldName() throws -> String {
-    guard let _normalizedFieldName else {
-      let cacheKey = try field.cacheKey(with: parentInfo.variables)
-      _normalizedFieldName = cacheKey
-      return cacheKey
+  var normalizedFieldName: String {
+    get throws {
+      guard let _normalizedFieldName else {
+        let cacheKey = try field.cacheKey(with: parentInfo.variables)
+        _normalizedFieldName = cacheKey
+        return cacheKey
+      }
+      return _normalizedFieldName
     }
-    return _normalizedFieldName
   }
 
   /// How the cache reader resolves this field — either by subscripting
@@ -124,17 +133,19 @@ public class FieldExecutionInfo {
   /// so the projection-collection path and the per-field resolve path
   /// share one policy evaluation per `(field, info)`. Mirrors the
   /// `_normalizedFieldName` memo pattern.
-  func cacheReadStrategy() throws -> CacheReadStrategy {
-    guard let _cacheReadStrategy else {
-      let strategy = try field.cacheReadStrategy(
-        variables: parentInfo.variables,
-        schema: parentInfo.schema,
-        responsePath: responsePath
-      )
-      _cacheReadStrategy = strategy
-      return strategy
+  var cacheReadStrategy: CacheReadStrategy {
+    get throws {
+      guard let _cacheReadStrategy else {
+        let strategy = try field.cacheReadStrategy(
+          variables: parentInfo.variables,
+          schema: parentInfo.schema,
+          responsePath: responsePath
+        )
+        _cacheReadStrategy = strategy
+        return strategy
+      }
+      return _cacheReadStrategy
     }
-    return _cacheReadStrategy
   }
 
   /// Computes the `ObjectExecutionInfo` and selections that should be used for
@@ -163,15 +174,32 @@ public class FieldExecutionInfo {
     )
     var childSelections: [Selection] = []
 
-    mergedFields.forEach { field in
-      guard case let .object(selectionSet) = field.type.namedType else {
-        return
-      }
+    for selectionSet in mergedChildSelectionSetTypes {
       childExecutionInfo.fulfilledFragments.insert(ObjectIdentifier(selectionSet.self))
       childSelections.append(contentsOf: selectionSet.__selections)
     }
 
     return (childExecutionInfo, childSelections)
+  }
+
+  /// The `RootSelectionSet` types of every merged field whose declared
+  /// output type is object-typed (after peeling `.nonNull`/`.list`
+  /// wrappers). Empty when no merged field is object-typed — i.e. the
+  /// field can never legitimately hold a `CacheReference`.
+  ///
+  /// This is the single source of truth for "which selections execute
+  /// against this field's child object": `computeChildExecutionData`
+  /// builds the executed union from it, and
+  /// `CacheDataExecutionSource.deferredResolve` builds the projected
+  /// union from it, so the two passes agree by construction rather
+  /// than by mirrored implementations.
+  var mergedChildSelectionSetTypes: [any RootSelectionSet.Type] {
+    mergedFields.compactMap { field in
+      guard case let .object(selectionSet) = field.type.namedType else {
+        return nil
+      }
+      return selectionSet
+    }
   }
 
   func copy() -> FieldExecutionInfo {
@@ -185,22 +213,14 @@ public class FieldExecutionInfo {
     self.responsePath = info.responsePath
     self.responseKeyForField = info.responseKeyForField
     self.cachePath = info.cachePath
-    // `_normalizedFieldName` doesn't depend on `responsePath`, so copying
-    // it is safe.
     self._normalizedFieldName = info._normalizedFieldName
-    // `_cacheReadStrategy` is deliberately NOT copied. The strategy is
-    // computed from `(field, variables, schema, responsePath)`; the only
-    // caller of `copy()` is the executor's list-element traversal in
-    // `GraphQLExecutor.complete(fields:withValue:asType:)`, which appends
-    // the element index to the copy's `responsePath` after construction.
-    // Carrying the parent's memo would silently return a stale strategy
-    // for any future `FieldPolicy.Provider` implementation that consults
-    // its `path:` argument. Today no provider uses path nontrivially, so
-    // this is preventive; the cost is one extra evaluation per copy on
-    // first call, which is amortized to zero since the memo is currently
-    // only ever queried once per info (see ADR 0007 PR-009g-bis for the
-    // cross-phase sharing that would actually exercise re-queries).
-    self._cacheReadStrategy = nil
+    // A true copy, memos included. `_cacheReadStrategy` is valid for
+    // the copied `responsePath`; if the caller diverges the path (the
+    // list-element traversal appends the element index), the
+    // property's `didSet` invalidates the memo at that moment.
+    // Property observers don't fire during `init`, so this assignment
+    // itself can't clobber the copied value.
+    self._cacheReadStrategy = info._cacheReadStrategy
   }
 
 }

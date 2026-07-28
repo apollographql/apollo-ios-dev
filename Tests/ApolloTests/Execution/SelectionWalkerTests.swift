@@ -9,7 +9,7 @@ import XCTest
 /// that distinguish the resolve path (`.byRuntimeType` /
 /// `.respectDeferCondition`) from the projection path (`.includeAll` /
 /// `.eager`). The walker is the shared dispatch surface for both
-/// `DefaultFieldSelectionCollector` and `FieldProjectionCollector`
+/// `DefaultFieldSelectionCollector` and `ProjectionCollector`
 /// (extracted in PR-009d-iv); these tests cover behaviors the two
 /// collectors share at the policy layer rather than at their own
 /// case-handling layer.
@@ -30,16 +30,14 @@ final class SelectionWalkerTests: XCTestCase {
   private func runWalker(
     selections: [Selection],
     variables: GraphQLOperation.Variables? = nil,
-    runtimeType: Object? = nil,
-    inlineFragmentPolicy: SelectionWalker.InlineFragmentPolicy = .byRuntimeType,
+    typeCases: TypeCaseProjection = .byRuntimeType({ nil }),
     deferredFragmentPolicy: SelectionWalker.DeferredFragmentPolicy = .respectDeferCondition
   ) throws -> EventLog {
     var log = EventLog()
     try SelectionWalker.walk(
       selections,
       variables: variables,
-      resolveRuntimeType: { runtimeType },
-      inlineFragmentPolicy: inlineFragmentPolicy,
+      typeCases: typeCases,
       deferredFragmentPolicy: deferredFragmentPolicy,
       onField: { field in log.fields.append(field.name) },
       onFragmentEntered: { type in log.fragmentsEntered.append(String(describing: type)) },
@@ -52,7 +50,7 @@ final class SelectionWalkerTests: XCTestCase {
 
   // MARK: - DeferredFragmentPolicy.respectDeferCondition
 
-  /// Closes the review-flagged gap: `FieldProjectionCollectorTests`'
+  /// Closes the review-flagged gap: `ProjectionCollectorTests`'
   /// deferred tests all use the `.eager` policy and therefore can't
   /// verify the `@defer(if:)` condition is actually evaluated. This
   /// test uses `.respectDeferCondition` and confirms the condition
@@ -138,7 +136,7 @@ final class SelectionWalkerTests: XCTestCase {
   /// `.eager` ignores `@defer(if:)` entirely — every deferred fragment's
   /// selections are walked. Confirms the cache path's projection
   /// behavior at the policy layer (vs. the indirect tests in
-  /// `FieldProjectionCollectorTests`).
+  /// `ProjectionCollectorTests`).
   func test__walk__withEagerDeferredPolicy__entersEveryDeferredFragment_regardlessOfCondition() throws {
     class GivenDeferred: MockTypeCase, @unchecked Sendable {
       override class var __selections: [Selection] { [
@@ -185,8 +183,7 @@ final class SelectionWalkerTests: XCTestCase {
 
     let log = try runWalker(
       selections: selections,
-      runtimeType: droidType,
-      inlineFragmentPolicy: .byRuntimeType
+      typeCases: .byRuntimeType { droidType }
     )
 
     expect(log.fields) == ["primaryFunction"]
@@ -213,8 +210,7 @@ final class SelectionWalkerTests: XCTestCase {
 
     let log = try runWalker(
       selections: selections,
-      runtimeType: humanType,
-      inlineFragmentPolicy: .byRuntimeType
+      typeCases: .byRuntimeType { humanType }
     )
 
     expect(log.fields).to(beEmpty())
@@ -240,8 +236,7 @@ final class SelectionWalkerTests: XCTestCase {
 
     let log = try runWalker(
       selections: selections,
-      runtimeType: nil,
-      inlineFragmentPolicy: .byRuntimeType
+      typeCases: .byRuntimeType { nil }
     )
 
     expect(log.fields).to(beEmpty())
@@ -282,8 +277,7 @@ final class SelectionWalkerTests: XCTestCase {
 
     let log = try runWalker(
       selections: selections,
-      runtimeType: droidType,
-      inlineFragmentPolicy: .byRuntimeType
+      typeCases: .byRuntimeType { droidType }
     )
 
     expect(log.fields) == ["name"]
@@ -319,8 +313,7 @@ final class SelectionWalkerTests: XCTestCase {
 
     let log = try runWalker(
       selections: selections,
-      runtimeType: vehicleType,
-      inlineFragmentPolicy: .byRuntimeType
+      typeCases: .byRuntimeType { vehicleType }
     )
 
     expect(log.fields).to(beEmpty())
@@ -332,6 +325,63 @@ final class SelectionWalkerTests: XCTestCase {
   /// `.includeAll` enters every inline fragment regardless of
   /// `resolveRuntimeType` (the closure is never even called under this
   /// policy).
+  func test__walk__withByRuntimeType__givenMultipleInlineFragments__resolvesRuntimeTypeOnce() throws {
+    // The receiving object's runtime type is constant for the whole
+    // walk, so the resolver is memoized: multiple inline fragments —
+    // including fragments nested inside an entered type case — must
+    // trigger at most one resolution.
+    let droidType = Object(typename: "Droid", implementedInterfaces: [])
+
+    class AsDroid: MockTypeCase, @unchecked Sendable {
+      override class var __parentType: any ParentType {
+        Object(typename: "Droid", implementedInterfaces: [])
+      }
+      override class var __selections: [Selection] { [
+        .field("primaryFunction", String.self),
+        .inlineFragment(AsDroidNested.self),
+      ]}
+    }
+    class AsDroidNested: MockTypeCase, @unchecked Sendable {
+      override class var __parentType: any ParentType {
+        Object(typename: "Droid", implementedInterfaces: [])
+      }
+      override class var __selections: [Selection] { [
+        .field("serialNumber", String.self)
+      ]}
+    }
+    class AsHuman: MockTypeCase, @unchecked Sendable {
+      override class var __parentType: any ParentType {
+        Object(typename: "Human", implementedInterfaces: [])
+      }
+      override class var __selections: [Selection] { [
+        .field("height", Double.self)
+      ]}
+    }
+
+    let selections: [Selection] = [
+      .field("name", String.self),
+      .inlineFragment(AsDroid.self),
+      .inlineFragment(AsHuman.self),
+    ]
+
+    var resolveCount = 0
+    var fields: [String] = []
+    try SelectionWalker.walk(
+      selections,
+      variables: nil,
+      typeCases: .byRuntimeType {
+        resolveCount += 1
+        return droidType
+      },
+      deferredFragmentPolicy: .respectDeferCondition,
+      onField: { fields.append($0.name) }
+    )
+
+    expect(resolveCount) == 1
+    expect(fields).to(contain("name", "primaryFunction", "serialNumber"))
+    expect(fields).toNot(contain("height"))
+  }
+
   func test__walk__withIncludeAll__entersEveryInlineFragment_regardlessOfRuntimeType() throws {
     class AsDroid: MockTypeCase, @unchecked Sendable {
       override class var __parentType: any ParentType {
@@ -357,8 +407,7 @@ final class SelectionWalkerTests: XCTestCase {
 
     let log = try runWalker(
       selections: selections,
-      runtimeType: nil,  // never consulted under .includeAll
-      inlineFragmentPolicy: .includeAll
+      typeCases: .allTypeCases  // runtime type never consulted
     )
 
     expect(log.fields).to(contain(["primaryFunction", "homePlanet"]))
