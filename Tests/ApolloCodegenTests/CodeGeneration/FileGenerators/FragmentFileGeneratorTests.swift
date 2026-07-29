@@ -66,14 +66,12 @@ class FragmentFileGeneratorTests: XCTestCase {
     expect(self.subject.target).to(equal(expected))
   }
 
-  func test__properties__givenGraphQLFragment_shouldReturnFileName_matchingFragmentDefinitionName() async throws {
+  func test__properties__givenGraphQLFragment_shouldReturnFileName_matchingGeneratedTypeName() async throws {
     // given
     try await buildSubject()
 
-    let expected = irFragment.definition.name
-
     // then
-    expect(self.subject.fileName).to(equal(expected))
+    expect(self.subject.fileName).to(equal("AnimalDetails"))
   }
 
   func test__properties__givenGraphQLFragmentWithCapitalizationRules_shouldReturnFileName_withRulesApplied() async throws {
@@ -97,9 +95,59 @@ class FragmentFileGeneratorTests: XCTestCase {
     )))
 
     // then
-    // File names apply the rules to the raw fragment name (no leading-capital normalization),
-    // so the lowercased leading segment stays lowercase, unlike the generated type name `IdDetails`.
-    expect(self.subject.fileName).to(equal("idDetails"))
+    expect(self.subject.fileName).to(equal("IdDetails"))
+  }
+
+  func test__properties__givenLowercaseFragmentWithUpperCapitalizationRule_shouldReturnFileName_matchingGeneratedTypeName() async throws {
+    // given
+    operationDocument = """
+    query AllAnimals {
+      animals {
+        ...idDetails
+      }
+    }
+
+    fragment idDetails on Animal {
+      species
+    }
+    """
+
+    try await buildSubject(config: .mock(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("id"), strategy: .upper)],
+      schemaDocumentation: .exclude,
+      markTypesNonisolated: false
+    )))
+
+    // then
+    // The rules run on the `firstUppercased` name, matching the generated type name `IDDetails` —
+    // the `upper` strategy would not fire on the raw name's lowercase leading segment.
+    expect(self.subject.fileName).to(equal("IDDetails"))
+  }
+
+  func test__properties__givenFragmentWithRuleResultCollidingWithReservedTypeName_shouldReturnFileName_withoutFragmentSuffix() async throws {
+    // given
+    operationDocument = """
+    query AllAnimals {
+      animals {
+        ...Id
+      }
+    }
+
+    fragment Id on Animal {
+      species
+    }
+    """
+
+    try await buildSubject(config: .mock(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("id"), strategy: .upper)],
+      schemaDocumentation: .exclude,
+      markTypesNonisolated: false
+    )))
+
+    // then
+    // The generated type name is escaped to `ID_Fragment`, but — like schema types, whose file
+    // names omit their reserved name suffixes — the file name never carries `_Fragment`.
+    expect(self.subject.fileName).to(equal("ID"))
   }
 
   func test__properties__givenGraphQLFragmentWithReplaceCapitalizationRule_shouldReturnFileName_withReplacementApplied() async throws {
@@ -123,7 +171,7 @@ class FragmentFileGeneratorTests: XCTestCase {
     )))
 
     // then
-    expect(self.subject.fileName).to(equal("graphQLConfig"))
+    expect(self.subject.fileName).to(equal("GraphQLConfig"))
   }
 
   func test__properties__givenGraphQLFragment_shouldOverwrite() async throws {

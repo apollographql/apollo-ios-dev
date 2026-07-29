@@ -77,6 +77,15 @@ extension CompilationResult.FragmentDefinition {
   func generatedDefinitionName(capitalizer: Capitalizer) -> String {
     name.asFragmentName(capitalizer: capitalizer)
   }
+
+  /// The name of the generated file for the fragment.
+  ///
+  /// Matches ``generatedDefinitionName(capitalizer:)`` except that the reserved type name
+  /// `_Fragment` suffix never appears in file names, mirroring schema types, whose file names
+  /// also omit their reserved name suffixes (`render(as: .filename)`).
+  func generatedFileName(capitalizer: Capitalizer) -> String {
+    name.asNormalizedFragmentName(capitalizer: capitalizer)
+  }
 }
 
 extension IR.NamedFragment {

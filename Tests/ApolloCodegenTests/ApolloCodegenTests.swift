@@ -2211,6 +2211,86 @@ class ApolloCodegenTests: XCTestCase {
     expect(directoryContents).notTo(contain("TestOperationByIdQuery.graphql.swift"))
   }
 
+  func test__fileDeletion__givenCapitalizationRuleChangesGeneratedFragmentFileNameCase_onCaseInsensitiveVolume_shouldRenameAndNotDeleteRegeneratedFile() async throws {
+    // given
+    let isCaseSensitive = await ApolloFileManager.default.volumeSupportsCaseSensitiveNames(
+      forPath: directoryURL.path
+    )
+    try XCTSkipIf(isCaseSensitive != false, "This test requires a case-insensitive volume.")
+
+    try await createFile(containing: schemaData, named: "schema.graphqls")
+
+    try await createFile(
+      body: """
+      query TestQuery {
+        authors {
+          ...TestFragmentById
+        }
+      }
+
+      fragment TestFragmentById on Author {
+        id
+        name
+      }
+      """,
+      filename: "TestFragmentById.graphql"
+    )
+
+    let fragmentsDirectory = "SchemaModule/Sources/Fragments"
+
+    try await createFile(
+      filename: "TestFragmentById.graphql.swift",
+      inDirectory: fragmentsDirectory
+    )
+    let testFile = try await createFile(
+      filename: "TestGeneratedA.graphql.swift",
+      inDirectory: "SchemaModule"
+    )
+
+    // when
+    let config = ApolloCodegenConfiguration.mock(
+      input: .init(
+        schemaSearchPaths: ["schema*.graphqls"],
+        operationSearchPaths: ["*.graphql"]
+      ),
+      output: .init(
+        schemaTypes: .init(path: "SchemaModule",
+                           moduleType: .swiftPackage()),
+        operations: .inSchemaModule
+      ),
+      options: .init(
+        additionalCapitalizationRules: [
+          .init(term: .string("id"), strategy: .upper)
+        ],
+        markTypesNonisolated: false
+      )
+    )
+
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
+
+    // then
+    let regeneratedFile = directoryURL
+      .appendingPathComponent("\(fragmentsDirectory)/TestFragmentByID.graphql.swift").path
+
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: regeneratedFile) }.to(beTrue())
+
+    let regeneratedFileContents = try XCTUnwrap(
+      FileManager.default.contents(atPath: regeneratedFile)
+        .flatMap { String(data: $0, encoding: .utf8) }
+    )
+    expect(regeneratedFileContents).to(contain("TestFragmentByID"))
+
+    // `doesFileExist(atPath:)` cannot distinguish paths differing only by case on a
+    // case-insensitive volume, so the directory entry name is asserted instead.
+    let directoryContents = try FileManager.default.contentsOfDirectory(
+      atPath: directoryURL.appendingPathComponent(fragmentsDirectory).path
+    )
+    expect(directoryContents).to(contain("TestFragmentByID.graphql.swift"))
+    expect(directoryContents).notTo(contain("TestFragmentById.graphql.swift"))
+
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: testFile) }.to(beFalse())
+  }
+
   func test__deleteExtraneousGeneratedFiles__givenOldPathMatchingWrittenFileCaseInsensitively_onCaseInsensitiveVolume_shouldNotDeleteFile() async throws {
     // given
     let subject = ApolloCodegen(

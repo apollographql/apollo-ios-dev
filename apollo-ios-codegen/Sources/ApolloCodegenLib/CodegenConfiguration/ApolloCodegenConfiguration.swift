@@ -666,6 +666,9 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     /// `replace` rule matching the leading word segment affects only the remainder of that
     /// segment (e.g. a `lower` rule on `id` renders fragment `IDDetails` as `IdDetails`, not
     /// `idDetails`).
+    ///
+    /// Generated operation and fragment file names match the generated type names, except that
+    /// the reserved type name `_Fragment` suffix never appears in file names.
     public let additionalCapitalizationRules: [CapitalizationRule]
     /// Any non-default rules for pluralization or singularization you wish to include.
     public let additionalInflectionRules: [InflectionRule]

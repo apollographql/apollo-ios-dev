@@ -339,6 +339,26 @@ class CapitalizerTests: XCTestCase {
     expect(fragment.generatedDefinitionName(capitalizer: capitalizer)).to(equal("IdDetails"))
   }
 
+  func test__generatedFileName__fragmentWithUpperRule__matchesGeneratedDefinitionName() {
+    // The file name shares the type name's normalization, so the rules see the
+    // `firstUppercased` name and the leading acronym is capitalized just like the type name.
+    let capitalizer = Capitalizer(rules: [.init(term: .string("id"), strategy: .upper)])
+    let fragment = CompilationResult.FragmentDefinition.mock("idDetails")
+
+    expect(fragment.generatedFileName(capitalizer: capitalizer)).to(equal("IDDetails"))
+    expect(fragment.generatedDefinitionName(capitalizer: capitalizer)).to(equal("IDDetails"))
+  }
+
+  func test__generatedFileName__ruleResultCollidesWithReservedTypeName__isNotSuffixed() {
+    // The type name is escaped to `ID_Fragment`, but file names never carry the reserved-name
+    // suffix — mirroring schema types, whose file names omit their reserved name suffixes.
+    let capitalizer = Capitalizer(rules: [.init(term: .string("id"), strategy: .upper)])
+    let fragment = CompilationResult.FragmentDefinition.mock("Id")
+
+    expect(fragment.generatedFileName(capitalizer: capitalizer)).to(equal("ID"))
+    expect(fragment.generatedDefinitionName(capitalizer: capitalizer)).to(equal("ID_Fragment"))
+  }
+
   func test__generatedDefinitionName__ruleMatchingOperationTypeSuffix__appliesToAppendedSuffix() {
     // The operation-type suffix is appended before the rules run, so a rule can match it.
     let capitalizer = Capitalizer(rules: [
