@@ -354,6 +354,31 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
       .toNot(throwError())
   }
 
+  func test__decodeOutputOptions__withoutRequireNonOptionalMockFields_defaultsToFalse() throws {
+    let options = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.OutputOptions.self,
+      from: "{}".asData
+    )
+
+    expect(options.requireNonOptionalMockFields).to(beFalse())
+  }
+
+  func test__encodeOutputOptions__withRequireNonOptionalMockFieldsTrue_roundTrips() throws {
+    let expected = ApolloCodegenConfiguration.OutputOptions(
+      markTypesNonisolated: false,
+      requireNonOptionalMockFields: true
+    )
+
+    let encoded = try testJSONEncoder.encode(expected)
+    let actual = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.OutputOptions.self,
+      from: encoded
+    )
+
+    expect(encoded.asString).to(contain("\"requireNonOptionalMockFields\" : true"))
+    expect(actual).to(equal(expected))
+  }
+
   // MARK: - Composition Tests
 
   func encodedValue(_ case: ApolloCodegenConfiguration.Composition) -> String {

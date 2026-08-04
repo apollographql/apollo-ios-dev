@@ -24,8 +24,16 @@ struct MockObjectTemplate: TemplateRenderer {
     let deprecationReason: String?
     let config: ApolloCodegen.ConfigurationContext
 
+    var initializerType: String {
+      if config.options.requireNonOptionalMockFields || type.isNullable {
+        return mockType
+      } else {
+        return "\(mockType)?"
+      }
+    }
+
     func defaultInitializer(config: ApolloCodegen.ConfigurationContext) -> String? {
-      if type.isNullable {
+      if !config.options.requireNonOptionalMockFields || type.isNullable {
         return " = nil"
       } else {
         return " = \(type.defaultMockValue(config: config))"
@@ -77,7 +85,7 @@ struct MockObjectTemplate: TemplateRenderer {
         \(conflictingFieldNameProperties(fields))
         convenience init(
           \(fields.map { """
-            \($0.propertyName)\(ifLet: $0.initializerParameterName, {" \($0)"}): \($0.mockType)\(ifLet: $0.defaultInitializer(config: config), { "\($0)" })
+            \($0.propertyName)\(ifLet: $0.initializerParameterName, {" \($0)"}): \($0.initializerType)\(ifLet: $0.defaultInitializer(config: config), { "\($0)" })
             """ }, separator: ",\n")
         ) {
           self.init()
