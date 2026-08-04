@@ -582,11 +582,11 @@ let configuration = ApolloCodegenConfiguration(
 
 </MultiCodeBlock>
 
-### Test Mock Field Optionality
+### Test mock field optionality
 
-By default, generated test mock convenience initializers accept optional parameters that default to `nil`, including fields that are non-null in the GraphQL schema. This allows tests to construct partial response data containing only the fields selected by an operation and preserves compatibility with explicit `nil` arguments.
+By default, generated test mock convenience initializers accept optional parameters that default to `nil`, including fields that are non-null in the GraphQL schema. Use this behavior when tests construct partial response data containing only the fields selected by an operation or pass explicit `nil` arguments.
 
-Set `requireNonOptionalMockFields` to `true` to instead generate non-optional initializer parameters for non-null schema fields. Apollo supplies schema-appropriate defaults for those parameters, such as `""` for `String`, `[]` for lists, and an empty generated mock for object fields. Nullable fields and nullable list elements remain optional in either mode.
+Set `requireNonOptionalMockFields` to `true` to instead generate non-optional initializer parameters for non-null schema fields. Apollo iOS supplies schema-appropriate defaults for those parameters, such as `""` for `String`, `[]` for lists, and an empty generated mock for object fields. Nullable fields and nullable list elements remain optional in either mode.
 
 <MultiCodeBlock>
 
@@ -598,7 +598,7 @@ Set `requireNonOptionalMockFields` to `true` to instead generate non-optional in
 
 ```swift title="Swift Codegen Setup"
 let configuration = ApolloCodegenConfiguration(
-  // Other properties not shown
+  // ... other properties not shown
   options: ApolloCodegenConfiguration.OutputOptions(
     requireNonOptionalMockFields: true
   )
