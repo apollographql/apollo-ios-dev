@@ -33,7 +33,8 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
 
   func buildSubjectAndOperation(
     named operationName: String = "ConflictingQuery",
-    fieldMerging: ApolloCodegenConfiguration.FieldMerging = .all
+    fieldMerging: ApolloCodegenConfiguration.FieldMerging = .all,
+    capitalizationRules: [ApolloCodegenLib.CapitalizationRule] = []
   ) async throws {
     ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
@@ -44,6 +45,11 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: "TestSchema",
       output: .mock(moduleType: .swiftPackage(), operations: .inSchemaModule),
+      options: .init(
+        additionalCapitalizationRules: capitalizationRules,
+        schemaDocumentation: .exclude,
+        markTypesNonisolated: false
+      ),
       experimentalFeatures: .init(
         fieldMerging: fieldMerging
       )
@@ -751,6 +757,53 @@ class SelectionSetTemplate_ErrorHandling_Tests: XCTestCase {
 
     // when
     try await buildSubjectAndOperation()
+    _ = subject.renderBody()
+
+    // then
+    expect(self.errorRecorder.recordedErrors.count).to(equal(1))
+    expect(self.errorRecorder.recordedErrors.first).to(equal(expectedError))
+  }
+
+  func
+    test__validation__selectionSet_typeConflicts_withCapitalizedNamedFragmentFieldCollision_shouldReturnNonFatalError()
+    async throws
+  {
+    schemaSDL = """
+      type Query {
+          allAnimals: [Animal!]
+      }
+
+      type Animal {
+          species: String!
+          idDetails: Animal
+      }
+      """
+
+    document = """
+      query ConflictingQuery {
+          allAnimals {
+            idDetails {
+              species
+            }
+            ...IDDetails
+          }
+      }
+
+      fragment IDDetails on Animal {
+          species
+      }
+      """
+
+    let expectedError = ApolloCodegen.NonFatalError.typeNameConflict(
+      name: "idDetails",
+      conflictingName: "IDDetails",
+      containingObject: "ConflictingQuery.Data.AllAnimal"
+    )
+
+    // when
+    try await buildSubjectAndOperation(
+      capitalizationRules: [.init(term: .string("id"), strategy: .lower)]
+    )
     _ = subject.renderBody()
 
     // then

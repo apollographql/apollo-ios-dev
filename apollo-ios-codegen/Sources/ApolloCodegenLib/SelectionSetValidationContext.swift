@@ -23,7 +23,8 @@ struct SelectionSetValidationContext {
       SelectionSetNameGenerator.generatedSelectionSetName(
         for: selections.typeInfo,
         format: .fullyQualified,
-        pluralizer: config.pluralizer
+        pluralizer: config.pluralizer,
+        capitalizer: config.capitalizer
       )
     }
 
@@ -55,7 +56,7 @@ struct SelectionSetValidationContext {
     referencedTypeNames.merge(typeNamesForEntityFields) { (current, _) in current }
 
     IteratorSequence(selections.makeNamedFragmentIterator()).forEach { fragmentSpread in
-      if let existingTypeName = referencedTypeNames[fragmentSpread.fragment.generatedDefinitionName] {
+      if let existingTypeName = referencedTypeNames[fragmentSpread.fragment.generatedDefinitionName(capitalizer: config.capitalizer)] {
         errorRecorder.record(error:
           ApolloCodegen.NonFatalError.typeNameConflict(
             name: existingTypeName,

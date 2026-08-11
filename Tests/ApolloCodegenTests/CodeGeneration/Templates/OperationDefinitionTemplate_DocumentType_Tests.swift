@@ -41,7 +41,8 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     operationIdentifier: String? = nil,
     moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackage(),
     operations: ApolloCodegenConfiguration.OperationsFileOutput = .inSchemaModule,
-    operationDocumentFormat: ApolloCodegenConfiguration.OperationDocumentFormat = .definition    
+    operationDocumentFormat: ApolloCodegenConfiguration.OperationDocumentFormat = .definition,
+    additionalCapitalizationRules: [CapitalizationRule] = []
   ) async throws {
     ir = try await .mock(schema: schemaSDL, document: document)
     let operationDefinition = try XCTUnwrap(ir.compilationResult[operation: operationName])
@@ -50,6 +51,7 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
     config = .mock(
       output: .mock(moduleType: moduleType, operations: operations),
       options: .init(
+        additionalCapitalizationRules: additionalCapitalizationRules,
         operationDocumentFormat: operationDocumentFormat,
         markTypesNonisolated: false
       )
@@ -181,6 +183,39 @@ class OperationDefinitionTemplate_DocumentType_Tests: XCTestCase {
       definition: .init(
         #"query NameQuery { ...nameFragment }"#,
         fragments: [NameFragment.self]
+      ))
+    """
+    expect(actual).to(equalLineByLine(expected))
+  }
+
+  func test__generate__givenIncludesFragment_withCapitalizationRuleMatchingFragmentName_generatesFragmentsListWithCapitalizationRulesApplied() async throws {
+    // given
+    document =
+    """
+    query NameQuery {
+      ...IDDetails
+    }
+
+    fragment IDDetails on Query {
+      name
+    }
+    """
+
+    try await buildSubjectAndOperation(
+      operationDocumentFormat: .definition,
+      additionalCapitalizationRules: [.init(term: .string("id"), strategy: .lower)]
+    )
+
+    // when
+    let actual = try renderDocumentType()
+
+    // then
+    let expected =
+    """
+    public static let operationDocument: ApolloAPI.OperationDocument = .init(
+      definition: .init(
+        #"query NameQuery { ...IDDetails }"#,
+        fragments: [IdDetails.self]
       ))
     """
     expect(actual).to(equalLineByLine(expected))

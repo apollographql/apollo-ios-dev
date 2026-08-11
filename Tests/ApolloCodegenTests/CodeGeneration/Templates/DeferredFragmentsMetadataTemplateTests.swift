@@ -458,6 +458,63 @@ class DeferredFragmentsMetadataTemplateTests: XCTestCase {
     )
   }
   
+  func test__render__givenDeferredNamedFragmentWithCapitalizationRules_rendersDeferMetadataWithCapitalizedTypeName() async throws {
+    // given
+    schemaSDL = """
+      type Query {
+        allAnimals: [Animal!]
+      }
+
+      interface Animal {
+        id: String
+        species: String
+      }
+      """.appendingDeferDirective()
+
+    document = """
+      query TestOperation {
+        allAnimals {
+          __typename
+          id
+          ...IDDetails @defer(label: "details")
+        }
+      }
+
+      fragment IDDetails on Animal {
+        species
+      }
+      """
+
+    configContext = .init(config: .mock(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("id"), strategy: .lower)],
+      schemaDocumentation: .exclude,
+      markTypesNonisolated: false
+    )))
+
+    // when
+    try await buildSubjectAndOperation()
+
+    // then
+    let rendered = renderSubject()
+
+    expect(rendered).to(equalLineByLine("""
+      // MARK: - Deferred Fragment Metadata
+
+      public typealias ResponseFormat = IncrementalDeferredResponseFormat
+      enum DeferredFragmentIdentifiers {
+        static let details = DeferredFragmentIdentifier(label: "details", fieldPath: ["allAnimals"])
+      }
+
+      public static let responseFormat: ResponseFormat = IncrementalDeferredResponseFormat(
+        deferredFragments: [
+          DeferredFragmentIdentifiers.details: IdDetails.self,
+        ]
+      )
+      """,
+      ignoringExtraLines: false)
+    )
+  }
+
   func test__render__givenDeferredNamedFragmentOnDifferentTypeCase_rendersDeferMetadata() async throws {
     schemaSDL = """
       type Query {

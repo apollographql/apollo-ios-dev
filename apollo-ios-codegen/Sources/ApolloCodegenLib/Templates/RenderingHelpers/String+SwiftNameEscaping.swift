@@ -12,12 +12,25 @@ extension String {
     "\(self)_SelectionSet" : self
   }
   
-  var asFragmentName: String {
-    let uppercasedName = self.firstUppercased
-    return SwiftKeywords.TypeNamesToSuffix.contains(uppercasedName) ?
-            "\(uppercasedName)_Fragment" : uppercasedName
+  /// Renders the string as a generated fragment type name with any configured capitalization
+  /// rules applied.
+  ///
+  /// Names that collide with reserved type names are suffixed with `_Fragment`.
+  func asFragmentName(capitalizer: Capitalizer) -> String {
+    let name = asNormalizedFragmentName(capitalizer: capitalizer)
+    return SwiftKeywords.TypeNamesToSuffix.contains(name) ?
+            "\(name)_Fragment" : name
   }
-  
+
+  /// Normalizes the string as a generated fragment name, without reserved type name escaping.
+  /// Shared by the generated fragment type name and file name so the two cannot drift apart.
+  ///
+  /// The name is `firstUppercased` both before the rules run (so rules match the type-name form
+  /// of each word segment) and after (so the name always begins with a capital letter).
+  func asNormalizedFragmentName(capitalizer: Capitalizer) -> String {
+    capitalizer.apply(to: firstUppercased).firstUppercased
+  }
+
   var asTestMockFieldPropertyName: String {
     escapeIf(in: SwiftKeywords.TestMockFieldNamesToEscape)
   }

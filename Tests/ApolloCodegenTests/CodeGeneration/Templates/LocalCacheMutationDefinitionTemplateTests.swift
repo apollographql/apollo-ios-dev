@@ -100,6 +100,131 @@ class LocalCacheMutationDefinitionTemplateTests: XCTestCase {
     expect(actual).to(equal(["ModuleA"]))
   }
 
+  // MARK: - Capitalization Rules
+
+  func test__generate__givenLocalCacheMutationWithCapitalizationRules_capitalizesTypeName() async throws {
+    // given
+    document = """
+      query TestOperationById @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
+      }
+      """
+
+    config = .mock(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("id"), strategy: .upper)],
+      schemaDocumentation: .exclude,
+      markTypesNonisolated: false
+    ))
+
+    let expected =
+      """
+      struct TestOperationByIDLocalCacheMutation: LocalCacheMutation {
+      """
+
+    // when
+    try await buildSubjectAndOperation(named: "TestOperationById")
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test__generate__givenLocalCacheMutationWithLowercaseCapitalizationRule_lowercasesAcronymInTypeName() async throws {
+    // given
+    document = """
+      query IDLookup @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
+      }
+      """
+
+    config = .mock(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("id"), strategy: .lower)],
+      schemaDocumentation: .exclude,
+      markTypesNonisolated: false
+    ))
+
+    let expected =
+      """
+      struct IdLookupLocalCacheMutation: LocalCacheMutation {
+      """
+
+    // when
+    try await buildSubjectAndOperation(named: "IDLookup")
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test__generate__givenLocalCacheMutationWithReplaceCapitalizationRule_replacesTermInTypeName() async throws {
+    // given
+    document = """
+      query GraphqlSettings @apollo_client_ios_localCacheMutation {
+        allAnimals {
+          species
+        }
+      }
+      """
+
+    config = .mock(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("graphql"), strategy: .replace("graphQL"))],
+      schemaDocumentation: .exclude,
+      markTypesNonisolated: false
+    ))
+
+    let expected =
+      """
+      struct GraphQLSettingsLocalCacheMutation: LocalCacheMutation {
+      """
+
+    // when
+    try await buildSubjectAndOperation(named: "GraphqlSettings")
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, ignoringExtraLines: true))
+  }
+
+  func test__generate__givenLocalCacheMutationFragmentWithCapitalizationRules_capitalizesFragmentTypeName() async throws {
+    // given
+    document = """
+      query TestOperation {
+        allAnimals {
+          ...IDDetails
+        }
+      }
+
+      fragment IDDetails on Animal @apollo_client_ios_localCacheMutation {
+        species
+      }
+      """
+
+    config = .mock(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("id"), strategy: .lower)],
+      schemaDocumentation: .exclude,
+      markTypesNonisolated: false
+    ))
+
+    let expected = """
+      struct IdDetails: TestSchema.MutableSelectionSet, Fragment {
+      """
+
+    // when
+    try await buildSubjectAndFragment(named: "IDDetails")
+
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
+  }
+
   // MARK: - Access Level Tests
 
   func
