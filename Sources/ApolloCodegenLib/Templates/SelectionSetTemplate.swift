@@ -151,7 +151,8 @@ struct SelectionSetTemplate {
     /// \(SelectionSetNameGenerator.generatedSelectionSetName(
           for: selectionSet.typeInfo,
           format: .omittingRoot,
-          pluralizer: config.pluralizer))
+          pluralizer: config.pluralizer,
+          capitalizer: config.capitalizer))
     \(if: config.options.schemaDocumentation == .include, """
       ///
       /// Parent Type: `\(selectionSet.typeInfo.parentType.render(as: .typename()))`
@@ -225,7 +226,8 @@ struct SelectionSetTemplate {
       for: selectionSet.typeInfo,
       to: selectionSet.scopePath.last.value.scopePath.head,
       format: .fullyQualified,
-      pluralizer: config.pluralizer
+      pluralizer: config.pluralizer,
+      capitalizer: config.capitalizer
     )
 
     return """
@@ -251,7 +253,8 @@ struct SelectionSetTemplate {
         let selectionSetName = SelectionSetNameGenerator.generatedSelectionSetName(
           for: $0,
           format: .fullyQualified,
-          pluralizer: config.pluralizer
+          pluralizer: config.pluralizer,
+          capitalizer: config.capitalizer
         )
         return "\(selectionSetName).self"
       })
@@ -414,7 +417,7 @@ struct SelectionSetTemplate {
 
     } else {
       return """
-      .fragment(\(fragment.definition.name.asFragmentName).self)
+      .fragment(\(fragment.definition.name.asFragmentName(capitalizer: config.capitalizer)).self)
       """
     }
   }
@@ -436,7 +439,7 @@ struct SelectionSetTemplate {
     """
     .deferred(\
     \(ifLet: deferCondition.variable, { "if: \"\($0)\", " })\
-    \(fragment.definition.name.asFragmentName).self, label: "\(deferCondition.label)")
+    \(fragment.definition.name.asFragmentName(capitalizer: config.capitalizer)).self, label: "\(deferCondition.label)")
     """
   }
 
@@ -455,7 +458,8 @@ struct SelectionSetTemplate {
         for: selectionSet,
         to: node,
         format: .fullyQualified,
-        pluralizer: config.pluralizer
+        pluralizer: config.pluralizer,
+        capitalizer: config.capitalizer
       )
 
       fulfilledFragments.append(selectionSetName)
@@ -465,7 +469,8 @@ struct SelectionSetTemplate {
       fulfilledFragments
         .append(
           contentsOf: source.generatedSelectionSetNamesOfFullfilledFragments(
-            pluralizer: config.pluralizer
+            pluralizer: config.pluralizer,
+            capitalizer: config.capitalizer
           )
         )
     }
@@ -489,7 +494,8 @@ struct SelectionSetTemplate {
         let selectionSetName = SelectionSetNameGenerator.generatedSelectionSetName(
           for: inlineFragmentSpread.typeInfo,
           format: .fullyQualified,
-          pluralizer: config.pluralizer
+          pluralizer: config.pluralizer,
+          capitalizer: config.capitalizer
         )
         deferredFragments.append(selectionSetName)
       }
@@ -497,7 +503,7 @@ struct SelectionSetTemplate {
 
     for namedFragment in directSelections.namedFragments.values.elements {
       if namedFragment.typeInfo.isDeferred {
-        deferredFragments.append(namedFragment.fragment.generatedDefinitionName)
+        deferredFragments.append(namedFragment.fragment.generatedDefinitionName(capitalizer: config.capitalizer))
       }
     }
 
@@ -651,7 +657,7 @@ struct SelectionSetTemplate {
   ) -> TemplateString {
     let name = fragment.definition.name
     let propertyName = name.firstLowercased
-    let typeName = name.asFragmentName
+    let typeName = name.asFragmentName(capitalizer: config.capitalizer)
     let isOptional =
       fragment.inclusionConditions != nil
       && !scope.matches(fragment.inclusionConditions.unsafelyUnwrapped)
@@ -661,7 +667,7 @@ struct SelectionSetTemplate {
       \(if: isDeferred,
           DeferredFragmentAccessorTemplate(
             propertyName: fragment.definition.name.firstLowercased,
-            typeName: fragment.definition.name.asFragmentName
+            typeName: fragment.definition.name.asFragmentName(capitalizer: config.capitalizer)
           )
       , else:
           """
@@ -828,7 +834,7 @@ private class SelectionSetNameCache {
     let location = typeInfo.entity.location
     return location.fieldPath?.last.value
       .formattedSelectionSetName(with: config.pluralizer)
-      ?? location.source.formattedSelectionSetName()
+      ?? location.source.formattedSelectionSetName(capitalizer: config.capitalizer)
   }
 
 }
@@ -859,7 +865,8 @@ extension IR.ComputedSelectionSet {
       .first.unsafelyUnwrapped
       .generatedSelectionSetNamePath(
         from: typeInfo,
-        pluralizer: config.pluralizer
+        pluralizer: config.pluralizer,
+        capitalizer: config.capitalizer
       )
   }
 
@@ -877,12 +884,14 @@ extension IR.MergedSelections.MergedSource {
 
   fileprivate func generatedSelectionSetNamePath(
     from targetTypeInfo: IR.SelectionSet.TypeInfo,
-    pluralizer: Pluralizer
+    pluralizer: Pluralizer,
+    capitalizer: Capitalizer
   ) -> String {
     if let fragment = fragment {
       return generatedSelectionSetNameForMergedEntity(
         in: fragment,
-        pluralizer: pluralizer
+        pluralizer: pluralizer,
+        capitalizer: capitalizer
       )
     }
 
@@ -911,7 +920,8 @@ extension IR.MergedSelections.MergedSource {
       return SelectionSetNameGenerator.generatedSelectionSetName(
         for: self,
         format: .fullyQualified,
-        pluralizer: pluralizer
+        pluralizer: pluralizer,
+        capitalizer: capitalizer
       )
     }
 
@@ -974,9 +984,10 @@ extension IR.MergedSelections.MergedSource {
 
   private func generatedSelectionSetNameForMergedEntity(
     in fragment: IR.NamedFragment,
-    pluralizer: Pluralizer
+    pluralizer: Pluralizer,
+    capitalizer: Capitalizer
   ) -> String {
-    var selectionSetNameComponents: [String] = [fragment.generatedDefinitionName]
+    var selectionSetNameComponents: [String] = [fragment.generatedDefinitionName(capitalizer: capitalizer)]
 
     let rootEntityScopePath = typeInfo.scopePath.head
     if let rootEntityTypeConditionPath = rootEntityScopePath.value.scopePath.head.next {
@@ -1003,7 +1014,8 @@ extension IR.MergedSelections.MergedSource {
   }
 
   fileprivate func generatedSelectionSetNamesOfFullfilledFragments(
-    pluralizer: Pluralizer
+    pluralizer: Pluralizer,
+    capitalizer: Capitalizer
   ) -> [String] {
     let entityRootNameInFragment =
       SelectionSetNameGenerator
@@ -1011,7 +1023,8 @@ extension IR.MergedSelections.MergedSource {
         for: self,
         to: typeInfo.scopePath.last.value.scopePath.head,
         format: .fullyQualified,
-        pluralizer: pluralizer
+        pluralizer: pluralizer,
+        capitalizer: capitalizer
       )
 
     var fulfilledFragments: [String] = [entityRootNameInFragment]
@@ -1048,13 +1061,15 @@ struct SelectionSetNameGenerator {
     for selectionSet: ComputedSelectionSet,
     to toNode: LinkedList<IR.ScopeCondition>.Node? = nil,
     format: Format,
-    pluralizer: Pluralizer
+    pluralizer: Pluralizer,
+    capitalizer: Capitalizer
   ) -> String {
     generatedSelectionSetName(
       for: selectionSet.typeInfo,
       to: toNode,
       format: format,
-      pluralizer: pluralizer
+      pluralizer: pluralizer,
+      capitalizer: capitalizer
     )
   }
 
@@ -1062,13 +1077,15 @@ struct SelectionSetNameGenerator {
     for mergedSource: IR.MergedSelections.MergedSource,
     to toNode: LinkedList<IR.ScopeCondition>.Node? = nil,
     format: Format,
-    pluralizer: Pluralizer
+    pluralizer: Pluralizer,
+    capitalizer: Capitalizer
   ) -> String {
     generatedSelectionSetName(
       for: mergedSource.typeInfo,
       to: toNode,
       format: format,
-      pluralizer: pluralizer
+      pluralizer: pluralizer,
+      capitalizer: capitalizer
     )
   }
 
@@ -1076,7 +1093,8 @@ struct SelectionSetNameGenerator {
     for typeInfo: IR.SelectionSet.TypeInfo,
     to toNode: LinkedList<IR.ScopeCondition>.Node? = nil,
     format: Format,
-    pluralizer: Pluralizer
+    pluralizer: Pluralizer,
+    capitalizer: Capitalizer
   ) -> String {
     var components: [String] = []
 
@@ -1086,9 +1104,9 @@ struct SelectionSetNameGenerator {
       let sourceName: String = {
         switch typeInfo.entity.location.source {
         case let .operation(operation):
-          return "\(operation.generatedDefinitionName).Data"
+          return "\(operation.generatedDefinitionName(capitalizer: capitalizer)).Data"
         case let .namedFragment(fragment):
-          return fragment.generatedDefinitionName
+          return fragment.generatedDefinitionName(capitalizer: capitalizer)
         }
       }()
       components.append(sourceName)
