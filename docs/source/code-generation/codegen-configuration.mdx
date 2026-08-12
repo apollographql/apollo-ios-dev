@@ -463,7 +463,7 @@ The top-level properties are:
 | [`schemaCustomization`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/schemacustomization) | Customization options to be applied to the schema during code generation. |
 | [`appendSchemaTypeFilenameSuffix`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/appendSchemaTypeFilenameSuffix) | `true` will add a filename suffix matching the schema type, the default is `false`. This can be used to avoid filename conflicts when operation type names match schema type names. |
 | [`reduceGeneratedSchemaTypes`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/reducegeneratedschematypes) | Defaults to `false` which generates `Object` types for all objects that implement any `Interface` referenced in operation documents. Setting this to `true` will only generate `Object` types for objects that are referenced in an operation document or have a `@typePolicy` |
-| [`requireNonOptionalMockFields`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/requirenonoptionalmockfields) | When `true`, test mock convenience initializer parameters for non-null schema fields are non-optional and use schema-appropriate defaults. Defaults to `false`, preserving optional parameters for partial test data. |
+| [`requireNonOptionalMockFields`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/requirenonoptionalmockfields) | When `true`, test mock convenience initializer parameters for non-null schema fields are non-optional and use schema-appropriate defaults. Defaults to `true`; set it to `false` to make all parameters optional for partial test data. |
 
 <MultiCodeBlock>
 
@@ -500,7 +500,7 @@ The top-level properties are:
   "pruneGeneratedFiles": true,
   "markOperationDefinitionsAsFinal": true,
   "reduceGeneratedSchemaTypes": false,
-  "requireNonOptionalMockFields": false,
+  "requireNonOptionalMockFields": true,
   "schemaCustomization" : {
     "customTypeNames" : {
       "MyEnum" : {
@@ -556,7 +556,7 @@ let configuration = ApolloCodegenConfiguration(
     pruneGeneratedFiles: true,
     markOperationDefinitionsAsFinal: true,
     reduceGeneratedSchemaTypes: false,
-    requireNonOptionalMockFields: false,
+    requireNonOptionalMockFields: true,
     schemaCustomization: .init(
       customTypeNames: [
         "MyEnum" : .enum(
@@ -584,15 +584,15 @@ let configuration = ApolloCodegenConfiguration(
 
 ### Test mock field optionality
 
-By default, generated test mock convenience initializers accept optional parameters that default to `nil`, including fields that are non-null in the GraphQL schema. Use this behavior when tests construct partial response data containing only the fields selected by an operation or pass explicit `nil` arguments.
+By default, generated test mock convenience initializers use non-optional parameters for fields that are non-null in the GraphQL schema. Apollo iOS supplies schema-appropriate defaults for those parameters, such as `""` for `String`, `[]` for lists, and an empty generated mock for object fields.
 
-Set `requireNonOptionalMockFields` to `true` to instead generate non-optional initializer parameters for non-null schema fields. Apollo iOS supplies schema-appropriate defaults for those parameters, such as `""` for `String`, `[]` for lists, and an empty generated mock for object fields. Nullable fields and nullable list elements remain optional in either mode.
+Set `requireNonOptionalMockFields` to `false` to make all initializer parameters optional and default them to `nil`. This opt-out can be useful when tests construct partial response data containing only the fields selected by an operation or pass explicit `nil` arguments. Nullable fields and nullable list elements remain optional in either mode.
 
 <MultiCodeBlock>
 
 ```json title="CLI Configuration JSON"
 "options": {
-  "requireNonOptionalMockFields": true
+  "requireNonOptionalMockFields": false
 }
 ```
 
@@ -600,7 +600,7 @@ Set `requireNonOptionalMockFields` to `true` to instead generate non-optional in
 let configuration = ApolloCodegenConfiguration(
   // ... other properties not shown
   options: ApolloCodegenConfiguration.OutputOptions(
-    requireNonOptionalMockFields: true
+    requireNonOptionalMockFields: false
   )
 )
 ```

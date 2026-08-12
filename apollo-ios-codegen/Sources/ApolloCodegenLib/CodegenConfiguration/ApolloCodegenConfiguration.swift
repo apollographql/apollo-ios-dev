@@ -709,11 +709,11 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     /// When `true`, generated test mock convenience initializers use non-optional parameters for
     /// non-null schema fields and provide schema-appropriate default values for those parameters.
     ///
-    /// When `false`, all test mock initializer parameters remain optional and default to `nil`.
-    /// This preserves source compatibility for tests that explicitly pass `nil` or omit fields that
-    /// were not selected by an operation.
+    /// Set this to `false` to make all test mock initializer parameters optional and default them
+    /// to `nil`. This can be useful for tests that explicitly pass `nil` or construct partial
+    /// response data.
     ///
-    /// Defaults to `false`.
+    /// Defaults to `true`.
     public let requireNonOptionalMockFields: Bool
 
     /// Default property values
@@ -731,7 +731,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       public static let conversionStrategies: ConversionStrategies = .init()
       public static let pruneGeneratedFiles: Bool = true
       public static let appendSchemaTypeFilenameSuffix: Bool = false
-      public static let requireNonOptionalMockFields: Bool = false
+      public static let requireNonOptionalMockFields: Bool = true
       #if compiler(>=6.2)
       public static let markTypesNonisolated: Bool = true
       #else
@@ -922,8 +922,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       try container.encode(self.pruneGeneratedFiles, forKey: .pruneGeneratedFiles)
       try container.encode(self.appendSchemaTypeFilenameSuffix, forKey: .appendSchemaTypeFilenameSuffix)
       try container.encode(self.markTypesNonisolated, forKey: .markTypesNonisolated)
-      if self.requireNonOptionalMockFields {
-        try container.encode(true, forKey: .requireNonOptionalMockFields)
+      if !self.requireNonOptionalMockFields {
+        try container.encode(false, forKey: .requireNonOptionalMockFields)
       }
     }
   }

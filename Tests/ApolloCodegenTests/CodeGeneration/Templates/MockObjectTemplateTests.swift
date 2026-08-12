@@ -29,15 +29,13 @@ class MockObjectTemplateTests: XCTestCase {
     testMocks: ApolloCodegenConfiguration.TestMockFileOutput = .swiftPackage(),
     deprecatedEnumCases: ApolloCodegenConfiguration.Composition = .include,
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude,
-    reduceGeneratedSchemaTypes: Bool = false,
-    requireNonOptionalMockFields: Bool = false
+    requireNonOptionalMockFields: Bool = true
   ) {
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
       output: .mock(moduleType: moduleType, testMocks: testMocks),
       options: .init(
         deprecatedEnumCases: deprecatedEnumCases,
-        reduceGeneratedSchemaTypes: reduceGeneratedSchemaTypes,
         warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
         markTypesNonisolated: false,
         requireNonOptionalMockFields: requireNonOptionalMockFields
@@ -640,32 +638,6 @@ class MockObjectTemplateTests: XCTestCase {
       atLine: 8 + self.subject.fields.count,
       ignoringExtraLines: false)
     )
-  }
-
-  func test__render__givenReducedSchemaTypesAndNonOptionalMocksDisabled_doesNotReferenceUngeneratedInterfaceImplementer() {
-    // given
-    let ungeneratedObject = GraphQLObjectType.mock("UngeneratedObject")
-    let generatedObject = GraphQLObjectType.mock("GeneratedObject")
-    let interface: GraphQLType = .entity(GraphQLInterfaceType.mock(
-      "Node",
-      implementingObjects: [ungeneratedObject, generatedObject]
-    ))
-
-    buildSubject(
-      fields: [
-        "node": .mock("node", type: .nonNull(interface)),
-      ],
-      moduleType: .swiftPackage(),
-      reduceGeneratedSchemaTypes: true,
-      requireNonOptionalMockFields: false
-    )
-
-    // when
-    let actual = renderSubject()
-
-    // then
-    expect(actual).to(contain("node: (any AnyMock)? = nil"))
-    expect(actual).toNot(contain("Mock<UngeneratedObject>()"))
   }
 
 
