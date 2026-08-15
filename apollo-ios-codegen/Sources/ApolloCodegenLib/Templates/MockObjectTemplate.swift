@@ -32,12 +32,20 @@ struct MockObjectTemplate: TemplateRenderer {
       }
     }
 
-    func defaultInitializer(config: ApolloCodegen.ConfigurationContext) -> String? {
+    func defaultInitializer(
+      config: ApolloCodegen.ConfigurationContext,
+      referencedTypes: IR.Schema.ReferencedTypes
+    ) -> String? {
       if !config.options.requireNonOptionalMockFields || type.isNullable {
         return " = nil"
-      } else {
-        return " = \(type.defaultMockValue(config: config))"
       }
+
+      guard let defaultValue = type.defaultMockValue(
+        config: config,
+        referencedTypes: referencedTypes
+      ) else { return nil }
+
+      return " = \(defaultValue)"
     }
   }
 
@@ -85,7 +93,7 @@ struct MockObjectTemplate: TemplateRenderer {
         \(conflictingFieldNameProperties(fields))
         convenience init(
           \(fields.map { """
-            \($0.propertyName)\(ifLet: $0.initializerParameterName, {" \($0)"}): \($0.initializerType)\(ifLet: $0.defaultInitializer(config: config), { "\($0)" })
+            \($0.propertyName)\(ifLet: $0.initializerParameterName, {" \($0)"}): \($0.initializerType)\(ifLet: $0.defaultInitializer(config: config, referencedTypes: ir.schema.referencedTypes), { "\($0)" })
             """ }, separator: ",\n")
         ) {
           self.init()

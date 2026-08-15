@@ -29,19 +29,22 @@ class MockObjectTemplateTests: XCTestCase {
     testMocks: ApolloCodegenConfiguration.TestMockFileOutput = .swiftPackage(),
     deprecatedEnumCases: ApolloCodegenConfiguration.Composition = .include,
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude,
-    requireNonOptionalMockFields: Bool = true
+    requireNonOptionalMockFields: Bool = true,
+    reduceGeneratedSchemaTypes: Bool = false,
+    referencedTypes: [GraphQLNamedType] = []
   ) {
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
       output: .mock(moduleType: moduleType, testMocks: testMocks),
       options: .init(
         deprecatedEnumCases: deprecatedEnumCases,
+        reduceGeneratedSchemaTypes: reduceGeneratedSchemaTypes,
         warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
         markTypesNonisolated: false,
         requireNonOptionalMockFields: requireNonOptionalMockFields
       )
     )
-    ir = IRBuilder.mock(compilationResult: .mock())
+    ir = IRBuilder.mock(compilationResult: .mock(referencedTypes: referencedTypes))
 
     let objectType = GraphQLObjectType.mock(
       name,
@@ -640,6 +643,67 @@ class MockObjectTemplateTests: XCTestCase {
     )
   }
 
+  func test__render__givenPrunedAbstractImplementations_generatesDefaultsUsingReferencedMockTypes() {
+    // given
+    let prunedInterfaceObject = GraphQLObjectType.mock("Aardvark")
+    let referencedInterfaceObject = GraphQLObjectType.mock("Zebra")
+    let prunedUnionObject = GraphQLObjectType.mock("Angelfish")
+    let referencedUnionObject = GraphQLObjectType.mock("Zebrafish")
+    referencedInterfaceObject.name.customName = "CustomZebra"
+    referencedUnionObject.name.customName = "CustomZebrafish"
+    let animal: GraphQLType = .entity(GraphQLInterfaceType.mock(
+      "Animal",
+      implementingObjects: [prunedInterfaceObject, referencedInterfaceObject]
+    ))
+    let pet: GraphQLType = .entity(GraphQLUnionType.mock(
+      "Pet",
+      types: [prunedUnionObject, referencedUnionObject]
+    ))
+
+    buildSubject(
+      fields: [
+        "interface": .mock("interface", type: .nonNull(animal)),
+        "union": .mock("union", type: .nonNull(pet)),
+      ],
+      requireNonOptionalMockFields: true,
+      reduceGeneratedSchemaTypes: true,
+      referencedTypes: [referencedInterfaceObject, referencedUnionObject]
+    )
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(contain("interface: (any AnyMock) = Mock<CustomZebra>()"))
+    expect(actual).to(contain("union: (any AnyMock) = Mock<CustomZebrafish>()"))
+    expect(actual).toNot(contain("Mock<Aardvark>()"))
+    expect(actual).toNot(contain("Mock<Angelfish>()"))
+  }
+
+  func test__render__givenNoReferencedAbstractImplementations_doesNotGenerateDefaultMockValue() {
+    // given
+    let prunedObject = GraphQLObjectType.mock("Aardvark")
+    let animal: GraphQLType = .entity(GraphQLInterfaceType.mock(
+      "Animal",
+      implementingObjects: [prunedObject]
+    ))
+
+    buildSubject(
+      fields: [
+        "interface": .mock("interface", type: .nonNull(animal)),
+      ],
+      requireNonOptionalMockFields: true,
+      reduceGeneratedSchemaTypes: true
+    )
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(contain("interface: (any AnyMock)"))
+    expect(actual).toNot(contain("interface: (any AnyMock) ="))
+    expect(actual).toNot(contain("Mock<Aardvark>()"))
+  }
 
   func test__render__givenSchemaTypeWithoutFields_doesNotgenerateConvenienceInitializer() {
     // given
