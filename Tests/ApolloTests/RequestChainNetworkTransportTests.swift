@@ -194,9 +194,19 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
       }
     }
 
+    // Yield to let the task start and the inner stream task begin executing
+    // before we cancel, so the cancellation propagation path is exercised.
+    await Task.yield()
+
     task.cancel()
 
-    await expect(cancellationInterceptor.hasBeenCancelled).toEventually(beTrue())
+    // Await the cancellation signal directly rather than polling with `toEventually`.
+    // Cancellation propagates across multiple cooperative-scheduler hops
+    // (outer task → stream onTermination → inner task → checkCancellation), so
+    // polling is both fragile under CI load and subject to a data race on the flag.
+    await cancellationInterceptor.waitForCancellation()
+
+    expect(cancellationInterceptor.hasBeenCancelled).to(beTrue())
   }
 
   // MARK: - Subscription State Tests
