@@ -155,17 +155,17 @@ tags that already exist, and it may leave duplicate draft releases behind.
    - Extracts release notes from CHANGELOG.md
    - Creates draft releases on apollo-ios and apollo-ios-codegen
    - Dispatches XCFramework build to apollo-ios-xcframework repo
-   - Pushes CocoaPods (v1 branch only)
 
-5. If the XCFramework dispatch fails (known issue on v1 — missing `localRef` param),
-   manually dispatch:
+5. If the XCFramework dispatch step fails, re-dispatch it manually. Both inputs are
+   required by the xcframework workflow:
    ```
    gh workflow run release-new-version.yml \
      -f localRef=<branch> \
      -f remoteRef=<version> \
      --repo apollographql/apollo-ios-xcframework
    ```
-   Monitor until complete.
+   `localRef` is the branch to check out in the apollo-ios-xcframework repo (`main`
+   or `v1`); `remoteRef` is the release tag to pull. Monitor until complete.
 
 6. Report the status of each step to the user.
 
