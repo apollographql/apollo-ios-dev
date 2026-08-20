@@ -105,27 +105,59 @@ This phase requires user verification before pushing.
    The subtree push must succeed before proceeding — the publish workflow checks
    out the upstream repos and needs the latest code.
 
-## Phase 5: Trigger "Publish Release" Workflow
+   Note the run ID. This run also contains the `publish-release` job that
+   auto-dispatches Phase 5, which you will inspect there.
 
-1. Run the publish workflow:
+## Phase 5: "Publish Release" Workflow
+
+Merging a `release/*` PR dispatches "Publish Release" automatically. The
+`publish-release` job in `pr-subtree-push.yml` runs once `split-subtrees` succeeds
+and dispatches the workflow on the PR's base branch.
+
+**Do not dispatch it yourself until you have confirmed the automatic dispatch did
+not happen.** Tagging is not idempotent — a second run fails when it tries to push
+tags that already exist, and it may leave duplicate draft releases behind.
+
+1. Check whether the automatic dispatch fired. Inspect the `publish-release` job in
+   the subtree run from Phase 4:
    ```
-   gh workflow run "Publish Release" --ref <branch>
+   gh run view <subtree-run-id> --json jobs --jq '.jobs[] | "\(.name): \(.conclusion)"'
+   ```
+   Then confirm a "Publish Release" run actually started:
+   ```
+   gh run list --workflow="Publish Release" --limit 3
    ```
 
-2. Monitor until complete:
+2. **If a run started**, monitor it and continue to step 4:
    ```
-   gh run list --workflow="Publish Release" --limit 1
    gh run watch <run-id> --exit-status
    ```
 
-3. The publish workflow performs these steps:
+3. **Fallback — if no run started**, dispatch it manually. Use the base branch
+   (`main` or `v1`), not the `release/*` branch — the workflow checks out the
+   upstream repos at the dispatched ref, and they only have `main` and `v1`:
+   ```
+   gh workflow run "Publish Release" --ref <branch>
+   gh run list --workflow="Publish Release" --limit 1
+   gh run watch <run-id> --exit-status
+   ```
+   Reasons the automatic dispatch may not fire:
+   - The PR head branch was not named `release/*` — only that prefix triggers the job
+   - `split-subtrees` failed, so the dependent job never ran
+   - `APOLLO_IOS_PAT` expired or lost SSO authorization
+
+   Report which case applied, since this step is meant to be automatic. If the job
+   was skipped for a reason not listed above, the gating condition may be broken
+   again — see `.github/workflows/pr-subtree-push.yml`.
+
+4. The publish workflow performs these steps:
    - Tags all three repos (apollo-ios-dev, apollo-ios, apollo-ios-codegen)
    - Extracts release notes from CHANGELOG.md
    - Creates draft releases on apollo-ios and apollo-ios-codegen
    - Dispatches XCFramework build to apollo-ios-xcframework repo
    - Pushes CocoaPods (v1 branch only)
 
-4. If the XCFramework dispatch fails (known issue on v1 — missing `localRef` param),
+5. If the XCFramework dispatch fails (known issue on v1 — missing `localRef` param),
    manually dispatch:
    ```
    gh workflow run release-new-version.yml \
@@ -135,7 +167,7 @@ This phase requires user verification before pushing.
    ```
    Monitor until complete.
 
-5. Report the status of each step to the user.
+6. Report the status of each step to the user.
 
 ## Phase 6: Review and Publish Draft Releases
 
