@@ -83,6 +83,25 @@ public struct DefaultFieldSelectionCollector: FieldSelectionCollector {
     for object: JSONObject,
     info: ObjectExecutionInfo
   ) throws {
+    try collectFields(
+      from: selections,
+      into: &groupedFields,
+      resolveRuntimeType: { info.runtimeObjectType(for: object) },
+      info: info
+    )
+  }
+
+  /// Variant for callers whose object data shape doesn't match `JSONObject`
+  /// directly — e.g. the cache path, where each value is wrapped in a
+  /// `CachedField`. The closure is invoked lazily only when an inline
+  /// fragment is encountered, so callers that hold non-`JSONObject` data
+  /// don't have to transform the entire field dictionary up front.
+  public static func collectFields(
+    from selections: [Selection],
+    into groupedFields: inout FieldSelectionGrouping,
+    resolveRuntimeType: () -> Object?,
+    info: ObjectExecutionInfo
+  ) throws {
     for selection in selections {
       switch selection {
       case let .field(field):
@@ -92,7 +111,7 @@ public struct DefaultFieldSelectionCollector: FieldSelectionCollector {
         if conditions.evaluate(with: info.variables) {
           try collectFields(from: conditionalSelections,
                             into: &groupedFields,
-                            for: object,
+                            resolveRuntimeType: resolveRuntimeType,
                             info: info)
         }
 
@@ -118,23 +137,26 @@ public struct DefaultFieldSelectionCollector: FieldSelectionCollector {
 
         } else {
           groupedFields.addFulfilledFragment(typeCase)
-          try collectFields(from: typeCase.__selections, into: &groupedFields, for: object, info: info)
+          try collectFields(from: typeCase.__selections,
+                            into: &groupedFields,
+                            resolveRuntimeType: resolveRuntimeType,
+                            info: info)
         }
 
       case let .fragment(fragment):
         groupedFields.addFulfilledFragment(fragment)
         try collectFields(from: fragment.__selections,
                           into: &groupedFields,
-                          for: object,
+                          resolveRuntimeType: resolveRuntimeType,
                           info: info)
 
       case let .inlineFragment(typeCase):
-        if let runtimeType = info.runtimeObjectType(for: object),
+        if let runtimeType = resolveRuntimeType(),
            typeCase.__parentType.canBeConverted(from: runtimeType) {
           groupedFields.addFulfilledFragment(typeCase)
           try collectFields(from: typeCase.__selections,
                             into: &groupedFields,
-                            for: object,
+                            resolveRuntimeType: resolveRuntimeType,
                             info: info)
         }
       }
