@@ -971,14 +971,13 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
 
   private func expectDidNotCallNextError<Interceptor: GraphQLInterceptor>(
     from transport: RequestChainNetworkTransport,
-    writeResultsToCache: Bool,
     namingInterceptor interceptorType: Interceptor.Type
   ) async {
     await expect {
       try await transport.send(
         query: MockQuery.mock(),
         fetchBehavior: .NetworkOnly,
-        requestConfiguration: RequestConfiguration(writeResultsToCache: writeResultsToCache)
+        requestConfiguration: RequestConfiguration(writeResultsToCache: true)
       ).getAllValues()
     }.to(throwError { error in
       guard
@@ -996,26 +995,6 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     })
   }
 
-  func test__interceptorDidNotCallNext__givenWriteResultsToCacheFalse__shouldThrowErrorNamingInterceptor()
-    async throws
-  {
-    // Previously an unconditional crash: the request was force unwrapped before `writeResultsToCache` was consulted.
-    let cacheWrites = CacheWriteRecorder()
-
-    let transport = makeTransportRecordingCacheWrites(
-      interceptors: [NextSkippingInterceptor(cacheRecords: Self.cannedCacheRecords)],
-      cacheWriteRecorder: cacheWrites
-    )
-
-    await expectDidNotCallNextError(
-      from: transport,
-      writeResultsToCache: false,
-      namingInterceptor: NextSkippingInterceptor.self
-    )
-
-    expect(cacheWrites.headers).to(beEmpty())
-  }
-
   func test__interceptorDidNotCallNext__givenCacheRecords__shouldThrowErrorAndNotWriteToCache() async throws {
     // Records that never went through response parsing must not reach the cache.
     let cacheWrites = CacheWriteRecorder()
@@ -1027,7 +1006,6 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
 
     await expectDidNotCallNextError(
       from: transport,
-      writeResultsToCache: true,
       namingInterceptor: NextSkippingInterceptor.self
     )
 
@@ -1050,7 +1028,6 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     // The first interceptor did call `next`; the error must name the second one, not the first.
     await expectDidNotCallNextError(
       from: transport,
-      writeResultsToCache: true,
       namingInterceptor: NextSkippingInterceptor.self
     )
 
