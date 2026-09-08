@@ -169,7 +169,10 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
       )
     }
 
-    let cancellationInterceptor = CancellationTestingInterceptor()
+    // Suspending holds the chain in flight until cancellation arrives. Without it, the interceptor's cancellation
+    // check races `task.cancel()`; when the check wins, the interceptor continues down the chain, never reports
+    // cancellation, and `waitForCancellation()` below never returns.
+    let cancellationInterceptor = CancellationTestingInterceptor(suspendsUntilCancelled: true)
     let retryInterceptor = BlindRetryingTestInterceptor()
 
     let transport = RequestChainNetworkTransport(
@@ -194,16 +197,10 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
       }
     }
 
-    // Yield to let the task start and the inner stream task begin executing
-    // before we cancel, so the cancellation propagation path is exercised.
-    await Task.yield()
-
     task.cancel()
 
-    // Await the cancellation signal directly rather than polling with `toEventually`.
-    // Cancellation propagates across multiple cooperative-scheduler hops
-    // (outer task → stream onTermination → inner task → checkCancellation), so
-    // polling is both fragile under CI load and subject to a data race on the flag.
+    // Cancellation propagates across several cooperative-scheduler hops (outer task → stream onTermination →
+    // inner task → the suspended interceptor), so await the signal rather than polling for it.
     await cancellationInterceptor.waitForCancellation()
 
     expect(cancellationInterceptor.hasBeenCancelled).to(beTrue())
