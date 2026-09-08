@@ -23,6 +23,3 @@ archive-cli-for-release:
 	make build-cli-universal; \
 	tar -czf apollo-ios-cli.tar.gz apollo-ios-cli; \
 	echo "Attach apollo-ios-cli.tar.gz to the GitHub release"
-
-test: 
-	swift test
