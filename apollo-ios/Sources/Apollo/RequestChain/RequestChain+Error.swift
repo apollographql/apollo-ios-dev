@@ -27,8 +27,8 @@ extension RequestChain {
       switch self {
       case .interceptorDidNotCallNext:
         return """
-          Every GraphQLInterceptor must call `next`. See the documentation for GraphQLInterceptor for the supported \
-          ways to supply results without performing a network fetch.
+          Every GraphQLInterceptor must call `next`. To supply a result without performing a network fetch, stub the \
+          ApolloURLSession, or call `next` and recover from the error with `mapErrors`.
           """
       }
     }

@@ -1,7 +1,7 @@
+import Foundation
 import Apollo
 import ApolloAPI
 import ApolloWebSocket
-import Foundation
 
 /// A factory that vends `MockWebSocketTask` instances in sequence.
 ///
@@ -47,12 +47,9 @@ public final class MockWebSocketTaskFactory: @unchecked Sendable {
   }
 }
 
-/// A `WebSocketURLSession` that vends `MockWebSocketTask`s instead of real WebSocket connections.
-///
-/// This is the WebSocket counterpart to `ApolloTestSupport`'s `MockURLSession`, which stubs `ApolloURLSession` for
-/// HTTP. It lives here rather than in `ApolloTestSupport` so that module does not need to depend on
-/// `ApolloWebSocket`.
-public struct MockWebSocketURLSession: WebSocketURLSession {
+public struct MockURLSession: ApolloURLSession, WebSocketURLSession {
+
+  public let session: URLSession
 
   /// The default mock WebSocket task, used when no task factory is provided.
   /// When a factory is provided, this is set to the factory's first task for convenience.
@@ -62,16 +59,31 @@ public struct MockWebSocketURLSession: WebSocketURLSession {
   /// When set, `mockWebSocketTask` is not used by `webSocketTask(with:)`.
   private let taskFactory: MockWebSocketTaskFactory?
 
-  public init() {
+  public init<T: MockResponseProvider>(responseProvider: T.Type) {
+    let configuration = URLSessionConfiguration.ephemeral
+    configuration.protocolClasses = [MockURLProtocol<T>.self]
+    session = URLSession(configuration: configuration)
     mockWebSocketTask = MockWebSocketTask()
     taskFactory = nil
   }
 
-  public init(taskFactory: MockWebSocketTaskFactory) {
+  public init<T: MockResponseProvider>(
+    responseProvider: T.Type,
+    taskFactory: MockWebSocketTaskFactory
+  ) {
+    let configuration = URLSessionConfiguration.ephemeral
+    configuration.protocolClasses = [MockURLProtocol<T>.self]
+    session = URLSession(configuration: configuration)
     self.taskFactory = taskFactory
     // Set mockWebSocketTask to the first task for test convenience,
     // but webSocketTask(with:) will call factory.next() sequentially.
     mockWebSocketTask = taskFactory.tasks[0]
+  }
+
+  public func chunks(
+    for request: URLRequest
+  ) async throws -> (any AsyncChunkSequence, URLResponse) {
+    try await session.chunks(for: request)
   }
 
   public func webSocketTask(with request: URLRequest) -> any WebSocketTask {

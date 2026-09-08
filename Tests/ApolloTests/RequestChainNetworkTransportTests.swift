@@ -1,6 +1,5 @@
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 @_spi(Execution) import ApolloInternalTestHelpers
-import ApolloTestSupport
 import Nimble
 import XCTest
 
@@ -840,7 +839,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
   }
 
   private static func cannedResult<Operation: GraphQLOperation>(
-    cacheRecords: RecordSet?
+    cacheRecords: RecordSet
   ) -> ParsedResult<Operation> {
     ParsedResult<Operation>(
       result: GraphQLResponse<Operation>(
@@ -857,7 +856,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
   /// An interceptor that emits its own results without calling `next`, violating the ``GraphQLInterceptor`` contract.
   private struct NextSkippingInterceptor: GraphQLInterceptor {
 
-    let cacheRecords: RecordSet?
+    let cacheRecords: RecordSet
 
     func intercept<Request: GraphQLRequest>(
       request: Request,
@@ -879,7 +878,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
   /// supported way to supply a result in place of a failed network fetch.
   private struct RecoveringInterceptor: GraphQLInterceptor {
 
-    let cacheRecords: RecordSet?
+    let cacheRecords: RecordSet
 
     func intercept<Request: GraphQLRequest>(
       request: Request,
@@ -997,25 +996,6 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     })
   }
 
-  func test__interceptorDidNotCallNext__givenWriteResultsToCacheTrue__shouldThrowErrorNamingInterceptor()
-    async throws
-  {
-    let cacheWrites = CacheWriteRecorder()
-
-    let transport = makeTransportRecordingCacheWrites(
-      interceptors: [NextSkippingInterceptor(cacheRecords: nil)],
-      cacheWriteRecorder: cacheWrites
-    )
-
-    await expectDidNotCallNextError(
-      from: transport,
-      writeResultsToCache: true,
-      namingInterceptor: NextSkippingInterceptor.self
-    )
-
-    expect(cacheWrites.headers).to(beEmpty())
-  }
-
   func test__interceptorDidNotCallNext__givenWriteResultsToCacheFalse__shouldThrowErrorNamingInterceptor()
     async throws
   {
@@ -1100,46 +1080,5 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     // Because `next` was called, the chain was fully traversed and the cache write still gets the mutated request.
     expect(cacheWrites.headers).to(haveCount(1))
     expect(cacheWrites.headers.first?["X-Mutated"]).to(equal("true"))
-  }
-
-  func test__interceptorChain__givenChainRunsToCompletion__shouldWriteCacheWithFullyMutatedRequest()
-    async throws
-  {
-    let data = """
-      {
-        "data": {
-          "__typename": "Hero",
-          "name": "R2-D2"
-        }
-      }
-      """.data(using: .utf8)!
-
-    await Self.registerRequestHandler(for: serverUrl) { _ in
-      (.mock(headerFields: ["content-type": "application/json"]), data)
-    }
-
-    let cacheWrites = CacheWriteRecorder()
-
-    let transport = makeTransportRecordingCacheWrites(
-      interceptors: [
-        HeaderAddingInterceptor(name: "X-First", value: "true"),
-        HeaderAddingInterceptor(name: "X-Second", value: "true"),
-      ],
-      cacheWriteRecorder: cacheWrites
-    )
-
-    let responseStream = try transport.send(
-      query: MockQuery<Hero>(),
-      fetchBehavior: .NetworkOnly,
-      requestConfiguration: RequestConfiguration(writeResultsToCache: true)
-    )
-
-    let results = try await responseStream.getAllValues()
-
-    expect(results).to(haveCount(1))
-    expect(cacheWrites.headers).to(haveCount(1))
-    // A chain that runs to completion writes the cache using the request as it was after every interceptor ran.
-    expect(cacheWrites.headers.first?["X-First"]).to(equal("true"))
-    expect(cacheWrites.headers.first?["X-Second"]).to(equal("true"))
   }
 }

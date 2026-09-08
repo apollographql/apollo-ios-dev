@@ -1,6 +1,5 @@
 import ApolloAPI
 import ApolloInternalTestHelpers
-import ApolloTestSupport
 import Nimble
 import XCTest
 
