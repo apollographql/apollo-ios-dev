@@ -3,6 +3,7 @@ import ApolloAPI
 import Foundation
 
 final class CancellationTestingInterceptor: GraphQLInterceptor, @unchecked Sendable {
+  private let suspendsUntilCancelled: Bool
   private let lock = NSLock()
   private var _hasBeenCancelled = false
   private var waiters: [CheckedContinuation<Void, Never>] = []
@@ -11,10 +12,25 @@ final class CancellationTestingInterceptor: GraphQLInterceptor, @unchecked Senda
     lock.withLock { _hasBeenCancelled }
   }
 
+  /// - Parameter suspendsUntilCancelled: When `true`, the interceptor holds the request chain in flight instead
+  /// of calling `next`, suspending until the task is cancelled and then throwing a `CancellationError`.
+  init(suspendsUntilCancelled: Bool = false) {
+    self.suspendsUntilCancelled = suspendsUntilCancelled
+  }
+
   func intercept<Request: GraphQLRequest>(
     request: Request,
     next: (Request) async -> InterceptorResultStream<Request>
   ) async throws -> InterceptorResultStream<Request> {
+    if suspendsUntilCancelled {
+      await withTaskCancellationHandler {
+        await waitForCancellation()
+      } onCancel: {
+        markCancelled()
+      }
+      throw CancellationError()
+    }
+
     do {
       try Task.checkCancellation()
       return await next(request)

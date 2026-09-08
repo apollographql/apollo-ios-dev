@@ -10,13 +10,16 @@ public final class MockNetworkTransport: NetworkTransport, UploadingNetworkTrans
 
   public init(
     mockServer: MockGraphQLServer = MockGraphQLServer(),
-    store: ApolloStore
+    store: ApolloStore,
+    additionalGraphQLInterceptors: [any GraphQLInterceptor] = []
   ) {
     self.mockServer = mockServer
     let session = MockSession(server: mockServer)
     self.requestChainTransport = RequestChainNetworkTransport(
       urlSession: session,
-      interceptorProvider: MockInterceptorProvider(),
+      interceptorProvider: MockInterceptorProvider(
+        additionalGraphQLInterceptors: additionalGraphQLInterceptors
+      ),
       store: store,
       endpointURL: TestURL.mockServer.url
     )
@@ -57,8 +60,12 @@ public final class MockNetworkTransport: NetworkTransport, UploadingNetworkTrans
   }
 
   private struct MockInterceptorProvider: InterceptorProvider {
+    let additionalGraphQLInterceptors: [any GraphQLInterceptor]
+
     func graphQLInterceptors<Operation: GraphQLOperation>(for operation: Operation) -> [any GraphQLInterceptor] {
-      return DefaultInterceptorProvider.shared.graphQLInterceptors(for: operation) + [TaskLocalRequestInterceptor()]
+      return DefaultInterceptorProvider.shared.graphQLInterceptors(for: operation)
+        + [TaskLocalRequestInterceptor()]
+        + additionalGraphQLInterceptors
     }
   }
 
