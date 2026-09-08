@@ -817,4 +817,273 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
 
     expect(cachedResult).to(beNil())
   }
+
+  // MARK: - Short-Circuiting Interceptor Tests
+  //
+  // A `GraphQLInterceptor` may supply its own results and skip the rest of the chain rather than calling `next`.
+  // Regression coverage for https://github.com/apollographql/apollo-ios/issues/3654
+
+  /// Thread-safe recorder for the `additionalHeaders` of each request seen by an interceptor.
+  private final class RequestHeaderRecorder: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _headers: [[String: String]] = []
+
+    func record(_ headers: [String: String]) {
+      lock.withLock { _headers.append(headers) }
+    }
+
+    var headers: [[String: String]] {
+      lock.withLock { _headers }
+    }
+  }
+
+  /// An interceptor that supplies its own results without calling `next`, skipping the rest of the `RequestChain`.
+  /// This is the shape of a test double that substitutes a canned response.
+  private struct ShortCircuitingInterceptor: GraphQLInterceptor {
+
+    /// The cache records supplied with the canned result. When `nil`, no post-flight cache write is attempted.
+    let cacheRecords: RecordSet?
+
+    func intercept<Request: GraphQLRequest>(
+      request: Request,
+      next: NextInterceptorFunction<Request>
+    ) async throws -> InterceptorResultStream<Request> {
+      // `next` is deliberately never called — the rest of the chain is skipped.
+      let result = ParsedResult<Request.Operation>(
+        result: GraphQLResponse<Request.Operation>(
+          data: nil,
+          extensions: nil,
+          errors: nil,
+          source: .server,
+          dependentKeys: nil
+        ),
+        cacheRecords: cacheRecords
+      )
+
+      let (stream, continuation) = AsyncThrowingStream<
+        ParsedResult<Request.Operation>, any Error
+      >.makeStream()
+
+      continuation.yield(result)
+      continuation.finish()
+
+      return InterceptorResultStream<Request>(stream: stream)
+    }
+  }
+
+  /// An interceptor that adds a header to the request before continuing down the chain.
+  private struct HeaderAddingInterceptor: GraphQLInterceptor {
+    let name: String
+    let value: String
+
+    func intercept<Request: GraphQLRequest>(
+      request: Request,
+      next: NextInterceptorFunction<Request>
+    ) async throws -> InterceptorResultStream<Request> {
+      var request = request
+      request.addHeader(name: name, value: value)
+
+      return await next(request)
+    }
+  }
+
+  /// A `CacheInterceptor` that records the requests it is asked to write cache data for, and never reads or writes
+  /// anything.
+  private struct RecordingCacheInterceptor: CacheInterceptor {
+    let recorder: RequestHeaderRecorder
+
+    func readCacheData<Request: GraphQLRequest>(
+      from store: ApolloStore,
+      request: Request
+    ) async throws -> GraphQLResponse<Request.Operation>? {
+      return nil
+    }
+
+    func writeCacheData<Request: GraphQLRequest>(
+      to store: ApolloStore,
+      request: Request,
+      response: ParsedResult<Request.Operation>
+    ) async throws {
+      recorder.record(request.additionalHeaders)
+    }
+  }
+
+  private struct MockProviderWithCacheInterceptor: InterceptorProvider {
+    var interceptors: [any GraphQLInterceptor]
+    var cache: any CacheInterceptor
+
+    func graphQLInterceptors<Operation: GraphQLOperation>(
+      for operation: Operation
+    ) -> [any GraphQLInterceptor] {
+      interceptors
+    }
+
+    func cacheInterceptor<Operation: GraphQLOperation>(
+      for operation: Operation
+    ) -> any CacheInterceptor {
+      cache
+    }
+  }
+
+  private static let shortCircuitCacheRecords: RecordSet = [
+    "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
+    "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2"],
+  ]
+
+  /// Builds a transport with the given GraphQL interceptors and a `RecordingCacheInterceptor` in place of the
+  /// default one, so a test can assert on which request the post-flight cache write was made with.
+  ///
+  /// For the short-circuiting tests, no request handler is registered on the session, so reaching the network at all
+  /// would fail the request. That makes those tests also assert that the chain really was short-circuited.
+  private func makeTransportRecordingCacheWrites(
+    interceptors: [any GraphQLInterceptor],
+    cacheWriteRecorder: RequestHeaderRecorder
+  ) -> RequestChainNetworkTransport {
+    RequestChainNetworkTransport(
+      urlSession: session,
+      interceptorProvider: MockProviderWithCacheInterceptor(
+        interceptors: interceptors,
+        cache: RecordingCacheInterceptor(recorder: cacheWriteRecorder)
+      ),
+      store: .mock(),
+      endpointURL: serverUrl
+    )
+  }
+
+  func test__shortCircuitingInterceptor__givenWriteResultsToCacheTrue_withNoCacheRecords__shouldEmitResultAndNotWriteToCache()
+    async throws
+  {
+    let cacheWrites = RequestHeaderRecorder()
+
+    let transport = makeTransportRecordingCacheWrites(
+      interceptors: [ShortCircuitingInterceptor(cacheRecords: nil)],
+      cacheWriteRecorder: cacheWrites
+    )
+
+    let responseStream = try transport.send(
+      query: MockQuery.mock(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: true)
+    )
+
+    let results = try await responseStream.getAllValues()
+
+    expect(results).to(haveCount(1))
+    // The canned result carries no cache records, so there is nothing to write.
+    expect(cacheWrites.headers).to(beEmpty())
+  }
+
+  func test__shortCircuitingInterceptor__givenWriteResultsToCacheFalse__shouldEmitResultAndNotWriteToCache()
+    async throws
+  {
+    let cacheWrites = RequestHeaderRecorder()
+
+    let transport = makeTransportRecordingCacheWrites(
+      interceptors: [ShortCircuitingInterceptor(cacheRecords: Self.shortCircuitCacheRecords)],
+      cacheWriteRecorder: cacheWrites
+    )
+
+    let responseStream = try transport.send(
+      query: MockQuery.mock(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    )
+
+    let results = try await responseStream.getAllValues()
+
+    expect(results).to(haveCount(1))
+    expect(cacheWrites.headers).to(beEmpty())
+  }
+
+  func test__shortCircuitingInterceptor__givenWriteResultsToCacheTrue_withCacheRecords__shouldWriteResultToCache()
+    async throws
+  {
+    let cacheWrites = RequestHeaderRecorder()
+
+    let transport = makeTransportRecordingCacheWrites(
+      interceptors: [ShortCircuitingInterceptor(cacheRecords: Self.shortCircuitCacheRecords)],
+      cacheWriteRecorder: cacheWrites
+    )
+
+    let responseStream = try transport.send(
+      query: MockQuery.mock(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: true)
+    )
+
+    let results = try await responseStream.getAllValues()
+
+    expect(results).to(haveCount(1))
+    expect(cacheWrites.headers).to(haveCount(1))
+  }
+
+  func test__shortCircuitingInterceptor__givenEarlierInterceptorMutatedRequest__shouldWriteCacheWithMutatedRequest()
+    async throws
+  {
+    let cacheWrites = RequestHeaderRecorder()
+
+    let transport = makeTransportRecordingCacheWrites(
+      interceptors: [
+        HeaderAddingInterceptor(name: "X-Mutated", value: "true"),
+        ShortCircuitingInterceptor(cacheRecords: Self.shortCircuitCacheRecords),
+      ],
+      cacheWriteRecorder: cacheWrites
+    )
+
+    let responseStream = try transport.send(
+      query: MockQuery.mock(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: true)
+    )
+
+    let results = try await responseStream.getAllValues()
+
+    expect(results).to(haveCount(1))
+    expect(cacheWrites.headers).to(haveCount(1))
+    // The cache write must use the request as it reached the short-circuiting interceptor, including the mutation
+    // made by the interceptor before it — not the request the chain was kicked off with.
+    expect(cacheWrites.headers.first?["X-Mutated"]).to(equal("true"))
+  }
+
+  func test__interceptorChain__givenChainRunsToCompletion__shouldWriteCacheWithFullyMutatedRequest()
+    async throws
+  {
+    let data = """
+      {
+        "data": {
+          "__typename": "Hero",
+          "name": "R2-D2"
+        }
+      }
+      """.data(using: .utf8)!
+
+    await Self.registerRequestHandler(for: serverUrl) { _ in
+      (.mock(headerFields: ["content-type": "application/json"]), data)
+    }
+
+    let cacheWrites = RequestHeaderRecorder()
+
+    let transport = makeTransportRecordingCacheWrites(
+      interceptors: [
+        HeaderAddingInterceptor(name: "X-First", value: "true"),
+        HeaderAddingInterceptor(name: "X-Second", value: "true"),
+      ],
+      cacheWriteRecorder: cacheWrites
+    )
+
+    let responseStream = try transport.send(
+      query: MockQuery<Hero>(),
+      fetchBehavior: .NetworkOnly,
+      requestConfiguration: RequestConfiguration(writeResultsToCache: true)
+    )
+
+    let results = try await responseStream.getAllValues()
+
+    expect(results).to(haveCount(1))
+    expect(cacheWrites.headers).to(haveCount(1))
+    // Seeding the recorded request must not regress the normal path: a chain that runs to completion still writes
+    // the cache using the request as it was after every interceptor ran.
+    expect(cacheWrites.headers.first?["X-First"]).to(equal("true"))
+    expect(cacheWrites.headers.first?["X-Second"]).to(equal("true"))
+  }
 }

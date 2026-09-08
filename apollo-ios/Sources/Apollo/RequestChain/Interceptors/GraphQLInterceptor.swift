@@ -21,8 +21,20 @@ public typealias InterceptorResultStream<Request: GraphQLRequest> =
 /// Each ``GraphQLInterceptor`` provided by an ``InterceptorProvider`` will have it's ``intercept(request:next:)``
 /// function called in sequential order prior to fetching the request.
 ///
-/// The interceptor may inspect or modify the provided `request`, which must then be passed into the `next` closure to
-/// continue through the ``RequestChain``
+/// The interceptor may inspect or modify the provided `request`, which is then passed into the `next` closure to
+/// continue through the ``RequestChain``.
+///
+/// ## Short-Circuiting the Request Chain
+/// Calling `next` is not required. An interceptor may instead return an ``InterceptorResultStream`` of its own, which
+/// skips the remaining steps of the ``RequestChain`` — including the cache read, network fetch, and response
+/// parsing — and passes the results emitted by that stream back "up" through the interceptors that were already
+/// called. This is useful for supplying canned responses, such as a test double or an offline stub.
+///
+/// A short-circuited chain still performs its post-flight cache write, using the request as it was received by the
+/// interceptor that short-circuited. As with any other result, a ``ParsedResult`` is only written to the cache if the
+/// request's ``GraphQLRequest/writeResultsToCache`` is `true`, the result's ``ParsedResult/cacheRecords`` are non-`nil`,
+/// and its ``GraphQLResponse/source`` is ``GraphQLResponse/Source/server``. A test double that yields
+/// `cacheRecords: nil` therefore leaves the cache untouched.
 ///
 /// ## Post-Flight
 /// After response data is fetched and parsed, the ``ParsedResult`` will be emitted by the ``InterceptorResultStream``
@@ -98,7 +110,9 @@ public protocol GraphQLInterceptor: Sendable {
   /// - Parameters:
   ///   - request: The current pre-flight state of the request, may be modified by subsequent interceptors after
   ///   calling the `next` closure.
-  ///   - next: The ``NextInterceptorFunction`` that should be called to proceed to the next step in the ``RequestChain``.
+  ///   - next: The ``NextInterceptorFunction`` called to proceed to the next step in the ``RequestChain``. An
+  ///   interceptor that supplies its own results may skip the rest of the chain by returning a stream without
+  ///   calling this closure.
   /// - Returns: The stream of results to pass to the next interceptor for post-flight processing.
   func intercept<Request: GraphQLRequest>(
     request: Request,

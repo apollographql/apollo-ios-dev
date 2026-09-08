@@ -32,6 +32,11 @@ import ApolloAPI
 /// The ``GraphQLRequest`` is passed "down" through the ``GraphQLInterceptor``s in sequential order. Each interceptor may
 /// inspect and/or mutate the request and proceeds by calling the provided `next` closure.
 ///
+/// An interceptor may also short-circuit the ``RequestChain`` by returning an ``InterceptorResultStream`` of its own
+/// without calling `next`. The remaining steps of the chain are then skipped, and the results emitted by the returned
+/// stream are passed back "up" through the interceptors that were already called. This is useful for supplying canned
+/// responses, such as a test double or an offline stub.
+///
 /// **2. Cache Read**
 ///
 /// The ``RequestChain`` uses the ``GraphQLRequest/fetchBehavior`` of the request to determine if a pre-flight cache
@@ -77,6 +82,10 @@ import ApolloAPI
 /// The ``RequestChain`` uses the ``GraphQLRequest/fetchBehavior`` of the request to determine if a cache write
 /// should be performed. If so, it attempts a cache write by calling the provided ``CacheInterceptor``'s
 /// ``CacheInterceptor/writeCacheData(to:request:response:)`` function.
+///
+/// The request passed to the ``CacheInterceptor`` is the most recently mutated request that reached a step of the
+/// chain. For a chain that ran to completion, this is the request as it was after every ``GraphQLInterceptor`` ran.
+/// If an interceptor short-circuited the chain, it is the request as that interceptor received it.
 ///
 /// **10. Return a ResultStream**
 ///
@@ -181,8 +190,11 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
   ) async throws {
     let interceptors = self.interceptors.graphQL
 
+    // The request for the post-flight cache write. Each step of the chain records the request it received, so an
+    // interceptor that returns its own stream without calling `next` still leaves a usable value here.
+    nonisolated(unsafe) var finalRequest: Request = initialRequest
+
     // Setup next function to traverse interceptors
-    nonisolated(unsafe) var finalRequest: Request!
     var next: @Sendable (Request) async -> InterceptorResultStream<Request> = {
       request in
       finalRequest = request
@@ -194,6 +206,8 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
       let tempNext = next
 
       next = { request in
+        finalRequest = request
+
         do {
           return try await interceptor.intercept(request: request, next: tempNext)
 
