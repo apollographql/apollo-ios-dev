@@ -3,6 +3,9 @@ name: "CI Tests"
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths-ignore:
+      - ".github/claude/**"
+      - ".github/claude-automation.md"
 
 env:
   XCODE_VERSION: "26.5"

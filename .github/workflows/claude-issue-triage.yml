@@ -1,0 +1,173 @@
+name: Claude Issue Triage
+
+# Watches apollographql/apollo-ios for new issues, triages each one with Claude,
+# and either opens a fix PR in this repo or files a tracking issue with
+# questions for the maintainer. See .github/claude-automation.md.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "apollo-ios issue number to triage (blank = poll for new issues)"
+        required: false
+        type: string
+      force:
+        description: "Re-triage even if a tracking issue already exists"
+        required: false
+        type: boolean
+        default: false
+  repository_dispatch:
+    types: [apollo-ios-issue]
+
+concurrency:
+  group: claude-issue-triage
+  cancel-in-progress: false
+
+env:
+  UPSTREAM_REPO: apollographql/apollo-ios
+  DEV_REPO: ${{ github.repository }}
+  TRIAGE_LABEL: claude-triage
+  XCODE_VERSION: "26.5"
+
+jobs:
+  discover:
+    name: Find untriaged issues
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      issues: ${{ steps.discover.outputs.issues }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/claude-triage
+      - name: Discover
+        id: discover
+        env:
+          GH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
+          LOOKBACK_DAYS: ${{ vars.CLAUDE_TRIAGE_LOOKBACK_DAYS || '3' }}
+          MAX_PER_RUN: ${{ vars.CLAUDE_TRIAGE_MAX_PER_RUN || '3' }}
+          INPUT_ISSUE: ${{ github.event.inputs.issue_number || github.event.client_payload.issue_number || '' }}
+          INPUT_FORCE: ${{ github.event.inputs.force || github.event.client_payload.force || 'false' }}
+        run: |
+          args=()
+          if [[ -n "$INPUT_ISSUE" ]]; then
+            args+=(--issue "$INPUT_ISSUE")
+            [[ "$INPUT_FORCE" == "true" ]] && args+=(--force)
+          fi
+          issues="$(scripts/claude-triage/discover-issues.sh "${args[@]}")"
+          echo "Issues to triage: $issues"
+          echo "issues=$issues" >> "$GITHUB_OUTPUT"
+
+  triage:
+    name: Triage apollo-ios#${{ matrix.issue }}
+    needs: discover
+    if: needs.discover.outputs.issues != '[]'
+    runs-on: macos-26
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        issue: ${{ fromJson(needs.discover.outputs.issues) }}
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+    env:
+      RESULT_FILE: ${{ runner.temp }}/claude-triage/result.json
+    steps:
+      # Optional custom GitHub App with access to apollo-ios, for posting
+      # replies upstream when the Claude App token is scoped to this repo only.
+      - name: Create bot token
+        id: bot
+        if: vars.CLAUDE_BOT_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.CLAUDE_BOT_APP_ID }}
+          private-key: ${{ secrets.CLAUDE_BOT_APP_PRIVATE_KEY }}
+          owner: apollographql
+          repositories: apollo-ios,apollo-ios-dev
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Tuist
+        uses: jdx/mise-action@v4
+
+      - name: Configure Git
+        uses: ./.github/actions/configure-git
+        with:
+          user: claude-triage[bot]
+          email: claude-triage[bot]@users.noreply.github.com
+
+      - name: Prepare result directory
+        run: mkdir -p "$(dirname "$RESULT_FILE")"
+
+      # With no github_token input, the action authenticates as the Claude
+      # GitHub App installed on the org, so everything it does shows as claude[bot].
+      - name: Run Claude triage
+        id: claude
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          # Either credential works; leave the one you are not using unset.
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            UPSTREAM REPO: ${{ env.UPSTREAM_REPO }}
+            ISSUE NUMBER: ${{ matrix.issue }}
+            DEV REPO (checked out here, branch main): ${{ github.repository }}
+            RESULT_FILE: ${{ env.RESULT_FILE }}
+
+            Triage apollo-ios issue #${{ matrix.issue }}. Read
+            `.github/claude/triage-instructions.md` first and follow it exactly.
+            Write your final result as JSON to RESULT_FILE. Do not push, do not
+            open pull requests, and do not comment on any GitHub issue.
+          claude_args: |
+            --model ${{ vars.CLAUDE_MODEL || 'claude-opus-5' }}
+            --max-turns 150
+            --allowedTools "Read,Glob,Grep,Edit,MultiEdit,Write,Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh pr list:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh search:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git blame:*),Bash(git grep:*),Bash(git checkout -b:*),Bash(git switch:*),Bash(git branch:*),Bash(git add:*),Bash(git commit:*),Bash(git restore:*),Bash(git stash:*),Bash(swift build:*),Bash(swift test:*),Bash(swift package:*),Bash(tuist generate:*),Bash(xcodebuild:*),Bash(xcrun:*),Bash(ls:*),Bash(cat:*),Bash(find:*),Bash(grep:*),Bash(rg:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(jq:*),Bash(mkdir:*),Bash(npm test:*),Bash(npm install:*)"
+            --disallowedTools "Bash(git push:*),Bash(gh pr create:*),Bash(gh pr comment:*),Bash(gh pr edit:*),Bash(gh pr merge:*),Bash(gh issue create:*),Bash(gh issue comment:*),Bash(gh issue edit:*),Bash(gh issue close:*),WebFetch,WebSearch"
+
+      # Dev-repo pushes and PRs use the Claude App token (claude[bot]). Upstream
+      # replies use a bot token only: the optional custom app first, else the
+      # Claude App token. APOLLO_IOS_PAT is a last resort for dev-repo ops when
+      # the Claude step produced no token; it is never used to post upstream.
+      - name: Publish result
+        id: publish
+        env:
+          GH_TOKEN: ${{ steps.claude.outputs.github_token || steps.bot.outputs.token || secrets.APOLLO_IOS_PAT }}
+          UPSTREAM_TOKEN: ${{ steps.bot.outputs.token || steps.claude.outputs.github_token }}
+          ASSIGNEE: ${{ vars.CLAUDE_TRIAGE_ASSIGNEE || 'AnthonyMDev' }}
+          AUTO_COMMENT: ${{ vars.CLAUDE_TRIAGE_AUTO_COMMENT || 'true' }}
+          ISSUE_NUMBER: ${{ matrix.issue }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ vars.CLAUDE_TRIAGE_SLACK_CHANNEL_ID || 'C06VAE92F7A' }}
+        run: |
+          git fetch origin main --quiet
+          scripts/claude-triage/publish-result.sh "$RESULT_FILE"
+
+      - name: Save triage result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: triage-result-${{ matrix.issue }}
+          path: ${{ runner.temp }}/claude-triage/
+          if-no-files-found: ignore
+
+      - name: Fail job if Claude failed
+        if: steps.claude.outcome == 'failure'
+        run: |
+          echo "Claude run failed; tracking issue filed: ${{ steps.publish.outputs.tracking_url }}"
+          exit 1
