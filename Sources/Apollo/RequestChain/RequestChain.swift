@@ -32,6 +32,10 @@ import ApolloAPI
 /// The ``GraphQLRequest`` is passed "down" through the ``GraphQLInterceptor``s in sequential order. Each interceptor may
 /// inspect and/or mutate the request and proceeds by calling the provided `next` closure.
 ///
+/// Calling `next` is required. Every later step of the chain runs inside that call, so an interceptor that emits a
+/// result from a stream of its own instead would silently skip them all. Doing so fails the request with a
+/// ``RequestChain/Error/interceptorDidNotCallNext(interceptor:operationName:)``.
+///
 /// **2. Cache Read**
 ///
 /// The ``RequestChain`` uses the ``GraphQLRequest/fetchBehavior`` of the request to determine if a pre-flight cache
@@ -78,6 +82,9 @@ import ApolloAPI
 /// should be performed. If so, it attempts a cache write by calling the provided ``CacheInterceptor``'s
 /// ``CacheInterceptor/writeCacheData(to:request:response:)`` function.
 ///
+/// The request passed to the ``CacheInterceptor`` is the request as it was after every ``GraphQLInterceptor`` ran,
+/// including any mutations they made to it.
+///
 /// **10. Return a ResultStream**
 ///
 /// The final ``GraphQLResponse`` values of the ``ParsedResult``.``ParsedResult/result`` emitted by the
@@ -120,7 +127,7 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
   private let interceptors: Interceptors
   private let store: ApolloStore
 
-  public typealias ResultStream = AsyncThrowingStream<GraphQLResponse<Request.Operation>, any Error>
+  public typealias ResultStream = AsyncThrowingStream<GraphQLResponse<Request.Operation>, any Swift.Error>
 
   /// Designated initializer
   ///
@@ -181,8 +188,12 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
   ) async throws {
     let interceptors = self.interceptors.graphQL
 
+    // The request as it reached the end of the chain, recorded only by the innermost step. A `nil` value once a
+    // result has been emitted means an interceptor never called `next`, and `deepestInterceptor` names it.
+    nonisolated(unsafe) var finalRequest: Request? = nil
+    nonisolated(unsafe) var deepestInterceptor: (any GraphQLInterceptor)? = nil
+
     // Setup next function to traverse interceptors
-    nonisolated(unsafe) var finalRequest: Request!
     var next: @Sendable (Request) async -> InterceptorResultStream<Request> = {
       request in
       finalRequest = request
@@ -194,6 +205,8 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
       let tempNext = next
 
       next = { request in
+        deepestInterceptor = interceptor
+
         do {
           return try await interceptor.intercept(request: request, next: tempNext)
 
@@ -213,6 +226,13 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
     for try await response in resultStream.getStream() {
       try Task.checkCancellation()
 
+      guard let finalRequest else {
+        throw Error.interceptorDidNotCallNext(
+          interceptor: deepestInterceptor,
+          operationName: Request.Operation.operationName
+        )
+      }
+
       try await writeToCacheIfNecessary(response: response, for: finalRequest)
 
       continuation.yield(response.result)
@@ -228,7 +248,7 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
     request: Request
   ) -> InterceptorResultStream<Request> {
     return InterceptorResultStream<Request>(
-      stream: AsyncThrowingStream<ParsedResult<Request.Operation>, any Error>.executingInAsyncTask { continuation in
+      stream: AsyncThrowingStream<ParsedResult<Request.Operation>, any Swift.Error>.executingInAsyncTask { continuation in
         let fetchBehavior = request.fetchBehavior
         var didYieldCacheData: Bool = false
 
