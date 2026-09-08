@@ -169,10 +169,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
       )
     }
 
-    // Suspending holds the chain in flight until cancellation arrives. Without it, the interceptor's cancellation
-    // check races `task.cancel()`; when the check wins, the interceptor continues down the chain, never reports
-    // cancellation, and `waitForCancellation()` below never returns.
-    let cancellationInterceptor = CancellationTestingInterceptor(suspendsUntilCancelled: true)
+    let cancellationInterceptor = CancellationTestingInterceptor()
     let retryInterceptor = BlindRetryingTestInterceptor()
 
     let transport = RequestChainNetworkTransport(
