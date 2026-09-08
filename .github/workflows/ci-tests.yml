@@ -151,27 +151,27 @@ jobs:
       run: |
         npm install && npm test
     - name: Save xcodebuild logs
-      if: ${{ failure() }}
+      if: ${{ failure() || cancelled() }}
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.name }}-logs
         path: |
           DerivedData/Logs/Build
     - name: Save crash logs
-      if: ${{ failure() }}
+      if: ${{ failure() || cancelled() }}
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.name }}-crashes
         path: |
           ~/Library/Logs/DiagnosticReports
     - name: Zip Result Bundle
-      if: ${{ failure() }}
+      if: ${{ failure() || cancelled() }}
       shell: bash
       working-directory: TestResults
       run: |
         zip -r ResultBundle.zip ResultBundle.xcresult
     - name: Save test results
-      if: ${{ failure() }}
+      if: ${{ failure() || cancelled() }}
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.name }}-results

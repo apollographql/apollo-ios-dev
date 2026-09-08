@@ -79,7 +79,7 @@ final class ApolloClientOperationTests: XCTestCase {
       networkTransport: MockNetworkTransport(
         mockServer: self.server,
         store: store,
-        additionalGraphQLInterceptors: [CancellationTestingInterceptor(suspendsUntilCancelled: true)]
+        additionalGraphQLInterceptors: [CancellationTestingInterceptor()]
       ),
       store: store
     )

@@ -2,8 +2,13 @@ import Apollo
 import ApolloAPI
 import Foundation
 
+/// A `GraphQLInterceptor` that holds the request chain in flight instead of calling `next`, suspending until its task
+/// is cancelled and then throwing a `CancellationError`.
+///
+/// Suspending is what makes a cancellation test deterministic. An interceptor that only checks cancellation on its way
+/// through races the test's `cancel()` call, and when the check wins it continues down the chain and never observes
+/// cancellation at all.
 final class CancellationTestingInterceptor: GraphQLInterceptor, @unchecked Sendable {
-  private let suspendsUntilCancelled: Bool
   private let lock = NSLock()
   private var _hasBeenCancelled = false
   private var waiters: [CheckedContinuation<Void, Never>] = []
@@ -12,37 +17,17 @@ final class CancellationTestingInterceptor: GraphQLInterceptor, @unchecked Senda
     lock.withLock { _hasBeenCancelled }
   }
 
-  /// - Parameter suspendsUntilCancelled: When `true`, the interceptor holds the request chain in flight instead
-  /// of calling `next`, suspending until the task is cancelled and then throwing a `CancellationError`.
-  init(suspendsUntilCancelled: Bool = false) {
-    self.suspendsUntilCancelled = suspendsUntilCancelled
-  }
-
   func intercept<Request: GraphQLRequest>(
     request: Request,
     next: (Request) async -> InterceptorResultStream<Request>
   ) async throws -> InterceptorResultStream<Request> {
-    if suspendsUntilCancelled {
-      await withTaskCancellationHandler {
-        await waitForCancellation()
-      } onCancel: {
-        markCancelled()
-      }
-      throw CancellationError()
-    }
-
-    do {
-      try Task.checkCancellation()
-      return await next(request)
-
-    } catch is CancellationError {
+    await withTaskCancellationHandler {
+      await waitForCancellation()
+    } onCancel: {
       markCancelled()
-      throw CancellationError()
     }
-  }
 
-  func cancel() {
-    markCancelled()
+    throw CancellationError()
   }
 
   /// Suspends until cancellation has been detected and `hasBeenCancelled` is `true`.
