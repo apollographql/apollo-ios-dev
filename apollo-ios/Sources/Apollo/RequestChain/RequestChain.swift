@@ -32,10 +32,11 @@ import ApolloAPI
 /// The ``GraphQLRequest`` is passed "down" through the ``GraphQLInterceptor``s in sequential order. Each interceptor may
 /// inspect and/or mutate the request and proceeds by calling the provided `next` closure.
 ///
-/// An interceptor may also short-circuit the ``RequestChain`` by returning an ``InterceptorResultStream`` of its own
-/// without calling `next`. The remaining steps of the chain are then skipped, and the results emitted by the returned
-/// stream are passed back "up" through the interceptors that were already called. This is useful for supplying canned
-/// responses, such as a test double or an offline stub.
+/// Calling `next` is required. Every later step of the chain runs inside that call, so an interceptor that emits a
+/// result from a stream of its own instead would silently skip them all. Doing so fails the request with a
+/// ``GraphQLInterceptorDidNotCallNextError``; see
+/// [Calling `next` Is Required](<doc:GraphQLInterceptor#Calling-next-Is-Required>) for the supported ways to supply
+/// results without performing a network fetch.
 ///
 /// **2. Cache Read**
 ///
@@ -83,9 +84,8 @@ import ApolloAPI
 /// should be performed. If so, it attempts a cache write by calling the provided ``CacheInterceptor``'s
 /// ``CacheInterceptor/writeCacheData(to:request:response:)`` function.
 ///
-/// The request passed to the ``CacheInterceptor`` is the most recently mutated request that reached a step of the
-/// chain. For a chain that ran to completion, this is the request as it was after every ``GraphQLInterceptor`` ran.
-/// If an interceptor short-circuited the chain, it is the request as that interceptor received it.
+/// The request passed to the ``CacheInterceptor`` is the request as it was after every ``GraphQLInterceptor`` ran,
+/// including any mutations they made to it.
 ///
 /// **10. Return a ResultStream**
 ///
@@ -190,9 +190,10 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
   ) async throws {
     let interceptors = self.interceptors.graphQL
 
-    // The request for the post-flight cache write. Each step of the chain records the request it received, so an
-    // interceptor that returns its own stream without calling `next` still leaves a usable value here.
-    nonisolated(unsafe) var finalRequest: Request = initialRequest
+    // The request as it reached the end of the chain, recorded only by the innermost step. A `nil` value once a
+    // result has been emitted means an interceptor never called `next`, and `deepestInterceptor` names it.
+    nonisolated(unsafe) var finalRequest: Request? = nil
+    nonisolated(unsafe) var deepestInterceptor: (any GraphQLInterceptor)? = nil
 
     // Setup next function to traverse interceptors
     var next: @Sendable (Request) async -> InterceptorResultStream<Request> = {
@@ -206,7 +207,7 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
       let tempNext = next
 
       next = { request in
-        finalRequest = request
+        deepestInterceptor = interceptor
 
         do {
           return try await interceptor.intercept(request: request, next: tempNext)
@@ -226,6 +227,13 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
 
     for try await response in resultStream.getStream() {
       try Task.checkCancellation()
+
+      guard let finalRequest else {
+        throw GraphQLInterceptorDidNotCallNextError(
+          interceptor: deepestInterceptor,
+          operationName: Request.Operation.operationName
+        )
+      }
 
       try await writeToCacheIfNecessary(response: response, for: finalRequest)
 

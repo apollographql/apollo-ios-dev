@@ -818,13 +818,14 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     expect(cachedResult).to(beNil())
   }
 
-  // MARK: - Short-Circuiting Interceptor Tests
-  //
-  // A `GraphQLInterceptor` may supply its own results and skip the rest of the chain rather than calling `next`.
+  // MARK: - Interceptors That Do Not Call `next`
+
+  // Calling `next` is required. An interceptor that emits a result without doing so silently skips the rest of the
+  // chain, so the `RequestChain` fails the request with a `GraphQLInterceptorDidNotCallNextError` naming it.
   // Regression coverage for https://github.com/apollographql/apollo-ios/issues/3654
 
-  /// Thread-safe recorder for the `additionalHeaders` of each request seen by an interceptor.
-  private final class RequestHeaderRecorder: @unchecked Sendable {
+  /// Thread-safe recorder for the `additionalHeaders` of each request a cache write was made with.
+  private final class CacheWriteRecorder: @unchecked Sendable {
     private let lock = NSLock()
     private var _headers: [[String: String]] = []
 
@@ -837,11 +838,24 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     }
   }
 
-  /// An interceptor that supplies its own results without calling `next`, skipping the rest of the `RequestChain`.
-  /// This is the shape of a test double that substitutes a canned response.
-  private struct ShortCircuitingInterceptor: GraphQLInterceptor {
+  private static func cannedResult<Operation: GraphQLOperation>(
+    cacheRecords: RecordSet?
+  ) -> ParsedResult<Operation> {
+    ParsedResult<Operation>(
+      result: GraphQLResponse<Operation>(
+        data: nil,
+        extensions: nil,
+        errors: nil,
+        source: .server,
+        dependentKeys: nil
+      ),
+      cacheRecords: cacheRecords
+    )
+  }
 
-    /// The cache records supplied with the canned result. When `nil`, no post-flight cache write is attempted.
+  /// An interceptor that emits its own results without calling `next`, violating the ``GraphQLInterceptor`` contract.
+  private struct NextSkippingInterceptor: GraphQLInterceptor {
+
     let cacheRecords: RecordSet?
 
     func intercept<Request: GraphQLRequest>(
@@ -849,25 +863,30 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
       next: NextInterceptorFunction<Request>
     ) async throws -> InterceptorResultStream<Request> {
       // `next` is deliberately never called — the rest of the chain is skipped.
-      let result = ParsedResult<Request.Operation>(
-        result: GraphQLResponse<Request.Operation>(
-          data: nil,
-          extensions: nil,
-          errors: nil,
-          source: .server,
-          dependentKeys: nil
-        ),
-        cacheRecords: cacheRecords
-      )
-
       let (stream, continuation) = AsyncThrowingStream<
         ParsedResult<Request.Operation>, any Error
       >.makeStream()
 
-      continuation.yield(result)
+      continuation.yield(cannedResult(cacheRecords: cacheRecords))
       continuation.finish()
 
       return InterceptorResultStream<Request>(stream: stream)
+    }
+  }
+
+  /// An interceptor that calls `next` and recovers from a failed fetch with a result of its own. This is the
+  /// supported way to supply a result in place of a failed network fetch.
+  private struct RecoveringInterceptor: GraphQLInterceptor {
+
+    let cacheRecords: RecordSet?
+
+    func intercept<Request: GraphQLRequest>(
+      request: Request,
+      next: NextInterceptorFunction<Request>
+    ) async throws -> InterceptorResultStream<Request> {
+      return await next(request).mapErrors { _ in
+        cannedResult(cacheRecords: cacheRecords)
+      }
     }
   }
 
@@ -890,7 +909,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
   /// A `CacheInterceptor` that records the requests it is asked to write cache data for, and never reads or writes
   /// anything.
   private struct RecordingCacheInterceptor: CacheInterceptor {
-    let recorder: RequestHeaderRecorder
+    let recorder: CacheWriteRecorder
 
     func readCacheData<Request: GraphQLRequest>(
       from store: ApolloStore,
@@ -925,7 +944,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     }
   }
 
-  private static let shortCircuitCacheRecords: RecordSet = [
+  private static let cannedCacheRecords: RecordSet = [
     "QUERY_ROOT": ["hero": CacheReference("QUERY_ROOT.hero")],
     "QUERY_ROOT.hero": ["__typename": "Droid", "name": "R2-D2"],
   ]
@@ -933,11 +952,11 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
   /// Builds a transport with the given GraphQL interceptors and a `RecordingCacheInterceptor` in place of the
   /// default one, so a test can assert on which request the post-flight cache write was made with.
   ///
-  /// For the short-circuiting tests, no request handler is registered on the session, so reaching the network at all
-  /// would fail the request. That makes those tests also assert that the chain really was short-circuited.
+  /// No request handler is registered on the session unless a test registers one, so reaching the network at all
+  /// fails the request. That makes these tests also assert whether the chain was actually traversed.
   private func makeTransportRecordingCacheWrites(
     interceptors: [any GraphQLInterceptor],
-    cacheWriteRecorder: RequestHeaderRecorder
+    cacheWriteRecorder: CacheWriteRecorder
   ) -> RequestChainNetworkTransport {
     RequestChainNetworkTransport(
       urlSession: session,
@@ -950,98 +969,130 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
     )
   }
 
-  func test__shortCircuitingInterceptor__givenWriteResultsToCacheTrue_withNoCacheRecords__shouldEmitResultAndNotWriteToCache()
+  private func expectDidNotCallNextError<Interceptor: GraphQLInterceptor>(
+    from transport: RequestChainNetworkTransport,
+    writeResultsToCache: Bool,
+    namingInterceptor interceptorType: Interceptor.Type
+  ) async {
+    await expect {
+      try await transport.send(
+        query: MockQuery.mock(),
+        fetchBehavior: .NetworkOnly,
+        requestConfiguration: RequestConfiguration(writeResultsToCache: writeResultsToCache)
+      ).getAllValues()
+    }.to(throwError { error in
+      guard let error = error as? GraphQLInterceptorDidNotCallNextError else {
+        return fail("Expected GraphQLInterceptorDidNotCallNextError, got \(error)")
+      }
+
+      // The error must name the interceptor that skipped `next` so the failure is attributable.
+      expect(error.interceptor).to(beAKindOf(interceptorType))
+      expect(error.description).to(contain("\(interceptorType)"))
+    })
+  }
+
+  func test__interceptorDidNotCallNext__givenWriteResultsToCacheTrue__shouldThrowErrorNamingInterceptor()
     async throws
   {
-    let cacheWrites = RequestHeaderRecorder()
+    let cacheWrites = CacheWriteRecorder()
 
     let transport = makeTransportRecordingCacheWrites(
-      interceptors: [ShortCircuitingInterceptor(cacheRecords: nil)],
+      interceptors: [NextSkippingInterceptor(cacheRecords: nil)],
       cacheWriteRecorder: cacheWrites
     )
 
-    let responseStream = try transport.send(
-      query: MockQuery.mock(),
-      fetchBehavior: .NetworkOnly,
-      requestConfiguration: RequestConfiguration(writeResultsToCache: true)
+    await expectDidNotCallNextError(
+      from: transport,
+      writeResultsToCache: true,
+      namingInterceptor: NextSkippingInterceptor.self
     )
 
-    let results = try await responseStream.getAllValues()
-
-    expect(results).to(haveCount(1))
-    // The canned result carries no cache records, so there is nothing to write.
     expect(cacheWrites.headers).to(beEmpty())
   }
 
-  func test__shortCircuitingInterceptor__givenWriteResultsToCacheFalse__shouldEmitResultAndNotWriteToCache()
+  func test__interceptorDidNotCallNext__givenWriteResultsToCacheFalse__shouldThrowErrorNamingInterceptor()
     async throws
   {
-    let cacheWrites = RequestHeaderRecorder()
+    // Previously an unconditional crash: the request was force unwrapped before `writeResultsToCache` was consulted.
+    let cacheWrites = CacheWriteRecorder()
 
     let transport = makeTransportRecordingCacheWrites(
-      interceptors: [ShortCircuitingInterceptor(cacheRecords: Self.shortCircuitCacheRecords)],
+      interceptors: [NextSkippingInterceptor(cacheRecords: Self.cannedCacheRecords)],
       cacheWriteRecorder: cacheWrites
     )
 
-    let responseStream = try transport.send(
-      query: MockQuery.mock(),
-      fetchBehavior: .NetworkOnly,
-      requestConfiguration: RequestConfiguration(writeResultsToCache: false)
+    await expectDidNotCallNextError(
+      from: transport,
+      writeResultsToCache: false,
+      namingInterceptor: NextSkippingInterceptor.self
     )
 
-    let results = try await responseStream.getAllValues()
-
-    expect(results).to(haveCount(1))
     expect(cacheWrites.headers).to(beEmpty())
   }
 
-  func test__shortCircuitingInterceptor__givenWriteResultsToCacheTrue_withCacheRecords__shouldWriteResultToCache()
-    async throws
-  {
-    let cacheWrites = RequestHeaderRecorder()
+  func test__interceptorDidNotCallNext__givenCacheRecords__shouldThrowErrorAndNotWriteToCache() async throws {
+    // Records that never went through response parsing must not reach the cache.
+    let cacheWrites = CacheWriteRecorder()
 
     let transport = makeTransportRecordingCacheWrites(
-      interceptors: [ShortCircuitingInterceptor(cacheRecords: Self.shortCircuitCacheRecords)],
+      interceptors: [NextSkippingInterceptor(cacheRecords: Self.cannedCacheRecords)],
       cacheWriteRecorder: cacheWrites
     )
 
-    let responseStream = try transport.send(
-      query: MockQuery.mock(),
-      fetchBehavior: .NetworkOnly,
-      requestConfiguration: RequestConfiguration(writeResultsToCache: true)
+    await expectDidNotCallNextError(
+      from: transport,
+      writeResultsToCache: true,
+      namingInterceptor: NextSkippingInterceptor.self
     )
 
-    let results = try await responseStream.getAllValues()
-
-    expect(results).to(haveCount(1))
-    expect(cacheWrites.headers).to(haveCount(1))
+    expect(cacheWrites.headers).to(beEmpty())
   }
 
-  func test__shortCircuitingInterceptor__givenEarlierInterceptorMutatedRequest__shouldWriteCacheWithMutatedRequest()
+  func test__interceptorDidNotCallNext__givenEarlierInterceptorCalledNext__shouldNameTheInterceptorThatDidNot()
     async throws
   {
-    let cacheWrites = RequestHeaderRecorder()
+    let cacheWrites = CacheWriteRecorder()
 
     let transport = makeTransportRecordingCacheWrites(
       interceptors: [
         HeaderAddingInterceptor(name: "X-Mutated", value: "true"),
-        ShortCircuitingInterceptor(cacheRecords: Self.shortCircuitCacheRecords),
+        NextSkippingInterceptor(cacheRecords: Self.cannedCacheRecords),
       ],
       cacheWriteRecorder: cacheWrites
     )
 
-    let responseStream = try transport.send(
+    // The first interceptor did call `next`; the error must name the second one, not the first.
+    await expectDidNotCallNextError(
+      from: transport,
+      writeResultsToCache: true,
+      namingInterceptor: NextSkippingInterceptor.self
+    )
+
+    expect(cacheWrites.headers).to(beEmpty())
+  }
+
+  func test__interceptorRecoveringWithMapErrors__givenFailedFetch__shouldEmitResultAndWriteToCache() async throws {
+    // The supported alternative to skipping the chain: call `next`, then recover from the failed fetch. No request
+    // handler is registered, so the fetch fails and `mapErrors` supplies the result in its place.
+    let cacheWrites = CacheWriteRecorder()
+
+    let transport = makeTransportRecordingCacheWrites(
+      interceptors: [
+        HeaderAddingInterceptor(name: "X-Mutated", value: "true"),
+        RecoveringInterceptor(cacheRecords: Self.cannedCacheRecords),
+      ],
+      cacheWriteRecorder: cacheWrites
+    )
+
+    let results = try await transport.send(
       query: MockQuery.mock(),
       fetchBehavior: .NetworkOnly,
       requestConfiguration: RequestConfiguration(writeResultsToCache: true)
-    )
-
-    let results = try await responseStream.getAllValues()
+    ).getAllValues()
 
     expect(results).to(haveCount(1))
+    // Because `next` was called, the chain was fully traversed and the cache write still gets the mutated request.
     expect(cacheWrites.headers).to(haveCount(1))
-    // The cache write must use the request as it reached the short-circuiting interceptor, including the mutation
-    // made by the interceptor before it — not the request the chain was kicked off with.
     expect(cacheWrites.headers.first?["X-Mutated"]).to(equal("true"))
   }
 
@@ -1061,7 +1112,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
       (.mock(headerFields: ["content-type": "application/json"]), data)
     }
 
-    let cacheWrites = RequestHeaderRecorder()
+    let cacheWrites = CacheWriteRecorder()
 
     let transport = makeTransportRecordingCacheWrites(
       interceptors: [
@@ -1081,8 +1132,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
 
     expect(results).to(haveCount(1))
     expect(cacheWrites.headers).to(haveCount(1))
-    // Seeding the recorded request must not regress the normal path: a chain that runs to completion still writes
-    // the cache using the request as it was after every interceptor ran.
+    // A chain that runs to completion writes the cache using the request as it was after every interceptor ran.
     expect(cacheWrites.headers.first?["X-First"]).to(equal("true"))
     expect(cacheWrites.headers.first?["X-Second"]).to(equal("true"))
   }
