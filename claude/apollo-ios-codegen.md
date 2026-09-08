@@ -33,15 +33,16 @@ Defined in `Sources/CodegenCLI/Commands/`:
 - `Initialize` — Create initial configuration file
 - `GenerateOperationManifest` — Create persisted queries manifest
 
-## Build Commands (Makefile)
+## Build Commands
+Targets live in `makefile` (lowercase) in this directory.
 - `make build` — Build release target
 - `make build-cli` — Build CLI for current platform
 - `make build-cli-universal` — Universal binary (arm64 + x86_64)
-- `make test` — Run swift test
+- `make archive-cli-for-release` — Universal binary + `apollo-ios-cli.tar.gz`
 - `make clean` / `make wipe` — Clean build artifacts
 
 ## Testing
-Tests live in the parent `apollo-ios-dev` repo. Use the `ApolloCodegenTests` scheme with `Apollo-CodegenTestPlan`.
+This package declares no `testTarget`, so `swift test` finds nothing to run. Tests live in the parent `apollo-ios-dev` repo — use the `ApolloCodegenTests` scheme with `Apollo-CodegenTestPlan`.
 
 ## Dependencies
 - InflectorKit (pluralization), swift-collections (OrderedCollections), swift-argument-parser (CLI)
