@@ -3,12 +3,13 @@ import Nimble
 @testable @_spi(Execution) import Apollo
 @_spi(Execution) @_spi(Unsafe) import ApolloAPI
 @_spi(Execution) import ApolloInternalTestHelpers
+import ApolloTestSupport
 @testable @_spi(Execution) import ApolloWebSocket
 
 class WebSocketTests: XCTestCase, MockResponseProvider {
   var networkTransport: WebSocketTransport!
   var client: ApolloClient!
-  var session: MockURLSession!
+  var session: MockWebSocketURLSession!
   var factory: MockWebSocketTaskFactory!
 
   var mockTask: MockWebSocketTask { factory.tasks[0] }
@@ -40,7 +41,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     store: ApolloStore = .mock()
   ) {
     factory = MockWebSocketTaskFactory(tasks)
-    session = MockURLSession(responseProvider: Self.self, taskFactory: factory)
+    session = MockWebSocketURLSession(taskFactory: factory)
     networkTransport = WebSocketTransport(
       urlSession: session,
       store: store,

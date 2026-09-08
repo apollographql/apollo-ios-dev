@@ -1,6 +1,7 @@
 @_spi(Execution) import Apollo
 @_spi(Execution) import ApolloAPI
 @_spi(Execution) import ApolloInternalTestHelpers
+import ApolloTestSupport
 import Nimble
 import XCTest
 

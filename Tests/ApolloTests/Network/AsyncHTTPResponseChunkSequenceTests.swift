@@ -2,6 +2,7 @@ import XCTest
 @testable import Apollo
 import Nimble
 import ApolloInternalTestHelpers
+import ApolloTestSupport
 
 class AsyncHTTPResponseChunkSequenceTests: XCTestCase, MockResponseProvider {
 

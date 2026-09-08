@@ -1,6 +1,7 @@
 import Apollo
 import ApolloAPI
 import ApolloInternalTestHelpers
+import ApolloTestSupport
 @preconcurrency import Combine
 import XCTest
 
