@@ -821,7 +821,7 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
   // MARK: - Interceptors That Do Not Call `next`
 
   // Calling `next` is required. An interceptor that emits a result without doing so silently skips the rest of the
-  // chain, so the `RequestChain` fails the request with a `GraphQLInterceptorDidNotCallNextError` naming it.
+  // chain, so the `RequestChain` fails the request with a `RequestChain.Error.interceptorDidNotCallNext`.
   // Regression coverage for https://github.com/apollographql/apollo-ios/issues/3654
 
   /// Thread-safe recorder for the `additionalHeaders` of each request a cache write was made with.
@@ -981,13 +981,18 @@ class RequestChainNetworkTransportTests: XCTestCase, MockResponseProvider {
         requestConfiguration: RequestConfiguration(writeResultsToCache: writeResultsToCache)
       ).getAllValues()
     }.to(throwError { error in
-      guard let error = error as? GraphQLInterceptorDidNotCallNextError else {
-        return fail("Expected GraphQLInterceptorDidNotCallNextError, got \(error)")
+      guard
+        let error = error as? RequestChain<JSONRequest<MockQuery<MockSelectionSet>>>.Error,
+        case let .interceptorDidNotCallNext(interceptor, operationName) = error
+      else {
+        return fail("Expected RequestChain.Error.interceptorDidNotCallNext, got \(error)")
       }
 
       // The error must name the interceptor that skipped `next` so the failure is attributable.
-      expect(error.interceptor).to(beAKindOf(interceptorType))
-      expect(error.description).to(contain("\(interceptorType)"))
+      expect(interceptor).to(beAKindOf(interceptorType))
+      expect(operationName).to(equal(MockQuery<MockSelectionSet>.operationName))
+      expect(error.errorDescription).to(contain("\(interceptorType)"))
+      expect(error.recoverySuggestion).toNot(beNil())
     })
   }
 

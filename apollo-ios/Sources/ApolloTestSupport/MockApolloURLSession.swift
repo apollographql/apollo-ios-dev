@@ -27,7 +27,7 @@ import Foundation
 ///
 /// Stubbing the session is the supported way to substitute a canned response. A `GraphQLInterceptor` that returns
 /// results of its own without calling `next` is not: it skips the rest of the chain, and the `RequestChain` fails the
-/// request with a `GraphQLInterceptorDidNotCallNextError`.
+/// request with a `RequestChain.Error.interceptorDidNotCallNext`.
 ///
 /// - Note: This stubs `ApolloURLSession` only. It does not conform to `WebSocketURLSession`, so it cannot stub
 /// WebSocket subscriptions — use ``Response/multipart(parts:boundary:protocolSpec:statusCode:)`` for subscriptions

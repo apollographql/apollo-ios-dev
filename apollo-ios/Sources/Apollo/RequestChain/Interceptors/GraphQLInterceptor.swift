@@ -24,25 +24,6 @@ public typealias InterceptorResultStream<Request: GraphQLRequest> =
 /// The interceptor may inspect or modify the provided `request`, which must then be passed into the `next` closure to
 /// continue through the ``RequestChain``.
 ///
-/// ## Calling `next` Is Required
-/// Every ``GraphQLInterceptor`` must call `next`. The remaining steps of the ``RequestChain`` — the interceptors after
-/// this one, the cache read, the network fetch, and response parsing — all run inside that call, so an interceptor
-/// that returns a stream of its own instead silently skips them. Nothing else in the chain can observe that this
-/// happened: ``GraphQLRequest/fetchBehavior`` is ignored, later interceptors never see the request, and the emitted
-/// ``ParsedResult`` has not been through response parsing.
-///
-/// An interceptor that emits a result without calling `next` therefore fails the request with a
-/// ``GraphQLInterceptorDidNotCallNextError`` naming the offending interceptor.
-///
-/// To supply results without performing a network fetch, use the seam intended for it rather than skipping the chain:
-///
-/// - **To substitute a canned response**, stub the `ApolloURLSession` — see `MockApolloURLSession` in
-/// `ApolloTestSupport`. The interceptors, response parsing, and cache writes then all run as they do in production.
-/// - **To supply a result only when the fetch fails**, call `next` and recover from the error with
-/// ``NonCopyableAsyncThrowingStream/mapErrors(_:)``, which may return a ``ParsedResult`` of your own in its place.
-/// - **To serve results from the cache**, use ``GraphQLRequest/fetchBehavior`` or a custom ``CacheInterceptor``.
-/// - **To abort the request**, throw from ``intercept(request:next:)``. The error is propagated to the caller.
-///
 /// ## Post-Flight
 /// After response data is fetched and parsed, the ``ParsedResult`` will be emitted by the ``InterceptorResultStream``
 /// returned by the call to the `next` closure. The ``ParsedResult`` is passed back up the interceptor chain in reverse
@@ -119,53 +100,11 @@ public protocol GraphQLInterceptor: Sendable {
   ///   calling the `next` closure.
   ///   - next: The ``NextInterceptorFunction`` that must be called to proceed to the next step in the
   ///   ``RequestChain``. An interceptor that emits a result without calling this closure fails the request with a
-  ///   ``GraphQLInterceptorDidNotCallNextError``.
+  ///   ``RequestChain/Error/interceptorDidNotCallNext(interceptor:operationName:)``.
   /// - Returns: The stream of results to pass to the next interceptor for post-flight processing.
   func intercept<Request: GraphQLRequest>(
     request: Request,
     next: NextInterceptorFunction<Request>
   ) async throws -> InterceptorResultStream<Request>
 
-}
-
-/// An error indicating that a ``GraphQLInterceptor`` emitted a result without calling its `next` closure, skipping
-/// the remaining steps of the ``RequestChain``.
-///
-/// See [Calling `next` Is Required](<doc:GraphQLInterceptor#Calling-next-Is-Required>) for the supported ways to
-/// supply results without performing a network fetch.
-public struct GraphQLInterceptorDidNotCallNextError: Swift.Error, LocalizedError, CustomStringConvertible {
-
-  /// The ``GraphQLInterceptor`` that emitted a result without calling `next`, if it could be identified.
-  public let interceptor: (any GraphQLInterceptor)?
-
-  /// The name of the operation the ``RequestChain`` was executing.
-  public let operationName: String
-
-  /// Designated initializer.
-  ///
-  /// - Parameters:
-  ///   - interceptor: The ``GraphQLInterceptor`` that emitted a result without calling `next`, if it could be
-  ///   identified.
-  ///   - operationName: The name of the operation the ``RequestChain`` was executing.
-  public init(interceptor: (any GraphQLInterceptor)?, operationName: String) {
-    self.interceptor = interceptor
-    self.operationName = operationName
-  }
-
-  public var description: String {
-    let interceptorName = interceptor.map { "\(type(of: $0))" } ?? "A GraphQLInterceptor"
-
-    return """
-      \(interceptorName) emitted a result for operation "\(operationName)" without calling the `next` closure. \
-      Every GraphQLInterceptor must call `next`, which is what runs the rest of the RequestChain — the remaining \
-      interceptors, the cache read, the network fetch, and response parsing.
-
-      To substitute a canned response, stub the ApolloURLSession instead of skipping the chain (see \
-      MockApolloURLSession in ApolloTestSupport). To supply a result only when the fetch fails, call `next` and \
-      recover with `mapErrors`. To serve results from the cache, use the request's `fetchBehavior` or a custom \
-      CacheInterceptor. To abort the request, throw from `intercept(request:next:)`.
-      """
-  }
-
-  public var errorDescription: String? { description }
 }

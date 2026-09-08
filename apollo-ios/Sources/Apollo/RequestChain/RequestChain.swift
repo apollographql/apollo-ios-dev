@@ -34,9 +34,7 @@ import ApolloAPI
 ///
 /// Calling `next` is required. Every later step of the chain runs inside that call, so an interceptor that emits a
 /// result from a stream of its own instead would silently skip them all. Doing so fails the request with a
-/// ``GraphQLInterceptorDidNotCallNextError``; see
-/// [Calling `next` Is Required](<doc:GraphQLInterceptor#Calling-next-Is-Required>) for the supported ways to supply
-/// results without performing a network fetch.
+/// ``RequestChain/Error/interceptorDidNotCallNext(interceptor:operationName:)``.
 ///
 /// **2. Cache Read**
 ///
@@ -129,7 +127,7 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
   private let interceptors: Interceptors
   private let store: ApolloStore
 
-  public typealias ResultStream = AsyncThrowingStream<GraphQLResponse<Request.Operation>, any Error>
+  public typealias ResultStream = AsyncThrowingStream<GraphQLResponse<Request.Operation>, any Swift.Error>
 
   /// Designated initializer
   ///
@@ -229,7 +227,7 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
       try Task.checkCancellation()
 
       guard let finalRequest else {
-        throw GraphQLInterceptorDidNotCallNextError(
+        throw Error.interceptorDidNotCallNext(
           interceptor: deepestInterceptor,
           operationName: Request.Operation.operationName
         )
@@ -250,7 +248,7 @@ public struct RequestChain<Request: GraphQLRequest>: Sendable {
     request: Request
   ) -> InterceptorResultStream<Request> {
     return InterceptorResultStream<Request>(
-      stream: AsyncThrowingStream<ParsedResult<Request.Operation>, any Error>.executingInAsyncTask { continuation in
+      stream: AsyncThrowingStream<ParsedResult<Request.Operation>, any Swift.Error>.executingInAsyncTask { continuation in
         let fetchBehavior = request.fetchBehavior
         var didYieldCacheData: Bool = false
 
