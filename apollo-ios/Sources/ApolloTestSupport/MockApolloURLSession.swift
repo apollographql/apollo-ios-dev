@@ -260,11 +260,10 @@ public final class MockApolloURLSession: ApolloURLSession, @unchecked Sendable {
 
     // Record the request and take the next stub under the lock, but call the handler outside of it — the handler is
     // async and may itself touch the session.
-    lock.lock()
-    _receivedRequests.append(request)
-    let nextStub: Stub? = queue.isEmpty ? nil : queue.removeFirst()
-    let currentHandler = self.handler
-    lock.unlock()
+    let (nextStub, currentHandler) = lock.withLock {
+      _receivedRequests.append(request)
+      return (queue.isEmpty ? nil : queue.removeFirst(), self.handler)
+    }
 
     let stub: Stub
     if let nextStub {
