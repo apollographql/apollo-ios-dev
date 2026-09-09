@@ -57,13 +57,8 @@ jobs:
       - name: Install Tuist
         uses: jdx/mise-action@v4
 
-      # The posting script is copied aside now, while the tree is on main, so the
-      # post step does not depend on whichever branch Claude leaves checked out.
       - name: Prepare run
-        run: |
-          echo "UPSTREAM_REPLY_FILE=$RUNNER_TEMP/upstream-reply.json" >> "$GITHUB_ENV"
-          cp scripts/claude-triage/post-upstream-reply.sh "$RUNNER_TEMP/post-upstream-reply.sh"
-          chmod +x "$RUNNER_TEMP/post-upstream-reply.sh"
+        run: echo "UPSTREAM_REPLY_FILE=$RUNNER_TEMP/upstream-reply.json" >> "$GITHUB_ENV"
 
       # Claude never posts upstream itself. An approved reply is written to
       # UPSTREAM_REPLY_FILE and posted by the step after this one.
@@ -108,6 +103,10 @@ jobs:
           # Copy shown on this PR has @mentions defused so the reporter is not pinged from here.
           zwsp="$(printf '\xe2\x80\x8b')"
           sed "s/@\([A-Za-z0-9]\)/@${zwsp}\1/g" "$RUNNER_TEMP/upstream-reply-body.md" > "$RUNNER_TEMP/upstream-reply-body-internal.md"
+          # Taken from origin/main after Claude has run: independent of the branch
+          # Claude left checked out, and not writable by the model's tools.
+          git show origin/main:scripts/claude-triage/post-upstream-reply.sh > "$RUNNER_TEMP/post-upstream-reply.sh"
+          chmod +x "$RUNNER_TEMP/post-upstream-reply.sh"
           set +e
           url="$("$RUNNER_TEMP/post-upstream-reply.sh" "$issue" "$RUNNER_TEMP/upstream-reply-body.md")"
           rc=$?
