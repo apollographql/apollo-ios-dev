@@ -107,7 +107,7 @@ jobs:
           if [[ $rc -eq 0 && -n "$url" ]]; then
             gh pr comment "$PR_NUMBER" --body "Posted the approved reply on apollographql/apollo-ios#${issue}: ${url}"
           elif [[ $rc -eq 2 ]]; then
-            gh pr comment "$PR_NUMBER" --body "$(printf 'Dispatched the approved reply to apollographql/apollo-ios#%s but could not confirm it was posted (run log: %s). **Check the issue before posting anything manually**; the relay has very likely posted it.' "$issue" "$RUN_URL")"
+            gh pr comment "$PR_NUMBER" --body "$(printf 'Dispatched the approved reply to apollographql/apollo-ios#%s but could not confirm it was posted (run log: %s). **Check https://github.com/apollographql/apollo-ios/issues/%s before posting this manually.** The relay may already have posted it, or may not be present on the upstream default branch yet.\n\n<details><summary>Approved text</summary>\n\n%s\n\n</details>' "$issue" "$RUN_URL" "$issue" "$(cat "$RUNNER_TEMP/upstream-reply-body.md")")"
             exit 1
           else
             gh pr comment "$PR_NUMBER" --body "$(printf 'Could not post the approved reply on apollographql/apollo-ios#%s (run log: %s). Text to paste:\n\n%s' "$issue" "$RUN_URL" "$(cat "$RUNNER_TEMP/upstream-reply-body.md")")"
