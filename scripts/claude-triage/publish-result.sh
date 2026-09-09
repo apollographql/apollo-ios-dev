@@ -232,11 +232,12 @@ post_unconfirmed=false
 if [[ -n "$response_draft" && "$confidence" == "high" && "$category" != "feature" && "$category" != "unclear" ]]; then
   if [[ "$AUTO_COMMENT" == "true" && ( -n "$UPSTREAM_TOKEN" || -n "$UPSTREAM_DISPATCH_TOKEN" ) ]]; then
     printf '%s' "$response_draft" | sed '/<!-- *claude-triage/d' >"$tmp/reply-body.md"
-    set +e
-    posted_comment_url="$(UPSTREAM_TOKEN="$UPSTREAM_TOKEN" UPSTREAM_DISPATCH_TOKEN="$UPSTREAM_DISPATCH_TOKEN" \
-      "$here/post-upstream-reply.sh" "$n" "$tmp/reply-body.md" 2>"$tmp/post-reply.log")"
-    rc=$?
-    set -e
+    # No command substitution here: with errtrace a subshell inherits the ERR
+    # trap, so the child's non-zero exit would fire it before the || is reached.
+    rc=0
+    UPSTREAM_TOKEN="$UPSTREAM_TOKEN" UPSTREAM_DISPATCH_TOKEN="$UPSTREAM_DISPATCH_TOKEN" \
+      "$here/post-upstream-reply.sh" "$n" "$tmp/reply-body.md" >"$tmp/post-reply.out" 2>"$tmp/post-reply.log" || rc=$?
+    posted_comment_url="$(cat "$tmp/post-reply.out")"
     cat "$tmp/post-reply.log" >&2
     if [[ $rc -eq 0 && -n "$posted_comment_url" ]]; then
       echo "Posted upstream comment: $posted_comment_url" >&2
