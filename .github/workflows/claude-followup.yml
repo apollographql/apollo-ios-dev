@@ -57,8 +57,13 @@ jobs:
       - name: Install Tuist
         uses: jdx/mise-action@v4
 
+      # The posting script is copied aside now, while the tree is on main, so the
+      # post step does not depend on whichever branch Claude leaves checked out.
       - name: Prepare run
-        run: echo "UPSTREAM_REPLY_FILE=$RUNNER_TEMP/upstream-reply.json" >> "$GITHUB_ENV"
+        run: |
+          echo "UPSTREAM_REPLY_FILE=$RUNNER_TEMP/upstream-reply.json" >> "$GITHUB_ENV"
+          cp scripts/claude-triage/post-upstream-reply.sh "$RUNNER_TEMP/post-upstream-reply.sh"
+          chmod +x "$RUNNER_TEMP/post-upstream-reply.sh"
 
       # Claude never posts upstream itself. An approved reply is written to
       # UPSTREAM_REPLY_FILE and posted by the step after this one.
@@ -104,7 +109,7 @@ jobs:
           zwsp="$(printf '\xe2\x80\x8b')"
           sed "s/@\([A-Za-z0-9]\)/@${zwsp}\1/g" "$RUNNER_TEMP/upstream-reply-body.md" > "$RUNNER_TEMP/upstream-reply-body-internal.md"
           set +e
-          url="$(scripts/claude-triage/post-upstream-reply.sh "$issue" "$RUNNER_TEMP/upstream-reply-body.md")"
+          url="$("$RUNNER_TEMP/post-upstream-reply.sh" "$issue" "$RUNNER_TEMP/upstream-reply-body.md")"
           rc=$?
           set -e
           if [[ $rc -eq 0 && -n "$url" ]]; then
