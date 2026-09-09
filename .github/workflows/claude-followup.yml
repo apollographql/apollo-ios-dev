@@ -33,9 +33,8 @@ jobs:
       id-token: write
       actions: read
     steps:
-      # When the bot app is configured it is passed as github_token so Claude's
-      # gh calls (including upstream replies) run as that bot. The action
-      # overwrites GH_TOKEN in Claude's environment, so an env var would not do.
+      # Optional org-owned bot app. When configured it is passed as github_token
+      # so Claude's gh calls run as that bot instead of the Claude App.
       - name: Create bot token
         id: bot
         if: vars.CLAUDE_BOT_APP_ID != ''
@@ -58,7 +57,13 @@ jobs:
       - name: Install Tuist
         uses: jdx/mise-action@v4
 
+      - name: Prepare run
+        run: echo "UPSTREAM_REPLY_FILE=$RUNNER_TEMP/upstream-reply.json" >> "$GITHUB_ENV"
+
+      # Claude never posts upstream itself. An approved reply is written to
+      # UPSTREAM_REPLY_FILE and posted by the step after this one.
       - name: Run Claude
+        id: claude
         uses: anthropics/claude-code-action@v1
         with:
           # Either credential works; leave the one you are not using unset.
@@ -70,6 +75,24 @@ jobs:
           claude_args: |
             --model ${{ vars.CLAUDE_MODEL || 'claude-opus-5' }}
             --max-turns 150
-            --append-system-prompt "Before doing anything else, read .github/claude/followup-instructions.md and follow it. UPSTREAM_POSTING_ENABLED=${{ steps.bot.outputs.token != '' }}"
-            --allowedTools "Read,Glob,Grep,Edit,MultiEdit,Write,Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh issue comment:*),Bash(gh pr list:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh pr create:*),Bash(gh pr ready:*),Bash(gh pr edit:*),Bash(gh pr close:*),Bash(gh pr comment:*),Bash(gh run view:*),Bash(gh search:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git blame:*),Bash(git grep:*),Bash(git fetch:*),Bash(git checkout:*),Bash(git switch:*),Bash(git branch:*),Bash(git add:*),Bash(git commit:*),Bash(git push origin:*),Bash(git restore:*),Bash(swift build:*),Bash(swift test:*),Bash(tuist generate:*),Bash(xcodebuild:*),Bash(ls:*),Bash(cat:*),Bash(find:*),Bash(grep:*),Bash(rg:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(jq:*),Bash(mkdir:*)"
-            --disallowedTools "Bash(gh api:*),Bash(gh pr merge:*),Bash(gh repo:*),Bash(git push --force:*),Bash(git push -f:*),Bash(git push origin --force:*),Bash(git push origin -f:*),Bash(npm:*),Bash(npx:*),Bash(curl:*),Bash(swift package:*),Bash(xcrun:*),WebFetch,WebSearch"
+            --append-system-prompt "Before doing anything else, read .github/claude/followup-instructions.md and follow it. UPSTREAM_REPLY_FILE=${{ env.UPSTREAM_REPLY_FILE }}"
+            --allowedTools "Read,Glob,Grep,Edit,MultiEdit,Write,Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh pr list:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh pr create:*),Bash(gh pr ready:*),Bash(gh pr edit:*),Bash(gh pr close:*),Bash(gh pr comment:*),Bash(gh run view:*),Bash(gh search:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git blame:*),Bash(git grep:*),Bash(git fetch:*),Bash(git checkout:*),Bash(git switch:*),Bash(git branch:*),Bash(git add:*),Bash(git commit:*),Bash(git push origin:*),Bash(git restore:*),Bash(swift build:*),Bash(swift test:*),Bash(tuist generate:*),Bash(xcodebuild:*),Bash(ls:*),Bash(cat:*),Bash(find:*),Bash(grep:*),Bash(rg:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(jq:*),Bash(mkdir:*)"
+            --disallowedTools "Bash(gh issue comment:*),Bash(gh issue edit:*),Bash(gh issue close:*),Bash(gh api:*),Bash(gh pr merge:*),Bash(gh repo:*),Bash(git push --force:*),Bash(git push -f:*),Bash(git push origin --force:*),Bash(git push origin -f:*),Bash(npm:*),Bash(npx:*),Bash(curl:*),Bash(swift package:*),Bash(xcrun:*),WebFetch,WebSearch"
+
+      - name: Post approved upstream reply
+        if: always() && hashFiles(env.UPSTREAM_REPLY_FILE) != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPSTREAM_TOKEN: ${{ steps.bot.outputs.token }}
+          UPSTREAM_DISPATCH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
+        run: |
+          issue="$(jq -r '.issue_number' "$UPSTREAM_REPLY_FILE")"
+          jq -r '.body' "$UPSTREAM_REPLY_FILE" > "$RUNNER_TEMP/upstream-reply-body.md"
+          if url="$(scripts/claude-triage/post-upstream-reply.sh "$issue" "$RUNNER_TEMP/upstream-reply-body.md")"; then
+            gh pr comment "$PR_NUMBER" --body "Posted the approved reply on apollographql/apollo-ios#${issue}: ${url}"
+          else
+            gh pr comment "$PR_NUMBER" --body "$(printf 'Could not post the approved reply on apollographql/apollo-ios#%s (see the run log: %s). Text to paste:\n\n%s' "$issue" "$RUN_URL" "$(cat "$RUNNER_TEMP/upstream-reply-body.md")")"
+            exit 1
+          fi
