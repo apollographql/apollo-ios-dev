@@ -27,6 +27,7 @@
 #   AUTO_COMMENT           default true; "false" disables posting even with a bot token
 #   RUN_URL                link to the workflow run
 #   ISSUE_NUMBER           upstream issue number (required)
+#   TRIGGER_REASON         new | reporter-followup | manual (informational)
 #   SLACK_BOT_TOKEN        optional
 #   SLACK_CHANNEL_ID       optional channel or member ID
 
@@ -71,9 +72,29 @@ existing_open_pr() {
 
 # Creates a PR for $1 (head branch), or updates the open one if a re-triage finds it already there.
 # $2 = title, $3 = body file, $4 = "draft"|"ready", rest = labels (--label X ...) and other create flags.
+triage_marker() {
+  printf '\n<!-- claude-triage issue=%s triaged-at=%s -->\n' "$n" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+}
+
+# Re-stamps the newest tracking or fix PR for this issue (open or closed) so
+# discovery does not re-trigger on the same reporter comments.
+stamp_latest_record() {
+  local record url body
+  record="$(gh pr list --repo "$DEV_REPO" --label "$TRIAGE_LABEL" --state all --limit 1 \
+    --search "apollo-ios#${n} in:title sort:updated-desc" --json url,body \
+    --jq '.[0] // empty | "\(.url)\n\(.body)"')"
+  [[ -z "$record" ]] && return 1
+  url="${record%%$'\n'*}"
+  body="${record#*$'\n'}"
+  { printf '%s\n' "$body" | sed '/<!-- claude-triage issue=/d'; triage_marker; } >"$tmp/restamped-body.md"
+  gh pr edit "$url" --repo "$DEV_REPO" --body-file "$tmp/restamped-body.md" >/dev/null
+  echo "$url"
+}
+
 create_or_update_pr() {
   local head="$1" title="$2" body_file="$3" mode="$4"; shift 4
   local url
+  triage_marker >>"$body_file"
   url="$(existing_open_pr "$head")"
   if [[ -n "$url" ]]; then
     local edit_args=()
@@ -136,6 +157,18 @@ related="$(jq -r '(.related // []) | map("- " + .) | join("\n")' "$result_file")
 response_draft="$(r '.response_draft // empty')"
 fix_branch="$(r '.fix.branch // empty')"
 fix_verified="$(r '.fix.verified // false')"
+
+trigger="${TRIGGER_REASON:-new}"
+
+if [[ "$(r '.nothing_to_do // false')" == "true" ]]; then
+  if url="$(stamp_latest_record)"; then
+    gh pr comment "$url" --repo "$DEV_REPO" --body "$(printf 'Re-triaged after a reporter follow-up (%s); no action needed.\n\n%s\n\n_Run: %s_' "$trigger" "$summary" "$RUN_URL")" >/dev/null
+    echo "No action needed; re-stamped $url" >&2
+    { echo "tracking_url=$url"; echo "confidence=$confidence"; echo "has_fix=false"; echo "posted_comment_url="; } >>"${GITHUB_OUTPUT:-/dev/null}"
+    exit 0
+  fi
+  echo "nothing_to_do set but no tracking record found; falling through to open one." >&2
+fi
 
 posted_comment_url=""
 if [[ -n "$response_draft" && "$confidence" == "high" && "$category" != "feature" ]]; then

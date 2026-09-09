@@ -8,7 +8,7 @@ workflow YAML.
 | Workflow | Trigger | What it does |
 |---|---|---|
 | `claude-pr-review.yml` | PRs opened, updated, or marked ready, once CI is green | Waits for every other check on the head commit to finish and reviews only if all passed; a newer push cancels a pending review, so only the latest commit is reviewed. Reviews the diff against `CLAUDE.md`, `claude/code-style.md`, and the subtree context files. Posts inline comments plus one sticky summary. Skips drafts, forks, and CI bots. |
-| `claude-issue-triage.yml` | Every 30 minutes, manual, or `repository_dispatch` | Finds new `apollographql/apollo-ios` issues, triages each one, and publishes a result (below). |
+| `claude-issue-triage.yml` | Every 30 minutes, manual, or `repository_dispatch` | Finds new `apollographql/apollo-ios` issues, and previously triaged issues where the reporter has commented since the last triage, then triages each one and publishes a result (below). |
 | `claude-followup.yml` | `@claude` in any issue or PR comment here | Continues a triage from your answers, or does whatever you ask on a PR. |
 
 ## Identity and authentication
@@ -71,6 +71,12 @@ so you can act from Slack. GitHub also emails you on assignment.
 
 The tracking PR is the dedup record: an issue is skipped while a PR labeled
 `claude-triage` with `apollo-ios#<N>` in its title exists (open or closed).
+Every tracking and fix PR body carries a hidden `triaged-at` stamp. When the
+issue's author (only the author; bots and other commenters are ignored) posts
+a comment newer than that stamp, the issue is re-triaged with the new comments
+in view: an open tracking PR is updated in place, a closed one is superseded
+by a new record, and a follow-up that changes nothing just re-stamps the
+record with a short comment and alerts no one.
 Empty-commit PRs change no files, so `ci-tests.yml` (which has a `paths-ignore`
 filter) does not run for them. `main` has no required status checks today; if
 that changes, move the filter to per-job `paths-filter` gating so PRs that touch
@@ -101,7 +107,7 @@ Variables (all optional):
 | `CLAUDE_TRIAGE_ASSIGNEE` | `AnthonyMDev` | Assigned to tracking PRs, requested as reviewer on fix PRs. |
 | `CLAUDE_TRIAGE_AUTO_COMMENT` | `true` | Post high-confidence replies upstream (bot identity only). |
 | `CLAUDE_TRIAGE_SLACK_CHANNEL_ID` | `C06VAE92F7A` (#alerts-client-ios) | Slack channel ID or member ID for alerts. |
-| `CLAUDE_TRIAGE_LOOKBACK_DAYS` | `3` | Only issues created within this window are picked up by the poll. |
+| `CLAUDE_TRIAGE_LOOKBACK_DAYS` | `3` | Only issues created or updated within this window are examined by the poll. |
 | `CLAUDE_TRIAGE_MAX_PER_RUN` | `3` | Cap on issues triaged per poll. |
 | `CLAUDE_BOT_APP_ID` | unset | Optional custom bot app, see above. |
 

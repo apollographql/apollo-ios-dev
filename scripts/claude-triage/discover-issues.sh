@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
 #
-# Finds apollographql/apollo-ios issues that have not yet been triaged and
-# prints them as a JSON array of issue numbers.
+# Finds apollographql/apollo-ios issues that need a triage run and prints them
+# as a JSON array of {"issue": N, "reason": "new" | "reporter-followup" | "manual"}.
 #
-# Dedup is based on tracking pull requests in apollographql/apollo-ios-dev: an
-# upstream issue is considered triaged when a dev-repo PR labeled
-# `claude-triage` has `apollo-ios#<N>` in its title.
+# Two triggers:
+#   new                new issue with no tracking PR yet
+#   reporter-followup  the issue's author commented after our last triage
+#                      (only the reporter counts; bots and other people do not)
+#
+# The dev repo's tracking PRs (label `claude-triage`, `apollo-ios#<N>` in the
+# title) are the record. publish-result.sh stamps each one with
+# `<!-- claude-triage issue=N triaged-at=<ISO-8601> -->`; the newest stamp per
+# issue is the last-triaged time.
 #
 # Usage:
-#   discover-issues.sh                      # poll: recent untriaged issues
-#   discover-issues.sh --issue <N>          # exactly this issue (still deduped)
+#   discover-issues.sh                      # poll
+#   discover-issues.sh --issue <N>          # exactly this issue (skipped if already triaged)
 #   discover-issues.sh --issue <N> --force  # this issue, even if triaged
 #
 # Environment:
@@ -17,7 +23,7 @@
 #   UPSTREAM_REPO            default apollographql/apollo-ios
 #   DEV_REPO                 default apollographql/apollo-ios-dev
 #   TRIAGE_LABEL             default claude-triage
-#   LOOKBACK_DAYS            default 3
+#   LOOKBACK_DAYS            default 3 (issues created or updated within this window)
 #   MAX_PER_RUN              default 3
 
 set -euo pipefail
@@ -44,22 +50,26 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-triaged_numbers() {
+# {"<issue>": "<last triaged-at>", ...}
+tracking_records() {
   gh pr list --repo "$DEV_REPO" --label "$TRIAGE_LABEL" --state all \
-    --limit 1000 --json title \
-    --jq '[.[].title | capture("apollo-ios#(?<n>[0-9]+)") | .n | tonumber]'
+    --limit 1000 --json title,body \
+    | jq -c '[ .[]
+        | (.title | capture("apollo-ios#(?<n>[0-9]+)") | .n) as $n
+        | select($n != null)
+        | { n: $n,
+            at: (((.body // "") | capture("triaged-at=(?<t>[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:]+Z)") | .t) // "1970-01-01T00:00:00Z") } ]
+      | group_by(.n) | map({ key: .[0].n, value: (map(.at) | max) }) | from_entries'
 }
 
+records="$(tracking_records)"
+
 if [[ -n "$issue" ]]; then
-  if [[ "$force" == true ]]; then
-    printf '[%s]\n' "$issue"
-    exit 0
-  fi
-  if triaged_numbers | jq -e --argjson n "$issue" 'index($n) != null' >/dev/null; then
+  if [[ "$force" == true ]] || ! jq -e --arg n "$issue" '.[$n] != null' <<<"$records" >/dev/null; then
+    jq -n -c --argjson n "$issue" '[{issue: $n, reason: "manual"}]'
+  else
     echo "Issue #$issue already has a tracking PR; use --force to re-triage." >&2
     echo '[]'
-  else
-    printf '[%s]\n' "$issue"
   fi
   exit 0
 fi
@@ -70,15 +80,27 @@ else
   since="$(date -u -d "${LOOKBACK_DAYS} days ago" +%Y-%m-%d)"
 fi
 
-candidates="$(gh issue list --repo "$UPSTREAM_REPO" --state open --limit 100 \
+new_issues="$(gh issue list --repo "$UPSTREAM_REPO" --state open --limit 100 \
   --search "created:>=${since} sort:created-asc" \
   --json number,author \
-  --jq '[.[] | select(.author.is_bot | not) | .number]')"
+  | jq -c --argjson rec "$records" \
+      '[ .[] | select(.author.is_bot | not) | select($rec[(.number|tostring)] == null)
+         | {issue: .number, reason: "new"} ]')"
 
-triaged="$(triaged_numbers)"
+followups="$(gh issue list --repo "$UPSTREAM_REPO" --state open --limit 100 \
+  --search "updated:>=${since} sort:updated-asc" \
+  --json number,author,comments \
+  | jq -c --argjson rec "$records" \
+      '[ .[]
+         | select(.author.is_bot | not)
+         | . as $i
+         | ($rec[(.number|tostring)]) as $last
+         | select($last != null)
+         | select([ .comments[]
+                    | select(.author.login == $i.author.login)
+                    | select(.author.login | endswith("[bot]") | not)
+                    | select(.createdAt > $last) ] | length > 0)
+         | {issue: .number, reason: "reporter-followup"} ]')"
 
-jq -n -c \
-  --argjson candidates "$candidates" \
-  --argjson triaged "$triaged" \
-  --argjson max "$MAX_PER_RUN" \
-  '$candidates | map(select(. as $n | $triaged | index($n) | not)) | .[:$max]'
+jq -n -c --argjson new "$new_issues" --argjson fu "$followups" --argjson max "$MAX_PER_RUN" \
+  '($new + $fu) | unique_by(.issue) | .[:$max]'

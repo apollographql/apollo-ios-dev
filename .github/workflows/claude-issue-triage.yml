@@ -71,7 +71,7 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        issue: ${{ fromJson(needs.discover.outputs.issues) }}
+        include: ${{ fromJson(needs.discover.outputs.issues) }}
     permissions:
       contents: write
       issues: write
@@ -126,6 +126,7 @@ jobs:
           prompt: |
             UPSTREAM REPO: ${{ env.UPSTREAM_REPO }}
             ISSUE NUMBER: ${{ matrix.issue }}
+            TRIGGER: ${{ matrix.reason }}
             DEV REPO (checked out here, branch main): ${{ github.repository }}
             RESULT_FILE: ${{ env.RESULT_FILE }}
 
@@ -151,6 +152,7 @@ jobs:
           ASSIGNEE: ${{ vars.CLAUDE_TRIAGE_ASSIGNEE || 'AnthonyMDev' }}
           AUTO_COMMENT: ${{ vars.CLAUDE_TRIAGE_AUTO_COMMENT || 'true' }}
           ISSUE_NUMBER: ${{ matrix.issue }}
+          TRIGGER_REASON: ${{ matrix.reason }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ vars.CLAUDE_TRIAGE_SLACK_CHANNEL_ID || 'C06VAE92F7A' }}

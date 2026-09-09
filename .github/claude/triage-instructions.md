@@ -27,6 +27,19 @@ GitHub yourself.
 4. Read the relevant source. Reproduce the reasoning in the report against the
    actual code on `main`, not against your memory of the library.
 
+### When TRIGGER is `reporter-followup`
+
+The issue was triaged before and the reporter has commented since. Find the
+earlier record with
+`gh pr list --repo apollographql/apollo-ios-dev --label claude-triage --state all --search "apollo-ios#<N> in:title"`
+and read its description (`gh pr view <url> --json body`). Focus on the new
+comments: they may answer the questions raised last time, add a reproduction,
+or confirm a workaround. Re-classify with that information. If the new
+comments change nothing (a thank-you, an acknowledgement, a duplicate of what
+was already known), set `"nothing_to_do": true` in the result with a one-line
+`summary` and skip the rest of the schema; the record is re-stamped and no one
+is alerted.
+
 ## Step 2: Classify
 
 `category` is one of:
@@ -97,6 +110,7 @@ Write JSON to the exact path given in the prompt as `RESULT_FILE`. Schema:
 
 ```json
 {
+  "nothing_to_do": false,
   "issue_number": 1234,
   "issue_title": "...",
   "issue_url": "https://github.com/apollographql/apollo-ios/issues/1234",
@@ -117,6 +131,9 @@ Write JSON to the exact path given in the prompt as `RESULT_FILE`. Schema:
   }
 }
 ```
+
+`nothing_to_do` is only ever `true` for a `reporter-followup` trigger whose new
+comments require no response and no change; `summary` must still be present.
 
 `fix` is `null` unless you committed a fix on a branch. `verified` must be
 `true` for a fix to be published; if you could not verify, do not include the
