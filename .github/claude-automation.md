@@ -7,45 +7,38 @@ workflow YAML.
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| `claude-pr-review.yml` | PRs opened, updated, or marked ready, once CI is green | Waits for every other check on the head commit to finish and reviews only if all passed; a newer push cancels a pending review, so only the latest commit is reviewed. Reviews the diff against `CLAUDE.md`, `claude/code-style.md`, and the subtree context files. Posts inline comments plus one sticky summary. Skips drafts, forks, and CI bots. |
+| `claude-pr-review.yml` | PRs opened, updated, or marked ready, once CI is green | Waits for every other check on the PR to finish and reviews only if all passed (a PR with no other checks is reviewed too); a newer push cancels a pending review, so only the latest commit is reviewed. When CI is red, cancelled, or unreadable, a single status comment says so instead of leaving a stale verdict. Review instructions are read from `main`, not from the PR. Posts inline comments plus one tracking-comment summary. Skips drafts, forks, and CI bots. |
 | `claude-issue-triage.yml` | Every 30 minutes, manual, or `repository_dispatch` | Finds new `apollographql/apollo-ios` issues, and previously triaged issues where the reporter has commented since the last triage, then triages each one and publishes a result (below). |
-| `claude-followup.yml` | `@claude` in any issue or PR comment here | Continues a triage from your answers, or does whatever you ask on a PR. |
+| `claude-followup.yml` | `@claude` in a PR comment by an owner, member, or collaborator | Continues a triage from your answers, or does whatever you ask on a PR. Only the triggering comment's own text counts as instructions. |
 
 ## Identity and authentication
 
-Two separate credentials are involved:
+Three credentials are involved, and it matters which does what.
 
-- **Model credential.** One of two secrets, whichever is set:
-  - `CLAUDE_CODE_OAUTH_TOKEN`: an **organization secret** that IT (Joshua
-    Phillips) created in August 2026 and grants to repositories on request.
-    Other Apollo repos, for example `mdg-private/constellation-policy-eval`,
-    use it. Ask Josh to add `apollo-ios-dev` to its repository list; no new
-    key is provisioned.
-  - `CLAUDE_API_KEY`: an **organization secret** holding an Anthropic Console
-    key, created by IT in September 2026 for GitHub Actions use. It must be
-    granted to this repository like any selected-repo org secret. A repo
-    secret named `ANTHROPIC_API_KEY` is accepted as a fallback for anyone
-    provisioning their own Console key (Console access is requested through
-    `/assist`; spend limits are covered by the "Usage and Budgets in Claude"
-    Confluence page).
-- **GitHub identity.** With no `github_token` input, the action authenticates
-  as the **Claude GitHub App** installed on the `apollographql` org, so every
-  push, PR, and comment shows as `claude[bot]`. No PAT is involved, and PRs
-  opened this way still trigger CI.
+- **Model credential.** One of the org secrets `CLAUDE_API_KEY` (Anthropic
+  Console key, preferred) or `CLAUDE_CODE_OAUTH_TOKEN`; a repo-level
+  `ANTHROPIC_API_KEY` is accepted as a fallback. IT grants org secrets to this
+  repository on request. Set only one.
+- **Claude GitHub App.** With no `github_token` input, the action authenticates
+  as the Claude App installed on the org, so review comments and the follow-up
+  bot's PR comments show as `claude[bot]`. Two hard limits, both confirmed in
+  the action's source and docs: the token is scoped to this repository only,
+  and the action revokes it at the end of its own step. It therefore cannot be
+  used to post on `apollo-ios` or by any later workflow step.
+- **Bot app (`CLAUDE_BOT_APP_ID` variable, `CLAUDE_BOT_APP_PRIVATE_KEY` secret).**
+  An org-owned GitHub App installed on `apollo-ios` and `apollo-ios-dev` with
+  Contents, Issues, and Pull requests read/write. This is the publishing
+  identity: the triage publish step opens PRs here and posts replies upstream
+  with it, and the follow-up workflow passes it to the action so Claude's `gh`
+  calls run as it. **Without it, upstream replies are disabled** and dev-repo
+  publishing falls back to `APOLLO_IOS_PAT`, which is a maintainer's personal
+  token and is never used to post upstream.
 
-Replies to reporters on `apollographql/apollo-ios` are posted only under a bot
-identity, never a person's account. The Claude App token may be scoped to this
-repository alone; if a post fails for lack of access, the draft is routed to
-you instead and the log says so. To guarantee upstream posting, create a
-small org-owned GitHub App (permissions: Issues read/write, Pull requests
-read/write, Contents read/write; install on `apollo-ios` and `apollo-ios-dev`)
-and set the `CLAUDE_BOT_APP_ID` variable and `CLAUDE_BOT_APP_PRIVATE_KEY`
-secret. When present, that app is preferred for upstream posts and for the
-follow-up workflow's `gh` calls.
-
-`APOLLO_IOS_PAT` (your account) is used only as a last resort to open a
-"triage failed" tracking PR when the Claude step produced no token. It is never
-used to post upstream.
+The triage job's tool deny list stops mistakes, not attacks. Issue text is
+untrusted input to the model; the instructions in `.github/claude/` say so
+explicitly and route anything that looks like an instruction to the maintainer.
+Network-capable tools (`curl`, `npm`, `swift package`, `WebFetch`) are denied
+in the triage and follow-up runs for that reason.
 
 ## Triage outcomes
 
@@ -54,14 +47,23 @@ rates its confidence in the proposed action. `high` requires locating the exact
 code, needing no guesses about the reporter's setup, and, for a fix, a build and
 targeted test run that pass. Features and unclear reports are never `high`.
 
+Claude never auto-replies to possible security reports, spam, issues a
+maintainer has already commented on, duplicates, non-English reports, or
+reports without a stated version; those always come to you.
+
 | Outcome | Result |
 |---|---|
-| `bug` + `high`, fix verified | Branch `claude/triage/apollo-ios-<N>` is pushed and a ready-for-review PR opens with you as reviewer. The PR review workflow reviews it like any other PR. |
-| `high` with a drafted reply | Reply is posted on the upstream issue by the bot, with a footer stating it was AI-generated and a maintainer will follow up. Disable with the `CLAUDE_TRIAGE_AUTO_COMMENT` variable set to `false`. |
+| `bug` + `high`, fix verified | Branch `claude/triage/apollo-ios-<N>` (the only accepted name) is pushed and a ready-for-review PR opens with you as reviewer. "Verified" means the new test was seen failing, the package built, and `xcodebuild test` passed afterwards; the publish step refuses a fix without a recorded test run. The PR review workflow reviews it like any other PR and labels it as self-authored. |
+| `high` with a drafted reply | Reply is posted on the upstream issue by the bot app, with a footer saying it was generated by an automated assistant and not yet reviewed by a maintainer, and inviting the reporter to reply. Reporter replies re-trigger triage. Disable with `CLAUDE_TRIAGE_AUTO_COMMENT` set to `false`. |
 | Anything else | A draft tracking PR `[triage] apollo-ios#<N>: ...` opens on an **empty commit** (no files are committed), assigned to you and labeled `needs-input`. Its description holds the summary, the questions whose answers would change the next step, and any draft reply. |
 
 Nothing from triage is written into the repository tree. Draft replies exist
-only in the PR description, the Slack alert, and the run artifact.
+only in the PR description, the Slack alert, and the run artifact. `@mentions`
+in anything written to dev-repo PRs are defused so reporters are never pinged
+from here. Uncommitted work Claude leaves behind is saved to the run artifact.
+Branches that already exist on the remote are never rewritten; if you or the
+follow-up bot pushed to a tracking branch, a re-triage only updates the PR
+description. Any publish failure sends a Slack alert.
 
 Every outcome sends a Slack message to `#alerts-client-ios` (the default;
 override with `CLAUDE_TRIAGE_SLACK_CHANNEL_ID`, or set it to your member ID for
@@ -96,8 +98,8 @@ Secrets:
 | `CLAUDE_CODE_OAUTH_TOKEN` | Org secret (Claude Code OAuth token); alternative if granted instead. |
 | `ANTHROPIC_API_KEY` | Repo-level fallback for a self-provisioned Console key. Set only one credential. |
 | `SLACK_BOT_TOKEN` | Existing. Needs `chat:write` (and `im:write` for DMs). |
-| `CLAUDE_BOT_APP_PRIVATE_KEY` | Optional custom bot app, see above. |
-| `APOLLO_IOS_PAT` | Existing. Last-resort fallback only. |
+| `CLAUDE_BOT_APP_PRIVATE_KEY` | Bot app private key. Required for upstream replies and for bot-identity PRs. |
+| `APOLLO_IOS_PAT` | Existing. Dev-repo fallback when no bot app is configured. Never posts upstream. |
 
 Variables (all optional):
 
@@ -109,7 +111,7 @@ Variables (all optional):
 | `CLAUDE_TRIAGE_SLACK_CHANNEL_ID` | `C06VAE92F7A` (#alerts-client-ios) | Slack channel ID or member ID for alerts. |
 | `CLAUDE_TRIAGE_LOOKBACK_DAYS` | `3` | Only issues created or updated within this window are examined by the poll. |
 | `CLAUDE_TRIAGE_MAX_PER_RUN` | `3` | Cap on issues triaged per poll. |
-| `CLAUDE_BOT_APP_ID` | unset | Optional custom bot app, see above. |
+| `CLAUDE_BOT_APP_ID` | unset | Bot app ID. Required for upstream replies and for bot-identity PRs. |
 
 ## Running triage by hand
 

@@ -1,8 +1,8 @@
 name: Claude Issue Triage
 
-# Watches apollographql/apollo-ios for new issues, triages each one with Claude,
-# and either opens a fix PR in this repo or files a tracking issue with
-# questions for the maintainer. See .github/claude-automation.md.
+# Watches apollographql/apollo-ios for new issues and reporter follow-ups,
+# triages each one with Claude, and publishes the result as a PR in this repo,
+# a bot reply upstream, or a Slack alert. See .github/claude-automation.md.
 
 on:
   schedule:
@@ -14,7 +14,7 @@ on:
         required: false
         type: string
       force:
-        description: "Re-triage even if a tracking issue already exists"
+        description: "Re-triage even if a tracking record already exists"
         required: false
         type: boolean
         default: false
@@ -46,7 +46,8 @@ jobs:
       - name: Discover
         id: discover
         env:
-          GH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
+          # Both repos are public; the workflow token is enough to read them.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LOOKBACK_DAYS: ${{ vars.CLAUDE_TRIAGE_LOOKBACK_DAYS || '3' }}
           MAX_PER_RUN: ${{ vars.CLAUDE_TRIAGE_MAX_PER_RUN || '3' }}
           INPUT_ISSUE: ${{ github.event.inputs.issue_number || github.event.client_payload.issue_number || '' }}
@@ -64,9 +65,10 @@ jobs:
   triage:
     name: Triage apollo-ios#${{ matrix.issue }}
     needs: discover
-    if: needs.discover.outputs.issues != '[]'
+    if: needs.discover.outputs.issues != '[]' && needs.discover.outputs.issues != ''
     runs-on: macos-26
-    timeout-minutes: 90
+    # The Claude step has its own budget below so that publishing always runs.
+    timeout-minutes: 85
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -74,12 +76,14 @@ jobs:
         include: ${{ fromJson(needs.discover.outputs.issues) }}
     permissions:
       contents: write
-      issues: write
       pull-requests: write
       id-token: write
     steps:
-      # Optional custom GitHub App with access to apollo-ios, for posting
-      # replies upstream when the Claude App token is scoped to this repo only.
+      # The bot app is the publishing identity: it opens PRs here and posts
+      # replies upstream. The Claude App token cannot be used for either; the
+      # action revokes it at the end of its own step and it is scoped to this
+      # repository only. Without the bot app, dev-repo publishing falls back to
+      # APOLLO_IOS_PAT and upstream posting is disabled.
       - name: Create bot token
         id: bot
         if: vars.CLAUDE_BOT_APP_ID != ''
@@ -108,16 +112,21 @@ jobs:
           user: claude-triage[bot]
           email: claude-triage[bot]@users.noreply.github.com
 
-      - name: Prepare result directory
+      # TRIAGED_AT is captured before Claude reads the issue so a reporter
+      # comment posted during the run still counts as new next time.
+      - name: Prepare run
         run: |
           echo "RESULT_FILE=$RUNNER_TEMP/claude-triage/result.json" >> "$GITHUB_ENV"
+          echo "TRIAGED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
           mkdir -p "$RUNNER_TEMP/claude-triage"
 
-      # With no github_token input, the action authenticates as the Claude
-      # GitHub App installed on the org, so everything it does shows as claude[bot].
+      # Claude only reads and edits the local checkout; every GitHub side
+      # effect happens in "Publish result". The deny list is a guard against
+      # mistakes, not a security boundary: issue text is untrusted input.
       - name: Run Claude triage
         id: claude
         continue-on-error: true
+        timeout-minutes: 60
         uses: anthropics/claude-code-action@v1
         with:
           # Either credential works; leave the one you are not using unset.
@@ -137,18 +146,14 @@ jobs:
           claude_args: |
             --model ${{ vars.CLAUDE_MODEL || 'claude-opus-5' }}
             --max-turns 150
-            --allowedTools "Read,Glob,Grep,Edit,MultiEdit,Write,Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh pr list:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh search:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git blame:*),Bash(git grep:*),Bash(git checkout -b:*),Bash(git switch:*),Bash(git branch:*),Bash(git add:*),Bash(git commit:*),Bash(git restore:*),Bash(git stash:*),Bash(swift build:*),Bash(swift test:*),Bash(swift package:*),Bash(tuist generate:*),Bash(xcodebuild:*),Bash(xcrun:*),Bash(ls:*),Bash(cat:*),Bash(find:*),Bash(grep:*),Bash(rg:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(jq:*),Bash(mkdir:*),Bash(npm test:*),Bash(npm install:*)"
-            --disallowedTools "Bash(git push:*),Bash(gh pr create:*),Bash(gh pr comment:*),Bash(gh pr edit:*),Bash(gh pr merge:*),Bash(gh issue create:*),Bash(gh issue comment:*),Bash(gh issue edit:*),Bash(gh issue close:*),WebFetch,WebSearch"
+            --allowedTools "Read,Glob,Grep,Edit,MultiEdit,Write,Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh pr list:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh search:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git blame:*),Bash(git grep:*),Bash(git checkout -b:*),Bash(git switch:*),Bash(git branch:*),Bash(git add:*),Bash(git commit:*),Bash(git restore:*),Bash(git stash:*),Bash(swift build:*),Bash(swift test:*),Bash(tuist generate:*),Bash(xcodebuild:*),Bash(ls:*),Bash(cat:*),Bash(find:*),Bash(grep:*),Bash(rg:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(jq:*),Bash(mkdir:*)"
+            --disallowedTools "Bash(git push:*),Bash(gh pr create:*),Bash(gh pr comment:*),Bash(gh pr edit:*),Bash(gh pr merge:*),Bash(gh issue create:*),Bash(gh issue comment:*),Bash(gh issue edit:*),Bash(gh issue close:*),Bash(gh api:*),Bash(npm:*),Bash(npx:*),Bash(curl:*),Bash(swift package:*),Bash(xcrun:*),WebFetch,WebSearch"
 
-      # Dev-repo pushes and PRs use the Claude App token (claude[bot]). Upstream
-      # replies use a bot token only: the optional custom app first, else the
-      # Claude App token. APOLLO_IOS_PAT is a last resort for dev-repo ops when
-      # the Claude step produced no token; it is never used to post upstream.
       - name: Publish result
         id: publish
         env:
-          GH_TOKEN: ${{ steps.claude.outputs.github_token || steps.bot.outputs.token || secrets.APOLLO_IOS_PAT }}
-          UPSTREAM_TOKEN: ${{ steps.bot.outputs.token || steps.claude.outputs.github_token }}
+          GH_TOKEN: ${{ steps.bot.outputs.token || secrets.APOLLO_IOS_PAT }}
+          UPSTREAM_TOKEN: ${{ steps.bot.outputs.token }}
           ASSIGNEE: ${{ vars.CLAUDE_TRIAGE_ASSIGNEE || 'AnthonyMDev' }}
           AUTO_COMMENT: ${{ vars.CLAUDE_TRIAGE_AUTO_COMMENT || 'true' }}
           ISSUE_NUMBER: ${{ matrix.issue }}
@@ -156,9 +161,7 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ vars.CLAUDE_TRIAGE_SLACK_CHANNEL_ID || 'C06VAE92F7A' }}
-        run: |
-          git fetch origin main --quiet
-          scripts/claude-triage/publish-result.sh "$RESULT_FILE"
+        run: scripts/claude-triage/publish-result.sh "$RESULT_FILE"
 
       - name: Save triage result
         if: always()
@@ -171,5 +174,5 @@ jobs:
       - name: Fail job if Claude failed
         if: steps.claude.outcome == 'failure'
         run: |
-          echo "Claude run failed; tracking issue filed: ${{ steps.publish.outputs.tracking_url }}"
+          echo "Claude run failed; tracking record: ${{ steps.publish.outputs.tracking_url }}"
           exit 1

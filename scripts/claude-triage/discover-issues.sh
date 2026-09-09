@@ -51,14 +51,24 @@ while [[ $# -gt 0 ]]; do
 done
 
 # {"<issue>": "<last triaged-at>", ...}
+# The issue number comes from the body stamp when present (authoritative) and from the
+# title otherwise. Stamps dated in the future are clamped to now so a planted stamp
+# cannot suppress follow-ups.
 tracking_records() {
+  local now
+  now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   gh pr list --repo "$DEV_REPO" --label "$TRIAGE_LABEL" --state all \
     --limit 1000 --json title,body \
-    | jq -c '[ .[]
-        | (.title | capture("apollo-ios#(?<n>[0-9]+)") | .n) as $n
+    | jq -c --arg now "$now" '[ .[]
+        | (.body // "") as $b
+        | ( ($b | capture("<!-- claude-triage issue=(?<n>[0-9]+) ") | .n)
+            // ($b | capture("<!-- claude-triage issue=(?<n>[0-9]+)") | .n)
+            // (.title | capture("^\\[triage\\] apollo-ios#(?<n>[0-9]+)") | .n)
+            // (.title | capture("\\(apollo-ios#(?<n>[0-9]+)\\)$") | .n) ) as $n
         | select($n != null)
         | { n: $n,
-            at: (((.body // "") | capture("triaged-at=(?<t>[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:]+Z)") | .t) // "1970-01-01T00:00:00Z") } ]
+            at: ((( $b | capture("triaged-at=(?<t>[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:]+Z)") | .t) // "1970-01-01T00:00:00Z")
+                 | if . > $now then $now else . end) } ]
       | group_by(.n) | map({ key: .[0].n, value: (map(.at) | max) }) | from_entries'
 }
 
@@ -102,5 +112,6 @@ followups="$(gh issue list --repo "$UPSTREAM_REPO" --state open --limit 100 \
                     | select(.createdAt > $last) ] | length > 0)
          | {issue: .number, reason: "reporter-followup"} ]')"
 
+# Follow-ups first (someone is waiting), then new issues oldest first; dedup keeps first occurrence.
 jq -n -c --argjson new "$new_issues" --argjson fu "$followups" --argjson max "$MAX_PER_RUN" \
-  '($new + $fu) | unique_by(.issue) | .[:$max]'
+  '($fu + $new) | reduce .[] as $x ([]; if any(.[]; .issue == $x.issue) then . else . + [$x] end) | .[:$max]'
