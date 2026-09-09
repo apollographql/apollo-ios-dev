@@ -288,9 +288,6 @@ fi
       printf '\n## Draft reply (not posted)\n\n%s\n' "$(printf '%s' "$response_draft" | sanitize_internal)"
     fi
   fi
-  if [[ "$post_unconfirmed" == true ]]; then
-    printf '\n> **Warning:** a reply was dispatched to the upstream relay but could not be confirmed. Check %s before posting again.\n' "$issue_url"
-  fi
   if [[ -s "$tmp/uncommitted-status.txt" ]]; then
     printf '\n> Uncommitted changes from the run were discarded; the diff is in the run artifact.\n'
   fi
