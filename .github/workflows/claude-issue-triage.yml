@@ -77,8 +77,6 @@ jobs:
       issues: write
       pull-requests: write
       id-token: write
-    env:
-      RESULT_FILE: ${{ runner.temp }}/claude-triage/result.json
     steps:
       # Optional custom GitHub App with access to apollo-ios, for posting
       # replies upstream when the Claude App token is scoped to this repo only.
@@ -111,7 +109,9 @@ jobs:
           email: claude-triage[bot]@users.noreply.github.com
 
       - name: Prepare result directory
-        run: mkdir -p "$(dirname "$RESULT_FILE")"
+        run: |
+          echo "RESULT_FILE=$RUNNER_TEMP/claude-triage/result.json" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/claude-triage"
 
       # With no github_token input, the action authenticates as the Claude
       # GitHub App installed on the org, so everything it does shows as claude[bot].
@@ -122,7 +122,7 @@ jobs:
         with:
           # Either credential works; leave the one you are not using unset.
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          anthropic_api_key: ${{ secrets.CLAUDE_API_KEY || secrets.ANTHROPIC_API_KEY }}
           prompt: |
             UPSTREAM REPO: ${{ env.UPSTREAM_REPO }}
             ISSUE NUMBER: ${{ matrix.issue }}

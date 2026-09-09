@@ -62,7 +62,7 @@ jobs:
         with:
           # Either credential works; leave the one you are not using unset.
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          anthropic_api_key: ${{ secrets.CLAUDE_API_KEY || secrets.ANTHROPIC_API_KEY }}
           additional_permissions: |
             actions: read
           claude_args: |

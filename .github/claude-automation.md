@@ -21,12 +21,13 @@ Two separate credentials are involved:
     Other Apollo repos, for example `mdg-private/constellation-policy-eval`,
     use it. Ask Josh to add `apollo-ios-dev` to its repository list; no new
     key is provisioned.
-  - `ANTHROPIC_API_KEY`: a key from the Anthropic Console (Claude Platform).
-    The Enterprise Claude plan does not include Console access; request it
-    through `/assist` in Slack, which makes you a Developer able to create
-    keys. `apollographql/apollo-mcp-server` runs this way on an org-level key.
-    Spend limits and increases are covered by the "Usage and Budgets in
-    Claude" Confluence page.
+  - `CLAUDE_API_KEY`: an **organization secret** holding an Anthropic Console
+    key, created by IT in September 2026 for GitHub Actions use. It must be
+    granted to this repository like any selected-repo org secret. A repo
+    secret named `ANTHROPIC_API_KEY` is accepted as a fallback for anyone
+    provisioning their own Console key (Console access is requested through
+    `/assist`; spend limits are covered by the "Usage and Budgets in Claude"
+    Confluence page).
 - **GitHub identity.** With no `github_token` input, the action authenticates
   as the **Claude GitHub App** installed on the `apollographql` org, so every
   push, PR, and comment shows as `claude[bot]`. No PAT is involved, and PRs
@@ -83,8 +84,9 @@ Secrets:
 
 | Secret | Purpose |
 |---|---|
-| `CLAUDE_CODE_OAUTH_TOKEN` | Org secret; ask IT to grant this repo access. **Not yet granted.** |
-| `ANTHROPIC_API_KEY` | Alternative to the OAuth token; from the Anthropic Console via `/assist`. Set only one of the two. |
+| `CLAUDE_API_KEY` | Org secret (Anthropic Console key); IT must grant this repo access. Preferred. |
+| `CLAUDE_CODE_OAUTH_TOKEN` | Org secret (Claude Code OAuth token); alternative if granted instead. |
+| `ANTHROPIC_API_KEY` | Repo-level fallback for a self-provisioned Console key. Set only one credential. |
 | `SLACK_BOT_TOKEN` | Existing. Needs `chat:write` (and `im:write` for DMs). |
 | `CLAUDE_BOT_APP_PRIVATE_KEY` | Optional custom bot app, see above. |
 | `APOLLO_IOS_PAT` | Existing. Last-resort fallback only. |
