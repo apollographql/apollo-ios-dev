@@ -101,7 +101,8 @@ jobs:
           issue="$(jq -r '.issue_number' "$UPSTREAM_REPLY_FILE")"
           jq -r '.body' "$UPSTREAM_REPLY_FILE" > "$RUNNER_TEMP/upstream-reply-body.md"
           # Copy shown on this PR has @mentions defused so the reporter is not pinged from here.
-          sed 's/@\([A-Za-z0-9]\)/@\xe2\x80\x8b\1/g' "$RUNNER_TEMP/upstream-reply-body.md" > "$RUNNER_TEMP/upstream-reply-body-internal.md"
+          zwsp="$(printf '\xe2\x80\x8b')"
+          sed "s/@\([A-Za-z0-9]\)/@${zwsp}\1/g" "$RUNNER_TEMP/upstream-reply-body.md" > "$RUNNER_TEMP/upstream-reply-body-internal.md"
           set +e
           url="$(scripts/claude-triage/post-upstream-reply.sh "$issue" "$RUNNER_TEMP/upstream-reply-body.md")"
           rc=$?

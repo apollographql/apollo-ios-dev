@@ -85,8 +85,9 @@ ensure_label "response-ready" "5319E7" "Automated triage drafted a reply awaitin
 
 # Model-authored text that is written into dev-repo PRs and comments: remove any
 # planted dedup stamps and defuse @mentions so reporters are not pinged from here.
+zwsp="$(printf '\xe2\x80\x8b')"
 sanitize_internal() {
-  sed -e '/<!-- *claude-triage/d' -e 's/@\([A-Za-z0-9]\)/@\xe2\x80\x8b\1/g'
+  sed -e '/<!-- *claude-triage/d' -e "s/@\([A-Za-z0-9]\)/@${zwsp}\1/g"
 }
 
 triage_marker() {
