@@ -231,3 +231,26 @@ jobs:
       shell: bash
       working-directory: apollo-ios/scripts
       run: ./cli-version-check.sh
+
+  # Runs the Claude review once every CI job above has finished. Skipped jobs
+  # count as passing; a failed or cancelled job posts a status note instead of
+  # a review. See .github/claude-automation.md.
+  claude-review:
+    needs:
+      - changes
+      - tuist-generation
+      - run-swift-builds
+      - build-and-unit-test
+      - run-codegen-test-configurations
+      - verify-frontend-bundle-latest
+      - verify-cli-binary-archive
+    if: ${{ !cancelled() }}
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+    uses: ./.github/workflows/claude-pr-review.yml
+    with:
+      ci_passed: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
+    secrets: inherit
