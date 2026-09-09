@@ -12,7 +12,7 @@ jobs:
   review:
     name: Review pull request
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 80
     if: >-
       github.event.pull_request.draft == false &&
       github.event.pull_request.head.repo.full_name == github.repository &&
@@ -21,6 +21,7 @@ jobs:
       contents: read
       pull-requests: write
       issues: read
+      checks: read
       id-token: write
     steps:
       - name: Checkout Repo
@@ -28,7 +29,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Review only the latest commit, and only after every other check on it
+      # has passed. Newer pushes cancel a pending wait via the concurrency group.
+      - name: Wait for CI
+        id: ci
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SELF_CHECK_NAME: Review pull request
+        run: |
+          result="$(scripts/claude-review/wait-for-ci.sh "${{ github.event.pull_request.head.sha }}" || true)"
+          echo "result=$result" >> "$GITHUB_OUTPUT"
+          echo "CI result: $result"
+
       - name: Run Claude review
+        if: steps.ci.outputs.result == 'green'
         uses: anthropics/claude-code-action@v1
         with:
           # Either credential works; leave the one you are not using unset.

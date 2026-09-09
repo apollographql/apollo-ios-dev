@@ -7,7 +7,7 @@ workflow YAML.
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| `claude-pr-review.yml` | PRs opened, updated, or marked ready | Reviews the diff against `CLAUDE.md`, `claude/code-style.md`, and the subtree context files. Posts inline comments plus one sticky summary. Skips drafts, forks, and CI bots. |
+| `claude-pr-review.yml` | PRs opened, updated, or marked ready, once CI is green | Waits for every other check on the head commit to finish and reviews only if all passed; a newer push cancels a pending review, so only the latest commit is reviewed. Reviews the diff against `CLAUDE.md`, `claude/code-style.md`, and the subtree context files. Posts inline comments plus one sticky summary. Skips drafts, forks, and CI bots. |
 | `claude-issue-triage.yml` | Every 30 minutes, manual, or `repository_dispatch` | Finds new `apollographql/apollo-ios` issues, triages each one, and publishes a result (below). |
 | `claude-followup.yml` | `@claude` in any issue or PR comment here | Continues a triage from your answers, or does whatever you ask on a PR. |
 
