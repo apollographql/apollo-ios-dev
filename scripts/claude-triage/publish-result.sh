@@ -97,7 +97,7 @@ triage_marker() {
 latest_record_url() {
   gh pr list --repo "$DEV_REPO" --label "$TRIAGE_LABEL" --state all --limit 20 \
     --search "apollo-ios#${n} in:title sort:updated-desc" --json url,body \
-    --jq --arg n "$n" 'map(select(.body | test("<!-- claude-triage issue=" + $n + " ")))[0].url // empty'
+    | jq -r --arg n "$n" 'map(select(.body | test("<!-- claude-triage issue=" + $n + " ")))[0].url // empty'
 }
 
 # Re-stamps the newest record so discovery does not re-trigger on the same reporter comments.

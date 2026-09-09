@@ -52,8 +52,8 @@ echo "Dispatched post-triage-reply for #$n; waiting for the relay to post it." >
 
 start=$(date +%s)
 while true; do
-  url="$(GH_TOKEN="$UPSTREAM_DISPATCH_TOKEN" gh api "repos/${UPSTREAM_REPO}/issues/${n}/comments?per_page=100&sort=created&direction=desc" \
-    --jq --arg m "$marker" '.[] | select(.body | contains($m)) | .html_url' 2>/dev/null | head -1 || true)"
+  url="$(GH_TOKEN="$UPSTREAM_DISPATCH_TOKEN" gh api --paginate "repos/${UPSTREAM_REPO}/issues/${n}/comments?per_page=100" \
+    | jq -r --arg m "$marker" '.[] | select(.body | contains($m)) | .html_url' | head -1 || true)"
   if [[ -n "$url" ]]; then
     echo "$url"
     exit 0

@@ -18,8 +18,8 @@ case "$status" in
 esac
 body="$(printf '%s\n%s' "$marker" "$text")"
 
-existing="$(gh api "repos/${REPO}/issues/${pr}/comments?per_page=100" --paginate \
-  --jq --arg m "$marker" '.[] | select(.body | startswith($m)) | .id' | head -1)"
+existing="$(gh api --paginate "repos/${REPO}/issues/${pr}/comments?per_page=100" \
+  | jq -r --arg m "$marker" '.[] | select(.body | startswith($m)) | .id' | head -1)"
 if [[ -n "$existing" ]]; then
   gh api -X PATCH "repos/${REPO}/issues/comments/${existing}" -f body="$body" >/dev/null
 else

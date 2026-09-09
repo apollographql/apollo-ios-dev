@@ -80,7 +80,8 @@ jobs:
             --disallowedTools "Bash(gh issue comment:*),Bash(gh issue edit:*),Bash(gh issue close:*),Bash(gh api:*),Bash(gh pr merge:*),Bash(gh repo:*),Bash(git push --force:*),Bash(git push -f:*),Bash(git push origin --force:*),Bash(git push origin -f:*),Bash(npm:*),Bash(npx:*),Bash(curl:*),Bash(swift package:*),Bash(xcrun:*),WebFetch,WebSearch"
 
       - name: Post approved upstream reply
-        if: always() && hashFiles(env.UPSTREAM_REPLY_FILE) != ''
+        # hashFiles() cannot see RUNNER_TEMP, so the file check lives in the step.
+        if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           UPSTREAM_TOKEN: ${{ steps.bot.outputs.token }}
@@ -88,11 +89,19 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
         run: |
+          [[ -f "$UPSTREAM_REPLY_FILE" ]] || { echo "No upstream reply queued."; exit 0; }
           issue="$(jq -r '.issue_number' "$UPSTREAM_REPLY_FILE")"
           jq -r '.body' "$UPSTREAM_REPLY_FILE" > "$RUNNER_TEMP/upstream-reply-body.md"
-          if url="$(scripts/claude-triage/post-upstream-reply.sh "$issue" "$RUNNER_TEMP/upstream-reply-body.md")"; then
+          set +e
+          url="$(scripts/claude-triage/post-upstream-reply.sh "$issue" "$RUNNER_TEMP/upstream-reply-body.md")"
+          rc=$?
+          set -e
+          if [[ $rc -eq 0 && -n "$url" ]]; then
             gh pr comment "$PR_NUMBER" --body "Posted the approved reply on apollographql/apollo-ios#${issue}: ${url}"
+          elif [[ $rc -eq 2 ]]; then
+            gh pr comment "$PR_NUMBER" --body "$(printf 'Dispatched the approved reply to apollographql/apollo-ios#%s but could not confirm it was posted (run log: %s). **Check the issue before posting anything manually**; the relay has very likely posted it.' "$issue" "$RUN_URL")"
+            exit 1
           else
-            gh pr comment "$PR_NUMBER" --body "$(printf 'Could not post the approved reply on apollographql/apollo-ios#%s (see the run log: %s). Text to paste:\n\n%s' "$issue" "$RUN_URL" "$(cat "$RUNNER_TEMP/upstream-reply-body.md")")"
+            gh pr comment "$PR_NUMBER" --body "$(printf 'Could not post the approved reply on apollographql/apollo-ios#%s (run log: %s). Text to paste:\n\n%s' "$issue" "$RUN_URL" "$(cat "$RUNNER_TEMP/upstream-reply-body.md")")"
             exit 1
           fi
