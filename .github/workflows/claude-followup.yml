@@ -79,6 +79,18 @@ jobs:
             --allowedTools "Read,Glob,Grep,Edit,MultiEdit,Write,Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh pr list:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh pr create:*),Bash(gh pr ready:*),Bash(gh pr edit:*),Bash(gh pr close:*),Bash(gh pr comment:*),Bash(gh run view:*),Bash(gh search:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git blame:*),Bash(git grep:*),Bash(git fetch:*),Bash(git checkout:*),Bash(git switch:*),Bash(git branch:*),Bash(git add:*),Bash(git commit:*),Bash(git push origin:*),Bash(git restore:*),Bash(swift build:*),Bash(swift test:*),Bash(tuist generate:*),Bash(xcodebuild:*),Bash(ls:*),Bash(cat:*),Bash(find:*),Bash(grep:*),Bash(rg:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(jq:*),Bash(mkdir:*)"
             --disallowedTools "Bash(gh issue comment:*),Bash(gh issue edit:*),Bash(gh issue close:*),Bash(gh api:*),Bash(gh pr merge:*),Bash(gh repo:*),Bash(git push --force:*),Bash(git push -f:*),Bash(git push origin --force:*),Bash(git push origin -f:*),Bash(npm:*),Bash(npx:*),Bash(curl:*),Bash(swift package:*),Bash(xcrun:*),WebFetch,WebSearch"
 
+      # A fresh checkout from GitHub, made after the Claude step, so the posting
+      # script cannot have been altered by anything the model did locally
+      # (refs under .git/ are writable files, so origin/main would not do).
+      - name: Fetch publishing script
+        if: success() || failure()
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: publish-tools
+          sparse-checkout: scripts/claude-triage
+          sparse-checkout-cone-mode: true
+
       - name: Post approved upstream reply
         # Runs after a failed Claude step too, but not after a cancellation:
         # cancelling the run must never post publicly. hashFiles() cannot see
@@ -103,12 +115,8 @@ jobs:
           # Copy shown on this PR has @mentions defused so the reporter is not pinged from here.
           zwsp="$(printf '\xe2\x80\x8b')"
           sed "s/@\([A-Za-z0-9]\)/@${zwsp}\1/g" "$RUNNER_TEMP/upstream-reply-body.md" > "$RUNNER_TEMP/upstream-reply-body-internal.md"
-          # Taken from origin/main after Claude has run: independent of the branch
-          # Claude left checked out, and not writable by the model's tools.
-          git show origin/main:scripts/claude-triage/post-upstream-reply.sh > "$RUNNER_TEMP/post-upstream-reply.sh"
-          chmod +x "$RUNNER_TEMP/post-upstream-reply.sh"
           set +e
-          url="$("$RUNNER_TEMP/post-upstream-reply.sh" "$issue" "$RUNNER_TEMP/upstream-reply-body.md")"
+          url="$(publish-tools/scripts/claude-triage/post-upstream-reply.sh "$issue" "$RUNNER_TEMP/upstream-reply-body.md")"
           rc=$?
           set -e
           if [[ $rc -eq 0 && -n "$url" ]]; then
