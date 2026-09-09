@@ -80,8 +80,7 @@ jobs:
             --disallowedTools "Bash(gh issue comment:*),Bash(gh issue edit:*),Bash(gh issue close:*),Bash(gh api:*),Bash(gh pr merge:*),Bash(gh repo:*),Bash(git push --force:*),Bash(git push -f:*),Bash(git push origin --force:*),Bash(git push origin -f:*),Bash(npm:*),Bash(npx:*),Bash(curl:*),Bash(swift package:*),Bash(xcrun:*),WebFetch,WebSearch"
 
       # A fresh checkout from GitHub, made after the Claude step, so the posting
-      # script cannot have been altered by anything the model did locally
-      # (refs under .git/ are writable files, so origin/main would not do).
+      # script cannot have been altered by anything the model did locally.
       - name: Fetch publishing script
         if: success() || failure()
         uses: actions/checkout@v4
@@ -89,7 +88,6 @@ jobs:
           ref: main
           path: publish-tools
           sparse-checkout: scripts/claude-triage
-          sparse-checkout-cone-mode: true
 
       - name: Post approved upstream reply
         # Runs after a failed Claude step too, but not after a cancellation:
