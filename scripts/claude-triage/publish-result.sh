@@ -281,6 +281,8 @@ fi
   if [[ -n "$response_draft" ]]; then
     if [[ -n "$posted_comment_url" ]]; then
       printf '\n## Reply posted upstream\n\n%s\n\n<details><summary>Text</summary>\n\n%s\n\n</details>\n' "$posted_comment_url" "$(printf '%s' "$response_draft" | sanitize_internal)"
+    elif [[ "$post_unconfirmed" == true ]]; then
+      printf '\n## Draft reply (dispatched to the relay, not confirmed)\n\nCheck %s before posting this manually.\n\n%s\n' "$issue_url" "$(printf '%s' "$response_draft" | sanitize_internal)"
     else
       printf '\n## Draft reply (not posted)\n\n%s\n' "$(printf '%s' "$response_draft" | sanitize_internal)"
     fi
@@ -310,6 +312,7 @@ if [[ "$has_fix" == true ]]; then
   echo "Opened fix PR: $tracking_url" >&2
   reply_line=""
   [[ -n "$posted_comment_url" ]] && reply_line="Reply posted: ${posted_comment_url}${nl}"
+  [[ "$post_unconfirmed" == true ]] && reply_line=":warning: A reply was dispatched to the upstream relay but not confirmed; check ${issue_url} before posting manually.${nl}"
   slack_notify "$(printf ':white_check_mark: *Apollo iOS triage opened a fix PR*\n*%s* (apollo-ios#%s)\n%s\n%sPR: %s' \
     "$title" "$n" "$summary" "$reply_line" "$tracking_url")"
 elif [[ -n "$posted_comment_url" ]]; then
@@ -344,7 +347,13 @@ else
   q_text=""
   [[ -n "$questions" ]] && q_text="${nl}${nl}*Questions:*${nl}${questions}"
   d_text=""
-  [[ -n "$response_draft" ]] && d_text="${nl}${nl}*Draft reply (not posted):*${nl}${response_draft}"
+  if [[ -n "$response_draft" ]]; then
+    if [[ "$post_unconfirmed" == true ]]; then
+      d_text="${nl}${nl}:warning: *A reply was dispatched to the upstream relay but not confirmed. Check ${issue_url} before posting this manually:*${nl}${response_draft}"
+    else
+      d_text="${nl}${nl}*Draft reply (not posted):*${nl}${response_draft}"
+    fi
+  fi
   slack_notify "$(printf ':mag: *Apollo iOS triage needs your input*\n*%s* (apollo-ios#%s) — %s / %s confidence\n%s\n%s%s%s\n\nAnswer with an @claude comment: %s' \
     "$title" "$n" "$category" "$confidence" "$issue_url" "$summary" "$q_text" "$d_text" "$tracking_url")"
 fi

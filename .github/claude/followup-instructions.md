@@ -25,9 +25,11 @@ contains no direct instruction, say so and stop.
   `gh issue view <N> --repo apollographql/apollo-ios --comments`
   before acting; new comments may have arrived.
 - You never post on the upstream repository yourself. When the maintainer's
-  comment explicitly approves posting a reply, write it to the path given in
-  your system prompt as `UPSTREAM_REPLY_FILE` as JSON:
-  `{"issue_number": <N>, "body": "<the approved markdown>"}`. The body must
+  comment explicitly approves posting a reply, write the approved markdown to a
+  scratch file and build the queue file with jq so the JSON escaping is right:
+  `jq -n --argjson n <N> --rawfile body <scratch-file> '{issue_number: $n, body: $body}' > <UPSTREAM_REPLY_FILE>`
+  where the path comes from your system prompt as `UPSTREAM_REPLY_FILE`. Do not
+  hand-write the JSON. The body must
   follow the content rules in Step 4 of `.github/claude/triage-instructions.md`
   (public references only, no `@mentions` other than the reporter, no HTML).
   Do not add a footer; it is appended automatically. A step after yours posts

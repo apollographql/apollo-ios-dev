@@ -90,6 +90,12 @@ jobs:
           PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
         run: |
           [[ -f "$UPSTREAM_REPLY_FILE" ]] || { echo "No upstream reply queued."; exit 0; }
+          # The queue file is model-authored; validate before anything is posted.
+          if ! jq -e '(.issue_number|tostring|test("^[0-9]+$")) and (.body|type=="string") and (.body|length>0)' \
+               "$UPSTREAM_REPLY_FILE" >/dev/null 2>&1; then
+            gh pr comment "$PR_NUMBER" --body "$(printf 'A reply was queued for apollographql/apollo-ios but the queue file was not valid JSON with a numeric issue_number and a non-empty string body, so nothing was posted. Run log: %s' "$RUN_URL")"
+            exit 1
+          fi
           issue="$(jq -r '.issue_number' "$UPSTREAM_REPLY_FILE")"
           jq -r '.body' "$UPSTREAM_REPLY_FILE" > "$RUNNER_TEMP/upstream-reply-body.md"
           set +e
