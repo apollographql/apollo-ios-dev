@@ -32,7 +32,13 @@ issue=""
 force=false
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --issue) issue="$2"; shift 2 ;;
+    --issue)
+      issue="${2:-}"
+      if ! [[ "$issue" =~ ^[0-9]+$ ]]; then
+        echo "--issue requires a bare issue number, got '${issue}'" >&2
+        exit 2
+      fi
+      shift 2 ;;
     --force) force=true; shift ;;
     *) echo "Unknown argument: $1" >&2; exit 2 ;;
   esac

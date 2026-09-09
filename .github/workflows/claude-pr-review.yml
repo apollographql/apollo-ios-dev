@@ -34,8 +34,6 @@ jobs:
           # Either credential works; leave the one you are not using unset.
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           anthropic_api_key: ${{ secrets.CLAUDE_API_KEY || secrets.ANTHROPIC_API_KEY }}
-          # TEMPORARY: bypass the Claude App main-branch check to test the credential on this PR. Revert before merge.
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           use_sticky_comment: true
           prompt: |
             REPO: ${{ github.repository }}

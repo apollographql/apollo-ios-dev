@@ -72,7 +72,9 @@ so you can act from Slack. GitHub also emails you on assignment.
 The tracking PR is the dedup record: an issue is skipped while a PR labeled
 `claude-triage` with `apollo-ios#<N>` in its title exists (open or closed).
 Empty-commit PRs change no files, so `ci-tests.yml` (which has a `paths-ignore`
-filter) does not run for them.
+filter) does not run for them. `main` has no required status checks today; if
+that changes, move the filter to per-job `paths-filter` gating so PRs that touch
+only `.github/claude/**` still get a check run and remain mergeable.
 
 Answer a tracking PR by commenting with `@claude` and your decision. Claude
 re-reads the upstream issue, implements the fix on that branch and marks the PR

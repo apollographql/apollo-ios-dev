@@ -63,14 +63,54 @@ slack_notify() {
     | jq -r 'if .ok then "Slack: sent" else "Slack: failed: " + (.error // "unknown") end' >&2
 }
 
-# Opens a draft PR on an empty commit. $1 = title, $2 = body file, rest = extra gh flags.
+nl=$'\n'
+
+existing_open_pr() {
+  gh pr list --repo "$DEV_REPO" --head "$1" --state open --json url --jq '.[0].url // empty'
+}
+
+# Creates a PR for $1 (head branch), or updates the open one if a re-triage finds it already there.
+# $2 = title, $3 = body file, $4 = "draft"|"ready", rest = labels (--label X ...) and other create flags.
+create_or_update_pr() {
+  local head="$1" title="$2" body_file="$3" mode="$4"; shift 4
+  local url
+  url="$(existing_open_pr "$head")"
+  if [[ -n "$url" ]]; then
+    local edit_args=()
+    for arg in "$@"; do
+      case "$arg" in
+        --label) edit_args+=(--add-label) ;;
+        --assignee) edit_args+=(--add-assignee) ;;
+        --reviewer) edit_args+=(--add-reviewer) ;;
+        *) edit_args+=("$arg") ;;
+      esac
+    done
+    gh pr edit "$url" --repo "$DEV_REPO" --title "$title" --body-file "$body_file" "${edit_args[@]}" >/dev/null
+    gh pr comment "$url" --repo "$DEV_REPO" --body "Re-triaged by automation; description updated. Run: ${RUN_URL}" >/dev/null
+    echo "$url"
+  else
+    local draft_flag=()
+    [[ "$mode" == "draft" ]] && draft_flag=(--draft)
+    gh pr create --repo "$DEV_REPO" --base main --head "$head" ${draft_flag[@]+"${draft_flag[@]}"} \
+      --title "$title" --body-file "$body_file" "$@"
+  fi
+}
+
+# Opens (or updates) a draft tracking PR. $1 = title, $2 = body file, rest = extra gh flags.
+# Any commits Claude left on the branch are preserved so an unverified fix attempt is not lost;
+# otherwise the branch is a single empty commit on top of origin/main.
 open_tracking_pr() {
   local title="$1" body_file="$2"; shift 2
-  git checkout -q -B "$branch" origin/main
-  git commit -q --allow-empty -m "Triage tracking for apollo-ios#${n}"
+  if git rev-parse --verify --quiet "$branch" >/dev/null && \
+     [[ "$(git rev-list --count "origin/main..$branch")" -gt 0 ]]; then
+    git checkout -q "$branch"
+    printf '\n> **Note:** this branch carries an unverified fix attempt from the triage run. Review it before building on it.\n' >>"$body_file"
+  else
+    git checkout -q -B "$branch" origin/main
+    git commit -q --allow-empty -m "Triage tracking for apollo-ios#${n}"
+  fi
   git push -q --force "$push_url" "${branch}:refs/heads/${branch}"
-  gh pr create --repo "$DEV_REPO" --base main --head "$branch" --draft \
-    --title "$title" --body-file "$body_file" --label "$TRIAGE_LABEL" "$@"
+  create_or_update_pr "$branch" "$title" "$body_file" draft --label "$TRIAGE_LABEL" "$@"
 }
 
 if [[ ! -s "$result_file" ]] || ! jq -e . "$result_file" >/dev/null 2>&1; then
@@ -154,13 +194,14 @@ if [[ "$has_fix" == true ]]; then
     cat "$tmp/triage-section.md"
     printf '\n_Workflow run: %s_\n\n</details>\n' "$RUN_URL"
   } >"$tmp/pr-body.md"
-  git push -q "$push_url" "${fix_branch}:refs/heads/${fix_branch}"
-  tracking_url="$(gh pr create --repo "$DEV_REPO" --base main --head "$fix_branch" \
-    --title "$pr_title" --body-file "$tmp/pr-body.md" --label "$TRIAGE_LABEL" \
-    ${ASSIGNEE:+--reviewer "$ASSIGNEE"})"
+  git push -q --force "$push_url" "${fix_branch}:refs/heads/${fix_branch}"
+  tracking_url="$(create_or_update_pr "$fix_branch" "$pr_title" "$tmp/pr-body.md" ready \
+    --label "$TRIAGE_LABEL" ${ASSIGNEE:+--reviewer "$ASSIGNEE"})"
   echo "Opened fix PR: $tracking_url" >&2
+  reply_line=""
+  [[ -n "$posted_comment_url" ]] && reply_line="Reply posted: ${posted_comment_url}${nl}"
   slack_notify "$(printf ':white_check_mark: *Apollo iOS triage opened a fix PR*\n*%s* (apollo-ios#%s)\n%s\n%sPR: %s' \
-    "$title" "$n" "$summary" "${posted_comment_url:+Reply posted: $posted_comment_url$'\n'}" "$tracking_url")"
+    "$title" "$n" "$summary" "$reply_line" "$tracking_url")"
 elif [[ -n "$posted_comment_url" ]]; then
   # The reply already went out; the tracking PR is only a dedup record, so it is closed immediately.
   {
@@ -191,9 +232,9 @@ else
     "${labels[@]}" ${ASSIGNEE:+--assignee "$ASSIGNEE"})"
   echo "Opened tracking PR: $tracking_url" >&2
   q_text=""
-  [[ -n "$questions" ]] && q_text=$'\n\n*Questions:*\n'"$questions"
+  [[ -n "$questions" ]] && q_text="${nl}${nl}*Questions:*${nl}${questions}"
   d_text=""
-  [[ -n "$response_draft" ]] && d_text=$'\n\n*Draft reply (not posted):*\n'"$response_draft"
+  [[ -n "$response_draft" ]] && d_text="${nl}${nl}*Draft reply (not posted):*${nl}${response_draft}"
   slack_notify "$(printf ':mag: *Apollo iOS triage needs your input*\n*%s* (apollo-ios#%s) — %s / %s confidence\n%s\n%s%s%s\n\nAnswer with an @claude comment: %s' \
     "$title" "$n" "$category" "$confidence" "$issue_url" "$summary" "$q_text" "$d_text" "$tracking_url")"
 fi
