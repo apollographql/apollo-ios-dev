@@ -59,22 +59,57 @@ review) is itself a finding: mention it in the summary and review normally.
 8. **Style.** Only what `claude/code-style.md` calls out. Do not comment on
    formatting, naming preferences, or comment wording beyond that file.
 
+## Severity
+
+Every finding gets one severity before you decide how to report it:
+
+- **Blocking.** Wrong behavior, data loss or corruption, a security weakness,
+  a failure that is silent or misreported, or an unannounced public API break.
+- **Important.** A real defect with a concrete failure scenario, but with a
+  narrow trigger or an easy workaround.
+- **Minor.** Style, wording, redundancy, anything `claude/code-style.md`
+  covers, or anything for which you cannot write down the concrete input or
+  state that produces a failure.
+
+An inline comment must state that concrete failure scenario in its first
+sentence. If you cannot write that sentence, the finding is minor.
+
+## Re-reviews
+
+If this PR already has a summary from this automation, you are re-reviewing:
+
+1. Verify each prior finding against the new commits and say which are
+   addressed and which are not.
+2. Review only the code changed since that summary. Do not re-read the
+   unchanged diff looking for new findings.
+3. Raise new findings only at blocking or important severity. Never raise a
+   minor on code that was already reviewed unchanged; if you missed it the
+   first time, it does not justify another round.
+
 ## How to report
 
 - Use `mcp__github_inline_comment__create_inline_comment` with `confirmed: true`
-  for each specific finding, anchored to the exact line. One finding per
-  comment. State the problem, why it matters, and a concrete fix. Skip
-  anything you are not confident is a real issue.
+  only for blocking and important findings, anchored to the exact line. One
+  finding per comment. Lead with the failure scenario, then why it matters,
+  then a concrete fix.
+- Minors never get an inline comment. Put up to five of them in the summary
+  under a collapsed `<details><summary>Minor, not blocking</summary>` block,
+  one line each with file:line. Drop the rest.
 - Write the summary into your tracking comment with
   `mcp__github_comment__update_claude_comment`. Never post a separate comment.
   Structure:
-  - One line verdict: `No blocking issues found`, or `N issues worth a look`.
-  - Bullets for each inline finding (file:line and a short phrase).
+  - One line verdict: `No blocking issues found` whenever nothing is blocking,
+    otherwise `N blocking issues`. Important findings do not change the
+    verdict line; they appear in the bullets.
+  - Bullets for each inline finding (severity, file:line, and a short phrase).
+  - On a re-review, a line stating which prior findings are addressed.
+  - The collapsed minors block, if any.
   - A `Coverage:` line naming the files and areas you actually read.
   - A `Not reviewed:` line naming what you skipped (generated files, vendored
     code, anything you could not assess without building). Never claim a
     category was verified; you did not build or run anything.
-  - Under 200 words. No praise, no restating the PR description.
+  - Under 200 words outside the collapsed block. No praise, no restating the
+    PR description.
 - If the PR is a release PR (title starts with `Release`), limit the review to
   version constants, `CHANGELOG.md` completeness against merged PRs since the
   prior tag, and the generated API docs. Do not review the generated docs
