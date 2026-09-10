@@ -33,9 +33,8 @@ jobs:
       id-token: write
       actions: read
     steps:
-      # When the bot app is configured it is passed as github_token so Claude's
-      # gh calls (including upstream replies) run as that bot. The action
-      # overwrites GH_TOKEN in Claude's environment, so an env var would not do.
+      # Optional org-owned bot app. When configured it is passed as github_token
+      # so Claude's gh calls run as that bot instead of the Claude App.
       - name: Create bot token
         id: bot
         if: vars.CLAUDE_BOT_APP_ID != ''
@@ -58,7 +57,13 @@ jobs:
       - name: Install Tuist
         uses: jdx/mise-action@v4
 
+      - name: Prepare run
+        run: echo "UPSTREAM_REPLY_FILE=$RUNNER_TEMP/upstream-reply.json" >> "$GITHUB_ENV"
+
+      # Claude never posts upstream itself. An approved reply is written to
+      # UPSTREAM_REPLY_FILE and posted by the step after this one.
       - name: Run Claude
+        id: claude
         uses: anthropics/claude-code-action@v1
         with:
           # Either credential works; leave the one you are not using unset.
@@ -70,6 +75,54 @@ jobs:
           claude_args: |
             --model ${{ vars.CLAUDE_MODEL || 'claude-opus-5' }}
             --max-turns 150
-            --append-system-prompt "Before doing anything else, read .github/claude/followup-instructions.md and follow it. UPSTREAM_POSTING_ENABLED=${{ steps.bot.outputs.token != '' }}"
-            --allowedTools "Read,Glob,Grep,Edit,MultiEdit,Write,Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh issue comment:*),Bash(gh pr list:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh pr create:*),Bash(gh pr ready:*),Bash(gh pr edit:*),Bash(gh pr close:*),Bash(gh pr comment:*),Bash(gh run view:*),Bash(gh search:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git blame:*),Bash(git grep:*),Bash(git fetch:*),Bash(git checkout:*),Bash(git switch:*),Bash(git branch:*),Bash(git add:*),Bash(git commit:*),Bash(git push origin:*),Bash(git restore:*),Bash(swift build:*),Bash(swift test:*),Bash(tuist generate:*),Bash(xcodebuild:*),Bash(ls:*),Bash(cat:*),Bash(find:*),Bash(grep:*),Bash(rg:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(jq:*),Bash(mkdir:*)"
-            --disallowedTools "Bash(gh api:*),Bash(gh pr merge:*),Bash(gh repo:*),Bash(git push --force:*),Bash(git push -f:*),Bash(git push origin --force:*),Bash(git push origin -f:*),Bash(npm:*),Bash(npx:*),Bash(curl:*),Bash(swift package:*),Bash(xcrun:*),WebFetch,WebSearch"
+            --append-system-prompt "Before doing anything else, read .github/claude/followup-instructions.md and follow it. UPSTREAM_REPLY_FILE=${{ env.UPSTREAM_REPLY_FILE }}"
+            --allowedTools "Read,Glob,Grep,Edit,MultiEdit,Write,Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh pr list:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh pr create:*),Bash(gh pr ready:*),Bash(gh pr edit:*),Bash(gh pr close:*),Bash(gh pr comment:*),Bash(gh run view:*),Bash(gh search:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git blame:*),Bash(git grep:*),Bash(git fetch:*),Bash(git checkout:*),Bash(git switch:*),Bash(git branch:*),Bash(git add:*),Bash(git commit:*),Bash(git push origin:*),Bash(git restore:*),Bash(swift build:*),Bash(swift test:*),Bash(tuist generate:*),Bash(xcodebuild:*),Bash(ls:*),Bash(cat:*),Bash(find:*),Bash(grep:*),Bash(rg:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(jq:*),Bash(mkdir:*)"
+            --disallowedTools "Bash(gh issue comment:*),Bash(gh issue edit:*),Bash(gh issue close:*),Bash(gh api:*),Bash(gh pr merge:*),Bash(gh repo:*),Bash(git push --force:*),Bash(git push -f:*),Bash(git push origin --force:*),Bash(git push origin -f:*),Bash(npm:*),Bash(npx:*),Bash(curl:*),Bash(swift package:*),Bash(xcrun:*),WebFetch,WebSearch"
+
+      # A fresh checkout from GitHub, made after the Claude step, so the posting
+      # script cannot have been altered by anything the model did locally.
+      - name: Fetch publishing script
+        if: success() || failure()
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: publish-tools
+          sparse-checkout: scripts/claude-triage
+
+      - name: Post approved upstream reply
+        # Runs after a failed Claude step too, but not after a cancellation:
+        # cancelling the run must never post publicly. hashFiles() cannot see
+        # RUNNER_TEMP, so the file check lives in the step.
+        if: success() || failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPSTREAM_TOKEN: ${{ steps.bot.outputs.token }}
+          UPSTREAM_DISPATCH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
+        run: |
+          [[ -f "$UPSTREAM_REPLY_FILE" ]] || { echo "No upstream reply queued."; exit 0; }
+          # The queue file is model-authored; validate before anything is posted.
+          if ! jq -e '(.issue_number|tostring|test("^[0-9]+$")) and (.body|type=="string") and (.body|length>0)' \
+               "$UPSTREAM_REPLY_FILE" >/dev/null 2>&1; then
+            gh pr comment "$PR_NUMBER" --body "$(printf 'A reply was queued for apollographql/apollo-ios but the queue file was not valid JSON with a numeric issue_number and a non-empty string body, so nothing was posted. Run log: %s' "$RUN_URL")"
+            exit 1
+          fi
+          issue="$(jq -r '.issue_number' "$UPSTREAM_REPLY_FILE")"
+          jq -r '.body' "$UPSTREAM_REPLY_FILE" > "$RUNNER_TEMP/upstream-reply-body.md"
+          # Copy shown on this PR has @mentions defused so the reporter is not pinged from here.
+          zwsp="$(printf '\xe2\x80\x8b')"
+          sed "s/@\([A-Za-z0-9]\)/@${zwsp}\1/g" "$RUNNER_TEMP/upstream-reply-body.md" > "$RUNNER_TEMP/upstream-reply-body-internal.md"
+          set +e
+          url="$(publish-tools/scripts/claude-triage/post-upstream-reply.sh "$issue" "$RUNNER_TEMP/upstream-reply-body.md")"
+          rc=$?
+          set -e
+          if [[ $rc -eq 0 && -n "$url" ]]; then
+            gh pr comment "$PR_NUMBER" --body "Posted the approved reply on apollographql/apollo-ios#${issue}: ${url}"
+          elif [[ $rc -eq 2 ]]; then
+            gh pr comment "$PR_NUMBER" --body "$(printf 'Dispatched the approved reply to apollographql/apollo-ios#%s but could not confirm it was posted (run log: %s). **Check https://github.com/apollographql/apollo-ios/issues/%s before posting this manually.** The relay may already have posted it, or may not be present on the upstream default branch yet.\n\n<details><summary>Approved text (the reporter handle is escaped; retype it if you paste this)</summary>\n\n%s\n\n</details>' "$issue" "$RUN_URL" "$issue" "$(cat "$RUNNER_TEMP/upstream-reply-body-internal.md")")"
+            exit 1
+          else
+            gh pr comment "$PR_NUMBER" --body "$(printf 'Could not post the approved reply on apollographql/apollo-ios#%s (run log: %s). Approved text, with the reporter handle escaped; retype it if you paste this:\n\n%s' "$issue" "$RUN_URL" "$(cat "$RUNNER_TEMP/upstream-reply-body-internal.md")")"
+            exit 1
+          fi
