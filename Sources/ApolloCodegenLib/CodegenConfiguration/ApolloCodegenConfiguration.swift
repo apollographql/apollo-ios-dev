@@ -721,6 +721,15 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     ///
     /// Defaults to `true` when compiled with Swift 6.2+, `false` otherwise.
     public let markTypesNonisolated: Bool
+    /// When `true`, generated test mock convenience initializers use non-optional parameters for
+    /// non-null schema fields and provide schema-appropriate default values for those parameters.
+    ///
+    /// Set this to `false` to make all test mock initializer parameters optional and default them
+    /// to `nil`. This can be useful for tests that explicitly pass `nil` or construct partial
+    /// response data.
+    ///
+    /// Defaults to `true`.
+    public let requireNonOptionalMockFields: Bool
 
     /// Default property values
     public struct Default {
@@ -737,6 +746,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       public static let conversionStrategies: ConversionStrategies = .init()
       public static let pruneGeneratedFiles: Bool = true
       public static let appendSchemaTypeFilenameSuffix: Bool = false
+      public static let requireNonOptionalMockFields: Bool = true
       #if compiler(>=6.2)
       public static let markTypesNonisolated: Bool = true
       #else
@@ -768,6 +778,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     ///     schema type names.
     ///   - markTypesNonisolated: When `true`, generated types are marked `nonisolated` for
     ///     compatibility with Swift 6.2's default actor isolation (`@MainActor`).
+    ///   - requireNonOptionalMockFields: When `true`, generated test mock convenience initializers
+    ///     use non-optional parameters and defaults for non-null schema fields.
     public init(
       additionalCapitalizationRules: [CapitalizationRule] = Default.additionalCapitalizationRules,
       additionalInflectionRules: [InflectionRule] = Default.additionalInflectionRules,
@@ -781,7 +793,8 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       conversionStrategies: ConversionStrategies = Default.conversionStrategies,
       pruneGeneratedFiles: Bool = Default.pruneGeneratedFiles,
       appendSchemaTypeFilenameSuffix: Bool = Default.appendSchemaTypeFilenameSuffix,
-      markTypesNonisolated: Bool = Default.markTypesNonisolated
+      markTypesNonisolated: Bool = Default.markTypesNonisolated,
+      requireNonOptionalMockFields: Bool = Default.requireNonOptionalMockFields
     ) {
       self.additionalCapitalizationRules = additionalCapitalizationRules
       self.additionalInflectionRules = additionalInflectionRules
@@ -796,6 +809,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       self.pruneGeneratedFiles = pruneGeneratedFiles
       self.appendSchemaTypeFilenameSuffix = appendSchemaTypeFilenameSuffix
       self.markTypesNonisolated = markTypesNonisolated
+      self.requireNonOptionalMockFields = requireNonOptionalMockFields
     }
 
     // MARK: Codable
@@ -815,6 +829,7 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       case pruneGeneratedFiles
       case appendSchemaTypeFilenameSuffix
       case markTypesNonisolated
+      case requireNonOptionalMockFields
     }
 
     public init(from decoder: any Decoder) throws {
@@ -898,6 +913,12 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
           Bool.self,
           forKey: .markTypesNonisolated
         ) ?? Default.markTypesNonisolated
+
+      requireNonOptionalMockFields =
+        try values.decodeIfPresent(
+          Bool.self,
+          forKey: .requireNonOptionalMockFields
+        ) ?? Default.requireNonOptionalMockFields
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -916,6 +937,9 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
       try container.encode(self.pruneGeneratedFiles, forKey: .pruneGeneratedFiles)
       try container.encode(self.appendSchemaTypeFilenameSuffix, forKey: .appendSchemaTypeFilenameSuffix)
       try container.encode(self.markTypesNonisolated, forKey: .markTypesNonisolated)
+      if !self.requireNonOptionalMockFields {
+        try container.encode(false, forKey: .requireNonOptionalMockFields)
+      }
     }
   }
 
