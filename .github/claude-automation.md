@@ -116,10 +116,12 @@ no-op and the rest of the automation still runs.
 | Triage needs your input | Full summary, the open questions, and any draft reply |
 | Triage publish fails | The issue and the run log |
 | Claude answers an `@claude` comment | What you asked, Claude's reply, and any PR the run opened or marked ready for review, plus any reply it posted upstream |
-| A follow-up run fails | The same, flagged, with the run log |
+| A follow-up run fails | The same, flagged with the step that failed — Claude's or the upstream post — plus a warning when a queued reply never made it upstream |
 
-The follow-up notice reports pull requests opened during the run only when the
-author is a bot, so a PR you open while it works is never reported as Claude's.
+The follow-up notice attributes by author: a PR opened during the run is
+reported only when a bot opened it, and "marked ready for review" is read from
+the timeline event's actor, so work you do on the PR while it runs is never
+reported as Claude's.
 Automated PR reviews are deliberately not announced: they land on every PR and
 GitHub already notifies the author.
 

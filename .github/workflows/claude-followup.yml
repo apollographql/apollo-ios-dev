@@ -57,17 +57,13 @@ jobs:
       - name: Install Tuist
         uses: jdx/mise-action@v4
 
-      # The timestamp and draft state are captured before Claude runs so the
-      # Slack notice can tell what this run posted from what was already there.
+      # The timestamp is captured before Claude runs so the Slack notice can
+      # tell what this run posted from what was already on the PR.
       - name: Prepare run
         id: prepare
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
         run: |
           echo "UPSTREAM_REPLY_FILE=$RUNNER_TEMP/upstream-reply.json" >> "$GITHUB_ENV"
           echo "started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
-          echo "was_draft=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json isDraft --jq '.isDraft' 2>/dev/null || echo unknown)" >> "$GITHUB_OUTPUT"
 
       # Claude never posts upstream itself. An approved reply is written to
       # UPSTREAM_REPLY_FILE and posted by the step after this one.
@@ -152,8 +148,10 @@ jobs:
           TRIGGER_COMMENT_URL: ${{ github.event.comment.html_url }}
           TRIGGER_COMMENT_BODY: ${{ github.event.comment.body }}
           RUN_STARTED_AT: ${{ steps.prepare.outputs.started_at }}
-          WAS_DRAFT: ${{ steps.prepare.outputs.was_draft }}
           CLAUDE_OUTCOME: ${{ steps.claude.outcome }}
+          # A queued reply that fails to post fails that step, not Claude's, and
+          # must still be flagged in Slack.
+          UPSTREAM_OUTCOME: ${{ steps.upstream.outcome }}
           UPSTREAM_REPLY_URL: ${{ steps.upstream.outputs.reply_url }}
           # Claude posts as the bot app when one is configured, else as the Claude App.
           REPLY_BOT_LOGIN: ${{ steps.bot.outputs.app-slug && format('{0}[bot]', steps.bot.outputs.app-slug) || 'claude[bot]' }}
