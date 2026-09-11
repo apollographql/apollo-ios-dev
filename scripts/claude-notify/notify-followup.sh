@@ -90,9 +90,12 @@ marked_ready="$(gh api --paginate "repos/${REPO}/issues/${PR_NUMBER}/timeline?pe
   | jq -s --arg since "$RUN_STARTED_AT" --arg login "$bot_login" "$is_claude"'
       any(.[]; (.event? == "ready_for_review") and (.created_at >= $since) and is_claude(.actor.login))' 2>/dev/null || echo false)"
 
+# Success is the only unflagged outcome for either step. "skipped" on the Claude
+# step means an earlier step failed, which is the very case to flag; the upstream
+# step is skipped only on cancellation, when this notice is skipped with it.
 failed=""
-[[ "$CLAUDE_OUTCOME" != "success" && "$CLAUDE_OUTCOME" != "skipped" ]] && failed="the Claude step (${CLAUDE_OUTCOME})"
-if [[ "$UPSTREAM_OUTCOME" != "success" && "$UPSTREAM_OUTCOME" != "skipped" ]]; then
+[[ "$CLAUDE_OUTCOME" != "success" ]] && failed="the Claude step (${CLAUDE_OUTCOME})"
+if [[ "$UPSTREAM_OUTCOME" != "success" ]]; then
   [[ -n "$failed" ]] && failed="${failed} and "
   failed="${failed}the upstream reply step (${UPSTREAM_OUTCOME})"
 fi
@@ -100,7 +103,7 @@ fi
 if [[ -z "$failed" ]]; then
   header=":robot_face: *Claude responded on ${REPO}#${PR_NUMBER}*"
 else
-  header=":rotating_light: *Claude follow-up failed in ${failed}* on ${REPO}#${PR_NUMBER}"
+  header=":rotating_light: *Claude follow-up did not complete* — ${failed} — on ${REPO}#${PR_NUMBER}"
 fi
 
 {
