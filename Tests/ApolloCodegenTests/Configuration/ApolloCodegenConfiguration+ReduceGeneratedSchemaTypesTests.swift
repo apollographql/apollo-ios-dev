@@ -21,7 +21,9 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
   }
   
   private func createSubject(
-    reduceGeneratedSchemaTypes: Bool = true
+    reduceGeneratedSchemaTypes: Bool = true,
+    testMocks: ApolloCodegenConfiguration.TestMockFileOutput = .none,
+    requireNonOptionalMockFields: Bool = true
   ) -> ApolloCodegen {
     let config = ApolloCodegen.ConfigurationContext(
       config: ApolloCodegenConfiguration.mock(
@@ -32,11 +34,13 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
         ),
         output: .mock(
           moduleType: .swiftPackage(apolloSDKDependency: .default),
+          testMocks: testMocks,
           path: directoryURL.path
         ),
         options: .init(
           reduceGeneratedSchemaTypes: reduceGeneratedSchemaTypes,
-          markTypesNonisolated: false
+          markTypesNonisolated: false,
+          requireNonOptionalMockFields: requireNonOptionalMockFields
         )
       )
     )
@@ -57,6 +61,7 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
         allAnimals: [Animal]!
         allPetFood: [PetFood]!
         allPetBeds: [PetBed]!
+        featuredPetBed: PetBed!
       }
       
       interface Animal @typePolicy(keyFields: "id") {
@@ -150,6 +155,60 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
   }
   
   // MARK: - Tests
+
+  func test_givenRequiredInterfaceWithoutReferencedObjects_reducingGeneratedSchemaTypes_generatesRequiredMockParameterWithoutDefault() async throws {
+    try await createFile(
+      body: """
+      query FeaturedPetBedQuery {
+        featuredPetBed {
+          id
+          name
+        }
+      }
+      """,
+      filename: "FeaturedPetBedQuery.graphql"
+    )
+
+    let testMocksURL = directoryURL.appendingPathComponent("TestMocks")
+    let subject = createSubject(
+      testMocks: .absolute(path: testMocksURL.path),
+      requireNonOptionalMockFields: true
+    )
+    let compilationResult = try await subject.compileGraphQLResult()
+    let ir = IRBuilder(compilationResult: compilationResult)
+
+    try await subject.generateFiles(
+      compilationResult: compilationResult,
+      ir: ir,
+      fileManager: ApolloFileManager.default
+    )
+
+    let queryMock = try String(
+      contentsOf: testMocksURL.appendingPathComponent("Query+Mock.graphql.swift"),
+      encoding: .utf8
+    )
+
+    expect(queryMock).to(contain("featuredPetBed: (any AnyMock)"))
+    expect(queryMock).toNot(contain("featuredPetBed: (any AnyMock) ="))
+    expect(queryMock).toNot(contain("Mock<CatBed>()"))
+    expect(queryMock).toNot(contain("Mock<DogBed>()"))
+    expect(queryMock).toNot(contain("Mock<BirdCage>()"))
+    await expect {
+      await ApolloFileManager.default.doesFileExist(
+        atPath: testMocksURL.appendingPathComponent("CatBed+Mock.graphql.swift").path
+      )
+    }.to(beFalse())
+    await expect {
+      await ApolloFileManager.default.doesFileExist(
+        atPath: testMocksURL.appendingPathComponent("DogBed+Mock.graphql.swift").path
+      )
+    }.to(beFalse())
+    await expect {
+      await ApolloFileManager.default.doesFileExist(
+        atPath: testMocksURL.appendingPathComponent("BirdCage+Mock.graphql.swift").path
+      )
+    }.to(beFalse())
+  }
   
   func test_givenSchemaAndOperationDocuments_andInterfaceWithTypePolicy_reducingGeneratedSchemaTypes_generatesOnlyReferencedObjects() async throws {
     try await createFile(
