@@ -67,7 +67,8 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           ),
           pruneGeneratedFiles: false,
           appendSchemaTypeFilenameSuffix: true,
-          markTypesNonisolated: false
+          markTypesNonisolated: false,
+          requireNonOptionalMockFields: false
         ),
         experimentalFeatures: .init(
           fieldMerging: .all,
@@ -133,6 +134,7 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
           ],
           "pruneGeneratedFiles" : false,
           "reduceGeneratedSchemaTypes" : false,
+          "requireNonOptionalMockFields" : false,
           "schemaCustomization" : {
             "customTypeNames" : {
               "MyEnum" : {
@@ -352,6 +354,42 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
 
     expect(try JSONDecoder().decode(ApolloCodegenConfiguration.self, from: encodedConfig))
       .toNot(throwError())
+  }
+
+  func test__decodeOutputOptions__withoutRequireNonOptionalMockFields_defaultsToTrue() throws {
+    let options = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.OutputOptions.self,
+      from: "{}".asData
+    )
+
+    expect(options.requireNonOptionalMockFields).to(beTrue())
+  }
+
+  func test__encodeOutputOptions__withRequireNonOptionalMockFieldsTrue_omitsDefaultValue() throws {
+    let options = ApolloCodegenConfiguration.OutputOptions(
+      markTypesNonisolated: false,
+      requireNonOptionalMockFields: true
+    )
+
+    let encoded = try testJSONEncoder.encode(options)
+
+    expect(encoded.asString).toNot(contain("\"requireNonOptionalMockFields\""))
+  }
+
+  func test__encodeOutputOptions__withRequireNonOptionalMockFieldsFalse_roundTrips() throws {
+    let expected = ApolloCodegenConfiguration.OutputOptions(
+      markTypesNonisolated: false,
+      requireNonOptionalMockFields: false
+    )
+
+    let encoded = try testJSONEncoder.encode(expected)
+    let actual = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.OutputOptions.self,
+      from: encoded
+    )
+
+    expect(encoded.asString).to(contain("\"requireNonOptionalMockFields\" : false"))
+    expect(actual).to(equal(expected))
   }
 
   // MARK: - Composition Tests

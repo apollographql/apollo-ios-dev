@@ -28,7 +28,8 @@ class MockObjectTemplateTests: XCTestCase {
     moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackage(),
     testMocks: ApolloCodegenConfiguration.TestMockFileOutput = .swiftPackage(),
     deprecatedEnumCases: ApolloCodegenConfiguration.Composition = .include,
-    warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude
+    warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude,
+    requireNonOptionalMockFields: Bool = true
   ) {
     let config = ApolloCodegenConfiguration.mock(
       schemaNamespace: schemaNamespace,
@@ -36,7 +37,8 @@ class MockObjectTemplateTests: XCTestCase {
       options: .init(
         deprecatedEnumCases: deprecatedEnumCases,
         warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
-        markTypesNonisolated: false
+        markTypesNonisolated: false,
+        requireNonOptionalMockFields: requireNonOptionalMockFields
       )
     )
     ir = IRBuilder.mock(compilationResult: .mock())
@@ -447,7 +449,7 @@ class MockObjectTemplateTests: XCTestCase {
 
   // MARK: Convenience Initializer Tests
 
-  func test__render__givenSchemaType_generatesConvenienceInitializer() {
+  func test__render__givenRequireNonOptionalMockFieldsFalse_generatesOptionalConvenienceInitializerParameters() {
     // given
     let Cat: GraphQLType = .entity(GraphQLObjectType.mock("Cat"))
     let Animal: GraphQLType = .entity(GraphQLInterfaceType.mock("Animal"))
@@ -479,7 +481,8 @@ class MockObjectTemplateTests: XCTestCase {
         "enumList": .mock("enumList", type: .list(.nonNull(.enum(.mock(name: "enumType"))))),
         "enumOptionalList": .mock("enumOptionalList", type: .list(.enum(.mock(name: "enumType"))))
       ],
-      moduleType: .swiftPackage()
+      moduleType: .swiftPackage(),
+      requireNonOptionalMockFields: false
     )
 
     let expected = """
@@ -487,7 +490,7 @@ class MockObjectTemplateTests: XCTestCase {
 
     public extension Mock where O == Dog {
       convenience init(
-        customScalar: TestSchema.CustomScalar = .defaultMockValue,
+        customScalar: TestSchema.CustomScalar? = nil,
         customScalarList: [TestSchema.CustomScalar]? = nil,
         customScalarOptionalList: [TestSchema.CustomScalar?]? = nil,
         enumList: [GraphQLEnum<TestSchema.EnumType>]? = nil,
@@ -502,7 +505,7 @@ class MockObjectTemplateTests: XCTestCase {
         objectNestedList: [[Mock<Cat>]]? = nil,
         objectOptionalList: [Mock<Cat>?]? = nil,
         optionalString: String? = nil,
-        string: String = "",
+        string: String? = nil,
         stringList: [String]? = nil,
         stringNestedList: [[String]?]? = nil,
         stringOptionalList: [String?]? = nil,
@@ -550,7 +553,7 @@ class MockObjectTemplateTests: XCTestCase {
     )
   }
 
-  func test__render__givenSchemaTypeAndDefaultParameterFlagOn_generatesDefaultValueForRequiredFields() {
+  func test__render__givenRequireNonOptionalMockFieldsTrue_generatesDefaultsForRequiredFields() {
     // given
     let aardvark: GraphQLType = .entity(GraphQLObjectType.mock("aardvark"))
     let Cat: GraphQLType = .entity(GraphQLObjectType.mock("Cat"))
@@ -577,7 +580,8 @@ class MockObjectTemplateTests: XCTestCase {
         "enumType": .mock("enumType", type: .nonNull(.enum(.mock(name: "enumType", values: ["foo", "bar"])))),
         "enumList": .mock("enumList", type: .nonNull(.list(.nonNull(.enum(.mock(name: "enumType", values: ["foo", "bar"])))))),
       ],
-      moduleType: .swiftPackage()
+      moduleType: .swiftPackage(),
+      requireNonOptionalMockFields: true
     )
 
     let expected = """
@@ -716,7 +720,8 @@ class MockObjectTemplateTests: XCTestCase {
         "Type": .mock("Type", type: .nonNull(.string())),
         "Any": .mock("Any", type: .nonNull(.string())),
       ],
-      moduleType: .swiftPackage()
+      moduleType: .swiftPackage(),
+      requireNonOptionalMockFields: true
     )
 
     let expected = """
@@ -1006,7 +1011,8 @@ class MockObjectTemplateTests: XCTestCase {
         fields: [
           "string": .mock("string", type: .nonNull(.string())),
         ],
-        moduleType: .swiftPackage()
+        moduleType: .swiftPackage(),
+        requireNonOptionalMockFields: true
       )
 
       let expected = """
@@ -1078,7 +1084,8 @@ class MockObjectTemplateTests: XCTestCase {
         "priority": .mock("priority", type: .nonNull(.enum(enumType))),
       ],
       moduleType: .swiftPackage(),
-      deprecatedEnumCases: .exclude
+      deprecatedEnumCases: .exclude,
+      requireNonOptionalMockFields: true
     )
 
     let expected = """
