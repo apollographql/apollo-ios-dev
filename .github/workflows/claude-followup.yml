@@ -57,8 +57,13 @@ jobs:
       - name: Install Tuist
         uses: jdx/mise-action@v4
 
+      # The timestamp is captured before Claude runs so the Slack notice can
+      # tell what this run posted from what was already on the PR.
       - name: Prepare run
-        run: echo "UPSTREAM_REPLY_FILE=$RUNNER_TEMP/upstream-reply.json" >> "$GITHUB_ENV"
+        id: prepare
+        run: |
+          echo "UPSTREAM_REPLY_FILE=$RUNNER_TEMP/upstream-reply.json" >> "$GITHUB_ENV"
+          echo "started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
 
       # Claude never posts upstream itself. An approved reply is written to
       # UPSTREAM_REPLY_FILE and posted by the step after this one.
@@ -87,9 +92,12 @@ jobs:
         with:
           ref: main
           path: publish-tools
-          sparse-checkout: scripts/claude-triage
+          sparse-checkout: |
+            scripts/claude-triage
+            scripts/claude-notify
 
       - name: Post approved upstream reply
+        id: upstream
         # Runs after a failed Claude step too, but not after a cancellation:
         # cancelling the run must never post publicly. hashFiles() cannot see
         # RUNNER_TEMP, so the file check lives in the step.
@@ -119,6 +127,7 @@ jobs:
           set -e
           if [[ $rc -eq 0 && -n "$url" ]]; then
             gh pr comment "$PR_NUMBER" --body "Posted the approved reply on apollographql/apollo-ios#${issue}: ${url}"
+            echo "reply_url=$url" >> "$GITHUB_OUTPUT"
           elif [[ $rc -eq 2 ]]; then
             gh pr comment "$PR_NUMBER" --body "$(printf 'Dispatched the approved reply to apollographql/apollo-ios#%s but could not confirm it was posted (run log: %s). **Check https://github.com/apollographql/apollo-ios/issues/%s before posting this manually.** The relay may already have posted it, or may not be present on the upstream default branch yet.\n\n<details><summary>Approved text (the reporter handle is escaped; retype it if you paste this)</summary>\n\n%s\n\n</details>' "$issue" "$RUN_URL" "$issue" "$(cat "$RUNNER_TEMP/upstream-reply-body-internal.md")")"
             exit 1
@@ -126,3 +135,27 @@ jobs:
             gh pr comment "$PR_NUMBER" --body "$(printf 'Could not post the approved reply on apollographql/apollo-ios#%s (run log: %s). Approved text, with the reporter handle escaped; retype it if you paste this:\n\n%s' "$issue" "$RUN_URL" "$(cat "$RUNNER_TEMP/upstream-reply-body-internal.md")")"
             exit 1
           fi
+
+      # Runs from publish-tools (a fresh checkout of main), not the working
+      # tree, for the same reason as the step above. Skipped on cancellation.
+      - name: Notify Slack
+        if: success() || failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
+          TRIGGER_ACTOR: ${{ github.event.comment.user.login }}
+          TRIGGER_COMMENT_URL: ${{ github.event.comment.html_url }}
+          TRIGGER_COMMENT_BODY: ${{ github.event.comment.body }}
+          RUN_STARTED_AT: ${{ steps.prepare.outputs.started_at }}
+          CLAUDE_OUTCOME: ${{ steps.claude.outcome }}
+          # A queued reply that fails to post fails that step, not Claude's, and
+          # must still be flagged in Slack.
+          UPSTREAM_OUTCOME: ${{ steps.upstream.outcome }}
+          UPSTREAM_REPLY_URL: ${{ steps.upstream.outputs.reply_url }}
+          # Claude posts as the bot app when one is configured, else as the Claude App.
+          REPLY_BOT_LOGIN: ${{ steps.bot.outputs.app-slug && format('{0}[bot]', steps.bot.outputs.app-slug) || 'claude[bot]' }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ vars.CLAUDE_TRIAGE_SLACK_CHANNEL_ID || 'C06VAE92F7A' }}
+        run: publish-tools/scripts/claude-notify/notify-followup.sh
