@@ -55,15 +55,12 @@ branch="claude/triage/apollo-ios-${n}"
 push_url="https://x-access-token:${GH_TOKEN}@github.com/${DEV_REPO}.git"
 nl=$'\n'
 
+# Delegates to the shared sender. Guarded: a checkout without
+# scripts/claude-notify must not fire the ERR trap from inside the trap itself.
 slack_notify() {
-  [[ -z "${SLACK_BOT_TOKEN:-}" || -z "${SLACK_CHANNEL_ID:-}" ]] && return 0
-  jq -n --arg channel "$SLACK_CHANNEL_ID" --arg text "${1:0:30000}" \
-    '{channel: $channel, text: $text, unfurl_links: false}' \
-    | curl -sS -X POST https://slack.com/api/chat.postMessage \
-        -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
-        -H "Content-Type: application/json; charset=utf-8" \
-        --data @- \
-    | jq -r 'if .ok then "Slack: sent" else "Slack: failed: " + (.error // "unknown") end' >&2 || true
+  local sender="$here/../claude-notify/slack-notify.sh"
+  [[ -x "$sender" ]] || { echo "Slack: sender missing at $sender" >&2; return 0; }
+  "$sender" "$1" || true
 }
 
 # A marker file, not a variable: the trap also fires inside command substitutions.

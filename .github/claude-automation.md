@@ -9,7 +9,7 @@ workflow YAML.
 |---|---|---|
 | `claude-pr-review.yml` | Called from `ci-tests.yml` as a job that `needs` every CI job | Runs on the same `pull_request` event as CI, so the action has full PR context, but only after every CI job has finished. Skipped CI jobs count as passing; a failed or cancelled job posts one editable status note instead of a review, so a stale verdict never stands. A newer push cancels a review in flight, so only the latest commit is reviewed. Review instructions are read from `main`, not from the PR. Findings are tiered: blocking and important ones (each with a concrete failure scenario) get inline comments; minors are listed, collapsed, in the summary only. A re-review verifies prior findings and reviews only the new commits, and never raises minors on already-reviewed code, so nits do not cause round after round. Posts a tracking-comment summary. Skips drafts, forks, and CI bots. PRs that touch only `.github/claude/**` do not trigger CI and therefore get no review. |
 | `claude-issue-triage.yml` | Every 30 minutes, manual, or `repository_dispatch` | Finds new `apollographql/apollo-ios` issues, and previously triaged issues where the reporter has commented since the last triage, then triages each one and publishes a result (below). |
-| `claude-followup.yml` | `@claude` in a PR comment by an owner, member, or collaborator | Continues a triage from your answers, or does whatever you ask on a PR. Only the triggering comment's own text counts as instructions. |
+| `claude-followup.yml` | `@claude` in a PR comment by an owner, member, or collaborator | Continues a triage from your answers, or does whatever you ask on a PR. Only the triggering comment's own text counts as instructions. Posts a Slack notice of what it replied and of anything it opened, marked ready, or sent upstream. |
 
 ## Identity and authentication
 
@@ -79,11 +79,9 @@ Branches that already exist on the remote are never rewritten; if you or the
 follow-up bot pushed to a tracking branch, a re-triage only updates the PR
 description. Any publish failure sends a Slack alert.
 
-Every outcome sends a Slack message to `#alerts-client-ios` (the default;
-override with `CLAUDE_TRIAGE_SLACK_CHANNEL_ID`, or set it to your member ID for
-DMs). The Slack app behind `SLACK_BOT_TOKEN` must be a member of the channel.
-The needs-input message carries the full summary, questions, and draft reply
-so you can act from Slack. GitHub also emails you on assignment.
+Every outcome sends a Slack message (see Slack alerts below). The needs-input
+message carries the full summary, questions, and draft reply so you can act
+from Slack. GitHub also emails you on assignment.
 
 The tracking PR is the dedup record: an issue is skipped while a PR labeled
 `claude-triage` with `apollo-ios#<N>` in its title exists (open or closed).
@@ -101,6 +99,29 @@ only `.github/claude/**` still get a check run and remain mergeable.
 Answer a tracking PR by commenting with `@claude` and your decision. Claude
 re-reads the upstream issue, implements the fix on that branch and marks the PR
 ready, posts the approved reply upstream, or closes the PR, per your comment.
+
+## Slack alerts
+
+Everything the bot does in public is announced in `#alerts-client-ios` (the
+default; override with `CLAUDE_TRIAGE_SLACK_CHANNEL_ID`, or set it to your
+member ID for DMs). The Slack app behind `SLACK_BOT_TOKEN` must be a member of
+the channel. `scripts/claude-notify/slack-notify.sh` is the only place anything
+posts to Slack; with either the token or the channel unset every alert is a
+no-op and the rest of the automation still runs.
+
+| Event | Message |
+|---|---|
+| Triage opens a fix PR | The PR, the issue summary, and whether a reply went out |
+| Triage replies to a reporter | The upstream comment and the tracking record |
+| Triage needs your input | Full summary, the open questions, and any draft reply |
+| Triage publish fails | The issue and the run log |
+| Claude answers an `@claude` comment | What you asked, Claude's reply, and any PR the run opened or marked ready for review, plus any reply it posted upstream |
+| A follow-up run fails | The same, flagged, with the run log |
+
+The follow-up notice reports pull requests opened during the run only when the
+author is a bot, so a PR you open while it works is never reported as Claude's.
+Automated PR reviews are deliberately not announced: they land on every PR and
+GitHub already notifies the author.
 
 ## Setup
 
@@ -122,7 +143,7 @@ Variables (all optional):
 | `CLAUDE_MODEL` | `claude-opus-5` | Model for all workflows. |
 | `CLAUDE_TRIAGE_ASSIGNEE` | `AnthonyMDev` | Assigned to tracking PRs, requested as reviewer on fix PRs. |
 | `CLAUDE_TRIAGE_AUTO_COMMENT` | `true` | Post high-confidence replies upstream (bot identity only). |
-| `CLAUDE_TRIAGE_SLACK_CHANNEL_ID` | `C06VAE92F7A` (#alerts-client-ios) | Slack channel ID or member ID for alerts. |
+| `CLAUDE_TRIAGE_SLACK_CHANNEL_ID` | `C06VAE92F7A` (#alerts-client-ios) | Slack channel ID or member ID for every alert, triage and follow-up alike. |
 | `CLAUDE_TRIAGE_LOOKBACK_DAYS` | `3` | Only issues created or updated within this window are examined by the poll. |
 | `CLAUDE_TRIAGE_MAX_PER_RUN` | `3` | Cap on issues triaged per poll. |
 | `CLAUDE_BOT_APP_ID` | unset | Optional bot app ID; see Identity and authentication. |
