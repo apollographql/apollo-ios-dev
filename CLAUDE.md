@@ -33,35 +33,48 @@ This is the apollo-ios-dev repository, a development environment for the Apollo 
 - [apollo-ios-pagination](https://github.com/apollographql/apollo-ios-pagination) - Pagination support
 
 ### Requirements
-- Xcode 26.1+
-- Swift 6.1 (packages support Swift 5 backward compatibility via `swiftLanguageModes`)
-- Tuist 4.119.1 (pinned in `.mise.toml`; install via [Mise](https://mise.jdx.dev/) or `curl -Ls https://install.tuist.io | bash`)
-- Node.js v22 (only needed for GraphQL compiler JS tests)
+- **Xcode 26.1+** — the supported floor for local development. Nothing in the repo enforces this floor; CI pins an exact version via `XCODE_VERSION` in the workflows under `.github/workflows/` (currently `26.5`) and runs on `macos-26` runners, so CI is normally ahead of the floor. If you change the floor, update it here — there is no file to derive it from.
+- **Swift 6.1** — `swift-tools-version:6.1` in each `Package.swift`; packages support Swift 5 backward compatibility via `swiftLanguageModes: [.v6, .v5]`.
+- **Tuist** — the pinned version lives in `.mise.toml`, which is the single source of truth. Do not restate the version in prose; read the file. Install via [Mise](https://mise.jdx.dev/) (`mise install` picks up the pin) or `curl -Ls https://install.tuist.io | bash`.
+- **Node.js v22** — only needed for GraphQL compiler JS tests.
 
 ### Initial Setup
 1. Install Tuist (see requirements above)
-2. Generate workspace: `tuist generate`
-3. Use `ApolloDev.xcworkspace` for all development (NOT the .xcodeproj)
+2. Configure the repo's git hooks: `make repo-setup` (points `core.hooksPath` at `.githooks/`)
+3. Generate workspace: `tuist generate`
+4. Use `ApolloDev.xcworkspace` for all development (NOT the .xcodeproj)
 
 ## Common Commands
 
-### Building and Testing
+`make` targets live in lowercase `makefile` files: one at the repo root, one in `apollo-ios/`, and one in `apollo-ios-codegen/`. Note the lowercase name — `find . -name Makefile` will not match them.
+
+### Building
 - Generate Xcode workspace: `tuist generate`
-- Build (codegen package): `cd apollo-ios-codegen && make build`
-- Build CLI: `cd apollo-ios-codegen && make build-cli`
-- Run tests (codegen): `cd apollo-ios-codegen && make test`
+- Build a package the way CI does: `cd <apollo-ios|apollo-ios-codegen|apollo-ios-pagination> && swift build` (see the `run-swift-builds` job in `.github/workflows/ci-tests.yml`)
+- Build codegen package (release config): `cd apollo-ios-codegen && make build` (`swift build -c release`)
+- Clean build artifacts: `cd apollo-ios-codegen && make clean` (`swift package clean`)
+- Wipe build directory: `cd apollo-ios-codegen && make wipe` (`rm -rf .build`)
+
+### Testing
+**There is no `swift test` in this repo.** None of the three `Package.swift` manifests declares a `testTarget`, so `swift test` fails with `error: no tests found; create a target in the 'Tests' directory`.
+
+All Swift tests run through the Xcode schemes and test plans in `ApolloDev.xcworkspace`. See [Schemes → Test Plans Mapping](#schemes--test-plans-mapping) below for the full list, and [Running Tests via Command Line](#running-tests-via-command-line) for the `xcodebuild` invocation. Codegen tests specifically run under the `ApolloCodegenTests` scheme.
+
+Script-driven tests that do work from the command line:
 - Test all codegen configurations: `./scripts/run-test-codegen-configurations.sh`
-- Test with project validation: `./scripts/run-test-codegen-configurations.sh -t`
+- Same, with project validation: `./scripts/run-test-codegen-configurations.sh -t` (this is what CI runs)
+- GraphQL compiler JS tests: `cd apollo-ios-codegen/Sources/GraphQLCompiler/JavaScript && npm install && npm test`
 
 ### Code Generation
 - Run codegen for test projects: `./scripts/run-codegen.sh`
-- Build CLI with universal binary: `cd apollo-ios-codegen && make build-cli-universal`
-- Archive CLI for release: `cd apollo-ios-codegen && make archive-cli-for-release`
 
-### Package Management
-- Archive CLI to apollo-ios package: `make archive-cli-to-apollo-package`
-- Clean build artifacts: `cd apollo-ios-codegen && make clean`
-- Wipe build directory: `cd apollo-ios-codegen && make wipe`
+### CLI and Release
+- Build CLI: `cd apollo-ios-codegen && make build-cli`
+- Build CLI as a universal binary: `cd apollo-ios-codegen && make build-cli-universal`
+- Archive CLI for release: `cd apollo-ios-codegen && make archive-cli-for-release` (universal build + `apollo-ios-cli.tar.gz`)
+- Archive CLI into the apollo-ios package: `make archive-cli-to-apollo-package` (from the repo root — archives, then copies the tarball to `apollo-ios/CLI/`). This is the step run by the `Archive CLI` job in `.github/workflows/create-release-pr.yml`; `publish-release.yml` then attaches `apollo-ios/CLI/apollo-ios-cli.tar.gz` to the GitHub release.
+- Unpack the vendored CLI tarball: `cd apollo-ios && make unpack-cli`
+- Set version numbers across both packages: `./scripts/set-version.sh <version>`
 
 ## Repository Structure
 - **Sources/**: Test API implementations (AnimalKingdomAPI, StarWarsAPI, GitHubAPI, etc.)
@@ -107,6 +120,8 @@ The three library directories are git subtrees. On PR merge to `main`, GitHub Ac
 
 Primary CI is **GitHub Actions** (`.github/workflows/ci-tests.yml`). CircleCI (`.circleci/config.yml`) only runs security scans (gitleaks, semgrep).
 
+Automated PR review and upstream issue triage run through `claude-code-action`; see `.github/claude-automation.md` for the workflows, outcomes, and required secrets. Claude's standing instructions for those runs live in `.github/claude/`.
+
 ### GitHub CLI Quirks
 - `gh pr edit` may fail with GraphQL deprecation errors for repos using Projects (classic). Use `gh api repos/{owner}/{repo}/pulls/{number} -X PATCH -f title="..." -f body="..."` as a workaround.
 
@@ -115,6 +130,7 @@ Primary CI is **GitHub Actions** (`.github/workflows/ci-tests.yml`). CircleCI (`
 
 ## Tool Preferences
 
+- **Xcode MCP server setup**: the tools below come from the `xcode` MCP server, configured in `.mcp.json` at the repo root as `xcrun mcpbridge`. It ships with Xcode (requires Xcode 26+), so no install is needed, but Claude Code will ask you to approve the project-scoped server the first time you open the repo. If you decline, or `xcrun mcpbridge` is unavailable, none of the tools below exist in your session — fall back to the `xcodebuild` invocations under [Running Tests via Command Line](#running-tests-via-command-line).
 - **Use the Xcode MCP tools** (`BuildProject`, `RunSomeTests`, `RunAllTests`, `GetTestList`, etc.) for building and running tests instead of invoking `xcodebuild` directly via Bash.
 - **Running tests**: Always use `RunSomeTests` (or `RunAllTests`) from the Xcode MCP. Do NOT run `xcodebuild test` via Bash. Use `GetTestList` to discover available tests and their identifiers first.
 - **Known issue — `RunSomeTests` schema bug**: `RunSomeTests` currently returns a `-32602` schema validation error after tests complete, even though the tests ran successfully. To verify test results, call `XcodeListNavigatorIssues` with `severity: "error"` — zero errors means all tests passed.

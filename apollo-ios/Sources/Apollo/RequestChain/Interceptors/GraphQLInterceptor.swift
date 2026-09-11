@@ -22,7 +22,7 @@ public typealias InterceptorResultStream<Request: GraphQLRequest> =
 /// function called in sequential order prior to fetching the request.
 ///
 /// The interceptor may inspect or modify the provided `request`, which must then be passed into the `next` closure to
-/// continue through the ``RequestChain``
+/// continue through the ``RequestChain``.
 ///
 /// ## Post-Flight
 /// After response data is fetched and parsed, the ``ParsedResult`` will be emitted by the ``InterceptorResultStream``
@@ -98,7 +98,9 @@ public protocol GraphQLInterceptor: Sendable {
   /// - Parameters:
   ///   - request: The current pre-flight state of the request, may be modified by subsequent interceptors after
   ///   calling the `next` closure.
-  ///   - next: The ``NextInterceptorFunction`` that should be called to proceed to the next step in the ``RequestChain``.
+  ///   - next: The ``NextInterceptorFunction`` that must be called to proceed to the next step in the
+  ///   ``RequestChain``. An interceptor that emits a result without calling this closure fails the request with a
+  ///   ``RequestChain/Error/interceptorDidNotCallNext(interceptor:operationName:)``.
   /// - Returns: The stream of results to pass to the next interceptor for post-flight processing.
   func intercept<Request: GraphQLRequest>(
     request: Request,

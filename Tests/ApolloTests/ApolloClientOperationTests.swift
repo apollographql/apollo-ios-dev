@@ -71,17 +71,32 @@ final class ApolloClientOperationTests: XCTestCase {
 
   // MARK: - Cancellation Tests
 
+  /// Builds a client whose request chain suspends in flight until the enclosing task is cancelled, so that
+  /// cancellation is always observed at a known point regardless of how the task and `cancel()` interleave.
+  private func makeClientSuspendingUntilCancelled() -> ApolloClient {
+    let store = ApolloStore(cache: self.cache)
+    return ApolloClient(
+      networkTransport: MockNetworkTransport(
+        mockServer: self.server,
+        store: store,
+        additionalGraphQLInterceptors: [CancellationTestingInterceptor()]
+      ),
+      store: store
+    )
+  }
+
   func test__fetch__givenSingleResponse_cancelledBeforeResultReturned_throwsCancellationError() async throws {
+    let client = makeClientSuspendingUntilCancelled()
     let query = MockQuery<MockSelectionSet>()
 
-    let task = Task { [client] in
+    let task = Task {
       try await client.fetch(query: query, cachePolicy: .networkOnly)
     }
 
     task.cancel()
 
     switch await task.result {
-      case .success:
+    case .success:
       XCTFail("Expected task to fail with a CancellationError")
     case .failure(let error):
       XCTAssertTrue(error is CancellationError)
@@ -89,16 +104,17 @@ final class ApolloClientOperationTests: XCTestCase {
   }
 
   func test__performMutation__givenSingleResponse_cancelledBeforeResultReturned_throwsCancellationError() async throws {
+    let client = makeClientSuspendingUntilCancelled()
     let mutation = MockMutation<MockSelectionSet>()
 
-    let task = Task { [client] in
+    let task = Task {
       try await client.perform(mutation: mutation)
     }
 
     task.cancel()
 
     switch await task.result {
-      case .success:
+    case .success:
       XCTFail("Expected task to fail with a CancellationError")
     case .failure(let error):
       XCTAssertTrue(error is CancellationError)
@@ -106,16 +122,17 @@ final class ApolloClientOperationTests: XCTestCase {
   }
 
   func test__upload__givenSingleResponse_cancelledBeforeResultReturned_throwsCancellationError() async throws {
+    let client = makeClientSuspendingUntilCancelled()
     let query = MockQuery<MockSelectionSet>()
 
-    let task = Task { [client] in
+    let task = Task {
       try await client.upload(operation: query, files: [])
     }
 
     task.cancel()
 
     switch await task.result {
-      case .success:
+    case .success:
       XCTFail("Expected task to fail with a CancellationError")
     case .failure(let error):
       XCTAssertTrue(error is CancellationError)

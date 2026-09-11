@@ -44,10 +44,10 @@ extension IR.Entity.Location.FieldComponent {
 extension IR.Entity.Location.SourceDefinition {
 
   /// Takes the associated `IR.Entity.Location.SourceDefinition` and formats it into a selection set name
-  func formattedSelectionSetName() -> String {
+  func formattedSelectionSetName(capitalizer: Capitalizer) -> String {
     switch self {
     case .operation: return "Data"
-    case let .namedFragment(fragment): return fragment.generatedDefinitionName
+    case let .namedFragment(fragment): return fragment.generatedDefinitionName(capitalizer: capitalizer)
     }
   }
 

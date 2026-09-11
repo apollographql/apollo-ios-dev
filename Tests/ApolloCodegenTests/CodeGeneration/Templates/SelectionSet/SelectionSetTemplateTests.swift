@@ -30,6 +30,7 @@ class SelectionSetTemplateTests: XCTestCase {
   func buildSubjectAndOperation(
     named operationName: String = "TestOperation",
     configOutput: ApolloCodegenConfiguration.FileOutput = .mock(),
+    capitalizationRules: [ApolloCodegenLib.CapitalizationRule] = [],
     inflectionRules: [ApolloCodegenLib.InflectionRule] = [],
     schemaDocumentation: ApolloCodegenConfiguration.Composition = .exclude,
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude,
@@ -42,6 +43,7 @@ class SelectionSetTemplateTests: XCTestCase {
       schemaNamespace: "TestSchema",
       output: configOutput,
       options: .init(
+        additionalCapitalizationRules: capitalizationRules,
         additionalInflectionRules: inflectionRules,
         schemaDocumentation: schemaDocumentation,
         warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
@@ -67,10 +69,11 @@ class SelectionSetTemplateTests: XCTestCase {
     named fragmentName: String,
     in ir: IRBuilderTestWrapper,
     configOutput: ApolloCodegenConfiguration.FileOutput = .mock(),
+    capitalizationRules: [ApolloCodegenLib.CapitalizationRule] = [],
     inflectionRules: [ApolloCodegenLib.InflectionRule] = [],
     schemaDocumentation: ApolloCodegenConfiguration.Composition = .exclude,
     warningsOnDeprecatedUsage: ApolloCodegenConfiguration.Composition = .exclude,
-    conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = .init(),    
+    conversionStrategies: ApolloCodegenConfiguration.ConversionStrategies = .init(),
   ) async throws -> FragmentTemplate {
     let fragmentDefinition = try XCTUnwrap(ir.compilationResult[fragment: fragmentName])
     let fragment = await ir.build(fragment: fragmentDefinition)
@@ -78,6 +81,7 @@ class SelectionSetTemplateTests: XCTestCase {
       schemaNamespace: "TestSchema",
       output: configOutput,
       options: .init(
+        additionalCapitalizationRules: capitalizationRules,
         additionalInflectionRules: inflectionRules,
         schemaDocumentation: schemaDocumentation,
         warningsOnDeprecatedUsage: warningsOnDeprecatedUsage,
@@ -1687,6 +1691,51 @@ class SelectionSetTemplateTests: XCTestCase {
 
     // when
     try await buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 7, ignoringExtraLines: true))
+  }
+
+  func test__render_selections__givenFragmentsWithCapitalizationRules_rendersFragmentSelectionsWithCapitalizedFragmentName() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    type Animal {
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ...IDDetails
+      }
+    }
+
+    fragment IDDetails on Animal {
+      species
+    }
+    """
+
+    let expected = """
+      @_spi(Execution) public static var __selections: [ApolloAPI.Selection] { [
+        .field("__typename", String.self),
+        .fragment(IdDetails.self),
+      ] }
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      capitalizationRules: [.init(term: .string("id"), strategy: .lower)]
+    )
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
@@ -4628,6 +4677,63 @@ class SelectionSetTemplateTests: XCTestCase {
 
     // when
     try await buildSubjectAndOperation()
+    let predator_asPet = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]?[as: "Pet"]
+    )
+
+    let actual = subject.test_render(inlineFragment: predator_asPet.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 8, ignoringExtraLines: true))
+  }
+
+  func test__render_mergedSources__givenTypeCaseMergedFromFragmentWithCapitalizationRules_rendersMergedSourcesWithCapitalizedFragmentName() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+      predator: Animal!
+    }
+
+    interface Pet {
+      name: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ...IDDetails
+        predator {
+          species
+        }
+      }
+    }
+
+    fragment IDDetails on Animal {
+      predator {
+        ... on Pet {
+          name
+        }
+      }
+    }
+    """
+
+    let expected = """
+      @_spi(Execution) public static var __mergedSources: [any ApolloAPI.SelectionSet.Type] { [
+        TestOperationQuery.Data.AllAnimal.Predator.self,
+        IdDetails.Predator.AsPet.self
+      ] }
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      capitalizationRules: [.init(term: .string("id"), strategy: .lower)]
+    )
     let predator_asPet = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?[field: "predator"]?[as: "Pet"]
     )
@@ -8128,6 +8234,53 @@ class SelectionSetTemplateTests: XCTestCase {
 
     // when
     try await buildSubjectAndOperation()
+    let allAnimals = try XCTUnwrap(
+      operation[field: "query"]?[field: "allAnimals"]?.selectionSet
+    )
+
+    let actual = subject.test_render(childEntity: allAnimals.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, forSection: .selectionSet.namedFragmentAccessors))
+  }
+
+  func test__render_fragmentAccessor__givenFragmentWithCapitalizationRules_rendersFragmentAccessorWithCapitalizedTypeName() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    type Animal {
+      species: String!
+    }
+    """
+
+    document = """
+    query TestOperation {
+      allAnimals {
+        ...IDDetails
+      }
+    }
+
+    fragment IDDetails on Animal {
+      species
+    }
+    """
+
+    let expected = """
+      public struct Fragments: FragmentContainer {
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public var iDDetails: IdDetails { _toFragment() }
+      }
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      capitalizationRules: [.init(term: .string("id"), strategy: .lower)]
+    )
     let allAnimals = try XCTUnwrap(
       operation[field: "query"]?[field: "allAnimals"]?.selectionSet
     )
@@ -11686,6 +11839,142 @@ class SelectionSetTemplateTests: XCTestCase {
 
     // then
     expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
+  }
+
+  func test__render_conditionalFragmentOnQueryRoot__givenCapitalizationRules_rendersRootEntityTypeWithCapitalizedOperationName() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      name: String!
+    }
+    """
+
+    document = """
+    query TestOperationById($a: Boolean!) {
+      ...Details @include(if: $a)
+    }
+
+    fragment Details on Query {
+      name
+    }
+    """
+
+    let expected = """
+    /// IfA
+    public struct IfA: TestSchema.InlineFragment {
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
+
+      public typealias RootEntityType = TestOperationByIDQuery.Data
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      named: "TestOperationById",
+      capitalizationRules: [.init(term: .string("id"), strategy: .upper)]
+    )
+    let query_ifA = try XCTUnwrap(
+      operation[field: "query"]?[if: "a"]
+    )
+
+    let actual = subject.test_render(inlineFragment: query_ifA.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
+  }
+
+  func test__render_conditionalFragmentOnQueryRoot__givenLowercaseCapitalizationRule_rendersRootEntityTypeWithCapitalizedOperationName() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      name: String!
+    }
+    """
+
+    document = """
+    query IDLookup($a: Boolean!) {
+      ...Details @include(if: $a)
+    }
+
+    fragment Details on Query {
+      name
+    }
+    """
+
+    let expected = """
+    /// IfA
+    public struct IfA: TestSchema.InlineFragment {
+      @_spi(Unsafe) public let __data: DataDict
+      @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
+
+      public typealias RootEntityType = IdLookupQuery.Data
+    """
+
+    // when
+    try await buildSubjectAndOperation(
+      named: "IDLookup",
+      capitalizationRules: [.init(term: .string("id"), strategy: .lower)]
+    )
+    let query_ifA = try XCTUnwrap(
+      operation[field: "query"]?[if: "a"]
+    )
+
+    let actual = subject.test_render(inlineFragment: query_ifA.computed)
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 1, ignoringExtraLines: true))
+  }
+
+  func test__render_inlineFragmentInFragment__givenCapitalizationRules_rendersRootEntityTypeWithCapitalizedFragmentName() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      allAnimals: [Animal!]
+    }
+
+    interface Animal {
+      species: String!
+    }
+
+    interface Pet implements Animal {
+      species: String!
+      name: String!
+    }
+    """
+
+    document = """
+    fragment IDDetails on Animal {
+      ... on Pet {
+        name
+      }
+    }
+    """
+
+    let expected = """
+      /// AsPet
+      public struct AsPet: TestSchema.InlineFragment {
+        @_spi(Unsafe) public let __data: DataDict
+        @_spi(Unsafe) public init(_dataDict: DataDict) { __data = _dataDict }
+
+        public typealias RootEntityType = IdDetails
+    """
+
+    // when
+    ir = try await IRBuilderTestWrapper(.mock(schema: schemaSDL, document: document))
+    let fragmentTemplate = try await buildFragment(
+      named: "IDDetails",
+      in: ir,
+      capitalizationRules: [.init(term: .string("id"), strategy: .lower)]
+    )
+
+    let actual = fragmentTemplate.renderBodyTemplate(nonFatalErrorRecorder: .init()).description
+
+    // then
+    expect(actual).to(equalLineByLine(
+      expected,
+      after: .selectionSet.inlineFragmentAccessors,
+      ignoringExtraLines: true)
+    )
   }
 
   func test__render_conditionalFragmentOnQueryRoot__rendersRootEntityType() async throws {

@@ -3,6 +3,9 @@ name: "CI Tests"
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths-ignore:
+      - ".github/claude/**"
+      - ".github/claude-automation.md"
 
 env:
   XCODE_VERSION: "26.5"
@@ -37,7 +40,6 @@ jobs:
               - 'Tests/ApolloInternalTestHelpers/**'
               - 'apollo-ios/**'
             tuist:
-              - '.tuist-version'
               - '.mise.toml'
 
   tuist-generation:
@@ -152,27 +154,27 @@ jobs:
       run: |
         npm install && npm test
     - name: Save xcodebuild logs
-      if: ${{ failure() }}
+      if: ${{ failure() || cancelled() }}
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.name }}-logs
         path: |
           DerivedData/Logs/Build
     - name: Save crash logs
-      if: ${{ failure() }}
+      if: ${{ failure() || cancelled() }}
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.name }}-crashes
         path: |
           ~/Library/Logs/DiagnosticReports
     - name: Zip Result Bundle
-      if: ${{ failure() }}
+      if: ${{ failure() || cancelled() }}
       shell: bash
       working-directory: TestResults
       run: |
         zip -r ResultBundle.zip ResultBundle.xcresult
     - name: Save test results
-      if: ${{ failure() }}
+      if: ${{ failure() || cancelled() }}
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.name }}-results
@@ -228,3 +230,26 @@ jobs:
       shell: bash
       working-directory: apollo-ios/scripts
       run: ./cli-version-check.sh
+
+  # Runs the Claude review once every CI job above has finished. Skipped jobs
+  # count as passing; a failed or cancelled job posts a status note instead of
+  # a review. See .github/claude-automation.md.
+  claude-review:
+    needs:
+      - changes
+      - tuist-generation
+      - run-swift-builds
+      - build-and-unit-test
+      - run-codegen-test-configurations
+      - verify-frontend-bundle-latest
+      - verify-cli-binary-archive
+    if: ${{ !cancelled() }}
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+    uses: ./.github/workflows/claude-pr-review.yml
+    with:
+      ci_passed: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
+    secrets: inherit

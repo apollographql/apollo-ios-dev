@@ -656,9 +656,19 @@ public final class ApolloCodegen: Sendable {
     from oldGeneratedFilePaths: Set<String>,
     afterCodeGenerationUsing fileManager: ApolloFileManager
   ) async throws {
-    let filePathsToDelete = await oldGeneratedFilePaths.subtracting(fileManager.writtenFiles)
+    let writtenFiles = await fileManager.writtenFiles
+    let caseFoldedWrittenFiles = Set(writtenFiles.map { $0.lowercased() })
 
-    for path in filePathsToDelete {
+    for path in oldGeneratedFilePaths.subtracting(writtenFiles) {
+      // On a case-insensitive volume, a path differing from a written file only by case refers
+      // to the same file; deleting it would delete the newly generated output. When the volume's
+      // case sensitivity cannot be determined, the path is also skipped — leaving a stale file
+      // behind is preferable to deleting fresh output.
+      if caseFoldedWrittenFiles.contains(path.lowercased()),
+        await fileManager.volumeSupportsCaseSensitiveNames(forPath: path) != true {
+        continue
+      }
+
       try await fileManager.deleteFile(atPath: path)
     }
   }

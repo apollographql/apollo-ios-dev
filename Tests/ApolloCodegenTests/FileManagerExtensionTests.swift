@@ -561,6 +561,148 @@ class FileManagerExtensionTests: XCTestCase {
     }.notTo(throwError())
   }
 
+  // MARK: File Name Case Adoption
+
+  func test_createFile_givenExistingFileNameDiffersOnlyByCase_onCaseInsensitiveVolume_shouldRenameFileToNewCasing() async throws {
+    // given
+    let subject = ApolloFileManager(base: FileManager.default)
+    let directoryPath = self.uniquePath
+    let originalPath = URL(fileURLWithPath: directoryPath).appendingPathComponent("CaseTest.swift").path
+    let recasedPath = URL(fileURLWithPath: directoryPath).appendingPathComponent("CASETest.swift").path
+
+    addTeardownBlock {
+      try? FileManager.default.removeItem(atPath: directoryPath)
+    }
+
+    try await subject.createFile(atPath: originalPath, data: "Original".data(using: .utf8))
+
+    let isCaseSensitive = await subject.volumeSupportsCaseSensitiveNames(forPath: originalPath)
+    try XCTSkipIf(isCaseSensitive != false, "This test requires a case-insensitive volume.")
+
+    // when
+    try await subject.createFile(atPath: recasedPath, data: "Recased".data(using: .utf8))
+
+    // then
+    let directoryContents = try FileManager.default.contentsOfDirectory(atPath: directoryPath)
+    expect(directoryContents).to(contain("CASETest.swift"))
+    expect(directoryContents).notTo(contain("CaseTest.swift"))
+    await expect { await subject.writtenFiles }.to(contain(recasedPath))
+  }
+
+  func test_createFile_givenExistingFileNameDiffersOnlyByCase_whenVolumeIsCaseInsensitive_shouldMoveFileToAdoptNewCasing() async throws {
+    // given
+    let directoryPath = "/A"
+    let onDiskPath = "/A/CaseTest.swift"
+    let requestedPath = "/A/CASETest.swift"
+    let mocked = MockApolloFileManager()
+
+    await mocked.mock(volumeIsCaseSensitive: false)
+    await mocked.mock(onDiskCasedPath: onDiskPath, forPath: requestedPath)
+
+    await mocked.mock(closure: .fileExists({ path, isDirectory in
+      switch path {
+      case directoryPath: isDirectory?.pointee = true
+      case requestedPath: isDirectory?.pointee = false
+      default: fail("Unknown path - \(path)")
+      }
+
+      return true
+
+    }))
+    await mocked.mock(closure: .moveItem({ srcPath, dstPath in
+      expect(srcPath).to(equal(onDiskPath))
+      expect(dstPath).to(equal(requestedPath))
+    }))
+    await mocked.mock(closure: .createFile({ path, data, attr in
+      expect(path).to(equal(requestedPath))
+
+      return true
+
+    }))
+
+    // then
+    await expect {
+      try await mocked.createFile(atPath: requestedPath, data: self.uniqueData)
+    }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
+  }
+
+  func test_createFile_givenCaseSensitiveVolume_shouldNotPerformFileNameCaseAdoption() async throws {
+    // given
+    let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path
+    let mocked = MockApolloFileManager()
+
+    await mocked.mock(volumeIsCaseSensitive: true)
+
+    await mocked.mock(closure: .fileExists({ path, isDirectory in
+      expect(path).to(equal(parentPath))
+      expect(isDirectory).notTo(beNil())
+
+      isDirectory?.pointee = true
+      return true
+
+    }))
+    let expectedPath = self.uniquePath
+    let expectedData = self.uniqueData
+    await mocked.mock(closure: .createFile({ path, data, attr in
+      expect(path).to(equal(expectedPath))
+      expect(data).to(equal(expectedData))
+      expect(attr).to(beNil())
+
+      return true
+
+    }))
+
+    // then
+    // The mock is strict and reports a case-sensitive volume, so any file system call made to
+    // adopt file name casing would fail the test.
+    await expect {
+      try await mocked.createFile(atPath: self.uniquePath, data:self.uniqueData)
+    }.notTo(throwError())
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
+  }
+
+  func test_createFile_givenFileNameCaseAdoptionFails_shouldNotThrow_shouldStillCreateFile() async throws {
+    // given
+    let directoryPath = "/A"
+    let onDiskPath = "/A/CaseTest.swift"
+    let requestedPath = "/A/CASETest.swift"
+    let mocked = MockApolloFileManager()
+
+    await mocked.mock(volumeIsCaseSensitive: false)
+    await mocked.mock(onDiskCasedPath: onDiskPath, forPath: requestedPath)
+
+    await mocked.mock(closure: .fileExists({ path, isDirectory in
+      switch path {
+      case directoryPath: isDirectory?.pointee = true
+      case requestedPath: isDirectory?.pointee = false
+      default: fail("Unknown path - \(path)")
+      }
+
+      return true
+
+    }))
+    await mocked.mock(closure: .moveItem({ [uniqueError] srcPath, dstPath in
+      expect(srcPath).to(equal(onDiskPath))
+      expect(dstPath).to(equal(requestedPath))
+
+      throw uniqueError!
+    }))
+    await mocked.mock(closure: .createFile({ path, data, attr in
+      expect(path).to(equal(requestedPath))
+
+      return true
+
+    }))
+
+    // then
+    await expect {
+      try await mocked.createFile(atPath: requestedPath, data: self.uniqueData)
+    }.notTo(throwError())
+    await expect { await mocked.writtenFiles }.to(contain(requestedPath))
+    await expect { await mocked.allClosuresCalled }.to(beTrue())
+  }
+
   func test_createContainingDirectory_givenFileExistsAndIsDirectory_shouldReturnEarly() async throws {
     // given
     let parentPath = URL(fileURLWithPath: self.uniquePath).deletingLastPathComponent().path

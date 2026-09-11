@@ -30,7 +30,7 @@ class OperationFileGeneratorTests: XCTestCase {
 
   // MARK: Test Helpers
 
-  private func buildSubject() async throws {
+  private func buildSubject(config: ApolloCodegenConfiguration = .mock()) async throws {
     let schemaSDL = """
     type Animal {
       species: String
@@ -44,8 +44,8 @@ class OperationFileGeneratorTests: XCTestCase {
     let ir = try await IRBuilder.mock(schema: schemaSDL, document: operationDocument)
     irOperation = await ir.build(operation: ir.compilationResult.operations[0])
 
-    let config = ApolloCodegen.ConfigurationContext(config: ApolloCodegenConfiguration.mock())
-    
+    let config = ApolloCodegen.ConfigurationContext(config: config)
+
     subject = OperationFileGenerator(irOperation: irOperation, operationIdentifier: nil, config: config)
   }
 
@@ -67,6 +67,26 @@ class OperationFileGeneratorTests: XCTestCase {
 
     // then
     expect(self.subject.fileName).to(equal("AllAnimalsQuery"))
+  }
+
+  func test__properties__givenIrOperationWithCapitalizationRules_shouldReturnFileName_withRulesApplied() async throws {
+    // given
+    operationDocument = """
+    query IDLookup {
+      animals {
+        species
+      }
+    }
+    """
+
+    try await buildSubject(config: .mock(options: .init(
+      additionalCapitalizationRules: [.init(term: .string("id"), strategy: .lower)],
+      schemaDocumentation: .exclude,
+      markTypesNonisolated: false
+    )))
+
+    // then
+    expect(self.subject.fileName).to(equal("IdLookupQuery"))
   }
 
   func test__properties__givenIrOperation_shouldOverwrite() async throws {

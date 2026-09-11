@@ -87,10 +87,16 @@ public class ApolloFileManager {
   ///       If `false` the function will exit without writing the file if it already exists.
   ///       This will not throw an error.
   ///       Defaults to `false.
+  ///
+  /// On a case-insensitive volume, overwriting an existing file whose on-disk name differs from
+  /// `path` only by case first renames the file so its directory entry adopts the casing of
+  /// `path`.
   public func createFile(atPath path: String, data: Data? = nil, overwrite: Bool = true) throws {
     try createContainingDirectoryIfNeeded(forPath: path)
 
     if !overwrite && doesFileExist(atPath: path) { return }
+
+    adoptFileNameCasingIfNeeded(atPath: path)
 
     guard base.createFile(atPath: path, contents: data, attributes: nil) else {
       throw FileManagerPathError.cannotCreateFile(at: path)
@@ -104,6 +110,79 @@ public class ApolloFileManager {
     try base.moveItem(atPath: oldPath, toPath: newPath)
 
     writtenFiles.insert(newPath)
+  }
+
+  // MARK: Case Sensitivity
+
+  private var volumeCaseSensitivityCache: [String: Bool] = [:]
+
+  /// Queries whether the volume containing the given directory treats file names that differ
+  /// only by case as distinct files, or `nil` when this cannot be determined.
+  /// Replaceable in tests to simulate volume behavior deterministically.
+  var volumeCaseSensitivityProvider: @Sendable (_ directoryPath: String) -> Bool? = {
+    directoryPath in
+    let resourceValues = try? URL(fileURLWithPath: directoryPath, isDirectory: true)
+      .resourceValues(forKeys: [.volumeSupportsCaseSensitiveNamesKey])
+    return resourceValues?.volumeSupportsCaseSensitiveNames
+  }
+
+  /// Queries the canonical path for an existing file, with the on-disk casing of its name, or
+  /// `nil` when this cannot be determined.
+  /// Replaceable in tests to simulate volume behavior deterministically.
+  var onDiskCasedPathProvider: @Sendable (_ path: String) -> String? = { path in
+    let resourceValues = try? URL(fileURLWithPath: path)
+      .resourceValues(forKeys: [.canonicalPathKey])
+    return resourceValues?.canonicalPath
+  }
+
+  /// Whether the volume containing `path` treats file names that differ only by case as
+  /// distinct files.
+  ///
+  /// Returns `nil` when the volume's capability cannot be determined; callers must choose the
+  /// failure mode that is safe for their operation.
+  func volumeSupportsCaseSensitiveNames(forPath path: String) -> Bool? {
+    let directoryPath = URL(fileURLWithPath: path).deletingLastPathComponent().path
+    if let cached = volumeCaseSensitivityCache[directoryPath] { return cached }
+
+    guard let isCaseSensitive = volumeCaseSensitivityProvider(directoryPath) else { return nil }
+
+    volumeCaseSensitivityCache[directoryPath] = isCaseSensitive
+    return isCaseSensitive
+  }
+
+  /// The canonical path for an existing file, with the on-disk casing of its name, or `nil` if
+  /// it cannot be determined.
+  func onDiskCasedPath(forPath path: String) -> String? {
+    onDiskCasedPathProvider(path)
+  }
+
+  /// On a case-insensitive volume, writing to a path whose on-disk file name differs only by
+  /// case would update the file's contents while keeping the old directory entry name. This
+  /// renames the file first so the directory entry adopts the casing of `path`.
+  ///
+  /// Skipped when the volume's case sensitivity cannot be determined — a stale directory entry
+  /// name is preferable to renaming on an unknown file system.
+  func adoptFileNameCasingIfNeeded(atPath path: String) {
+    guard
+      volumeSupportsCaseSensitiveNames(forPath: path) == false,
+      let onDiskPath = onDiskCasedPath(forPath: path)
+    else { return }
+
+    let onDiskName = URL(fileURLWithPath: onDiskPath).lastPathComponent
+    let targetName = URL(fileURLWithPath: path).lastPathComponent
+    guard
+      onDiskName != targetName,
+      onDiskName.caseInsensitiveCompare(targetName) == .orderedSame
+    else { return }
+
+    do {
+      try base.moveItem(atPath: onDiskPath, toPath: path)
+    } catch {
+      CodegenLogger.log(
+        "Unable to rename \(onDiskPath) to adopt the casing of \(targetName): \(error)",
+        logLevel: .warning
+      )
+    }
   }
 
   /// Creates the containing directory (including all intermediate directories) for the given file URL if necessary.
