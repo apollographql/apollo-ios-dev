@@ -1,0 +1,121 @@
+name: Claude PR Review (fork)
+
+# Fork PRs cannot be reviewed by ci-tests.yml: a `pull_request` run from a fork
+# gets a read-only GITHUB_TOKEN and no secrets, so the reviewer can neither
+# authenticate nor post comments. This workflow closes that gap with
+# `pull_request_target`, which runs in the context of the BASE repository and
+# therefore does have secrets and write access.
+#
+# That power is why every step below is deliberate:
+#
+#   * The workflow definition comes from the base branch, never from the PR.
+#   * The PR is never checked out at the workspace root. It goes into pr-head/
+#     and reaches Claude through --add-dir, which is the layout
+#     claude-code-action documents for untrusted refs. Claude's working
+#     directory - and so the configuration it auto-loads - stays on the base
+#     branch.
+#   * Fork code is checked out for READING only. No build, no test, no install,
+#     no setup-* action, no script from the PR is ever executed, and the
+#     reviewer's tool allowlist (in claude-pr-review.yml) excludes Edit, Write
+#     and arbitrary Bash.
+#   * The review only runs after a maintainer applies the trigger label, so a
+#     drive-by PR cannot spend Claude credits or aim prompt-injected content at
+#     a job that holds a write token. See "Removing the label gate" below.
+#   * The reviewer's standing instructions are read from origin/main, so a PR
+#     cannot rewrite the rules it is reviewed by.
+#
+# Removing the label gate: swap the `types:` list for [opened, synchronize,
+# reopened] and delete the `has_label` condition. Do that only if you accept
+# that any stranger opening a PR triggers a credentialed job that reads their
+# content. The gate is the recommended posture.
+
+on:
+  pull_request_target:
+    types: [labeled, synchronize, reopened]
+
+permissions: {}
+
+env:
+  TRIGGER_LABEL: safe to review
+
+jobs:
+  gate:
+    name: Check fork review preconditions
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    # Only fork PRs: same-repo PRs are already reviewed by ci-tests.yml, and
+    # running both would double-post.
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name != github.repository &&
+      !contains(fromJson('["github-actions[bot]","renovate[bot]","dependabot[bot]","svc-secops"]'), github.event.pull_request.user.login)
+    permissions:
+      contents: read
+      checks: read
+      pull-requests: read
+    outputs:
+      should_review: ${{ steps.label.outputs.has_label }}
+      ci_passed: ${{ steps.ci.outcome == 'success' }}
+    steps:
+      # `labeled` fires for every label; only ours should start a review. On
+      # `synchronize` / `reopened` the label must already be present.
+      - name: Check trigger label
+        id: label
+        env:
+          LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+          ACTION: ${{ github.event.action }}
+          ADDED: ${{ github.event.label.name }}
+        run: |
+          set -euo pipefail
+          if [[ "$ACTION" == "labeled" && "$ADDED" != "$TRIGGER_LABEL" ]]; then
+            echo "has_label=false" >> "$GITHUB_OUTPUT"
+            echo "Label '$ADDED' is not the trigger label; nothing to do."
+            exit 0
+          fi
+          if jq -e --arg l "$TRIGGER_LABEL" 'index($l)' <<<"$LABELS" >/dev/null; then
+            echo "has_label=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_label=false" >> "$GITHUB_OUTPUT"
+            echo "PR is not labeled '$TRIGGER_LABEL'; skipping review."
+          fi
+
+      - name: Checkout base repo
+        if: steps.label.outputs.has_label == 'true'
+        uses: actions/checkout@v4
+        # No `ref:` — pull_request_target defaults to the base branch, so the
+        # scripts run here are ours, not the PR's.
+
+      # ci-tests.yml still runs on the fork PR (with a read-only token), so wait
+      # for its verdict rather than reviewing code that does not compile.
+      - name: Wait for CI
+        id: ci
+        if: steps.label.outputs.has_label == 'true'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          scripts/claude-review/wait-for-ci.sh \
+            "${{ github.event.pull_request.number }}" \
+            "${{ github.event.pull_request.head.sha }}"
+
+  review:
+    name: Review pull request
+    needs: gate
+    if: needs.gate.outputs.should_review == 'true'
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    uses: ./.github/workflows/claude-pr-review.yml
+    with:
+      ci_passed: ${{ needs.gate.outputs.ci_passed == 'true' }}
+      # An immutable SHA, not refs/pull/N/merge: the merge ref is recomputed
+      # whenever either branch moves, so it is not the tree CI just validated.
+      pr_head_sha: ${{ github.event.pull_request.head.sha }}
+      allow_non_write_users: true
+    # Not `secrets: inherit`: this path runs against fork content, so it gets
+    # the reviewer's credentials and nothing else in the repo's secret store.
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
