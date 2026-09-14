@@ -148,9 +148,12 @@ jobs:
           # Setting it also turns on the action's best-effort scrubbing of
           # Anthropic, cloud and Actions secrets from subprocess environments.
           allowed_non_write_users: ${{ inputs.allow_non_write_users && '*' || '' }}
-          # Bot noise is not worth review context, and every excluded comment is
-          # one less channel for injected text.
-          exclude_comments_by_actor: "dependabot[bot],renovate[bot],github-actions[bot]"
+          # Skip pure bot noise, but NOT the reviewer's own identity: on the fork
+          # path it posts as github-actions[bot], and excluding that would hide its
+          # own tracking comment, so the re-review protocol (read the prior summary,
+          # review only the new commits) would silently never engage. Fork authors
+          # comment under their own login, so this is not an injection channel.
+          exclude_comments_by_actor: "dependabot[bot],renovate[bot]"
           # Tag mode with a tracking comment: the summary is written into that
           # comment via mcp__github_comment__update_claude_comment.
           track_progress: true

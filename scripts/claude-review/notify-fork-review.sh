@@ -29,7 +29,9 @@
 #   DECLINE_LABEL      default "fork-review-declined"
 #   PR_NUMBER, PR_TITLE, PR_AUTHOR, PR_URL   event-mode PR fields
 #
-# Best effort: a Slack failure is logged, never fatal (exit 0).
+# Best effort with Slack: a Slack post failure is logged, never fatal. Catch-up
+# mode does exit non-zero on a missing REPO/GH_TOKEN or a GitHub API failure, so
+# a broken sweep is visible rather than silently reporting zero.
 
 set -uo pipefail
 
@@ -83,8 +85,11 @@ fi
 # Catch-up: notify for every currently pending fork PR.
 : "${REPO:?REPO or GITHUB_REPOSITORY required for catch-up mode}"
 : "${GH_TOKEN:?GH_TOKEN required for catch-up mode}"
-pending="$(REPO="$REPO" GH_TOKEN="$GH_TOKEN" TRIGGER_LABEL="$TRIGGER_LABEL" DECLINE_LABEL="$DECLINE_LABEL" \
-  "$here/list-pending-fork-prs.sh")"
+if ! pending="$(REPO="$REPO" GH_TOKEN="$GH_TOKEN" TRIGGER_LABEL="$TRIGGER_LABEL" DECLINE_LABEL="$DECLINE_LABEL" \
+  "$here/list-pending-fork-prs.sh")"; then
+  echo "list-pending-fork-prs.sh failed (bad GH_TOKEN, rate limit, API error); catch-up aborted." >&2
+  exit 1
+fi
 count=0
 while IFS= read -r row; do
   [[ -z "$row" || "$row" == "null" ]] && continue

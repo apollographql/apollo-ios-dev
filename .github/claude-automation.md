@@ -183,8 +183,13 @@ to a Slack bot token and GitHub's own permissions — no Workflow Builder, no
 connector, no PAT, no webhook, nothing stored in Slack.
 
 The bot needs only `chat:write` on `SLACK_BOT_TOKEN` and to be a member of the
-channel. Both labels must exist (`safe to review`, `fork-review-declined`); create
-them once with `gh label create`. To notify for PRs opened before this was set
+channel. Both labels must exist; create them once (declining is impossible
+without `fork-review-declined`, and the queue would re-notify on every reopen):
+
+```bash
+gh label create "safe to review" --repo apollographql/apollo-ios-dev --color 0e8a16 --description "Run the automated Claude review on this fork PR"
+gh label create "fork-review-declined" --repo apollographql/apollo-ios-dev --color b60205 --description "Fork PR declined for automated review"
+``` To notify for PRs opened before this was set
 up, run the workflow manually (Actions → Fork Review Approval Queue → Run
 workflow), which posts for every currently pending fork PR.
 
