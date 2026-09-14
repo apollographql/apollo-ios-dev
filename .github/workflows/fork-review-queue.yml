@@ -1,0 +1,60 @@
+name: Fork Review Approval Queue
+
+# When a fork PR opens, posts a Slack heads-up with a link to the PR. A
+# maintainer approves by adding the `safe to review` label in GitHub's own UI
+# (declines with `fork-review-declined`). GitHub gates labeling on repo write
+# access — only a maintainer can do it, and a fork author cannot — so GitHub's
+# browser auth is the approval. Adding the label (by a human, not the default
+# GITHUB_TOKEN) fires claude-fork-pr-review.yml.
+#
+# This job only reads PR metadata and posts to Slack: no write token, no label
+# application, no fork checkout, no fork code executed. See
+# .github/claude-automation.md.
+
+on:
+  pull_request_target:
+    types: [opened, reopened, ready_for_review]
+  workflow_dispatch:   # manual catch-up: notify for every currently pending fork PR
+
+permissions: {}
+
+concurrency:
+  group: fork-review-queue-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    name: Notify Slack of pending fork PRs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Event path: fork PRs only, not drafts, not bots, not already decided. Manual
+    # runs have no pull_request context, so let those through to catch up.
+    if: >-
+      github.repository == 'apollographql/apollo-ios-dev' &&
+      (github.event_name != 'pull_request_target' ||
+       (github.event.pull_request.draft == false &&
+        github.event.pull_request.head.repo.full_name != github.repository &&
+        !contains(fromJson('["github-actions[bot]","renovate[bot]","dependabot[bot]","svc-secops"]'), github.event.pull_request.user.login) &&
+        !contains(github.event.pull_request.labels.*.name, 'safe to review') &&
+        !contains(github.event.pull_request.labels.*.name, 'fork-review-declined')))
+    permissions:
+      contents: read
+      pull-requests: read   # catch-up mode lists pending PRs; nothing is written
+    steps:
+      - name: Checkout base repo
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Notify Slack
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ vars.FORK_REVIEW_SLACK_CHANNEL_ID || vars.CLAUDE_TRIAGE_SLACK_CHANNEL_ID || 'C06VAE92F7A' }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          # Empty on workflow_dispatch, which triggers catch-up mode instead.
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: scripts/claude-review/notify-fork-review.sh

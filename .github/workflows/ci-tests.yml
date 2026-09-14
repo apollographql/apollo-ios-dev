@@ -248,7 +248,6 @@ jobs:
       contents: read
       pull-requests: write
       issues: write
-      id-token: write
     uses: ./.github/workflows/claude-pr-review.yml
     with:
       ci_passed: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
