@@ -41,7 +41,11 @@ name: Claude PR Review (fork)
 
 on:
   pull_request_target:
-    types: [labeled, reopened]
+    # `ready_for_review` covers a PR labelled while still a draft (the gate skips
+    # drafts, so `labeled` alone would leave it silently unreviewed once ready).
+    # `synchronize` stays out on purpose: it fires on every push, which would turn
+    # an applied label into standing consent for code no maintainer inspected.
+    types: [labeled, reopened, ready_for_review]
 
 permissions: {}
 
@@ -71,7 +75,7 @@ jobs:
       ci_status: ${{ steps.ci.outputs.status }}
     steps:
       # `labeled` fires for every label; only ours should start a review. On
-      # `reopened` the label must already be present.
+      # `reopened` / `ready_for_review` the label must already be present.
       - name: Check trigger label
         id: label
         env:
