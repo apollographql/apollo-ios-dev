@@ -22,15 +22,17 @@ Three credentials are involved, and it matters which does what.
   `ANTHROPIC_API_KEY` is accepted as a fallback. IT grants org secrets to this
   repository on request. Set only one.
 - **Claude GitHub App.** With no `github_token` input, the action authenticates
-  as the Claude App installed on the org, so review comments and the follow-up
-  bot's PR comments show as `claude[bot]`. Two hard limits, both confirmed in
-  the action's source and docs: the token is scoped to this repository only,
-  and the action revokes it at the end of its own step. It therefore cannot be
-  used to post on `apollo-ios` or by any later workflow step. The same-repo PR
-  review uses this identity. The **fork** review path is the exception: it must
-  pass `github_token` (the action requires it alongside `allowed_non_write_users`),
-  which suppresses the App token, so fork-review comments post as
-  `github-actions[bot]` instead of `claude[bot]`.
+  as the Claude App installed on the org (via an OIDC exchange), so comments would
+  show as `claude[bot]`. Two hard limits, both confirmed in the action's source
+  and docs: the token is scoped to this repository only, and the action revokes it
+  at the end of its own step, so it cannot post on `apollo-ios` or in a later step.
+  The **PR review** does not use this identity: `claude-pr-review.yml` drops
+  `id-token: write` (an OIDC token is exchangeable for cloud credentials), and
+  without OIDC the App token cannot be minted, so the job passes `github_token`
+  instead and its review comments post as `github-actions[bot]` on both the
+  same-repo and fork paths. Its re-review can still find its own prior summary
+  because `github-actions[bot]` is not excluded from the pre-fetched comment
+  context. The follow-up bot (`claude-followup.yml`) keeps the App identity.
 - **Upstream replies** are posted under a bot identity by
   `scripts/claude-triage/post-upstream-reply.sh`, never by Claude and never
   with a person's token as author. Two mechanisms, in order of preference:

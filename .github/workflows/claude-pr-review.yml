@@ -134,14 +134,16 @@ jobs:
           # Either credential works; leave the one you are not using unset.
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           anthropic_api_key: ${{ secrets.CLAUDE_API_KEY || secrets.ANTHROPIC_API_KEY }}
-          # Only passed on the fork path (where allowed_non_write_users is set and
-          # the action requires it). Leaving it empty on the same-repo path lets the
-          # action mint a Claude App token, so comments post as claude[bot] — the
-          # documented same-repo identity, and the actor the re-review context is
-          # allowed to see. This token is scoped to the permissions block above and
-          # dies with the job; a PAT would be a static credential prompt injection
-          # could recover across runs, so never use one here.
-          github_token: ${{ inputs.allow_non_write_users && secrets.GITHUB_TOKEN || '' }}
+          # Always provided, on both paths. This job intentionally omits
+          # id-token:write (an OIDC token is exchangeable for cloud credentials),
+          # and without OIDC the action cannot mint a Claude App token — so it MUST
+          # be given a github_token or it fails trying to fetch one. The reviewer
+          # therefore posts as github-actions[bot] on both paths; its re-review can
+          # still see its own prior summary because that actor is NOT in
+          # exclude_comments_by_actor below. The token is scoped to the permissions
+          # block above and dies with the job; a PAT would be a static credential a
+          # prompt injection could recover across runs, so never use one here.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           # Fork contributors have no write access, so without this the action
           # stops before Claude starts. Safe only because the permissions above
           # are read + comment, and because the caller gates on a label.
