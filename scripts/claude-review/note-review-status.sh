@@ -14,6 +14,7 @@ marker="<!-- claude-review-status -->"
 
 case "$status" in
   ci-failed) text="CI failed or was cancelled on \`${sha:0:9}\`, so the automated review did not run. It runs again automatically when CI passes on a new push." ;;
+  timed-out) text="CI on \`${sha:0:9}\` did not finish within the review's wait window, so the automated review did not run. It runs again automatically when CI passes on a new push." ;;
   *)         text="The automated review did not run on \`${sha:0:9}\` (\`${status}\`)." ;;
 esac
 body="$(printf '%s\n%s' "$marker" "$text")"

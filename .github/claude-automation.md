@@ -26,7 +26,11 @@ Three credentials are involved, and it matters which does what.
   bot's PR comments show as `claude[bot]`. Two hard limits, both confirmed in
   the action's source and docs: the token is scoped to this repository only,
   and the action revokes it at the end of its own step. It therefore cannot be
-  used to post on `apollo-ios` or by any later workflow step.
+  used to post on `apollo-ios` or by any later workflow step. The same-repo PR
+  review uses this identity. The **fork** review path is the exception: it must
+  pass `github_token` (the action requires it alongside `allowed_non_write_users`),
+  which suppresses the App token, so fork-review comments post as
+  `github-actions[bot]` instead of `claude[bot]`.
 - **Upstream replies** are posted under a bot identity by
   `scripts/claude-triage/post-upstream-reply.sh`, never by Claude and never
   with a person's token as author. Two mechanisms, in order of preference:

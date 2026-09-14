@@ -21,6 +21,10 @@ name: Claude PR Review (fork)
 #   * The review only runs after a maintainer applies the trigger label, so a
 #     drive-by PR cannot spend Claude credits or aim prompt-injected content at
 #     a job that holds a write token. See "Removing the label gate" below.
+#   * The label is consent for the commit that was inspected, not standing
+#     consent for the branch: `synchronize` is deliberately NOT a trigger, so a
+#     push after approval does not re-run the credentialed job against a tree no
+#     maintainer has seen. Re-reviewing a new commit means re-applying the label.
 #   * The reviewer's standing instructions are read from origin/main, so a PR
 #     cannot rewrite the rules it is reviewed by.
 #
@@ -28,10 +32,16 @@ name: Claude PR Review (fork)
 # reopened] and delete the `has_label` condition. Do that only if you accept
 # that any stranger opening a PR triggers a credentialed job that reads their
 # content. The gate is the recommended posture.
+#
+# Note on `synchronize`: it is intentionally absent. Adding it back would make an
+# applied label authorise every later push automatically — the contributor could
+# force-push a tree no maintainer inspected and the credentialed job would run.
+# Keep re-consent explicit (re-apply the label) unless the gate is changed to
+# strip the label on `synchronize`, which needs `pull-requests: write` here.
 
 on:
   pull_request_target:
-    types: [labeled, synchronize, reopened]
+    types: [labeled, reopened]
 
 permissions: {}
 
@@ -54,11 +64,14 @@ jobs:
       checks: read
       pull-requests: read
     outputs:
-      should_review: ${{ steps.label.outputs.has_label }}
-      ci_passed: ${{ steps.ci.outcome == 'success' }}
+      # Head-moved is not reviewable: the superseded run posts nothing and the
+      # new head's own run owns the verdict.
+      should_review: ${{ steps.label.outputs.has_label == 'true' && steps.ci.outputs.status != 'head-moved' }}
+      ci_passed: ${{ steps.ci.outputs.status == 'passed' }}
+      ci_status: ${{ steps.ci.outputs.status }}
     steps:
       # `labeled` fires for every label; only ours should start a review. On
-      # `synchronize` / `reopened` the label must already be present.
+      # `reopened` the label must already be present.
       - name: Check trigger label
         id: label
         env:
@@ -90,13 +103,23 @@ jobs:
       - name: Wait for CI
         id: ci
         if: steps.label.outputs.has_label == 'true'
-        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          scripts/claude-review/wait-for-ci.sh \
-            "${{ github.event.pull_request.number }}" \
-            "${{ github.event.pull_request.head.sha }}"
+          set +e
+          scripts/claude-review/wait-for-ci.sh "$PR_NUMBER" "$HEAD_SHA"
+          code=$?
+          case "$code" in
+            0) status=passed ;;
+            2) status=head-moved ;;
+            3) status=timed-out ;;
+            *) status=failed ;;
+          esac
+          echo "wait-for-ci.sh exited $code -> status=$status"
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
 
   review:
     name: Review pull request
@@ -109,6 +132,8 @@ jobs:
     uses: ./.github/workflows/claude-pr-review.yml
     with:
       ci_passed: ${{ needs.gate.outputs.ci_passed == 'true' }}
+      # Distinguishes a genuine CI failure from a wait timeout in the skip note.
+      review_status: ${{ needs.gate.outputs.ci_status == 'timed-out' && 'timed-out' || 'ci-failed' }}
       # An immutable SHA, not refs/pull/N/merge: the merge ref is recomputed
       # whenever either branch moves, so it is not the tree CI just validated.
       pr_head_sha: ${{ github.event.pull_request.head.sha }}
