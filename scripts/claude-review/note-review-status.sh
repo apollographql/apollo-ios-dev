@@ -5,7 +5,10 @@
 # in place so it never accumulates.
 #
 # Usage: note-review-status.sh <pr-number> <status> <sha>
-# Environment: GH_TOKEN, REPO (default GITHUB_REPOSITORY)
+# Environment: GH_TOKEN, REPO (default GITHUB_REPOSITORY),
+#              RERUN_HINT (sentence appended to the ci-failed / timed-out notes;
+#              defaults to the same-repo "runs again on a new push" wording, which
+#              the fork caller overrides since a push does not re-trigger there)
 
 set -euo pipefail
 pr="${1:?pr number}"; status="${2:?status}"; sha="${3:?sha}"
