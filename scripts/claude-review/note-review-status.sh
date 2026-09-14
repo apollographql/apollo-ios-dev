@@ -12,9 +12,12 @@ pr="${1:?pr number}"; status="${2:?status}"; sha="${3:?sha}"
 REPO="${REPO:-${GITHUB_REPOSITORY:?}}"
 marker="<!-- claude-review-status -->"
 
+# The fork path has no `synchronize` trigger, so a push does not re-run the review
+# there; the caller passes the correct hint. Default suits the same-repo path.
+rerun_hint="${RERUN_HINT:-It runs again automatically when CI passes on a new push.}"
 case "$status" in
-  ci-failed) text="CI failed or was cancelled on \`${sha:0:9}\`, so the automated review did not run. It runs again automatically when CI passes on a new push." ;;
-  timed-out) text="CI on \`${sha:0:9}\` did not finish within the review's wait window, so the automated review did not run. It runs again automatically when CI passes on a new push." ;;
+  ci-failed) text="CI failed or was cancelled on \`${sha:0:9}\`, so the automated review did not run. ${rerun_hint}" ;;
+  timed-out) text="CI on \`${sha:0:9}\` did not finish within the review's wait window, so the automated review did not run. ${rerun_hint}" ;;
   *)         text="The automated review did not run on \`${sha:0:9}\` (\`${status}\`)." ;;
 esac
 body="$(printf '%s\n%s' "$marker" "$text")"

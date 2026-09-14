@@ -112,6 +112,9 @@ jobs:
         if: ${{ !inputs.ci_passed }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # The fork path does not re-run on a push (no `synchronize` trigger), so
+          # tell the author to re-apply the label; the same-repo path does re-run.
+          RERUN_HINT: ${{ inputs.allow_non_write_users && 'Re-apply the `safe to review` label to run the review again.' || 'It runs again automatically when CI passes on a new push.' }}
         run: |
           scripts/claude-review/note-review-status.sh "${{ github.event.pull_request.number }}" \
             "${{ inputs.review_status }}" "${{ github.event.pull_request.head.sha }}"

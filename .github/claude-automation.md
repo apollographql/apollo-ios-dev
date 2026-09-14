@@ -191,9 +191,11 @@ without `fork-review-declined`, and the queue would re-notify on every reopen):
 ```bash
 gh label create "safe to review" --repo apollographql/apollo-ios-dev --color 0e8a16 --description "Run the automated Claude review on this fork PR"
 gh label create "fork-review-declined" --repo apollographql/apollo-ios-dev --color b60205 --description "Fork PR declined for automated review"
-``` To notify for PRs opened before this was set
-up, run the workflow manually (Actions → Fork Review Approval Queue → Run
-workflow), which posts for every currently pending fork PR.
+```
+
+To notify for PRs opened before this was set up, run the workflow manually
+(Actions → Fork Review Approval Queue → Run workflow), which posts for every
+currently pending fork PR.
 
 ## Running triage by hand
 

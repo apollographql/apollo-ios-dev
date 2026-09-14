@@ -40,7 +40,7 @@ gh pr list --repo "$REPO" --state open --limit "$LIMIT" \
         | select(.isCrossRepository == true)
         | select(.isDraft == false)
         | select((.author.is_bot // false) == false)
-        | select(([ "github-actions[bot]", "renovate[bot]", "dependabot[bot]", "svc-secops" ] | index(.author.login)) == null)
+        | select((.author.login | IN("github-actions[bot]", "renovate[bot]", "dependabot[bot]", "svc-secops")) | not)
         | ([ .labels[].name ]) as $names
         | select(($names | index($approve)) == null)
         | select(($names | index($decline)) == null)
