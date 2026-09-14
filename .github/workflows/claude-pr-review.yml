@@ -52,15 +52,20 @@ jobs:
     concurrency:
       group: claude-pr-review-${{ github.event.pull_request.number }}
       cancel-in-progress: true
-    # The pull_request_target path is gated by its caller, which additionally
-    # requires a fork head and a maintainer-applied label. Do not call this
-    # workflow from a pull_request_target trigger without that gate.
+    # Defence in depth: this reusable workflow does not trust its caller to have
+    # gated the pull_request_target path. It re-checks here that the event is a
+    # fork PR carrying the maintainer-applied label, so a second, less careful
+    # pull_request_target caller cannot reach Claude with a write token on
+    # unlabelled fork code. The label literal must stay in sync with
+    # TRIGGER_LABEL in claude-fork-pr-review.yml.
     if: >-
       github.event.pull_request.draft == false &&
       !contains(fromJson('["github-actions[bot]","renovate[bot]","dependabot[bot]","svc-secops"]'), github.event.pull_request.user.login) &&
       (
         (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) ||
-        github.event_name == 'pull_request_target'
+        (github.event_name == 'pull_request_target' &&
+         github.event.pull_request.head.repo.full_name != github.repository &&
+         contains(github.event.pull_request.labels.*.name, 'safe to review'))
       )
     # The reviewer reads and comments. It never pushes, so contents stays read
     # and id-token is not granted at all - an OIDC token is exchangeable for
@@ -83,7 +88,7 @@ jobs:
       # On pull_request this is the PR tree, as before. On pull_request_target
       # it is the base branch, and the PR never touches the workspace root.
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
           # Keeps the job's GITHUB_TOKEN out of .git/config, where the Read and
@@ -92,7 +97,7 @@ jobs:
 
       - name: Checkout PR head for review
         if: inputs.pr_head_sha != ''
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           ref: ${{ inputs.pr_head_sha }}
           path: pr-head
@@ -119,7 +124,7 @@ jobs:
 
       - name: Run Claude review
         if: ${{ inputs.ci_passed }}
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@56cf60fde42f7b19c3abfd5c9c48b69a1288461f # v1.0.222
         with:
           # Either credential works; leave the one you are not using unset.
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}

@@ -81,7 +81,7 @@ jobs:
 
       - name: Checkout base repo
         if: steps.label.outputs.has_label == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         # No `ref:` — pull_request_target defaults to the base branch, so the
         # scripts run here are ours, not the PR's.
 
