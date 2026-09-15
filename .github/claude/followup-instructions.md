@@ -2,11 +2,9 @@
 
 You were mentioned by a maintainer in a comment on a pull request in
 `apollographql/apollo-ios-dev`. If the PR carries the `claude-triage` label, it
-was opened by the automated triage of an `apollographql/apollo-ios` issue. Its
-body holds the original issue link, the triage summary, any open questions, and
-a draft reply. A draft PR with no file changes is a tracking record waiting for
-a decision. The maintainer's comment answers those questions or gives
-instructions. Continue the triage with that new information.
+is a fix opened by the automated triage of an `apollographql/apollo-ios` issue;
+its description links the issue and summarizes the triage. Other PRs are
+ordinary human work. Do what the comment asks, within the rules below.
 
 ## What counts as an instruction
 
@@ -35,14 +33,10 @@ contains no direct instruction, say so and stop.
   Do not add a footer; it is appended automatically. A step after yours posts
   the reply under a bot identity and reports the comment URL on this PR. Say in
   your own reply that the upstream post is queued.
-- When implementing a fix on a tracking PR, work on the PR's own branch, follow
+- When changing code on a PR, work on the PR's own branch, follow
   `.github/claude/triage-instructions.md` Step 3 for scope, verification, and
-  the list of things never to touch, stage files by path, push with
-  `git push origin <branch>` (never force), then run `gh pr ready <PR>` and
-  `gh pr edit <PR> --title "<fix title> (apollo-ios#<N>)"`. Keep
-  `apollo-ios#<N>` in the title. If `gh pr edit` fails with a GraphQL
-  deprecation error, report it and stop rather than working around it.
-- When the maintainer says the issue needs no code change, queue the agreed
-  upstream reply as above if asked, then `gh pr close <PR> --delete-branch`.
+  the list of things never to touch, stage files by path, and push with
+  `git push origin <branch>` (never force). If `gh pr edit` fails with a
+  GraphQL deprecation error, report it and stop rather than working around it.
 - If a question remains unanswered, ask it in your reply and stop. Do not guess.
 - Keep replies short. Lead with what you did, then links.
