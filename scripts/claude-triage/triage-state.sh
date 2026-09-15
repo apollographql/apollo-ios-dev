@@ -21,11 +21,22 @@ STATE_PATH="triaged.json"
 fetch_state() {
   # Prints "<sha>\t<json>"; sha is "-" when the file or branch does not exist
   # (a placeholder, because read drops a leading empty tab-separated field).
-  local resp
-  if resp="$(gh api "repos/${DEV_REPO}/contents/${STATE_PATH}?ref=${STATE_BRANCH}" 2>/dev/null)"; then
+  # Only a 404 is an empty state. Any other failure must propagate: an empty
+  # state on a transient error would make every recent issue look untriaged.
+  local resp errfile status=0
+  errfile="$(mktemp)"
+  resp="$(gh api "repos/${DEV_REPO}/contents/${STATE_PATH}?ref=${STATE_BRANCH}" 2>"$errfile")" || status=$?
+  if (( status == 0 )); then
+    rm -f "$errfile"
     printf '%s\t%s\n' "$(jq -r '.sha' <<<"$resp")" "$(jq -r '.content' <<<"$resp" | base64 -d | jq -c '.')"
-  else
+  elif grep -q "HTTP 404" "$errfile"; then
+    rm -f "$errfile"
     printf -- '-\t{}\n'
+  else
+    echo "Could not read triage state:" >&2
+    cat "$errfile" >&2
+    rm -f "$errfile"
+    return 1
   fi
 }
 
@@ -44,7 +55,16 @@ create_branch_with() {
 
 case "${1:-}" in
   read)
-    fetch_state | cut -f2
+    # Transient failures are retried; a persistent one fails the caller, which
+    # must never fall back to an empty state.
+    for attempt in 1 2 3; do
+      if out="$(fetch_state)"; then
+        printf '%s\n' "$out" | cut -f2
+        exit 0
+      fi
+      sleep $((attempt * 5))
+    done
+    exit 1
     ;;
   stamp)
     issue="${2:?issue number}"; ts="${3:?timestamp}"

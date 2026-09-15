@@ -32,8 +32,9 @@
 #   TRIGGER_REASON         new | reporter-followup | manual (informational)
 #   RUN_URL                link to the workflow run
 #   ISSUE_NUMBER           upstream issue number (required)
-#   SLACK_BOT_TOKEN        required for alerts; a failed Slack post fails the job
-#   SLACK_CHANNEL_ID       channel or member ID
+#   SLACK_BOT_TOKEN, SLACK_CHANNEL_ID
+#                          see scripts/claude-notify/slack-notify.sh; posted in strict
+#                          mode, so a failed Slack post fails the job
 
 set -Eeuo pipefail
 
@@ -55,24 +56,10 @@ branch="claude/triage/apollo-ios-${n}"
 push_url="https://x-access-token:${GH_TOKEN}@github.com/${DEV_REPO}.git"
 nl=$'\n'
 
-# Returns non-zero when Slack rejects the message, so callers can fail loudly:
-# with no PR or issue as a fallback record, a lost alert must not be silent.
+# Slack is the only record for most outcomes, so a rejected or unconfigured post
+# must fail the job rather than vanish.
 slack_notify() {
-  [[ -z "${SLACK_BOT_TOKEN:-}" || -z "${SLACK_CHANNEL_ID:-}" ]] && { echo "Slack not configured; message was:" >&2; printf '%s\n' "$1" >&2; return 1; }
-  local resp
-  resp="$(jq -n --arg channel "$SLACK_CHANNEL_ID" --arg text "${1:0:30000}" \
-    '{channel: $channel, text: $text, unfurl_links: false}' \
-    | curl -sS -X POST https://slack.com/api/chat.postMessage \
-        -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
-        -H "Content-Type: application/json; charset=utf-8" \
-        --data @-)"
-  if jq -e '.ok' <<<"$resp" >/dev/null 2>&1; then
-    echo "Slack: sent" >&2
-  else
-    echo "Slack: failed: $(jq -r '.error // "unknown"' <<<"$resp" 2>/dev/null)" >&2
-    echo "Message was:" >&2; printf '%s\n' "$1" >&2
-    return 1
-  fi
+  SLACK_STRICT=1 "$here/../claude-notify/slack-notify.sh" "$1"
 }
 
 on_error() {
@@ -162,6 +149,9 @@ if [[ -n "$response_draft" && "$confidence" == "high" && "$category" != "feature
     cat "$tmp/post-reply.log" >&2
     if [[ $rc -eq 0 && -n "$posted_comment_url" ]]; then
       echo "Posted upstream comment: $posted_comment_url" >&2
+      # The comment is the first irreversible action; record it before anything
+      # else can fail so a later error cannot cause a repeat post next run.
+      stamp_state
     else
       posted_comment_url=""
       [[ $rc -eq 2 ]] && post_unconfirmed=true
@@ -218,8 +208,8 @@ if [[ "$has_fix" == true ]]; then
   git push -q "$push_url" "${fix_branch}:refs/heads/${fix_branch}"
   pr_url="$(gh pr create --repo "$DEV_REPO" --base main --head "$fix_branch" --title "$pr_title" --body-file "$tmp/pr-body.md")"
   pr_number="${pr_url##*/}"
-  gh api -X POST "repos/${DEV_REPO}/issues/${pr_number}/labels" -f "labels[]=${TRIAGE_LABEL}" >/dev/null 2>&1 || echo "Could not label PR" >&2
-  [[ -n "${ASSIGNEE:-}" ]] && { gh api -X POST "repos/${DEV_REPO}/pulls/${pr_number}/requested_reviewers" -f "reviewers[]=${ASSIGNEE}" >/dev/null 2>&1 || echo "Could not request reviewer" >&2; }
+  gh api -X POST "repos/${DEV_REPO}/issues/${pr_number}/labels" -f "labels[]=${TRIAGE_LABEL}" >/dev/null || echo "Could not label PR ${pr_number}" >&2
+  [[ -n "${ASSIGNEE:-}" ]] && { gh api -X POST "repos/${DEV_REPO}/pulls/${pr_number}/requested_reviewers" -f "reviewers[]=${ASSIGNEE}" >/dev/null || echo "Could not request reviewer ${ASSIGNEE}" >&2; }
   echo "Opened fix PR: $pr_url" >&2
 fi
 
