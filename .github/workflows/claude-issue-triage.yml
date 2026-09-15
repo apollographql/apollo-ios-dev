@@ -1,8 +1,8 @@
 name: Claude Issue Triage
 
 # Watches apollographql/apollo-ios for new issues and reporter follow-ups,
-# triages each one with Claude, and publishes the result as a PR in this repo,
-# a bot reply upstream, or a Slack alert. See .github/claude-automation.md.
+# triages each one with Claude, and publishes the result as a fix PR in this
+# repo, a bot reply upstream, or a Slack alert. See .github/claude-automation.md.
 
 on:
   schedule:
@@ -14,7 +14,7 @@ on:
         required: false
         type: string
       force:
-        description: "Re-triage even if a tracking record already exists"
+        description: "Re-triage even if the issue was already triaged"
         required: false
         type: boolean
         default: false
@@ -29,6 +29,7 @@ env:
   UPSTREAM_REPO: apollographql/apollo-ios
   DEV_REPO: ${{ github.repository }}
   TRIAGE_LABEL: claude-triage
+  STATE_BRANCH: claude-triage-state
   XCODE_VERSION: "26.5"
 
 jobs:
@@ -176,5 +177,5 @@ jobs:
       - name: Fail job if Claude failed
         if: steps.claude.outcome == 'failure'
         run: |
-          echo "Claude run failed; tracking record: ${{ steps.publish.outputs.tracking_url }}"
+          echo "Claude run failed; the maintainers were alerted on Slack."
           exit 1

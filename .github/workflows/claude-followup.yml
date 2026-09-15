@@ -1,8 +1,7 @@
 name: Claude Follow-up
 
-# Responds to `@claude` mentions from maintainers on pull requests in this repo.
-# Used to answer the questions raised by Claude Issue Triage tracking PRs and to
-# continue that work. See .github/claude-automation.md.
+# Responds to `@claude` mentions from maintainers on pull requests in this repo,
+# including fix PRs opened by Claude Issue Triage. See .github/claude-automation.md.
 
 on:
   issue_comment:
