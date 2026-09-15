@@ -70,7 +70,11 @@ case "${1:-}" in
     issue="${2:?issue number}"; ts="${3:?timestamp}"
     [[ "$issue" =~ ^[0-9]+$ ]] || { echo "issue must be an integer" >&2; exit 2; }
     for attempt in 1 2 3 4 5; do
-      IFS=$'\t' read -r sha current < <(fetch_state)
+      if ! state_line="$(fetch_state)"; then
+        echo "State read failed (attempt $attempt); retrying." >&2
+        sleep $((attempt * 2)); continue
+      fi
+      IFS=$'\t' read -r sha current <<<"$state_line"
       [[ "$sha" == "-" ]] && sha=""
       updated="$(jq -c --arg n "$issue" --arg t "$ts" '.[$n] = (if .[$n] == null or .[$n] < $t then $t else .[$n] end)' <<<"$current")"
       if [[ -z "$sha" ]]; then
