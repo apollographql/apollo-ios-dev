@@ -94,7 +94,7 @@ jobs:
         git push || echo "::warning::Failed to push updated history. This is non-fatal — the next successful run will re-sync subtree metadata."
 
   publish-release:
-    if: success('split-subtrees') && startsWith(github.ref, 'refs/heads/release/')
+    if: ${{ github.event.pull_request.merged && startsWith(github.event.pull_request.head.ref, 'release/') }}
     needs: split-subtrees
     runs-on: ubuntu-latest
     name: Publish Release
@@ -106,6 +106,6 @@ jobs:
       - name: Trigger publish-release workflow
         shell: bash
         run: |
-          gh workflow run publish-release.yml
+          gh workflow run publish-release.yml --ref ${{ github.event.pull_request.base.ref }}
         env:
           GH_TOKEN: ${{ secrets.APOLLO_IOS_PAT }}
