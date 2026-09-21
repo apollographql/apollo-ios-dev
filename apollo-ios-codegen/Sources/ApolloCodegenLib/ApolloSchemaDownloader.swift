@@ -271,6 +271,7 @@ public struct ApolloSchemaDownloader {
           kind
           name
           description
+          isOneOf
           fields(includeDeprecated: true) {
             name
             description
