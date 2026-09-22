@@ -2,16 +2,19 @@ import Foundation
 import ProjectDescription
 
 enum ApolloTestPlan {
+    case cacheBenchmarkTest
     case ciTest
     case codegenTest
     case codegenCITest
-    case codegenCLITest    
+    case codegenCLITest
     case paginationTest
     case performanceTest
     case unitTest
-    
+
     var path: Path {
         switch self {
+        case .cacheBenchmarkTest:
+            return Path("Tests/TestPlans/Apollo-CacheBenchmarksTestPlan.xctestplan")
         case .ciTest:
             return Path("Tests/TestPlans/Apollo-CITestPlan.xctestplan")
         case .codegenTest:

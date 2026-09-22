@@ -7,32 +7,42 @@ public typealias CacheKey = String
 public struct Record: Sendable, Hashable {
   public let key: CacheKey
 
+  /// A field value carried by a record. Any value that is both `Hashable`
+  /// (for record-set deduplication) and `Sendable` (for cross-actor cache
+  /// traversal).
   public typealias Value = any Hashable & Sendable
-  public typealias Fields = [CacheKey: Value]
-  public private(set) var fields: Fields
 
-  public init(key: CacheKey, _ fields: Fields = [:]) {
+  /// The map of field name to cached field. Each `CachedField` pairs the
+  /// stored value with the timestamp at which it was last written.
+  public typealias Fields = [CacheKey: CachedField]
+
+  public internal(set) var fields: Fields
+
+  /// Construct a record from a fully-formed field dictionary. Use this
+  /// initializer when the caller has explicit `writtenAt` timestamps for
+  /// each field — e.g. when deserializing from storage.
+  public init(key: CacheKey, fields: Fields = [:]) {
     self.key = key
     self.fields = fields
   }
 
+  /// Convenience initializer for callers that have raw field values and
+  /// no per-field timestamps. Each value is wrapped in a `CachedField`
+  /// stamped with the supplied `writtenAt` (default `0`).
+  public init(key: CacheKey, _ values: [CacheKey: Value], writtenAt: Int64 = 0) {
+    self.key = key
+    self.fields = values.mapValues { CachedField(value: $0, writtenAt: writtenAt) }
+  }
+
+  /// Value-only read access to a field.
   public subscript(key: CacheKey) -> Value? {
-    get {
-      return fields[key]
-    }
-    set {
-      fields[key] = newValue
-    }
+    return fields[key]?.value
   }
 
-  public static func == (lhs: Record, rhs: Record) -> Bool {
-    lhs.key == rhs.key &&
-    AnySendableHashable.equatableCheck(lhs.fields, rhs.fields)
-  }
-
-  public func hash(into hasher: inout Hasher) {
-    hasher.combine(key)
-    hasher.combine(fields)
+  /// Metadata-aware accessor for callers that need the field's
+  /// `writtenAt` timestamp alongside its value.
+  public func cachedField(for key: CacheKey) -> CachedField? {
+    fields[key]
   }
 
 }
