@@ -1,0 +1,183 @@
+# Comprehensive operations exercising all GraphQL operation features per D-27.
+#
+# Coverage:
+# - Query, Mutation, Subscription operations
+# - Named fragments and fragment spreads
+# - Inline fragments on union types and interfaces
+# - Deeply nested selections (3+ levels)
+# - Aliases
+# - Field arguments with enum values and variables
+# - Variables with default values
+# - __typename selection
+# - Nested fragments (fragment referencing another fragment)
+
+# -- Named Fragments --
+
+fragment CharacterFields on Character {
+  name
+  appearsIn
+  friends {
+    name
+  }
+}
+
+fragment TimestampFields on Timestamped {
+  createdAt
+  updatedAt
+}
+
+# Nested fragment: references CharacterFields
+fragment HumanDetails on Human {
+  ...CharacterFields
+  homePlanet
+  mass_kg
+  starships {
+    name
+    length(unit: FOOT)
+  }
+  ...TimestampFields
+}
+
+# -- Queries --
+
+# Simple query with nested selections
+query HeroAndFriends($ep: Episode) {
+  hero(episode: $ep) {
+    name
+    friends {
+      name
+      appearsIn
+    }
+  }
+}
+
+# Query using named fragment
+query HeroWithFragment($ep: Episode) {
+  hero(episode: $ep) {
+    ...CharacterFields
+  }
+}
+
+# Query with inline fragments on union type
+query Search($text: String!) {
+  search(text: $text) {
+    ... on Human {
+      name
+      homePlanet
+    }
+    ... on Droid {
+      name
+      primaryFunction
+    }
+    ... on Starship {
+      name
+      length
+    }
+  }
+}
+
+# Query with deeply nested selections (3 levels: hero -> friends -> friends -> name)
+query DeeplyNested($ep: Episode) {
+  hero(episode: $ep) {
+    name
+    friends {
+      name
+      friends {
+        name
+        appearsIn
+      }
+    }
+  }
+}
+
+# Query with aliases
+query Aliases {
+  empireHero: hero(episode: EMPIRE) {
+    name
+  }
+  jediHero: hero(episode: JEDI) {
+    name
+  }
+}
+
+# Query with field arguments
+query HumanHeight {
+  human(id: "1000") {
+    name
+    height(unit: FOOT)
+  }
+}
+
+# Query with variables and defaults
+query WithDefaults($ep: Episode = NEWHOPE, $first: Int = 5) {
+  reviews(episode: $ep) {
+    stars
+    commentary
+  }
+  search(text: "test", pagination: {first: $first}) {
+    ... on Human {
+      name
+    }
+  }
+}
+
+# Query using interface type condition in inline fragment
+query NodeLookup($id: ID!) {
+  node(id: $id) {
+    ... on Node {
+      id
+    }
+    ... on Human {
+      name
+      homePlanet
+    }
+    ... on Droid {
+      name
+      primaryFunction
+    }
+  }
+}
+
+# Query with __typename
+query WithTypename {
+  search(text: "r2") {
+    __typename
+    ... on Human {
+      name
+    }
+    ... on Droid {
+      name
+    }
+    ... on Starship {
+      name
+    }
+  }
+}
+
+# Query with nested fragment spread (HumanDetails references CharacterFields)
+query HumanWithNestedFragments {
+  human(id: "1000") {
+    ...HumanDetails
+  }
+}
+
+# -- Mutation --
+
+mutation CreateReview($ep: Episode!, $review: ReviewInput!) {
+  createReview(episode: $ep, review: $review) {
+    stars
+    commentary
+  }
+}
+
+# -- Subscription --
+
+subscription OnReviewAdded($ep: Episode!) {
+  reviewAdded(episode: $ep) {
+    stars
+    commentary
+    reviewer {
+      name
+    }
+  }
+}

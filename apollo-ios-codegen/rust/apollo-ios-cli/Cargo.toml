@@ -1,0 +1,26 @@
+[package]
+name = "apollo-ios-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+indexmap = { workspace = true }
+codegen-cli = { path = "../codegen-cli" }
+apollo-codegen-lib = { path = "../apollo-codegen-lib" }
+clap = { workspace = true }
+prost = { workspace = true }
+bytes = { workspace = true }
+ctrlc = { workspace = true }
+sha2 = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+libc = "0.2"
+tempfile = "3"
+
+[build-dependencies]
+prost-build = "0.14"
+protox = "0.9"
+
+[lints]
+workspace = true
