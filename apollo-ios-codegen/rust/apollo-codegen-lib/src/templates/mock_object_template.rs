@@ -10,6 +10,7 @@ use std::sync::Arc;
 
 use graphql_compiler::graphql_type::GraphQLType;
 use graphql_compiler::schema::{GraphQLCompositeType, GraphQLNamedType, GraphQLObjectType};
+use ir::ReferencedTypes;
 
 use crate::config::composition::Composition;
 use crate::config::ApolloCodegenConfiguration;
@@ -33,6 +34,10 @@ use crate::templates::{
 pub struct MockObjectTemplate {
     pub graphql_object: Arc<GraphQLObjectType>,
     pub fields: Vec<(String, GraphQLType, Option<String>)>, // (response_key, type, deprecation_reason)
+    /// The types referenced by the compiled operations (`ir.schema.referencedTypes` in Swift);
+    /// with `reduceGeneratedSchemaTypes` only these object types get a mock, so default values
+    /// for abstract fields must pick one of them.
+    pub referenced_types: Arc<ReferencedTypes>,
     pub config: ConfigurationContext,
 }
 
@@ -47,12 +52,29 @@ struct TemplateField {
 }
 
 impl TemplateField {
-    fn default_initializer(&self, config: &ConfigurationContext) -> String {
-        if self.graphql_type.is_nullable() {
-            " = nil".to_string()
+    /// Mirrors Swift's `TemplateField.initializerType`.
+    fn initializer_type(&self, config: &ConfigurationContext) -> String {
+        if config.config.options.require_non_optional_mock_fields || self.graphql_type.is_nullable()
+        {
+            self.mock_type.clone()
         } else {
-            format!(" = {}", default_mock_value(&self.graphql_type, config))
+            format!("{}?", self.mock_type)
         }
+    }
+
+    /// Mirrors Swift's `TemplateField.defaultInitializer(config:referencedTypes:)`.
+    fn default_initializer(
+        &self,
+        config: &ConfigurationContext,
+        referenced_types: &ReferencedTypes,
+    ) -> Option<String> {
+        if !config.config.options.require_non_optional_mock_fields
+            || self.graphql_type.is_nullable()
+        {
+            return Some(" = nil".to_string());
+        }
+        default_mock_value(&self.graphql_type, config, referenced_types)
+            .map(|value| format!(" = {}", value))
     }
 }
 
@@ -185,8 +207,15 @@ impl TemplateRenderer for MockObjectTemplate {
                     } else {
                         f.property_name.clone()
                     };
-                    let default_init = f.default_initializer(&self.config);
-                    format!("    {}: {}{}", param_name, f.mock_type, default_init)
+                    let default_init = f
+                        .default_initializer(&self.config, &self.referenced_types)
+                        .unwrap_or_default();
+                    format!(
+                        "    {}: {}{}",
+                        param_name,
+                        f.initializer_type(&self.config),
+                        default_init
+                    )
                 })
                 .collect();
 
@@ -236,25 +265,40 @@ fn render_deprecation(
     }
 }
 
-/// Returns the default mock value for the given GraphQL type.
+/// Returns the default mock value for the given GraphQL type, or `None` when
+/// `reduceGeneratedSchemaTypes` pruned every concrete type an abstract field could default to.
 ///
-/// Mirrors Swift's `GraphQLType.defaultMockValue(config:)` from
+/// Mirrors Swift's `GraphQLType.defaultMockValue(config:referencedTypes:)` from
 /// `DefaultMockValueProviding.swift`.
-fn default_mock_value(graphql_type: &GraphQLType, config: &ConfigurationContext) -> String {
+fn default_mock_value(
+    graphql_type: &GraphQLType,
+    config: &ConfigurationContext,
+    referenced_types: &ReferencedTypes,
+) -> Option<String> {
+    let reduce = config.config.options.reduce_generated_schema_types;
+    let mock_of = |obj: &Arc<GraphQLObjectType>| {
+        let name = render_named_type(
+            &GraphQLNamedType::Object(Arc::clone(obj)),
+            &RenderContext::Typename {
+                is_input_value: false,
+            },
+        );
+        format!("Mock<{}>()", name)
+    };
     match graphql_type {
-        GraphQLType::List(_) => "[]".to_string(),
-        GraphQLType::NonNull(inner) => default_mock_value(inner, config),
-        GraphQLType::Scalar(scalar) => match scalar.name.schema_name.as_str() {
+        GraphQLType::List(_) => Some("[]".to_string()),
+        GraphQLType::NonNull(inner) => default_mock_value(inner, config, referenced_types),
+        GraphQLType::Scalar(scalar) => Some(match scalar.name.schema_name.as_str() {
             "String" | "ID" => "\"\"".to_string(),
             "Int" => "0".to_string(),
             "Float" => "0.0".to_string(),
             "Boolean" => "false".to_string(),
             _ => ".defaultMockValue".to_string(),
-        },
+        }),
         GraphQLType::Enum(enum_type) => {
             if let Some(first) = enum_type.values.first() {
                 let case_name = render_enum_value(first, EnumRenderContext::EnumCase, config);
-                format!(".case(.{})", case_name)
+                Some(format!(".case(.{})", case_name))
             } else {
                 panic!(
                     "Cannot provide a default value for caseless enum {}",
@@ -263,34 +307,36 @@ fn default_mock_value(graphql_type: &GraphQLType, config: &ConfigurationContext)
             }
         }
         GraphQLType::Entity(composite) => match composite {
-            GraphQLCompositeType::Object(obj) => {
-                let name = render_named_type(
-                    &GraphQLNamedType::Object(Arc::clone(obj)),
-                    &RenderContext::Typename {
-                        is_input_value: false,
-                    },
-                );
-                format!("Mock<{}>()", name)
-            }
+            GraphQLCompositeType::Object(obj) => Some(mock_of(obj)),
+            // With `reduceGeneratedSchemaTypes` only referenced object types have a mock, so the
+            // first *referenced* implementor is used; when none is left there is no default.
             GraphQLCompositeType::Interface(iface) => {
-                let impl_obj = iface.implementing_objects.first().unwrap_or_else(|| {
-                    panic!(
+                let impl_obj = iface
+                    .implementing_objects
+                    .iter()
+                    .find(|obj| !reduce || referenced_types.objects.contains(*obj));
+                match impl_obj {
+                    Some(obj) => Some(mock_of(obj)),
+                    None if reduce => None,
+                    None => panic!(
                         "Cannot provide a default value for interface {} because no types conform to it.",
                         iface.name.schema_name
-                    )
-                });
-                // Swift uses `implementingObject.name` directly (raw schema name)
-                format!("Mock<{}>()", impl_obj.name.schema_name)
+                    ),
+                }
             }
             GraphQLCompositeType::Union(union) => {
-                let impl_type = union.types.first().unwrap_or_else(|| {
-                    panic!(
+                let impl_type = union
+                    .types
+                    .iter()
+                    .find(|obj| !reduce || referenced_types.objects.contains(*obj));
+                match impl_type {
+                    Some(obj) => Some(mock_of(obj)),
+                    None if reduce => None,
+                    None => panic!(
                         "Cannot provide a default value for empty union {}",
                         union.name.schema_name
-                    )
-                });
-                // Swift uses `implementingType.name` directly (raw schema name)
-                format!("Mock<{}>()", impl_type.name.schema_name)
+                    ),
+                }
             }
         },
         GraphQLType::InputObject(_) => panic!("InputObjects aren't mocked"),
@@ -477,6 +523,7 @@ mod tests {
         GraphQLEnumType, GraphQLEnumValue, GraphQLInterfaceType, GraphQLScalarType,
         GraphQLUnionType,
     };
+    use graphql_compiler::RootTypeDefinition;
     use indexmap::IndexMap;
     use std::sync::Arc;
 
@@ -591,6 +638,19 @@ mod tests {
         GraphQLType::NonNull(Box::new(string_type()))
     }
 
+    /// A `ReferencedTypes` holding only the object under test (reduce is off in these tests).
+    fn referenced_types_for(obj: &Arc<GraphQLObjectType>) -> ReferencedTypes {
+        let named = GraphQLNamedType::Object(Arc::clone(obj));
+        ReferencedTypes::new(
+            std::slice::from_ref(&named),
+            RootTypeDefinition {
+                query_type: named.clone(),
+                mutation_type: None,
+                subscription_type: None,
+            },
+        )
+    }
+
     fn build_subject(
         name: &str,
         custom_name: Option<&str>,
@@ -607,8 +667,10 @@ mod tests {
         if let Some(cn) = custom_name {
             obj.name.custom_name = Some(cn.to_string());
         }
+        let graphql_object = Arc::new(obj);
         MockObjectTemplate {
-            graphql_object: Arc::new(obj),
+            referenced_types: Arc::new(referenced_types_for(&graphql_object)),
+            graphql_object,
             fields: fields
                 .into_iter()
                 .map(|(k, t, d)| (k.to_string(), t, d.map(|s| s.to_string())))

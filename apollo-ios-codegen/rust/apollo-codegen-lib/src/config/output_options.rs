@@ -58,6 +58,16 @@ pub struct OutputOptions {
     /// When true, generated types are marked `nonisolated` for Swift 6.2+ compatibility.
     /// Defaults to true (matching Swift 2.1.0 compiled with Swift 6.2+).
     pub mark_types_nonisolated: bool,
+    /// When `true`, generated test mock convenience initializers use non-optional parameters for
+    /// non-null schema fields and provide schema-appropriate default values for those parameters.
+    /// If `reduceGeneratedSchemaTypes` removes every concrete type for an abstract field, its
+    /// parameter remains non-optional but does not receive a default value.
+    ///
+    /// Set this to `false` to make all test mock initializer parameters optional and default them
+    /// to `nil`.
+    ///
+    /// Defaults to `true`.
+    pub require_non_optional_mock_fields: bool,
 }
 
 impl Default for OutputOptions {
@@ -78,6 +88,7 @@ impl Default for OutputOptions {
             mark_operation_definitions_as_final: false,
             append_schema_type_filename_suffix: false,
             mark_types_nonisolated: true,
+            require_non_optional_mock_fields: true,
         }
     }
 }
@@ -101,6 +112,7 @@ const VALID_OUTPUT_OPTIONS_KEYS: &[&str] = &[
     "markOperationDefinitionsAsFinal",
     "appendSchemaTypeFilenameSuffix",
     "markTypesNonisolated",
+    "requireNonOptionalMockFields",
 ];
 
 impl<'de> Deserialize<'de> for OutputOptions {
@@ -133,6 +145,7 @@ impl<'de> Deserialize<'de> for OutputOptions {
                 let mut mark_operation_definitions_as_final: Option<bool> = None;
                 let mut append_schema_type_filename_suffix: Option<bool> = None;
                 let mut mark_types_nonisolated: Option<bool> = None;
+                let mut require_non_optional_mock_fields: Option<bool> = None;
 
                 while let Some(key) = map.next_key::<String>()? {
                     if !VALID_OUTPUT_OPTIONS_KEYS.contains(&key.as_str()) {
@@ -192,6 +205,9 @@ impl<'de> Deserialize<'de> for OutputOptions {
                         "markTypesNonisolated" => {
                             mark_types_nonisolated = Some(map.next_value()?);
                         }
+                        "requireNonOptionalMockFields" => {
+                            require_non_optional_mock_fields = Some(map.next_value()?);
+                        }
                         _ => unreachable!(), // Already checked above
                     }
                 }
@@ -232,6 +248,8 @@ impl<'de> Deserialize<'de> for OutputOptions {
                         .unwrap_or(defaults.append_schema_type_filename_suffix),
                     mark_types_nonisolated: mark_types_nonisolated
                         .unwrap_or(defaults.mark_types_nonisolated),
+                    require_non_optional_mock_fields: require_non_optional_mock_fields
+                        .unwrap_or(defaults.require_non_optional_mock_fields),
                 })
             }
         }
@@ -279,6 +297,10 @@ impl Serialize for OutputOptions {
             &self.append_schema_type_filename_suffix,
         )?;
         map.serialize_entry("markTypesNonisolated", &self.mark_types_nonisolated)?;
+        // Swift only encodes this key when it is `false` (`ApolloCodegenConfiguration.encode(to:)`).
+        if !self.require_non_optional_mock_fields {
+            map.serialize_entry("requireNonOptionalMockFields", &false)?;
+        }
         map.end()
     }
 }

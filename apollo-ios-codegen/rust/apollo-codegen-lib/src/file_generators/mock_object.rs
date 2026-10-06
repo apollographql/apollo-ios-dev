@@ -7,6 +7,7 @@ use std::sync::Arc;
 
 use graphql_compiler::graphql_type::GraphQLType;
 use graphql_compiler::schema::GraphQLObjectType;
+use ir::ReferencedTypes;
 
 use crate::templates::mock_object_template::MockObjectTemplate;
 use crate::templates::{ConfigurationContext, TemplateRenderer};
@@ -18,6 +19,8 @@ pub struct MockObjectFileGenerator {
     pub graphql_object: Arc<GraphQLObjectType>,
     /// Fields as (response_key, type, deprecation_reason) tuples.
     pub fields: Vec<(String, GraphQLType, Option<String>)>,
+    /// `ir.schema.referencedTypes`: used to pick default mock values for abstract fields.
+    pub referenced_types: Arc<ReferencedTypes>,
     pub config: ConfigurationContext,
 }
 
@@ -36,6 +39,7 @@ impl FileGenerator for MockObjectFileGenerator {
         Box::new(MockObjectTemplate {
             graphql_object: self.graphql_object.clone(),
             fields: self.fields.clone(),
+            referenced_types: Arc::clone(&self.referenced_types),
             config: self.config.clone(),
         })
     }

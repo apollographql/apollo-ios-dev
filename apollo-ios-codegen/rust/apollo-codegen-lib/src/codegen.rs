@@ -1493,6 +1493,7 @@ fn test_mock_file_generators(
         generators.push(Box::new(MockObjectFileGenerator {
             graphql_object: Arc::clone(graphql_object),
             fields,
+            referenced_types: Arc::clone(&ir.schema.referenced_types),
             config: config.clone(),
         }));
     }

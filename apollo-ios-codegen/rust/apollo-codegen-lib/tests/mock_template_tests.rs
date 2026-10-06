@@ -16,7 +16,9 @@ use graphql_compiler::graphql_type::GraphQLType;
 use graphql_compiler::schema::{
     GraphQLInterfaceType, GraphQLNamedType, GraphQLObjectType, GraphQLUnionType,
 };
+use graphql_compiler::RootTypeDefinition;
 use indexmap::IndexSet;
+use ir::ReferencedTypes;
 
 use apollo_codegen_lib::config::ApolloCodegenConfiguration;
 use apollo_codegen_lib::templates::mock_interfaces_template::MockInterfacesTemplate;
@@ -183,9 +185,18 @@ fn render_mock_object(name: &str, registry: &TypeRegistry) -> String {
     let obj = get_object_type(name, registry);
     let fields = collect_schema_fields(&obj);
     let config = animal_kingdom_mock_config();
+    let referenced_types = Arc::new(ReferencedTypes::new(
+        &[GraphQLNamedType::Object(Arc::clone(&obj))],
+        RootTypeDefinition {
+            query_type: GraphQLNamedType::Object(Arc::clone(&obj)),
+            mutation_type: None,
+            subscription_type: None,
+        },
+    ));
     let template = MockObjectTemplate {
         graphql_object: obj,
         fields,
+        referenced_types,
         config,
     };
     template.render().body
