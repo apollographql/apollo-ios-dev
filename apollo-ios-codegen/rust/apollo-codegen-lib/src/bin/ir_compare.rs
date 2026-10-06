@@ -17,18 +17,16 @@
 use std::sync::Arc;
 use std::{env, fs, process};
 
-use apollo_compiler::{schema, executable, validation::Valid};
+use apollo_compiler::{executable, schema, validation::Valid};
 use graphql_compiler::adapter::{
-    self, TypeRegistry, build_network_request_source, collect_referenced_fragments,
-    collect_referenced_types, convert_directives, convert_selection_set,
+    self, build_network_request_source, collect_referenced_fragments, collect_referenced_types,
+    convert_directives, convert_selection_set, TypeRegistry,
 };
 use graphql_compiler::compilation_result::{
     self, CompilationResult, FragmentDefinition, OperationDefinition, OperationType,
     RootTypeDefinition,
 };
-use graphql_compiler::{
-    GraphQLCompositeType, GraphQLNamedType, GraphQLType, GraphQLValue,
-};
+use graphql_compiler::{GraphQLCompositeType, GraphQLNamedType, GraphQLType, GraphQLValue};
 use indexmap::IndexMap;
 use ir::builder::IRBuilder;
 use serde_json::{json, Value};
@@ -45,20 +43,29 @@ fn main() {
     // Parse flags
     let strict = args.iter().any(|a| a == "--strict");
     let compilation_result_mode = args.iter().any(|a| a == "--compilation-result");
-    let file_args: Vec<&str> = args[1..].iter()
+    let file_args: Vec<&str> = args[1..]
+        .iter()
         .filter(|a| *a != "--strict" && *a != "--compilation-result")
         .map(|s| s.as_str())
         .collect();
 
     if file_args.len() < 2 {
-        eprintln!("Usage: ir-compare [OPTIONS] <schema.graphql> <operations.graphql> [more.graphql...]");
+        eprintln!(
+            "Usage: ir-compare [OPTIONS] <schema.graphql> <operations.graphql> [more.graphql...]"
+        );
         eprintln!();
         eprintln!("Parses GraphQL schema and operations, outputs canonical JSON.");
         eprintln!();
         eprintln!("Options:");
-        eprintln!("  --strict              Full apollo-compiler validation (rejects unused fragments)");
-        eprintln!("                        Default: permissive parsing matching Swift's GraphQL.js");
-        eprintln!("  --compilation-result  Output CompilationResult JSON (pre-IR, for comparing with");
+        eprintln!(
+            "  --strict              Full apollo-compiler validation (rejects unused fragments)"
+        );
+        eprintln!(
+            "                        Default: permissive parsing matching Swift's GraphQL.js"
+        );
+        eprintln!(
+            "  --compilation-result  Output CompilationResult JSON (pre-IR, for comparing with"
+        );
         eprintln!("                        Swift's compare-compilation-result tool)");
         eprintln!("                        Default: output post-IR JSON");
         process::exit(1);
@@ -67,15 +74,14 @@ fn main() {
     let schema_path = file_args[0];
     let op_paths: Vec<&str> = file_args[1..].to_vec();
 
-    // GAP-06: Resolve schema path to absolute
+    // Resolve schema path to absolute
     let schema_abs_path = canonicalize_path(schema_path);
 
     // 1. Read and parse schema (always validated -- schema errors are fatal)
-    let schema_sdl = fs::read_to_string(schema_path)
-        .unwrap_or_else(|e| {
-            eprintln!("Error reading schema file '{}': {}", schema_path, e);
-            process::exit(1);
-        });
+    let schema_sdl = fs::read_to_string(schema_path).unwrap_or_else(|e| {
+        eprintln!("Error reading schema file '{}': {}", schema_path, e);
+        process::exit(1);
+    });
 
     // Prepend stub definitions for custom directives that Swift's graphql-js
     // accepts but apollo-compiler's strict validation rejects.
@@ -89,16 +95,15 @@ fn main() {
         });
 
     // 2. Parse each operation file individually with its absolute path.
-    //    GAP-06: Each file gets its own absolute path for file_path fields.
+    //    Each file gets its own absolute path for file_path fields.
     let parsed_files: Vec<ParsedFile> = op_paths
         .iter()
         .map(|path| {
             let abs_path = canonicalize_path(path);
-            let content = fs::read_to_string(path)
-                .unwrap_or_else(|e| {
-                    eprintln!("Error reading operation file '{}': {}", path, e);
-                    process::exit(1);
-                });
+            let content = fs::read_to_string(path).unwrap_or_else(|e| {
+                eprintln!("Error reading operation file '{}': {}", path, e);
+                process::exit(1);
+            });
 
             let doc = if strict {
                 executable::ExecutableDocument::parse_and_validate(
@@ -107,20 +112,19 @@ fn main() {
                     &abs_path,
                 )
                 .unwrap_or_else(|diag| {
-                    eprintln!("Operation validation failed for '{}':\n{}", path, diag.errors);
+                    eprintln!(
+                        "Operation validation failed for '{}':\n{}",
+                        path, diag.errors
+                    );
                     process::exit(1);
                 })
                 .into_inner()
             } else {
-                executable::ExecutableDocument::parse(
-                    &parsed_schema,
-                    &content,
-                    &abs_path,
-                )
-                .unwrap_or_else(|diag| {
-                    eprintln!("Operation parsing failed for '{}':\n{}", path, diag.errors);
-                    process::exit(1);
-                })
+                executable::ExecutableDocument::parse(&parsed_schema, &content, &abs_path)
+                    .unwrap_or_else(|diag| {
+                        eprintln!("Operation parsing failed for '{}':\n{}", path, diag.errors);
+                        process::exit(1);
+                    })
             };
 
             ParsedFile { abs_path, doc }
@@ -145,16 +149,11 @@ fn main() {
         &fragment_defs,
     );
 
-    // 7. GAP-03: Use adapter::collect_referenced_types() which filters to
+    // 7. Use adapter::collect_referenced_types() which filters to
     //    operation-referenced types and excludes introspection meta-types.
     let fragment_defs_vec: Vec<FragmentDefinition> =
         fragment_defs.values().map(|f| (**f).clone()).collect();
-    let all_types = collect_referenced_types(
-        &registry,
-        &operation_defs,
-        &fragment_defs_vec,
-        false,
-    );
+    let all_types = collect_referenced_types(&registry, &operation_defs, &fragment_defs_vec, false);
 
     // 8. Assemble CompilationResult
     let compilation_result = Arc::new(CompilationResult {
@@ -173,8 +172,7 @@ fn main() {
     // (matches Swift's compare-compilation-result tool format)
     if compilation_result_mode {
         let value = serialize_compilation_result(&compilation_result);
-        let json = serde_json::to_string_pretty(&value)
-            .expect("Failed to format JSON");
+        let json = serde_json::to_string_pretty(&value).expect("Failed to format JSON");
         println!("{}", json);
         return;
     }
@@ -190,11 +188,14 @@ fn main() {
         let op_arc = Arc::new(op_def.clone());
         let operation = builder.build_operation(&op_arc);
         let json_str = ir::serialize_operation_to_json(&operation);
-        let json_val: serde_json::Value = serde_json::from_str(&json_str)
-            .expect("IR serialization produced invalid JSON");
+        let json_val: serde_json::Value =
+            serde_json::from_str(&json_str).expect("IR serialization produced invalid JSON");
         operations_arr.push(json_val);
     }
-    output.insert("operations".to_string(), serde_json::Value::Array(operations_arr));
+    output.insert(
+        "operations".to_string(),
+        serde_json::Value::Array(operations_arr),
+    );
 
     // Build and serialize each fragment
     let mut fragments_arr = Vec::new();
@@ -202,11 +203,14 @@ fn main() {
         let frag_arc = Arc::new(frag_def.clone());
         let fragment = builder.build_fragment(&frag_arc);
         let json_str = ir::serialize_fragment_to_json(&fragment);
-        let json_val: serde_json::Value = serde_json::from_str(&json_str)
-            .expect("IR serialization produced invalid JSON");
+        let json_val: serde_json::Value =
+            serde_json::from_str(&json_str).expect("IR serialization produced invalid JSON");
         fragments_arr.push(json_val);
     }
-    output.insert("fragments".to_string(), serde_json::Value::Array(fragments_arr));
+    output.insert(
+        "fragments".to_string(),
+        serde_json::Value::Array(fragments_arr),
+    );
 
     // Output canonical JSON
     let final_json = serde_json::to_string_pretty(&serde_json::Value::Object(output))
@@ -218,7 +222,7 @@ fn main() {
 /// Falls back to the original path if canonicalize fails (e.g., file doesn't exist yet).
 /// Makes a path absolute without resolving symlinks.
 ///
-/// GAP-06: Swift's graphql-js uses the path as-is (no symlink resolution).
+/// Swift's graphql-js uses the path as-is (no symlink resolution).
 /// Using `std::fs::canonicalize` resolves `/tmp` -> `/private/tmp` on macOS,
 /// causing file_path mismatches. Instead, prepend CWD for relative paths.
 fn canonicalize_path(path: &str) -> String {
@@ -304,10 +308,8 @@ fn build_fragment_definitions_multi_file(
                 &fragment_defs,
             );
 
-            let referenced = collect_referenced_fragments(
-                &frag.selection_set.selections,
-                &fragment_defs,
-            );
+            let referenced =
+                collect_referenced_fragments(&frag.selection_set.selections, &fragment_defs);
 
             let full = Arc::new(FragmentDefinition {
                 name: name.as_str().to_string(),
@@ -388,14 +390,15 @@ fn build_operation_definitions_multi_file(
                 .map(|var| compilation_result::VariableDefinition {
                     name: var.name.as_str().to_string(),
                     type_: adapter::convert_type(&var.ty, registry),
-                    default_value: var.default_value.as_ref().map(|v| adapter::convert_value(v)),
+                    default_value: var
+                        .default_value
+                        .as_ref()
+                        .map(|v| adapter::convert_value(v)),
                 })
                 .collect();
 
-            let referenced = collect_referenced_fragments(
-                &op.selection_set.selections,
-                fragment_defs,
-            );
+            let referenced =
+                collect_referenced_fragments(&op.selection_set.selections, fragment_defs);
 
             operations.push(OperationDefinition {
                 name: op_name.clone(),
@@ -414,10 +417,7 @@ fn build_operation_definitions_multi_file(
     operations
 }
 
-fn build_root_types(
-    schema: &Valid<schema::Schema>,
-    registry: &TypeRegistry,
-) -> RootTypeDefinition {
+fn build_root_types(schema: &Valid<schema::Schema>, registry: &TypeRegistry) -> RootTypeDefinition {
     let query_name = schema
         .schema_definition
         .query
@@ -437,15 +437,14 @@ fn build_root_types(
         .as_ref()
         .map(|n| n.as_str().to_string());
 
-    let query_type = registry.get(&query_name)
+    let query_type = registry
+        .get(&query_name)
         .cloned()
         .unwrap_or_else(|| panic!("Query type '{}' not found in schema", query_name));
 
-    let mutation_type = mutation_name
-        .and_then(|name| registry.get(&name).cloned());
+    let mutation_type = mutation_name.and_then(|name| registry.get(&name).cloned());
 
-    let subscription_type = subscription_name
-        .and_then(|name| registry.get(&name).cloned());
+    let subscription_type = subscription_name.and_then(|name| registry.get(&name).cloned());
 
     RootTypeDefinition {
         query_type,
@@ -461,7 +460,11 @@ fn resolve_composite_type(name: &str, registry: &TypeRegistry) -> GraphQLComposi
             GraphQLCompositeType::Interface(Arc::clone(iface))
         }
         Some(GraphQLNamedType::Union(union_)) => GraphQLCompositeType::Union(Arc::clone(union_)),
-        Some(other) => panic!("Type '{}' is not a composite type: {:?}", name, other.name()),
+        Some(other) => panic!(
+            "Type '{}' is not a composite type: {:?}",
+            name,
+            other.name()
+        ),
         None => panic!("Type '{}' not found in registry", name),
     }
 }
@@ -552,12 +555,20 @@ fn serialize_schema_field(f: &graphql_compiler::GraphQLField) -> Value {
 
 fn serialize_graphql_type(t: &GraphQLType) -> Value {
     match t {
-        GraphQLType::NonNull(inner) => json!({"kind": "NonNull", "ofType": serialize_graphql_type(inner)}),
-        GraphQLType::List(inner) => json!({"kind": "List", "ofType": serialize_graphql_type(inner)}),
-        GraphQLType::Entity(ct) => json!({"kind": "Entity", "value": {"name": ct.name().schema_name}}),
+        GraphQLType::NonNull(inner) => {
+            json!({"kind": "NonNull", "ofType": serialize_graphql_type(inner)})
+        }
+        GraphQLType::List(inner) => {
+            json!({"kind": "List", "ofType": serialize_graphql_type(inner)})
+        }
+        GraphQLType::Entity(ct) => {
+            json!({"kind": "Entity", "value": {"name": ct.name().schema_name}})
+        }
         GraphQLType::Scalar(s) => json!({"kind": "Scalar", "value": {"name": s.name.schema_name}}),
         GraphQLType::Enum(e) => json!({"kind": "Enum", "value": {"name": e.name.schema_name}}),
-        GraphQLType::InputObject(io) => json!({"kind": "InputObject", "value": {"name": io.name.schema_name}}),
+        GraphQLType::InputObject(io) => {
+            json!({"kind": "InputObject", "value": {"name": io.name.schema_name}})
+        }
     }
 }
 
@@ -573,13 +584,17 @@ fn serialize_graphql_value(v: &GraphQLValue) -> Value {
             } else {
                 json!({"kind": "float", "value": f})
             }
-        },
+        }
         GraphQLValue::String(s) => json!({"kind": "string", "value": s}),
         GraphQLValue::Boolean(b) => json!({"kind": "boolean", "value": b}),
         GraphQLValue::Null => json!({"kind": "null"}),
         GraphQLValue::Enum(s) => json!({"kind": "enum", "value": s}),
-        GraphQLValue::List(arr) => json!({"kind": "list", "value": arr.iter().map(serialize_graphql_value).collect::<Vec<_>>()}),
-        GraphQLValue::Object(map) => json!({"kind": "object", "value": map.iter().map(|(k,v)| (k.clone(), serialize_graphql_value(v))).collect::<serde_json::Map<_,_>>()}),
+        GraphQLValue::List(arr) => {
+            json!({"kind": "list", "value": arr.iter().map(serialize_graphql_value).collect::<Vec<_>>()})
+        }
+        GraphQLValue::Object(map) => {
+            json!({"kind": "object", "value": map.iter().map(|(k,v)| (k.clone(), serialize_graphql_value(v))).collect::<serde_json::Map<_,_>>()})
+        }
     }
 }
 

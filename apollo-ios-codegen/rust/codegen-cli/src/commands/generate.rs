@@ -119,7 +119,7 @@ impl Generate {
     pub fn run(&self) -> Result<(), CliError> {
         CodegenLogger::set_level(self.inputs.verbose);
 
-        // D-70: --fetch-schema is accepted but errors if used (stub)
+        // --fetch-schema is accepted but errors if used (stub)
         if self.fetch_schema {
             return Err(CliError::Generic {
                 description: "Schema downloading is not yet supported in the Rust CLI. \
@@ -423,9 +423,9 @@ fn optimize_schema_metadata(path: &Path, schema_namespace: &str) -> Result<(), C
     let entries: Vec<(String, String)> = cases_block
         .lines()
         .filter_map(|line| {
-            case_re.captures(line).map(|c| {
-                (c[1].to_string(), c[2].to_string())
-            })
+            case_re
+                .captures(line)
+                .map(|c| (c[1].to_string(), c[2].to_string()))
         })
         .collect();
 
@@ -572,21 +572,32 @@ mod tests {
     fn test_bazel_mock_flags_parsing_and_overrides() {
         let cli = TestCli::try_parse_from([
             "test",
-            "--bazel-output-dir", "/tmp/out",
-            "--bazel-mode", "test_mocks",
-            "--bazel-mocks-scope", "referenced",
-            "--bazel-mocks-for", "Dog",
-            "--bazel-mocks-for", "Cat",
-            "--bazel-mocks-exclude", "Query",
-            "--bazel-mocks-base-module", "BaseMocks",
-            "--bazel-mocks-typealiases", "true",
+            "--bazel-output-dir",
+            "/tmp/out",
+            "--bazel-mode",
+            "test_mocks",
+            "--bazel-mocks-scope",
+            "referenced",
+            "--bazel-mocks-for",
+            "Dog",
+            "--bazel-mocks-for",
+            "Cat",
+            "--bazel-mocks-exclude",
+            "Query",
+            "--bazel-mocks-base-module",
+            "BaseMocks",
+            "--bazel-mocks-typealiases",
+            "true",
         ])
         .unwrap();
         assert_eq!(cli.cmd.bazel_mode, "test_mocks");
         assert_eq!(cli.cmd.bazel_mocks_scope.as_deref(), Some("referenced"));
         assert_eq!(cli.cmd.bazel_mocks_for, vec!["Dog", "Cat"]);
         assert_eq!(cli.cmd.bazel_mocks_exclude, vec!["Query"]);
-        assert_eq!(cli.cmd.bazel_mocks_base_module.as_deref(), Some("BaseMocks"));
+        assert_eq!(
+            cli.cmd.bazel_mocks_base_module.as_deref(),
+            Some("BaseMocks")
+        );
         assert_eq!(cli.cmd.bazel_mocks_typealiases, Some(true));
 
         let mut configuration: ApolloCodegenConfiguration = serde_json::from_str(
@@ -594,11 +605,17 @@ mod tests {
                 "testMocks":{"absolute":{"path":"Mocks","excludeTypes":["User"]}}}}"#,
         )
         .unwrap();
-        cli.cmd.apply_bazel_mock_overrides(&mut configuration).unwrap();
+        cli.cmd
+            .apply_bazel_mock_overrides(&mut configuration)
+            .unwrap();
         let scoping = configuration.output.test_mocks.scoping().unwrap();
         assert_eq!(scoping.scope, TestMockScope::ReferencedByOperations);
         assert_eq!(scoping.include_types, vec!["Dog", "Cat"]);
-        assert_eq!(scoping.exclude_types, vec!["Query"], "flags replace the config key");
+        assert_eq!(
+            scoping.exclude_types,
+            vec!["Query"],
+            "flags replace the config key"
+        );
         assert_eq!(scoping.base_module.as_deref(), Some("BaseMocks"));
         assert_eq!(scoping.include_typealiases, Some(true));
         assert!(scoping.generates_typealiases());
@@ -612,7 +629,10 @@ mod tests {
         .unwrap();
         let mut cmd = generate("test_mocks");
         cmd.bazel_output_dir = Some("/tmp/out".to_string());
-        let err = cmd.apply_bazel_mock_overrides(&mut none).unwrap_err().to_string();
+        let err = cmd
+            .apply_bazel_mock_overrides(&mut none)
+            .unwrap_err()
+            .to_string();
         assert!(err.contains("'output.testMocks'"), "{err}");
 
         let mut mocks: ApolloCodegenConfiguration = serde_json::from_str(
@@ -622,17 +642,25 @@ mod tests {
         .unwrap();
         let mut cmd = generate("schema_types");
         cmd.bazel_mocks_scope = Some("referenced".to_string());
-        let err = cmd.apply_bazel_mock_overrides(&mut mocks).unwrap_err().to_string();
+        let err = cmd
+            .apply_bazel_mock_overrides(&mut mocks)
+            .unwrap_err()
+            .to_string();
         assert!(err.contains("--bazel-output-dir"), "{err}");
 
         cmd.bazel_output_dir = Some("/tmp/out".to_string());
         cmd.bazel_mocks_scope = Some("bogus".to_string());
-        let err = cmd.apply_bazel_mock_overrides(&mut mocks).unwrap_err().to_string();
+        let err = cmd
+            .apply_bazel_mock_overrides(&mut mocks)
+            .unwrap_err()
+            .to_string();
         assert!(err.contains("Unknown --bazel-mocks-scope: bogus"), "{err}");
 
         // No flags, no test_mocks mode: the configuration is left alone.
         let before = mocks.clone();
-        generate("schema_types").apply_bazel_mock_overrides(&mut mocks).unwrap();
+        generate("schema_types")
+            .apply_bazel_mock_overrides(&mut mocks)
+            .unwrap();
         assert_eq!(mocks, before);
     }
 
@@ -658,7 +686,9 @@ mod tests {
         cmd.bazel_generate_for = vec!["Features/Account/A.graphql".to_string()];
         assert_eq!(
             cmd.generation_filter(),
-            Some(GenerationFilter::Files(vec!["Features/Account/A.graphql".to_string()]))
+            Some(GenerationFilter::Files(vec![
+                "Features/Account/A.graphql".to_string()
+            ]))
         );
     }
 
@@ -674,11 +704,7 @@ mod tests {
             "import ApolloAPI\nimport MySchemaAPI\n\npublic struct Query {}\n",
         )
         .unwrap();
-        std::fs::write(
-            &file2,
-            "import ApolloAPI\n\npublic struct Fragment {}\n",
-        )
-        .unwrap();
+        std::fs::write(&file2, "import ApolloAPI\n\npublic struct Fragment {}\n").unwrap();
         std::fs::write(&file3, "import MySchemaAPI\nshould not be touched\n").unwrap();
 
         strip_import_from_dir_recursive(dir.path(), "MySchemaAPI").unwrap();
@@ -743,7 +769,10 @@ public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
         let file = dir.path().join("SchemaMetadata.graphql.swift");
         std::fs::write(
             &file,
-            METADATA.replace("  public static func objectType", "  @_spi(Execution) public static func objectType"),
+            METADATA.replace(
+                "  public static func objectType",
+                "  @_spi(Execution) public static func objectType",
+            ),
         )
         .unwrap();
 
@@ -751,7 +780,11 @@ public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
 
         let result = std::fs::read_to_string(&file).unwrap();
         assert!(result.contains("  @_spi(Execution) public static func objectType(forTypename typename: String) -> ApolloAPI.Object? {\n    if fastObjectTypeLookup {"), "{}", result);
-        assert!(result.contains(r#"    "Cat": MySchemaAPI.Objects.Cat"#), "{}", result);
+        assert!(
+            result.contains(r#"    "Cat": MySchemaAPI.Objects.Cat"#),
+            "{}",
+            result
+        );
         assert_eq!(result.matches("func objectType").count(), 1, "{}", result);
     }
 
@@ -803,7 +836,8 @@ public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
 
             let mut cmd = generate("schema_types");
             cmd.bazel_keep_schema_configuration = keep;
-            cmd.postprocess_tree_artifact(dir.path(), "MySchemaAPI").unwrap();
+            cmd.postprocess_tree_artifact(dir.path(), "MySchemaAPI")
+                .unwrap();
 
             assert_eq!(dir.path().join("SchemaConfiguration.swift").exists(), keep);
             assert_eq!(dir.path().join("CustomScalars").is_dir(), keep);
@@ -824,7 +858,8 @@ public enum SchemaMetadata: ApolloAPI.SchemaMetadata {
         let mut config = ConfigurationContext::new(configuration, None);
         config.set_output_root(Some(dir.path().join("out")));
         let compile_result = ApolloCodegen::compile_schema_and_ir(&config).unwrap();
-        let result = generate("invalid").generate_bazel(&compile_result, &config, ItemsToGenerate::CODE);
+        let result =
+            generate("invalid").generate_bazel(&compile_result, &config, ItemsToGenerate::CODE);
         let err = format!("{}", result.unwrap_err());
         assert!(err.contains("Unknown --bazel-mode: invalid"));
     }

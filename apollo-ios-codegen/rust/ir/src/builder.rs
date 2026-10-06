@@ -1,7 +1,7 @@
 //! IRBuilder -- the main entry point for building IR from a CompilationResult.
 //!
 //! Mirrors `IRBuilder` from `IRBuilder.swift` (118 lines).
-//! All async functions become synchronous per D-32.
+//! All async functions become synchronous.
 
 use std::sync::{Arc, Mutex};
 
@@ -20,13 +20,12 @@ use crate::schema::{ReferencedTypes, Schema};
 /// Cache for built fragments to avoid rebuilding the same fragment multiple times.
 ///
 /// In Swift this is an `actor` with a CacheEntry enum (.inProgress, .ready).
-/// In Rust, we use `Mutex<IndexMap>` per D-31. Since we're synchronous (D-32),
+/// In Rust, we use `Mutex<IndexMap>`. Since we're synchronous,
 /// we don't need the .inProgress variant -- we just need deadlock prevention.
 ///
 /// CRITICAL: The lock must be dropped before calling the builder closure to avoid
 /// deadlock. Pattern: lock -> check cache -> if found, return clone -> drop lock ->
 /// call builder -> re-lock -> insert if absent -> return.
-/// (per RESEARCH.md Pitfall 1 / T-04-09)
 struct BuiltFragmentStorage {
     cache: Mutex<IndexMap<String, Arc<NamedFragment>>>,
 }
@@ -40,7 +39,7 @@ impl BuiltFragmentStorage {
 
     /// Gets a fragment from cache, or builds it using the provided closure.
     ///
-    /// T-04-09: Lock is dropped before calling builder to prevent deadlock.
+    /// Lock is dropped before calling builder to prevent deadlock.
     /// On re-acquire, checks if another thread inserted while we were building.
     fn get_or_build(
         &self,
@@ -53,7 +52,7 @@ impl BuiltFragmentStorage {
             if let Some(fragment) = cache.get(name) {
                 return Arc::clone(fragment);
             }
-        } // Lock dropped here before calling builder -- T-04-09 deadlock prevention
+        } // Lock dropped here before calling builder -- deadlock prevention
 
         // Phase 2: Build the fragment (no lock held)
         let fragment = builder();
@@ -119,7 +118,7 @@ impl IRBuilder {
 
     /// Builds an IR Operation from a CompilationResult OperationDefinition.
     ///
-    /// Mirrors Swift's `build(operation:)`. Synchronous per D-32.
+    /// Mirrors Swift's `build(operation:)`. Synchronous.
     pub fn build_operation(
         &self,
         operation_definition: &Arc<compilation_result::OperationDefinition>,
@@ -128,9 +127,7 @@ impl IRBuilder {
             name: operation_definition.operation_type.to_string(),
             alias: None,
             type_: graphql_compiler::GraphQLType::NonNull(Box::new(
-                graphql_compiler::GraphQLType::from_composite(
-                    &operation_definition.root_type,
-                ),
+                graphql_compiler::GraphQLType::from_composite(&operation_definition.root_type),
             )),
             arguments: None,
             inclusion_conditions: None,
@@ -140,15 +137,11 @@ impl IRBuilder {
             documentation: None,
         };
 
-        let root_entity = Arc::new(Entity::new_root(
-            SourceDefinition::Operation(Arc::clone(operation_definition)),
-        ));
+        let root_entity = Arc::new(Entity::new_root(SourceDefinition::Operation(Arc::clone(
+            operation_definition,
+        ))));
 
-        let result = RootFieldBuilder::build_root_entity_field(
-            &root_field,
-            root_entity,
-            self,
-        );
+        let result = RootFieldBuilder::build_root_entity_field(&root_field, root_entity, self);
 
         Operation::new(
             Arc::clone(operation_definition),
@@ -162,7 +155,7 @@ impl IRBuilder {
     /// Builds an IR NamedFragment from a CompilationResult FragmentDefinition.
     ///
     /// Uses BuiltFragmentStorage to cache and deduplicate fragment builds.
-    /// Mirrors Swift's `build(fragment:)`. Synchronous per D-32.
+    /// Mirrors Swift's `build(fragment:)`. Synchronous.
     ///
     /// NOTE: The passed-in `fragment_definition` may be a stale reference (e.g., a stub
     /// from the first pass of fragment compilation). We always look up the canonical
@@ -200,15 +193,11 @@ impl IRBuilder {
                 documentation: None,
             };
 
-            let root_entity = Arc::new(Entity::new_root(
-                SourceDefinition::NamedFragment(Arc::clone(&def)),
-            ));
+            let root_entity = Arc::new(Entity::new_root(SourceDefinition::NamedFragment(
+                Arc::clone(&def),
+            )));
 
-            let result = RootFieldBuilder::build_root_entity_field(
-                &root_field,
-                root_entity,
-                self,
-            );
+            let result = RootFieldBuilder::build_root_entity_field(&root_field, root_entity, self);
 
             Arc::new(NamedFragment::new(
                 Arc::clone(&def),
@@ -240,8 +229,7 @@ impl GraphQLTypeFromComposite for graphql_compiler::GraphQLType {
 mod tests {
     use super::*;
     use graphql_compiler::{
-        GraphQLCompositeType, GraphQLName, GraphQLNamedType, GraphQLObjectType,
-        RootTypeDefinition,
+        GraphQLCompositeType, GraphQLName, GraphQLNamedType, GraphQLObjectType, RootTypeDefinition,
     };
     use indexmap::IndexMap;
 
@@ -276,7 +264,7 @@ mod tests {
         let cr = make_compilation_result();
         let builder = IRBuilder::new(cr);
 
-        assert!(builder.schema.referenced_types.objects.len() >= 1);
+        assert!(!builder.schema.referenced_types.objects.is_empty());
         assert!(builder.schema.documentation.is_none());
     }
 
@@ -303,9 +291,9 @@ mod tests {
 
         let frag1 = storage.get_or_build("TestFragment", || {
             build_count += 1;
-            let root_entity = Arc::new(Entity::new_root(
-                SourceDefinition::NamedFragment(Arc::clone(&def_clone)),
-            ));
+            let root_entity = Arc::new(Entity::new_root(SourceDefinition::NamedFragment(
+                Arc::clone(&def_clone),
+            )));
             let entity_storage = crate::definition_entity_storage::DefinitionEntityStorage::new(
                 Arc::clone(&root_entity),
             );
@@ -334,7 +322,9 @@ mod tests {
                 Arc::new(compilation_result::Field {
                     name: "TestFragment".to_string(),
                     alias: None,
-                    type_: graphql_compiler::GraphQLType::Entity(GraphQLCompositeType::Object(make_object("User"))),
+                    type_: graphql_compiler::GraphQLType::Entity(GraphQLCompositeType::Object(
+                        make_object("User"),
+                    )),
                     arguments: None,
                     inclusion_conditions: None,
                     directives: None,
@@ -387,9 +377,9 @@ mod tests {
                 file_path: String::new(),
             });
 
-            let root_entity = Arc::new(Entity::new_root(
-                SourceDefinition::NamedFragment(Arc::clone(&frag_def)),
-            ));
+            let root_entity = Arc::new(Entity::new_root(SourceDefinition::NamedFragment(
+                Arc::clone(&frag_def),
+            )));
             let entity_storage = crate::definition_entity_storage::DefinitionEntityStorage::new(
                 Arc::clone(&root_entity),
             );
@@ -418,7 +408,9 @@ mod tests {
                 Arc::new(compilation_result::Field {
                     name: name.to_string(),
                     alias: None,
-                    type_: graphql_compiler::GraphQLType::Entity(GraphQLCompositeType::Object(make_object("User"))),
+                    type_: graphql_compiler::GraphQLType::Entity(GraphQLCompositeType::Object(
+                        make_object("User"),
+                    )),
                     arguments: None,
                     inclusion_conditions: None,
                     directives: None,

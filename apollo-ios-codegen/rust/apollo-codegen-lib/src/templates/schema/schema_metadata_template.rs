@@ -7,10 +7,12 @@ use std::sync::Arc;
 
 use graphql_compiler::schema::GraphQLNamedType;
 
-use crate::templates::SPI;
-use crate::templates::rendering_helpers::graphql_name_rendering::{render_named_type, RenderContext};
+use crate::templates::rendering_helpers::graphql_name_rendering::{
+    render_named_type, RenderContext,
+};
 use crate::templates::rendering_helpers::string_casing::first_uppercased;
 use crate::templates::rendering_helpers::template_string_documentation::render_documentation;
+use crate::templates::SPI;
 use crate::templates::{
     ConfigurationContext, NonFatalErrorRecorder, SchemaFileType, Scope, TemplateRenderer,
     TemplateTarget,
@@ -29,7 +31,7 @@ pub struct SchemaMetadataTemplate {
 
 impl SchemaMetadataTemplate {
     pub fn new(schema: Arc<ir::Schema>, config: ConfigurationContext) -> Self {
-        let schema_namespace = first_uppercased(&config.schema_namespace());
+        let schema_namespace = first_uppercased(config.schema_namespace());
         Self {
             schema,
             config,
@@ -71,7 +73,9 @@ impl SchemaMetadataTemplate {
     ///
     /// Mirrors Swift's `objectTypeFunction` computed property (Swift 1.25.4+ renders a dictionary lookup).
     fn object_type_function(&self) -> String {
-        let access_level = self.access_control_renderer(Scope::Member).render_with_spis(&[SPI::Execution]);
+        let access_level = self
+            .access_control_renderer(Scope::Member)
+            .render_with_spis(&[SPI::Execution]);
 
         let dict_entries: Vec<String> = self
             .schema
@@ -81,7 +85,9 @@ impl SchemaMetadataTemplate {
             .map(|obj| {
                 let typename = render_named_type(
                     &GraphQLNamedType::Object(Arc::clone(obj)),
-                    &RenderContext::Typename { is_input_value: false },
+                    &RenderContext::Typename {
+                        is_input_value: false,
+                    },
                 );
                 format!(
                     "    \"{}\": {}.Objects.{}",
@@ -116,10 +122,7 @@ impl TemplateRenderer for SchemaMetadataTemplate {
         TemplateTarget::SchemaFile(SchemaFileType::SchemaMetadata)
     }
 
-    fn render_body_template(
-        &self,
-        _non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
+    fn render_body_template(&self, _non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
         let parent_access = self.access_control_renderer(Scope::Parent).render();
         let member_access = self.access_control_renderer(Scope::Member).render();
 
@@ -146,10 +149,8 @@ impl TemplateRenderer for SchemaMetadataTemplate {
         }
 
         // Documentation
-        if let Some(doc) = render_documentation(
-            self.schema.documentation.as_deref(),
-            &self.config,
-        ) {
+        if let Some(doc) = render_documentation(self.schema.documentation.as_deref(), &self.config)
+        {
             parts.push(doc);
         }
 
@@ -355,10 +356,15 @@ mod tests {
 
         // Detached should have protocol definitions
         let detached = detached.expect("detached should exist for embedded");
-        assert!(detached.contains("protocol AName_SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet"));
+        assert!(detached.contains(
+            "protocol AName_SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet"
+        ));
         assert!(detached.contains("where Schema == AName.SchemaMetadata {}"));
-        assert!(detached.contains("protocol AName_InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment"));
-        assert!(detached.contains("protocol AName_MutableSelectionSet: ApolloAPI.MutableRootSelectionSet"));
+        assert!(detached.contains(
+            "protocol AName_InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment"
+        ));
+        assert!(detached
+            .contains("protocol AName_MutableSelectionSet: ApolloAPI.MutableRootSelectionSet"));
         assert!(detached.contains("protocol AName_MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment"));
         // Internal access: no "public" prefix
         assert!(!detached.contains("public "));
@@ -379,7 +385,9 @@ mod tests {
         let detached = detached.expect("detached should exist for embedded");
         assert!(detached.contains("public protocol AName_SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet"));
         assert!(detached.contains("public protocol AName_InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment"));
-        assert!(detached.contains("public protocol AName_MutableSelectionSet: ApolloAPI.MutableRootSelectionSet"));
+        assert!(detached.contains(
+            "public protocol AName_MutableSelectionSet: ApolloAPI.MutableRootSelectionSet"
+        ));
         assert!(detached.contains("public protocol AName_MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment"));
     }
 
@@ -392,10 +400,16 @@ mod tests {
         let detached = render_detached(&template);
 
         // Body should have inline protocol definitions with public access
-        assert!(body.contains("public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet"));
+        assert!(body.contains(
+            "public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet"
+        ));
         assert!(body.contains("where Schema == AName.SchemaMetadata {}"));
-        assert!(body.contains("public protocol InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment"));
-        assert!(body.contains("public protocol MutableSelectionSet: ApolloAPI.MutableRootSelectionSet"));
+        assert!(body.contains(
+            "public protocol InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment"
+        ));
+        assert!(
+            body.contains("public protocol MutableSelectionSet: ApolloAPI.MutableRootSelectionSet")
+        );
         assert!(body.contains("public protocol MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment"));
 
         // No typealiases
@@ -414,7 +428,9 @@ mod tests {
         let detached = render_detached(&template);
 
         // Body should have inline protocol definitions with public access
-        assert!(body.contains("public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet"));
+        assert!(body.contains(
+            "public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet"
+        ));
         assert!(body.contains("where Schema == AName.SchemaMetadata {}"));
 
         // No detached
@@ -481,7 +497,10 @@ mod tests {
         let expected = if OBJECT_TYPE_LOOKUP_IS_DICTIONARY {
             format!("\"{}\": ObjectSchema.Objects.{}", schema_name, swift_name)
         } else {
-            format!("case \"{}\": return ObjectSchema.Objects.{}", schema_name, swift_name)
+            format!(
+                "case \"{}\": return ObjectSchema.Objects.{}",
+                schema_name, swift_name
+            )
         };
         assert!(body.contains(&expected), "body:\n{}", body);
     }
@@ -489,7 +508,11 @@ mod tests {
     #[test]
     fn test_render_with_referenced_objects_correctly_cased() {
         let schema = make_schema(
-            vec![make_object("objA"), make_object("objB"), make_object("objC")],
+            vec![
+                make_object("objA"),
+                make_object("objB"),
+                make_object("objC"),
+            ],
             None,
         );
         let template = make_template(schema, spm_config_with_namespace("objectSchema"));
@@ -497,7 +520,11 @@ mod tests {
         let body = render_body(&template);
 
         if OBJECT_TYPE_LOOKUP_IS_DICTIONARY {
-            assert!(body.contains("objectTypeMap: [String: ApolloAPI.Object]"), "body:\n{}", body);
+            assert!(
+                body.contains("objectTypeMap: [String: ApolloAPI.Object]"),
+                "body:\n{}",
+                body
+            );
             assert!(body.contains("objectTypeMap[typename]"), "body:\n{}", body);
             assert!(!body.contains("switch typename {"), "body:\n{}", body);
         } else {
@@ -508,7 +535,8 @@ mod tests {
         assert_object_type_entry(&body, "objA", "ObjA");
         assert_object_type_entry(&body, "objB", "ObjB");
         assert_object_type_entry(&body, "objC", "ObjC");
-        assert!(body.contains("static func objectType(forTypename typename: String) -> ApolloAPI.Object?"));
+        assert!(body
+            .contains("static func objectType(forTypename typename: String) -> ApolloAPI.Object?"));
     }
 
     #[test]
@@ -529,7 +557,11 @@ mod tests {
     #[test]
     fn test_render_object_type_function_has_execution_spi() {
         let schema = make_schema(
-            vec![make_object("objA"), make_object("objB"), make_object("objC")],
+            vec![
+                make_object("objA"),
+                make_object("objB"),
+                make_object("objC"),
+            ],
             None,
         );
         let template = make_template(schema, spm_config_with_namespace("objectSchema"));
@@ -601,7 +633,10 @@ mod tests {
 
     #[test]
     fn test_render_with_documentation_include() {
-        let schema = make_schema(vec![], Some("This is some great documentation!".to_string()));
+        let schema = make_schema(
+            vec![],
+            Some("This is some great documentation!".to_string()),
+        );
         let config = make_config(
             r#"{
             "schemaNamespace": "TestSchema",
@@ -624,7 +659,10 @@ mod tests {
 
     #[test]
     fn test_render_with_documentation_exclude() {
-        let schema = make_schema(vec![], Some("This is some great documentation!".to_string()));
+        let schema = make_schema(
+            vec![],
+            Some("This is some great documentation!".to_string()),
+        );
         let config = make_config(
             r#"{
             "schemaNamespace": "TestSchema",

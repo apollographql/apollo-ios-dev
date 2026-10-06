@@ -33,10 +33,7 @@ impl TemplateRenderer for SchemaConfigurationTemplate {
         ))
     }
 
-    fn render_body_template(
-        &self,
-        _non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
+    fn render_body_template(&self, _non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
         let parent_access = self.access_control_renderer(Scope::Parent).render();
         let member_access = self.access_control_renderer(Scope::Member).render();
 
@@ -59,7 +56,6 @@ impl TemplateRenderer for SchemaConfigurationTemplate {
 mod tests {
     use super::*;
     use crate::config::ApolloCodegenConfiguration;
-    use crate::templates::NonFatalErrorRecorder;
 
     fn make_config(json: &str) -> ApolloCodegenConfiguration {
         serde_json::from_str(json).unwrap()
@@ -99,7 +95,9 @@ mod tests {
         // Verify the full header matches Swift's expected output
         assert!(rendered.contains("// @generated"));
         assert!(rendered.contains("This file was automatically generated and can be edited to"));
-        assert!(rendered.contains("// provide custom configuration for a generated GraphQL schema."));
+        assert!(
+            rendered.contains("// provide custom configuration for a generated GraphQL schema.")
+        );
         assert!(rendered.contains("// Any changes to this file will not be overwritten by future"));
         assert!(rendered.contains("// code generation execution."));
     }
@@ -116,9 +114,13 @@ mod tests {
         };
 
         // SPM generates public access
-        assert!(rendered.contains("public enum SchemaConfiguration: ApolloAPI.SchemaConfiguration {"));
+        assert!(
+            rendered.contains("public enum SchemaConfiguration: ApolloAPI.SchemaConfiguration {")
+        );
         assert!(rendered.contains("public static func cacheKeyInfo(for type: ApolloAPI.Object, object: ApolloAPI.ObjectData) -> CacheKeyInfo?"));
-        assert!(rendered.contains("// Implement this function to configure cache key resolution for your schema types."));
+        assert!(rendered.contains(
+            "// Implement this function to configure cache key resolution for your schema types."
+        ));
         assert!(rendered.contains("return nil"));
     }
 

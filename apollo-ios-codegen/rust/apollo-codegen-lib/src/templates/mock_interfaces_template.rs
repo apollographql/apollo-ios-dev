@@ -11,7 +11,9 @@ use indexmap::IndexSet;
 
 use graphql_compiler::schema::{GraphQLInterfaceType, GraphQLNamedType};
 
-use crate::templates::rendering_helpers::graphql_name_rendering::{render_named_type, RenderContext};
+use crate::templates::rendering_helpers::graphql_name_rendering::{
+    render_named_type, RenderContext,
+};
 use crate::templates::{
     ConfigurationContext, NonFatalErrorRecorder, Scope, TemplateRenderer, TemplateTarget,
 };
@@ -33,10 +35,7 @@ impl TemplateRenderer for MockInterfacesTemplate {
         TemplateTarget::TestMockFile
     }
 
-    fn render_body_template(
-        &self,
-        _non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
+    fn render_body_template(&self, _non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
         let access = self.access_control_renderer(Scope::Parent).render();
 
         let lines: Vec<String> = self
@@ -45,7 +44,9 @@ impl TemplateRenderer for MockInterfacesTemplate {
             .map(|i| {
                 let name = render_named_type(
                     &GraphQLNamedType::Interface(Arc::clone(i)),
-                    &RenderContext::Typename { is_input_value: false },
+                    &RenderContext::Typename {
+                        is_input_value: false,
+                    },
                 );
                 format!("  typealias {} = Interface", name)
             })
@@ -60,6 +61,7 @@ impl TemplateRenderer for MockInterfacesTemplate {
 }
 
 #[cfg(test)]
+#[allow(non_snake_case)] // test names mirror the Swift test suite
 mod tests {
     use super::*;
     use crate::config::ApolloCodegenConfiguration;
@@ -166,8 +168,8 @@ mod tests {
     }
 
     #[test]
-    fn test__render__given_multiple_interface_types_generates_extension_with_typealiases_correctly_cased()
-    {
+    fn test__render__given_multiple_interface_types_generates_extension_with_typealiases_correctly_cased(
+    ) {
         let iface_a = mock_interface("InterfaceA");
         let iface_b = mock_interface("interfaceB");
         let iface_c = mock_interface("Interfacec");
@@ -187,8 +189,8 @@ mod tests {
     // MARK: - Access Level Tests
 
     #[test]
-    fn test__render__given_interface_type_when_test_mocks_is_swift_package_should_render_with_public_access()
-    {
+    fn test__render__given_interface_type_when_test_mocks_is_swift_package_should_render_with_public_access(
+    ) {
         let pet = mock_interface("Pet");
         let mut interfaces = IndexSet::new();
         interfaces.insert(pet);
@@ -199,8 +201,8 @@ mod tests {
     }
 
     #[test]
-    fn test__render__given_interface_type_when_test_mocks_absolute_with_public_access_modifier_should_render_with_public_access()
-    {
+    fn test__render__given_interface_type_when_test_mocks_absolute_with_public_access_modifier_should_render_with_public_access(
+    ) {
         let pet = mock_interface("Pet");
         let mut interfaces = IndexSet::new();
         interfaces.insert(pet);
@@ -211,8 +213,8 @@ mod tests {
     }
 
     #[test]
-    fn test__render__given_interface_type_when_test_mocks_absolute_with_internal_access_modifier_should_render_with_internal_access()
-    {
+    fn test__render__given_interface_type_when_test_mocks_absolute_with_internal_access_modifier_should_render_with_internal_access(
+    ) {
         let pet = mock_interface("Pet");
         let mut interfaces = IndexSet::new();
         interfaces.insert(pet);

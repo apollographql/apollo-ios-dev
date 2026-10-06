@@ -70,8 +70,7 @@ pub fn root_output_url(inputs: &InputOptions) -> Option<PathBuf> {
     let root_url = config_path.parent().unwrap_or(Path::new(""));
     let cwd = std::env::current_dir().unwrap_or_default();
     // Canonicalize for comparison; if that fails, fall back to string comparison
-    let root_canonical =
-        std::fs::canonicalize(root_url).unwrap_or_else(|_| root_url.to_path_buf());
+    let root_canonical = std::fs::canonicalize(root_url).unwrap_or_else(|_| root_url.to_path_buf());
     let cwd_canonical = std::fs::canonicalize(&cwd).unwrap_or(cwd);
     if root_canonical == cwd_canonical {
         None
@@ -164,9 +163,8 @@ mod tests {
         // This will fail on deserialization (incomplete config), but it sets log level first
         let _ = inputs.get_codegen_configuration();
         // Log level should have been set to debug
-        use std::sync::atomic::Ordering;
-        let level =
-            apollo_codegen_lib::codegen_logger::LogLevel::Debug as u8;
+
+        let level = apollo_codegen_lib::codegen_logger::LogLevel::Debug as u8;
         // We can't easily read the static, but we verify it doesn't panic
         assert_eq!(level, 2);
     }

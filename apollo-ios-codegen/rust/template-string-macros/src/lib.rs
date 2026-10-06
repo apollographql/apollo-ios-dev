@@ -17,7 +17,7 @@
 //! );
 //! ```
 //!
-//! ## Interpolation types (mirror Swift's names per D-02):
+//! ## Interpolation types (mirror Swift's names):
 //!
 //! - `{expr}` -- string interpolation via `.to_string()`
 //! - `{if: cond, then_expr}` / `{if: cond, then_expr, else: else_expr}`

@@ -10,12 +10,12 @@ use ir::selection_set::TypeInfo;
 use ir::ComputedSelectionSet;
 
 use crate::capitalizer::Capitalizer;
-use crate::templates::ConfigurationContext;
 use crate::templates::rendering_helpers::ir_definition_rendering::{
     generated_definition_name_capitalized, generated_fragment_definition_name_capitalized,
 };
 use crate::templates::rendering_helpers::string_casing::first_uppercased;
 use crate::templates::rendering_helpers::string_swift_name_escaping::as_selection_set_name;
+use crate::templates::ConfigurationContext;
 
 use utilities::linked_list::NodeRef;
 
@@ -63,7 +63,9 @@ impl SelectionSetNameCache {
         };
         rendered(
             &field.underlying_field.type_,
-            &TypeRenderContext::SelectionSetField { force_non_null: false },
+            &TypeRenderContext::SelectionSetField {
+                force_non_null: false,
+            },
             Some(&name),
             self.config_ref(),
         )
@@ -125,12 +127,7 @@ impl SelectionSetNameGenerator {
         format: NameFormat,
         config: &ConfigurationContext,
     ) -> String {
-        Self::generated_selection_set_name(
-            &selection_set.type_info,
-            to_node,
-            format,
-            config,
-        )
+        Self::generated_selection_set_name(&selection_set.type_info, to_node, format, config)
     }
 
     /// Generates a selection set name for a MergedSource.
@@ -140,12 +137,7 @@ impl SelectionSetNameGenerator {
         format: NameFormat,
         config: &ConfigurationContext,
     ) -> String {
-        Self::generated_selection_set_name(
-            &source.type_info,
-            to_node,
-            format,
-            config,
-        )
+        Self::generated_selection_set_name(&source.type_info, to_node, format, config)
     }
 
     /// Generates a selection set name for a TypeInfo.
@@ -218,7 +210,8 @@ impl SelectionSetNameGenerator {
         config: &ConfigurationContext,
     ) -> String {
         // Set up starting nodes
-        let mut current_type_path_node: Option<NodeRef<'_, ir::ScopeDescriptor>> = Some(type_path_node);
+        let mut current_type_path_node: Option<NodeRef<'_, ir::ScopeDescriptor>> =
+            Some(type_path_node);
         let mut current_condition_node: Option<NodeRef<'_, ScopeCondition>> =
             Some(type_path_node.value().scope_path.head_node());
         // Because the Location's field path starts on the first field (not the location's source),
@@ -273,9 +266,10 @@ impl SelectionSetNameGenerator {
             }
 
             // Advance to next entity
-            current_type_path_node = current_type_path_node.and_then(|n: NodeRef<'_, ir::ScopeDescriptor>| n.next());
-            current_condition_node =
-                current_type_path_node.map(|n: NodeRef<'_, ir::ScopeDescriptor>| n.value().scope_path.head_node());
+            current_type_path_node =
+                current_type_path_node.and_then(|n: NodeRef<'_, ir::ScopeDescriptor>| n.next());
+            current_condition_node = current_type_path_node
+                .map(|n: NodeRef<'_, ir::ScopeDescriptor>| n.value().scope_path.head_node());
             current_field_path_node = current_field_path_node
                 .and_then(|n: NodeRef<'_, FieldComponent>| n.next())
                 .or(field_path_node);
@@ -323,7 +317,10 @@ pub fn selection_set_name_component(condition: &ScopeCondition) -> String {
         result.push_str(&format!("As{}", type_name));
     }
     if let Some(ref conditions) = condition.conditions {
-        result.push_str(&format!("If{}", inclusion_conditions_type_name_components(conditions)));
+        result.push_str(&format!(
+            "If{}",
+            inclusion_conditions_type_name_components(conditions)
+        ));
     }
     result
 }
@@ -332,9 +329,7 @@ pub fn selection_set_name_component(condition: &ScopeCondition) -> String {
 ///
 /// Mirrors Swift's `CompilationResult.DeferCondition.renderedTypeName` extension
 /// from `SelectionSetTemplate.swift` (lines 1251-1254).
-pub fn defer_condition_rendered_type_name(
-    condition: &graphql_compiler::DeferCondition,
-) -> String {
+pub fn defer_condition_rendered_type_name(condition: &graphql_compiler::DeferCondition) -> String {
     use crate::templates::rendering_helpers::string_swift_name_escaping::convert_to_camel_case;
     let camel = convert_to_camel_case(&condition.label);
     let uppercased = first_uppercased(&camel);
@@ -359,7 +354,12 @@ fn render_composite_type_name(type_: &graphql_compiler::GraphQLCompositeType) ->
             graphql_compiler::GraphQLNamedType::Union(u.clone())
         }
     };
-    render_named_type(&named, &RenderContext::Typename { is_input_value: false })
+    render_named_type(
+        &named,
+        &RenderContext::Typename {
+            is_input_value: false,
+        },
+    )
 }
 
 /// Formats a FieldComponent as a selection set name (uppercased, singularized if list).
@@ -394,12 +394,10 @@ fn formatted_selection_set_name_for_source(
 /// Renders the type name components for inclusion conditions.
 ///
 /// Mirrors Swift's `IR.InclusionConditions.typeNameComponents` extension.
-fn inclusion_conditions_type_name_components(
-    conditions: &ir::InclusionConditions,
-) -> String {
+fn inclusion_conditions_type_name_components(conditions: &ir::InclusionConditions) -> String {
     let parts: Vec<String> = conditions
         .iter()
-        .map(|c| inclusion_condition_type_name_component(c))
+        .map(inclusion_condition_type_name_component)
         .collect();
     parts.join("And")
 }
@@ -407,9 +405,7 @@ fn inclusion_conditions_type_name_components(
 /// Renders a single inclusion condition as a type name component.
 ///
 /// Mirrors Swift's `IR.InclusionCondition.typeNameComponent` extension.
-fn inclusion_condition_type_name_component(
-    condition: &ir::InclusionCondition,
-) -> String {
+fn inclusion_condition_type_name_component(condition: &ir::InclusionCondition) -> String {
     let prefix = if condition.is_inverted { "Not" } else { "" };
     format!("{}{}", prefix, first_uppercased(&condition.variable))
 }
@@ -466,10 +462,7 @@ mod tests {
         let cond = ScopeCondition::with_conditions(InclusionConditions::new(
             InclusionCondition::include_if("showDetails".to_string()),
         ));
-        assert_eq!(
-            selection_set_name_component(&cond),
-            "IfShowDetails"
-        );
+        assert_eq!(selection_set_name_component(&cond), "IfShowDetails");
     }
 
     #[test]
@@ -479,10 +472,7 @@ mod tests {
         let cond = ScopeCondition::with_conditions(InclusionConditions::new(
             InclusionCondition::skip_if("hideField".to_string()),
         ));
-        assert_eq!(
-            selection_set_name_component(&cond),
-            "IfNotHideField"
-        );
+        assert_eq!(selection_set_name_component(&cond), "IfNotHideField");
     }
 
     #[test]
@@ -495,10 +485,7 @@ mod tests {
                 variable: None,
             }),
         );
-        assert_eq!(
-            selection_set_name_component(&cond),
-            "DetailsSection"
-        );
+        assert_eq!(selection_set_name_component(&cond), "DetailsSection");
     }
 
     #[test]
@@ -517,22 +504,19 @@ mod tests {
         });
         let cond = ScopeCondition::new(
             Some(GraphQLCompositeType::Object(obj)),
-            Some(InclusionConditions::new(
-                InclusionCondition::include_if("showDog".to_string()),
-            )),
+            Some(InclusionConditions::new(InclusionCondition::include_if(
+                "showDog".to_string(),
+            ))),
             None,
         );
-        assert_eq!(
-            selection_set_name_component(&cond),
-            "AsDogIfShowDog"
-        );
+        assert_eq!(selection_set_name_component(&cond), "AsDogIfShowDog");
     }
 
     #[test]
     fn test_name_cache_returns_cached_value() {
         use graphql_compiler::{
-            compilation_result, GraphQLCompositeType, GraphQLName,
-            GraphQLNamedType, GraphQLObjectType,
+            compilation_result, GraphQLCompositeType, GraphQLName, GraphQLNamedType,
+            GraphQLObjectType,
         };
         use indexmap::IndexMap;
         use ir::entity::{Entity, SourceDefinition};

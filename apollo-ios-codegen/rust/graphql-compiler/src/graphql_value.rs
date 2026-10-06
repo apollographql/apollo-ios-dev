@@ -67,8 +67,8 @@ mod tests {
 
     #[test]
     fn test_float_variant() {
-        let val = GraphQLValue::Float(3.14);
-        assert_eq!(val, GraphQLValue::Float(3.14));
+        let val = GraphQLValue::Float(2.75);
+        assert_eq!(val, GraphQLValue::Float(2.75));
     }
 
     #[test]
@@ -97,10 +97,7 @@ mod tests {
 
     #[test]
     fn test_list_variant() {
-        let val = GraphQLValue::List(vec![
-            GraphQLValue::Int(1),
-            GraphQLValue::Int(2),
-        ]);
+        let val = GraphQLValue::List(vec![GraphQLValue::Int(1), GraphQLValue::Int(2)]);
         if let GraphQLValue::List(items) = &val {
             assert_eq!(items.len(), 2);
         } else {

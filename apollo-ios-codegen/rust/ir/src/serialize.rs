@@ -1,4 +1,4 @@
-//! IR Serialization for comparison testing (D-33).
+//! IR Serialization for comparison testing.
 //!
 //! Provides canonical JSON serialization for IR types via `serde_json::Value` construction.
 //! Uses direct Value construction instead of `serde::Serialize` trait impls to avoid
@@ -14,13 +14,11 @@
 //! - ScopeDescriptor -> skip all_types_in_schema
 //! - GraphQLCompositeType/GraphQLType -> Display string to avoid recursive schema types
 
-use std::sync::Arc;
-
 use serde_json::{json, Map, Value};
 
 use crate::definition_entity_storage::DefinitionEntityStorage;
 use crate::direct_selections::DirectSelections;
-use crate::entity::{Entity, FieldComponent, Location, SourceDefinition};
+use crate::entity::{FieldComponent, Location, SourceDefinition};
 use crate::fields::{EntityField, Field, ScalarField};
 use crate::inclusion_conditions::{AnyOf, InclusionCondition, InclusionConditions};
 use crate::inline_fragment_spread::InlineFragmentSpread;
@@ -32,13 +30,13 @@ use crate::selection_set::{SelectionSet, TypeInfo};
 
 // MARK: - Top-level serialization functions
 
-/// Serialize an Operation to canonical JSON for comparison testing (D-33).
+/// Serialize an Operation to canonical JSON for comparison testing.
 pub fn serialize_operation_to_json(operation: &Operation) -> String {
     let value = operation_to_value(operation);
     serde_json::to_string_pretty(&value).expect("IR serialization failed")
 }
 
-/// Serialize a NamedFragment to canonical JSON for comparison testing (D-33).
+/// Serialize a NamedFragment to canonical JSON for comparison testing.
 pub fn serialize_fragment_to_json(fragment: &NamedFragment) -> String {
     let value = named_fragment_to_value(fragment);
     serde_json::to_string_pretty(&value).expect("IR serialization failed")
@@ -86,9 +84,15 @@ fn scalar_field_to_value(f: &ScalarField) -> Value {
     if let Some(ref alias) = f.underlying_field.alias {
         obj.insert("alias".to_string(), json!(alias));
     }
-    obj.insert("type".to_string(), json!(f.underlying_field.type_.to_string()));
+    obj.insert(
+        "type".to_string(),
+        json!(f.underlying_field.type_.to_string()),
+    );
     if let Some(ref conditions) = f.inclusion_conditions {
-        obj.insert("inclusion_conditions".to_string(), any_of_conditions_to_value(conditions));
+        obj.insert(
+            "inclusion_conditions".to_string(),
+            any_of_conditions_to_value(conditions),
+        );
     }
     Value::Object(obj)
 }
@@ -100,11 +104,20 @@ fn entity_field_to_value(f: &EntityField) -> Value {
     if let Some(ref alias) = f.underlying_field.alias {
         obj.insert("alias".to_string(), json!(alias));
     }
-    obj.insert("type".to_string(), json!(f.underlying_field.type_.to_string()));
+    obj.insert(
+        "type".to_string(),
+        json!(f.underlying_field.type_.to_string()),
+    );
     if let Some(ref conditions) = f.inclusion_conditions {
-        obj.insert("inclusion_conditions".to_string(), any_of_conditions_to_value(conditions));
+        obj.insert(
+            "inclusion_conditions".to_string(),
+            any_of_conditions_to_value(conditions),
+        );
     }
-    obj.insert("selection_set".to_string(), selection_set_to_value(&f.selection_set));
+    obj.insert(
+        "selection_set".to_string(),
+        selection_set_to_value(&f.selection_set),
+    );
     Value::Object(obj)
 }
 
@@ -114,7 +127,10 @@ fn selection_set_to_value(ss: &SelectionSet) -> Value {
     let mut obj = Map::new();
     obj.insert("type_info".to_string(), type_info_to_value(&ss.type_info));
     if let Some(ref selections) = ss.selections {
-        obj.insert("selections".to_string(), direct_selections_to_value(selections));
+        obj.insert(
+            "selections".to_string(),
+            direct_selections_to_value(selections),
+        );
     }
     Value::Object(obj)
 }
@@ -130,13 +146,19 @@ fn type_info_to_value(ti: &TypeInfo) -> Value {
 // MARK: - DirectSelections
 
 fn direct_selections_to_value(ds: &DirectSelections) -> Value {
-    let fields: Map<String, Value> = ds.fields.iter()
+    let fields: Map<String, Value> = ds
+        .fields
+        .iter()
         .map(|(k, v)| (k.clone(), field_to_value(v)))
         .collect();
-    let inlines: Map<String, Value> = ds.inline_fragments.iter()
+    let inlines: Map<String, Value> = ds
+        .inline_fragments
+        .iter()
         .map(|(k, v)| (k.to_string(), inline_fragment_spread_to_value(v)))
         .collect();
-    let named: Map<String, Value> = ds.named_fragments.iter()
+    let named: Map<String, Value> = ds
+        .named_fragments
+        .iter()
         .map(|(k, v)| (k.clone(), named_fragment_spread_to_value(v)))
         .collect();
     json!({
@@ -158,21 +180,15 @@ fn named_fragment_spread_to_value(nfs: &NamedFragmentSpread) -> Value {
     obj.insert("fragment_name".to_string(), json!(nfs.fragment.name()));
     obj.insert("type_info".to_string(), type_info_to_value(&nfs.type_info));
     if let Some(ref conditions) = nfs.inclusion_conditions {
-        obj.insert("inclusion_conditions".to_string(), any_of_conditions_to_value(conditions));
+        obj.insert(
+            "inclusion_conditions".to_string(),
+            any_of_conditions_to_value(conditions),
+        );
     }
     Value::Object(obj)
 }
 
 // MARK: - Entity & Location
-
-fn entity_to_value(entity: &Entity) -> Value {
-    json!({
-        "location": location_to_value(&entity.location),
-        "root_type_path": entity.root_type_path().iter()
-            .map(|t| t.to_string())
-            .collect::<Vec<_>>(),
-    })
-}
 
 fn location_to_value(loc: &Location) -> Value {
     json!({
@@ -197,9 +213,8 @@ fn field_component_to_value(fc: &FieldComponent) -> Value {
 // MARK: - Scope
 
 fn scope_descriptor_to_value(sd: &ScopeDescriptor) -> Value {
-    let matching_type_names: Vec<String> = sd.matching_types.iter()
-        .map(|t| t.to_string())
-        .collect();
+    let matching_type_names: Vec<String> =
+        sd.matching_types.iter().map(|t| t.to_string()).collect();
     json!({
         "type": sd.type_.to_string(),
         "scope_path": sd.scope_path.iter()
@@ -218,10 +233,13 @@ fn scope_condition_to_value(sc: &ScopeCondition) -> Value {
         obj.insert("conditions".to_string(), inclusion_conditions_to_value(c));
     }
     if let Some(ref d) = sc.defer_condition {
-        obj.insert("defer_condition".to_string(), json!({
-            "label": d.label,
-            "variable": d.variable,
-        }));
+        obj.insert(
+            "defer_condition".to_string(),
+            json!({
+                "label": d.label,
+                "variable": d.variable,
+            }),
+        );
     }
     Value::Object(obj)
 }
@@ -240,18 +258,28 @@ fn inclusion_conditions_to_value(ics: &InclusionConditions) -> Value {
 }
 
 fn any_of_conditions_to_value(any_of: &AnyOf<InclusionConditions>) -> Value {
-    Value::Array(any_of.elements.iter().map(inclusion_conditions_to_value).collect())
+    Value::Array(
+        any_of
+            .elements
+            .iter()
+            .map(inclusion_conditions_to_value)
+            .collect(),
+    )
 }
 
 // MARK: - DefinitionEntityStorage
 
 #[allow(dead_code)]
 fn definition_entity_storage_to_value(des: &DefinitionEntityStorage) -> Value {
-    let entities: Map<String, Value> = des.entities_for_fields.iter()
-        .map(|(loc, entity)| (
-            format!("{}", loc.source),
-            location_to_value(&entity.location),
-        ))
+    let entities: Map<String, Value> = des
+        .entities_for_fields
+        .iter()
+        .map(|(loc, entity)| {
+            (
+                format!("{}", loc.source),
+                location_to_value(&entity.location),
+            )
+        })
         .collect();
     Value::Object(entities)
 }

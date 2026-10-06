@@ -5,11 +5,11 @@
 
 use std::sync::Arc;
 
+#[cfg(test)]
 use graphql_compiler::graphql_type::GraphQLType;
 use graphql_compiler::schema::{GraphQLInputField, GraphQLInputObjectType, GraphQLNamedType};
 use indexmap::IndexMap;
 
-use crate::templates::SPI;
 use crate::config::composition::Composition;
 use crate::templates::rendering_helpers::graphql_input_field_rendered::{
     has_default_value, is_nullable, render_input_value_type,
@@ -19,6 +19,7 @@ use crate::templates::rendering_helpers::graphql_name_rendering::{
 };
 use crate::templates::rendering_helpers::template_string_deprecation::render_deprecation_reason;
 use crate::templates::rendering_helpers::template_string_documentation::render_documentation;
+use crate::templates::SPI;
 use crate::templates::{
     ConfigurationContext, NonFatalErrorRecorder, SchemaFileType, Scope, TemplateRenderer,
     TemplateTarget,
@@ -41,12 +42,8 @@ impl TemplateRenderer for InputObjectTemplate {
         TemplateTarget::SchemaFile(SchemaFileType::InputObject)
     }
 
-    fn render_body_template(
-        &self,
-        _non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
-        let (valid_fields, deprecated_fields) =
-            filter_fields(&self.graphql_input_object.fields);
+    fn render_body_template(&self, _non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
+        let (valid_fields, deprecated_fields) = filter_fields(&self.graphql_input_object.fields);
         let member_access_control = self.access_control_renderer(Scope::Member);
         let parent_access_control = self.access_control_renderer(Scope::Parent).render();
         let member_str = member_access_control.render();
@@ -55,7 +52,9 @@ impl TemplateRenderer for InputObjectTemplate {
 
         let typename = render_named_type(
             &GraphQLNamedType::InputObject(Arc::clone(&self.graphql_input_object)),
-            &RenderContext::Typename { is_input_value: false },
+            &RenderContext::Typename {
+                is_input_value: false,
+            },
         );
 
         let should_include_deprecated_warnings = self.should_include_deprecated_warnings();
@@ -169,8 +168,7 @@ impl InputObjectTemplate {
             .values()
             .map(|field| {
                 let field_name = render_input_field(field, &self.config);
-                let type_str =
-                    render_input_value_type(field, true, &self.config.config);
+                let type_str = render_input_value_type(field, true, &self.config.config);
                 format!("    {}: {}", field_name, type_str)
             })
             .collect();
@@ -186,12 +184,11 @@ impl InputObjectTemplate {
             .map(|field| {
                 let field_name = render_input_field(field, &self.config);
                 let schema_name = &field.name.schema_name;
-                let null_coalescing =
-                    if !is_nullable(field) && has_default_value(field) {
-                        " ?? GraphQLNullable.none"
-                    } else {
-                        ""
-                    };
+                let null_coalescing = if !is_nullable(field) && has_default_value(field) {
+                    " ?? GraphQLNullable.none"
+                } else {
+                    ""
+                };
                 format!(
                     "      \"{}\": {}{}",
                     schema_name, field_name, null_coalescing
@@ -210,11 +207,13 @@ impl InputObjectTemplate {
         let mut property_parts: Vec<String> = Vec::new();
 
         // Documentation
-        if let Some(doc) =
-            render_documentation(field.documentation.as_deref(), &self.config)
-        {
+        if let Some(doc) = render_documentation(field.documentation.as_deref(), &self.config) {
             // Indent every line of multiline doc comments
-            let indented = doc.lines().map(|line| format!("  {}", line)).collect::<Vec<_>>().join("\n");
+            let indented = doc
+                .lines()
+                .map(|line| format!("  {}", line))
+                .collect::<Vec<_>>()
+                .join("\n");
             property_parts.push(indented);
         }
 
@@ -222,7 +221,11 @@ impl InputObjectTemplate {
         if let Some(depr) =
             render_deprecation_reason(field.deprecation_reason.as_deref(), &self.config)
         {
-            let indented = depr.lines().map(|line| format!("  {}", line)).collect::<Vec<_>>().join("\n");
+            let indented = depr
+                .lines()
+                .map(|line| format!("  {}", line))
+                .collect::<Vec<_>>()
+                .join("\n");
             property_parts.push(indented);
         }
 
@@ -271,9 +274,7 @@ mod tests {
     const INT_SWIFT_TYPE: &str = "Int32";
     use graphql_compiler::graphql_name::GraphQLName;
     use graphql_compiler::graphql_value::GraphQLValue;
-    use graphql_compiler::schema::{
-        GraphQLEnumType, GraphQLScalarType,
-    };
+    use graphql_compiler::schema::{GraphQLEnumType, GraphQLScalarType};
 
     fn make_config(json: &str) -> ConfigurationContext {
         let config: ApolloCodegenConfiguration = serde_json::from_str(json).unwrap();
@@ -389,13 +390,11 @@ mod tests {
     }
 
     fn make_string_type() -> GraphQLType {
-        GraphQLType::NonNull(Box::new(GraphQLType::Scalar(Arc::new(
-            GraphQLScalarType {
-                name: GraphQLName::new("String".to_string()),
-                documentation: None,
-                specified_by_url: None,
-            },
-        ))))
+        GraphQLType::NonNull(Box::new(GraphQLType::Scalar(Arc::new(GraphQLScalarType {
+            name: GraphQLName::new("String".to_string()),
+            documentation: None,
+            specified_by_url: None,
+        }))))
     }
 
     fn make_nullable_string_type() -> GraphQLType {
@@ -527,22 +526,6 @@ mod tests {
         })
     }
 
-    fn make_input_object_custom_name(
-        name: &str,
-        custom_name: &str,
-        fields: Vec<(String, GraphQLInputField)>,
-    ) -> Arc<GraphQLInputObjectType> {
-        let field_map: IndexMap<String, GraphQLInputField> = fields.into_iter().collect();
-        let mut gql_name = GraphQLName::new(name.to_string());
-        gql_name.custom_name = Some(custom_name.to_string());
-        Arc::new(GraphQLInputObjectType {
-            name: gql_name,
-            documentation: None,
-            is_one_of: false,
-            fields: field_map,
-        })
-    }
-
     fn render_body(template: &InputObjectTemplate) -> String {
         let recorder = NonFatalErrorRecorder::new();
         template.render_body_template(&recorder)
@@ -552,7 +535,10 @@ mod tests {
 
     #[test]
     fn test_render_generates_input_object_with_input_dict_variable_and_initializer() {
-        let input = make_input_object("mockInput", vec![make_field("field", make_non_null_int_type())]);
+        let input = make_input_object(
+            "mockInput",
+            vec![make_field("field", make_non_null_int_type())],
+        );
         let template = InputObjectTemplate {
             graphql_input_object: input,
             config: spm_config(),
@@ -591,11 +577,33 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("public struct MockInput: InputObject {"), "actual:\n{}", actual);
-        assert!(actual.contains("public private(set) var __data: InputDict"), "actual:\n{}", actual);
-        assert!(actual.contains("public init(\n    fieldTwo: String\n  )"), "actual:\n{}", actual);
-        assert!(actual.contains("@available(*, deprecated, message: \"Argument 'fieldOne' is deprecated.\")"), "actual:\n{}", actual);
-        assert!(actual.contains("@available(*, deprecated, message: \"Not used anymore!\")"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("public struct MockInput: InputObject {"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("public private(set) var __data: InputDict"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("public init(\n    fieldTwo: String\n  )"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(
+                "@available(*, deprecated, message: \"Argument 'fieldOne' is deprecated.\")"
+            ),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("@available(*, deprecated, message: \"Not used anymore!\")"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
@@ -613,11 +621,23 @@ mod tests {
         };
         let actual = render_body(&template);
         // Parent scope in embedded = no access modifier
-        assert!(actual.contains("struct MockInput: InputObject {"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("struct MockInput: InputObject {"),
+            "actual:\n{}",
+            actual
+        );
         assert!(!actual.starts_with("public struct"), "actual:\n{}", actual);
         // Member scope in embedded public = public
-        assert!(actual.contains("public private(set) var __data: InputDict"), "actual:\n{}", actual);
-        assert!(actual.contains("public init(\n    fieldTwo: String\n  )"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("public private(set) var __data: InputDict"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("public init(\n    fieldTwo: String\n  )"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
@@ -634,45 +654,78 @@ mod tests {
             config: embedded_internal_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("struct MockInput: InputObject {"), "actual:\n{}", actual);
-        assert!(actual.contains("private(set) var __data: InputDict"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("struct MockInput: InputObject {"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("private(set) var __data: InputDict"),
+            "actual:\n{}",
+            actual
+        );
         assert!(!actual.contains("public"), "actual:\n{}", actual);
-        assert!(actual.contains("init(\n    fieldTwo: String\n  )"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("init(\n    fieldTwo: String\n  )"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     // MARK: - Casing Tests
 
     #[test]
     fn test_render_lowercased_input_object_name() {
-        let input = make_input_object("mockInput", vec![make_field("field", make_non_null_int_type())]);
+        let input = make_input_object(
+            "mockInput",
+            vec![make_field("field", make_non_null_int_type())],
+        );
         let template = InputObjectTemplate {
             graphql_input_object: input,
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("public struct MockInput: InputObject {"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("public struct MockInput: InputObject {"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
     fn test_render_uppercased_input_object_name() {
-        let input = make_input_object("MOCKInput", vec![make_field("field", make_non_null_int_type())]);
+        let input = make_input_object(
+            "MOCKInput",
+            vec![make_field("field", make_non_null_int_type())],
+        );
         let template = InputObjectTemplate {
             graphql_input_object: input,
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("public struct MOCKInput: InputObject {"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("public struct MOCKInput: InputObject {"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
     fn test_render_mixed_case_input_object_name() {
-        let input = make_input_object("mOcK_Input", vec![make_field("field", make_non_null_int_type())]);
+        let input = make_input_object(
+            "mOcK_Input",
+            vec![make_field("field", make_non_null_int_type())],
+        );
         let template = InputObjectTemplate {
             graphql_input_object: input,
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("public struct MOcK_Input: InputObject {"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("public struct MOcK_Input: InputObject {"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     // MARK: - Field Type Tests
@@ -685,8 +738,22 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains(&format!("nullable: GraphQLNullable<{}> = nil", INT_SWIFT_TYPE)), "actual:\n{}", actual);
-        assert!(actual.contains(&format!("public var nullable: GraphQLNullable<{}> {{", INT_SWIFT_TYPE)), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&format!(
+                "nullable: GraphQLNullable<{}> = nil",
+                INT_SWIFT_TYPE
+            )),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&format!(
+                "public var nullable: GraphQLNullable<{}> {{",
+                INT_SWIFT_TYPE
+            )),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
@@ -704,19 +771,37 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains(&format!("nullableWithDefault: GraphQLNullable<{}> = nil", INT_SWIFT_TYPE)), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&format!(
+                "nullableWithDefault: GraphQLNullable<{}> = nil",
+                INT_SWIFT_TYPE
+            )),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
     fn test_render_non_nullable_field_no_default() {
-        let input = make_input_object("MockInput", vec![make_field("nonNullable", make_non_null_int_type())]);
+        let input = make_input_object(
+            "MockInput",
+            vec![make_field("nonNullable", make_non_null_int_type())],
+        );
         let template = InputObjectTemplate {
             graphql_input_object: input,
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains(&format!("nonNullable: {}\n  )", INT_SWIFT_TYPE)), "actual:\n{}", actual);
-        assert!(actual.contains(&format!("public var nonNullable: {} {{", INT_SWIFT_TYPE)), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&format!("nonNullable: {}\n  )", INT_SWIFT_TYPE)),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&format!("public var nonNullable: {} {{", INT_SWIFT_TYPE)),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
@@ -734,9 +819,27 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains(&format!("nonNullableWithDefault: {}? = nil", INT_SWIFT_TYPE)), "actual:\n{}", actual);
-        assert!(actual.contains("\"nonNullableWithDefault\": nonNullableWithDefault"), "actual:\n{}", actual);
-        assert!(actual.contains(&format!("public var nonNullableWithDefault: {}? {{", INT_SWIFT_TYPE)), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&format!(
+                "nonNullableWithDefault: {}? = nil",
+                INT_SWIFT_TYPE
+            )),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("\"nonNullableWithDefault\": nonNullableWithDefault"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&format!(
+                "public var nonNullableWithDefault: {}? {{",
+                INT_SWIFT_TYPE
+            )),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
@@ -756,16 +859,21 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("nullableListNullableItem: GraphQLNullable<[String?]> = nil"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("nullableListNullableItem: GraphQLNullable<[String?]> = nil"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
     fn test_render_nullable_list_non_nullable_item() {
-        let inner = GraphQLType::NonNull(Box::new(GraphQLType::Scalar(Arc::new(GraphQLScalarType {
-            name: GraphQLName::new("String".to_string()),
-            documentation: None,
-            specified_by_url: None,
-        }))));
+        let inner =
+            GraphQLType::NonNull(Box::new(GraphQLType::Scalar(Arc::new(GraphQLScalarType {
+                name: GraphQLName::new("String".to_string()),
+                documentation: None,
+                specified_by_url: None,
+            }))));
         let list_type = GraphQLType::List(Box::new(inner));
         let input = make_input_object(
             "MockInput",
@@ -776,7 +884,11 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("nullableListNonNullableItem: GraphQLNullable<[String]> = nil"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("nullableListNonNullableItem: GraphQLNullable<[String]> = nil"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
@@ -796,7 +908,11 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("nonNullableListNullableItem: [String?]\n  )"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("nonNullableListNullableItem: [String?]\n  )"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
@@ -820,17 +936,22 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("nonNullableListNullableItemWithDefault: [String?]? = nil"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("nonNullableListNullableItemWithDefault: [String?]? = nil"),
+            "actual:\n{}",
+            actual
+        );
         assert!(actual.contains("\"nonNullableListNullableItemWithDefault\": nonNullableListNullableItemWithDefault ?? GraphQLNullable.none\n"), "actual:\n{}", actual);
     }
 
     #[test]
     fn test_render_non_null_list_non_null_item_no_default() {
-        let inner = GraphQLType::NonNull(Box::new(GraphQLType::Scalar(Arc::new(GraphQLScalarType {
-            name: GraphQLName::new("String".to_string()),
-            documentation: None,
-            specified_by_url: None,
-        }))));
+        let inner =
+            GraphQLType::NonNull(Box::new(GraphQLType::Scalar(Arc::new(GraphQLScalarType {
+                name: GraphQLName::new("String".to_string()),
+                documentation: None,
+                specified_by_url: None,
+            }))));
         let list_type = GraphQLType::NonNull(Box::new(GraphQLType::List(Box::new(inner))));
         let input = make_input_object(
             "MockInput",
@@ -841,16 +962,21 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("nonNullableListNonNullableItem: [String]\n  )"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("nonNullableListNonNullableItem: [String]\n  )"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
     fn test_render_non_null_list_non_null_item_with_default() {
-        let inner = GraphQLType::NonNull(Box::new(GraphQLType::Scalar(Arc::new(GraphQLScalarType {
-            name: GraphQLName::new("String".to_string()),
-            documentation: None,
-            specified_by_url: None,
-        }))));
+        let inner =
+            GraphQLType::NonNull(Box::new(GraphQLType::Scalar(Arc::new(GraphQLScalarType {
+                name: GraphQLName::new("String".to_string()),
+                documentation: None,
+                specified_by_url: None,
+            }))));
         let list_type = GraphQLType::NonNull(Box::new(GraphQLType::List(Box::new(inner))));
         let input = make_input_object(
             "MockInput",
@@ -865,7 +991,11 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("nonNullableListNonNullableItemWithDefault: [String]? = nil"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("nonNullableListNonNullableItemWithDefault: [String]? = nil"),
+            "actual:\n{}",
+            actual
+        );
         // 2.0.0+: optional initializer parameters are null-coalesced into the InputDict
         assert!(actual.contains("\"nonNullableListNonNullableItemWithDefault\": nonNullableListNonNullableItemWithDefault ?? GraphQLNullable.none\n"), "actual:\n{}", actual);
     }
@@ -888,7 +1018,9 @@ mod tests {
         };
         let actual = render_body(&template);
         assert!(
-            actual.contains("nullableListNullableItem: GraphQLNullable<[GraphQLEnum<EnumValue>?]> = nil"),
+            actual.contains(
+                "nullableListNullableItem: GraphQLNullable<[GraphQLEnum<EnumValue>?]> = nil"
+            ),
             "actual:\n{}",
             actual
         );
@@ -900,7 +1032,11 @@ mod tests {
     fn test_render_with_documentation_include() {
         let input = make_input_object_with_docs(
             "MockInput",
-            vec![make_field_with_docs("fieldOne", make_string_type(), "Field Documentation!")],
+            vec![make_field_with_docs(
+                "fieldOne",
+                make_string_type(),
+                "Field Documentation!",
+            )],
             "This is some great documentation!",
         );
         let template = InputObjectTemplate {
@@ -908,15 +1044,27 @@ mod tests {
             config: spm_config_with_options("include", "include"),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("/// This is some great documentation!"), "actual:\n{}", actual);
-        assert!(actual.contains("/// Field Documentation!"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("/// This is some great documentation!"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("/// Field Documentation!"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
     fn test_render_with_documentation_exclude() {
         let input = make_input_object_with_docs(
             "MockInput",
-            vec![make_field_with_docs("fieldOne", make_string_type(), "Field Documentation!")],
+            vec![make_field_with_docs(
+                "fieldOne",
+                make_string_type(),
+                "Field Documentation!",
+            )],
             "This is some great documentation!",
         );
         let template = InputObjectTemplate {
@@ -924,8 +1072,16 @@ mod tests {
             config: spm_config_with_options("exclude", "include"),
         };
         let actual = render_body(&template);
-        assert!(!actual.contains("/// This is some great documentation!"), "actual:\n{}", actual);
-        assert!(!actual.contains("/// Field Documentation!"), "actual:\n{}", actual);
+        assert!(
+            !actual.contains("/// This is some great documentation!"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            !actual.contains("/// Field Documentation!"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     // MARK: - Deprecation Tests
@@ -934,22 +1090,40 @@ mod tests {
     fn test_render_deprecated_field_include_warnings() {
         let input = make_input_object(
             "MockInput",
-            vec![make_field_deprecated("fieldOne", make_string_type(), "Not used anymore!")],
+            vec![make_field_deprecated(
+                "fieldOne",
+                make_string_type(),
+                "Not used anymore!",
+            )],
         );
         let template = InputObjectTemplate {
             graphql_input_object: input,
             config: spm_config_with_options("include", "include"),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("@available(*, deprecated, message: \"Argument 'fieldOne' is deprecated.\")"), "actual:\n{}", actual);
-        assert!(actual.contains("@available(*, deprecated, message: \"Not used anymore!\")"), "actual:\n{}", actual);
+        assert!(
+            actual.contains(
+                "@available(*, deprecated, message: \"Argument 'fieldOne' is deprecated.\")"
+            ),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("@available(*, deprecated, message: \"Not used anymore!\")"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
     fn test_render_only_deprecated_fields_include_warnings_no_valid_initializer() {
         let input = make_input_object(
             "MockInput",
-            vec![make_field_deprecated("fieldOne", make_string_type(), "Not used anymore!")],
+            vec![make_field_deprecated(
+                "fieldOne",
+                make_string_type(),
+                "Not used anymore!",
+            )],
         );
         let template = InputObjectTemplate {
             graphql_input_object: input,
@@ -957,18 +1131,32 @@ mod tests {
         };
         let actual = render_body(&template);
         // Should have the deprecated annotation on the initializer
-        assert!(actual.contains("@available(*, deprecated, message: \"Argument 'fieldOne' is deprecated.\")"), "actual:\n{}", actual);
+        assert!(
+            actual.contains(
+                "@available(*, deprecated, message: \"Argument 'fieldOne' is deprecated.\")"
+            ),
+            "actual:\n{}",
+            actual
+        );
         // Should have 2 inits: __data init + deprecated all-fields init (both public)
         // (the `InputDict` initializer carries an `@_spi` attribute from 2.0.0)
         let init_count = actual.matches("public init(").count();
-        assert_eq!(init_count, 2, "Should have exactly 2 public init (data init + all-fields), actual:\n{}", actual);
+        assert_eq!(
+            init_count, 2,
+            "Should have exactly 2 public init (data init + all-fields), actual:\n{}",
+            actual
+        );
     }
 
     #[test]
     fn test_render_deprecated_field_exclude_warnings() {
         let input = make_input_object(
             "MockInput",
-            vec![make_field_deprecated("fieldOne", make_string_type(), "Not used anymore!")],
+            vec![make_field_deprecated(
+                "fieldOne",
+                make_string_type(),
+                "Not used anymore!",
+            )],
         );
         let template = InputObjectTemplate {
             graphql_input_object: input,
@@ -995,7 +1183,11 @@ mod tests {
         };
         let actual = render_body(&template);
         // Valid initializer with only non-deprecated fields
-        assert!(actual.contains("public init(\n    fieldTwo: String,\n    fieldThree: String\n  )"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("public init(\n    fieldTwo: String,\n    fieldThree: String\n  )"),
+            "actual:\n{}",
+            actual
+        );
         // Deprecated annotation listing both deprecated fields
         assert!(
             actual.contains("@available(*, deprecated, message: \"Arguments 'fieldOne, fieldFour' are deprecated.\")"),
@@ -1003,8 +1195,16 @@ mod tests {
             actual
         );
         // Individual field deprecation annotations
-        assert!(actual.contains("@available(*, deprecated, message: \"Not used anymore!\")"), "actual:\n{}", actual);
-        assert!(actual.contains("@available(*, deprecated, message: \"Stop using this field!\")"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("@available(*, deprecated, message: \"Not used anymore!\")"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("@available(*, deprecated, message: \"Stop using this field!\")"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
@@ -1024,7 +1224,11 @@ mod tests {
         let actual = render_body(&template);
         // Should have only one initializer with all fields
         assert!(!actual.contains("@available"), "actual:\n{}", actual);
-        assert!(actual.contains("fieldOne: String,\n    fieldTwo: String,\n    fieldThree: String"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("fieldOne: String,\n    fieldTwo: String,\n    fieldThree: String"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
@@ -1044,39 +1248,73 @@ mod tests {
             config: spm_config_with_options("include", "include"),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("/// This is some great documentation!"), "actual:\n{}", actual);
-        assert!(actual.contains("/// Field Documentation!"), "actual:\n{}", actual);
-        assert!(actual.contains("@available(*, deprecated, message: \"Not used anymore!\")"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("/// This is some great documentation!"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("/// Field Documentation!"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("@available(*, deprecated, message: \"Not used anymore!\")"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     // MARK: - Field name casing tests
 
     #[test]
     fn test_render_mixed_case_field_name_uses_schema_name_in_dict() {
-        let input = make_input_object("MockInput", vec![make_field("Field", make_nullable_string_type())]);
+        let input = make_input_object(
+            "MockInput",
+            vec![make_field("Field", make_nullable_string_type())],
+        );
         let template = InputObjectTemplate {
             graphql_input_object: input,
             config: spm_config(),
         };
         let actual = render_body(&template);
         // The initializer parameter should use camelCase (field)
-        assert!(actual.contains("field: GraphQLNullable<String> = nil"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("field: GraphQLNullable<String> = nil"),
+            "actual:\n{}",
+            actual
+        );
         // The dict key should use the schema name (Field)
         assert!(actual.contains("\"Field\": field"), "actual:\n{}", actual);
         // Property getter/setter should use schema name
-        assert!(actual.contains("get { __data[\"Field\"] }"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("get { __data[\"Field\"] }"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
     fn test_render_all_uppercase_field_name() {
-        let input = make_input_object("MockInput", vec![make_field("FIELDNAME", make_nullable_string_type())]);
+        let input = make_input_object(
+            "MockInput",
+            vec![make_field("FIELDNAME", make_nullable_string_type())],
+        );
         let template = InputObjectTemplate {
             graphql_input_object: input,
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("fieldname: GraphQLNullable<String> = nil"), "actual:\n{}", actual);
-        assert!(actual.contains("\"FIELDNAME\": fieldname"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("fieldname: GraphQLNullable<String> = nil"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("\"FIELDNAME\": fieldname"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     // MARK: - Reserved Keyword Tests
@@ -1084,7 +1322,8 @@ mod tests {
     #[test]
     fn test_render_reserved_keyword_type_name() {
         for keyword in &["Type", "type"] {
-            let input = make_input_object(keyword, vec![make_field("field", make_non_null_int_type())]);
+            let input =
+                make_input_object(keyword, vec![make_field("field", make_non_null_int_type())]);
             let template = InputObjectTemplate {
                 graphql_input_object: input,
                 config: spm_config(),
@@ -1117,7 +1356,11 @@ mod tests {
         let actual = render_body(&template);
         assert!(actual.contains("`class`: String"), "actual:\n{}", actual);
         assert!(actual.contains("\"class\": `class`"), "actual:\n{}", actual);
-        assert!(actual.contains("public var `class`: String {"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("public var `class`: String {"),
+            "actual:\n{}",
+            actual
+        );
         assert!(actual.contains("`self`: String"), "actual:\n{}", actual);
     }
 
@@ -1136,13 +1379,16 @@ mod tests {
         };
 
         let mut fields: IndexMap<String, GraphQLInputField> = IndexMap::new();
-        fields.insert("fieldOne".to_string(), GraphQLInputField {
-            name: GraphQLName::new("fieldOne".to_string()),
-            type_: make_string_type(),
-            documentation: None,
-            deprecation_reason: None,
-            default_value: None,
-        });
+        fields.insert(
+            "fieldOne".to_string(),
+            GraphQLInputField {
+                name: GraphQLName::new("fieldOne".to_string()),
+                type_: make_string_type(),
+                documentation: None,
+                deprecation_reason: None,
+                default_value: None,
+            },
+        );
         fields.insert("myField".to_string(), custom_field);
 
         let mut gql_name = GraphQLName::new("MyInputObject".to_string());
@@ -1159,11 +1405,31 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("// Renamed from GraphQL schema value: 'MyInputObject'"), "actual:\n{}", actual);
-        assert!(actual.contains("struct MyCustomInputObject: InputObject"), "actual:\n{}", actual);
-        assert!(actual.contains("myCustomField: String"), "actual:\n{}", actual);
-        assert!(actual.contains("\"myField\": myCustomField"), "actual:\n{}", actual);
-        assert!(actual.contains("// Renamed from GraphQL schema value: 'myField'"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("// Renamed from GraphQL schema value: 'MyInputObject'"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("struct MyCustomInputObject: InputObject"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("myCustomField: String"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("\"myField\": myCustomField"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("// Renamed from GraphQL schema value: 'myField'"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     // MARK: - Namespace Tests
@@ -1193,8 +1459,16 @@ mod tests {
             config: spm_relative_config_with_namespace("TestSchema"),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("GraphQLEnum<TestSchema.EnumValue>"), "actual:\n{}", actual);
-        assert!(actual.contains("TestSchema.InnerInputObject"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("GraphQLEnum<TestSchema.EnumValue>"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("TestSchema.InnerInputObject"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
@@ -1204,18 +1478,23 @@ mod tests {
             documentation: None,
             values: vec![],
         }));
-        let input = make_input_object(
-            "MockInput",
-            vec![make_field("enumField", enum_type)],
-        );
+        let input = make_input_object("MockInput", vec![make_field("enumField", enum_type)]);
         let template = InputObjectTemplate {
             graphql_input_object: input,
             config: spm_config_with_namespace("TestSchema"),
         };
         let actual = render_body(&template);
         // In schema module, no namespace prefix
-        assert!(actual.contains("GraphQLEnum<EnumValue>"), "actual:\n{}", actual);
-        assert!(!actual.contains("TestSchema.EnumValue"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("GraphQLEnum<EnumValue>"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            !actual.contains("TestSchema.EnumValue"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     // MARK: - Schema namespace casing tests
@@ -1227,16 +1506,17 @@ mod tests {
             documentation: None,
             values: vec![],
         }));
-        let input = make_input_object(
-            "MockInput",
-            vec![make_field("enumField", enum_type)],
-        );
+        let input = make_input_object("MockInput", vec![make_field("enumField", enum_type)]);
         let template = InputObjectTemplate {
             graphql_input_object: input,
             config: spm_relative_config_with_namespace("testschema"),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("Testschema.EnumValue"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("Testschema.EnumValue"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
@@ -1246,34 +1526,58 @@ mod tests {
             documentation: None,
             values: vec![],
         }));
-        let input = make_input_object(
-            "MockInput",
-            vec![make_field("enumField", enum_type)],
-        );
+        let input = make_input_object("MockInput", vec![make_field("enumField", enum_type)]);
         let template = InputObjectTemplate {
             graphql_input_object: input,
             config: spm_relative_config_with_namespace("TESTSCHEMA"),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("TESTSCHEMA.EnumValue"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("TESTSCHEMA.EnumValue"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     // MARK: - Single field with closing brace test
 
     #[test]
     fn test_render_single_field_type_complete_structure() {
-        let input = make_input_object("MockInput", vec![make_field("field", make_nullable_string_type())]);
+        let input = make_input_object(
+            "MockInput",
+            vec![make_field("field", make_nullable_string_type())],
+        );
         let template = InputObjectTemplate {
             graphql_input_object: input,
             config: spm_config(),
         };
         let actual = render_body(&template);
         // Check the full structure has init, dict entry, and property
-        assert!(actual.contains("public init(\n    field: GraphQLNullable<String> = nil\n  )"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("public init(\n    field: GraphQLNullable<String> = nil\n  )"),
+            "actual:\n{}",
+            actual
+        );
         assert!(actual.contains("\"field\": field"), "actual:\n{}", actual);
-        assert!(actual.contains("public var field: GraphQLNullable<String> {"), "actual:\n{}", actual);
-        assert!(actual.contains("get { __data[\"field\"] }"), "actual:\n{}", actual);
-        assert!(actual.contains("set { __data[\"field\"] = newValue }"), "actual:\n{}", actual);
-        assert!(actual.ends_with("}\n"), "actual should end with closing brace + newline, actual:\n{}", actual);
+        assert!(
+            actual.contains("public var field: GraphQLNullable<String> {"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("get { __data[\"field\"] }"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("set { __data[\"field\"] = newValue }"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.ends_with("}\n"),
+            "actual should end with closing brace + newline, actual:\n{}",
+            actual
+        );
     }
 }

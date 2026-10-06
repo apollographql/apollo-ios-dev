@@ -10,12 +10,9 @@
 use std::sync::Arc;
 
 use crate::templates::rendering_helpers::ir_definition_rendering::rendered_selection_set_type;
-use crate::templates::rendering_helpers::operation_template_renderer::{
-    self, VariableDefinition,
-};
+use crate::templates::rendering_helpers::operation_template_renderer::{self, VariableDefinition};
 use crate::templates::{
-    ConfigurationContext, NonFatalErrorRecorder, Scope,
-    TemplateRenderer, TemplateTarget,
+    ConfigurationContext, NonFatalErrorRecorder, Scope, TemplateRenderer, TemplateTarget,
 };
 
 use super::rendering_helpers::ir_definition_rendering::generated_definition_name_capitalized;
@@ -50,10 +47,7 @@ impl TemplateRenderer for LocalCacheMutationDefinitionTemplate {
         }
     }
 
-    fn render_body_template(
-        &self,
-        non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
+    fn render_body_template(&self, non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
         let member_access = self.access_control_renderer(Scope::Member);
         let parent_access = self.access_control_renderer(Scope::Parent);
         let member_access_str = member_access.render();
@@ -77,17 +71,14 @@ impl TemplateRenderer for LocalCacheMutationDefinitionTemplate {
         // operationType static let
         result.push_str(&format!(
             "  {}static let operationType: GraphQLOperationType = .{}\n",
-            member_access_str,
-            self.operation.definition.operation_type,
+            member_access_str, self.operation.definition.operation_type,
         ));
 
         // Variable properties (section: blank line before if non-empty)
         let variables = self.convert_variables();
         if !variables.is_empty() {
-            let var_props = operation_template_renderer::render_variable_properties(
-                &variables,
-                &self.config,
-            );
+            let var_props =
+                operation_template_renderer::render_variable_properties(&variables, &self.config);
             result.push('\n');
             result.push_str(&indent(&var_props, 2));
             result.push('\n');
@@ -112,11 +103,8 @@ impl TemplateRenderer for LocalCacheMutationDefinitionTemplate {
         result.push('\n');
 
         // Variable accessors (graphQLOperation: false for local cache mutations)
-        let var_accessors = operation_template_renderer::render_variable_accessors(
-            &variables,
-            &self.config,
-            false,
-        );
+        let var_accessors =
+            operation_template_renderer::render_variable_accessors(&variables, &self.config, false);
         if !var_accessors.is_empty() {
             result.push('\n');
             result.push_str(&indent(&var_accessors, 2));
@@ -142,7 +130,8 @@ impl TemplateRenderer for LocalCacheMutationDefinitionTemplate {
         result.push_str(&format!(
             "  {}{}struct Data: {} {{\n",
             self.config.nonisolated_modifier(),
-            member_access_str, selection_set_type
+            member_access_str,
+            selection_set_type
         ));
         result.push_str(&indent(&selection_body, 4));
         result.push_str("\n  }\n");
@@ -191,8 +180,8 @@ mod tests {
 
     #[test]
     fn test_rendered_selection_set_type_is_mutable() {
-        let config: crate::config::ApolloCodegenConfiguration =
-            serde_json::from_str(r#"{
+        let config: crate::config::ApolloCodegenConfiguration = serde_json::from_str(
+            r#"{
                 "schemaNamespace": "TestSchema",
                 "input": {},
                 "output": {
@@ -200,7 +189,9 @@ mod tests {
                     "operations": {"inSchemaModule": {}},
                     "testMocks": {"none": {}}
                 }
-            }"#).unwrap();
+            }"#,
+        )
+        .unwrap();
         let ctx = ConfigurationContext::new(config, None);
         let result = rendered_selection_set_type(&ctx, true);
         assert_eq!(result, "TestSchema.MutableSelectionSet");

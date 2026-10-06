@@ -83,13 +83,15 @@ mod tests {
     use crate::direct_selections::DirectSelections;
     use crate::entity::{Entity, SourceDefinition};
     use crate::fields::EntityField;
+    use crate::schema::ReferencedTypes;
+    use crate::scope_descriptor::ScopeDescriptor;
     use crate::selection_set::{SelectionSet, TypeInfo};
     use graphql_compiler::compilation_result::{
         OperationDefinition, OperationType, SelectionSet as CRSelectionSet,
     };
-    use graphql_compiler::{GraphQLCompositeType, GraphQLName, GraphQLObjectType, GraphQLScalarType, GraphQLType};
-    use crate::schema::ReferencedTypes;
-    use crate::scope_descriptor::ScopeDescriptor;
+    use graphql_compiler::{
+        GraphQLCompositeType, GraphQLName, GraphQLObjectType, GraphQLScalarType, GraphQLType,
+    };
     use graphql_compiler::{GraphQLNamedType, RootTypeDefinition};
     use indexmap::IndexMap;
     use utilities::linked_list::LinkedList;

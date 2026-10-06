@@ -43,10 +43,7 @@ impl SchemaModuleFileGenerator {
         config: &ConfigurationContext,
         file_manager: &ApolloFileManager,
     ) -> Result<Vec<NonFatalError>, std::io::Error> {
-        let path_base = resolve_url(
-            &config.output().schema_types.path,
-            config.root_url(),
-        );
+        let path_base = resolve_url(&config.output().schema_types.path, config.root_url());
 
         match &config.output().schema_types.module_type {
             ModuleType::SwiftPackage { .. } => {

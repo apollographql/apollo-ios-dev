@@ -7,13 +7,13 @@ use std::sync::Arc;
 
 use graphql_compiler::schema::{GraphQLInputField, GraphQLInputObjectType, GraphQLNamedType};
 
-use crate::templates::SPI;
 use crate::templates::rendering_helpers::graphql_name_rendering::{
     render_input_field, render_named_type, RenderContext,
 };
 use crate::templates::rendering_helpers::graphql_type_rendered::render_as_input_value;
 use crate::templates::rendering_helpers::template_string_deprecation::render_deprecation_reason;
 use crate::templates::rendering_helpers::template_string_documentation::render_documentation;
+use crate::templates::SPI;
 use crate::templates::{
     ConfigurationContext, NonFatalErrorRecorder, SchemaFileType, Scope, TemplateRenderer,
     TemplateTarget,
@@ -22,7 +22,6 @@ use crate::templates::{
 /// Provides the format to convert a GraphQL OneOf Input Object into Swift code.
 ///
 /// OneOf input objects are rendered as Swift enums with a case per field.
-/// Per D-48 decision.
 ///
 /// Mirrors Swift's `OneOfInputObjectTemplate` struct.
 pub struct OneOfInputObjectTemplate {
@@ -39,18 +38,16 @@ impl TemplateRenderer for OneOfInputObjectTemplate {
         TemplateTarget::SchemaFile(SchemaFileType::InputObject)
     }
 
-    fn render_body_template(
-        &self,
-        _non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
+    fn render_body_template(&self, _non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
         let member_access_control = self.access_control_renderer(Scope::Member);
         let parent_access_control = self.access_control_renderer(Scope::Parent).render();
-        let member_str = member_access_control.render();
         let member_unsafe_str = member_access_control.render_with_spis(&[SPI::Unsafe]);
 
         let typename = render_named_type(
             &GraphQLNamedType::InputObject(Arc::clone(&self.graphql_input_object)),
-            &RenderContext::Typename { is_input_value: false },
+            &RenderContext::Typename {
+                is_input_value: false,
+            },
         );
 
         let mut parts: Vec<String> = Vec::new();
@@ -112,9 +109,7 @@ impl OneOfInputObjectTemplate {
         let mut case_parts: Vec<String> = Vec::new();
 
         // Documentation
-        if let Some(doc) =
-            render_documentation(field.documentation.as_deref(), &self.config)
-        {
+        if let Some(doc) = render_documentation(field.documentation.as_deref(), &self.config) {
             case_parts.push(format!("  {}", doc));
         }
 
@@ -131,8 +126,7 @@ impl OneOfInputObjectTemplate {
         }
 
         let field_name = render_input_field(field, &self.config);
-        let type_str =
-            render_as_input_value(&field.type_, false, &self.config.config);
+        let type_str = render_as_input_value(&field.type_, false, &self.config.config);
 
         case_parts.push(format!("  case {}({})", field_name, type_str));
 
@@ -230,13 +224,11 @@ mod tests {
     }
 
     fn make_string_type() -> GraphQLType {
-        GraphQLType::NonNull(Box::new(GraphQLType::Scalar(Arc::new(
-            GraphQLScalarType {
-                name: GraphQLName::new("String".to_string()),
-                documentation: None,
-                specified_by_url: None,
-            },
-        ))))
+        GraphQLType::NonNull(Box::new(GraphQLType::Scalar(Arc::new(GraphQLScalarType {
+            name: GraphQLName::new("String".to_string()),
+            documentation: None,
+            specified_by_url: None,
+        }))))
     }
 
     fn make_nullable_string_type() -> GraphQLType {
@@ -248,13 +240,11 @@ mod tests {
     }
 
     fn make_int_type() -> GraphQLType {
-        GraphQLType::NonNull(Box::new(GraphQLType::Scalar(Arc::new(
-            GraphQLScalarType {
-                name: GraphQLName::new("Int".to_string()),
-                documentation: None,
-                specified_by_url: None,
-            },
-        ))))
+        GraphQLType::NonNull(Box::new(GraphQLType::Scalar(Arc::new(GraphQLScalarType {
+            name: GraphQLName::new("Int".to_string()),
+            documentation: None,
+            specified_by_url: None,
+        }))))
     }
 
     fn make_field(name: &str, type_: GraphQLType) -> (String, GraphQLInputField) {
@@ -349,10 +339,26 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("public enum MockOneOf: OneOfInputObject {"), "actual:\n{}", actual);
-        assert!(actual.contains("case fieldOne(String)"), "actual:\n{}", actual);
-        assert!(actual.contains("case .fieldOne(let value):"), "actual:\n{}", actual);
-        assert!(actual.contains("return InputDict([\"fieldOne\": value])"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("public enum MockOneOf: OneOfInputObject {"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("case fieldOne(String)"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("case .fieldOne(let value):"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("return InputDict([\"fieldOne\": value])"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
@@ -369,10 +375,26 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("case fieldOne(String)"), "actual:\n{}", actual);
-        assert!(actual.contains(&format!("case fieldTwo({})", INT_SWIFT_TYPE)), "actual:\n{}", actual);
-        assert!(actual.contains("case .fieldOne(let value):"), "actual:\n{}", actual);
-        assert!(actual.contains("case .fieldTwo(let value):"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("case fieldOne(String)"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&format!("case fieldTwo({})", INT_SWIFT_TYPE)),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("case .fieldOne(let value):"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("case .fieldTwo(let value):"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     // MARK: - Access Level Tests
@@ -388,8 +410,16 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("public enum MockOneOf: OneOfInputObject {"), "actual:\n{}", actual);
-        assert!(actual.contains("public var __data: InputDict {"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("public enum MockOneOf: OneOfInputObject {"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("public var __data: InputDict {"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
@@ -404,10 +434,18 @@ mod tests {
         };
         let actual = render_body(&template);
         // Parent scope = no access modifier for embedded
-        assert!(actual.contains("enum MockOneOf: OneOfInputObject {"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("enum MockOneOf: OneOfInputObject {"),
+            "actual:\n{}",
+            actual
+        );
         assert!(!actual.starts_with("public enum"), "actual:\n{}", actual);
         // Member scope = public
-        assert!(actual.contains("public var __data: InputDict {"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("public var __data: InputDict {"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
@@ -421,9 +459,17 @@ mod tests {
             config: embedded_internal_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("enum MockOneOf: OneOfInputObject {"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("enum MockOneOf: OneOfInputObject {"),
+            "actual:\n{}",
+            actual
+        );
         assert!(!actual.contains("public"), "actual:\n{}", actual);
-        assert!(actual.contains("var __data: InputDict {"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("var __data: InputDict {"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     // MARK: - Documentation Tests
@@ -432,7 +478,11 @@ mod tests {
     fn test_render_with_documentation() {
         let input = make_one_of_input_with_docs(
             "MockOneOf",
-            vec![make_field_with_docs("fieldOne", make_string_type(), "Field docs")],
+            vec![make_field_with_docs(
+                "fieldOne",
+                make_string_type(),
+                "Field docs",
+            )],
             "Input docs",
         );
         let template = OneOfInputObjectTemplate {
@@ -448,7 +498,11 @@ mod tests {
     fn test_render_without_documentation() {
         let input = make_one_of_input_with_docs(
             "MockOneOf",
-            vec![make_field_with_docs("fieldOne", make_string_type(), "Field docs")],
+            vec![make_field_with_docs(
+                "fieldOne",
+                make_string_type(),
+                "Field docs",
+            )],
             "Input docs",
         );
         let template = OneOfInputObjectTemplate {
@@ -466,21 +520,33 @@ mod tests {
     fn test_render_with_deprecated_field() {
         let input = make_one_of_input(
             "MockOneOf",
-            vec![make_field_deprecated("fieldOne", make_string_type(), "No longer used")],
+            vec![make_field_deprecated(
+                "fieldOne",
+                make_string_type(),
+                "No longer used",
+            )],
         );
         let template = OneOfInputObjectTemplate {
             graphql_input_object: input,
             config: spm_config_with_options("include", "include"),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("@available(*, deprecated, message: \"No longer used\")"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("@available(*, deprecated, message: \"No longer used\")"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
     fn test_render_deprecated_field_excluded() {
         let input = make_one_of_input(
             "MockOneOf",
-            vec![make_field_deprecated("fieldOne", make_string_type(), "No longer used")],
+            vec![make_field_deprecated(
+                "fieldOne",
+                make_string_type(),
+                "No longer used",
+            )],
         );
         let template = OneOfInputObjectTemplate {
             graphql_input_object: input,
@@ -494,23 +560,23 @@ mod tests {
 
     #[test]
     fn test_render_with_enum_field() {
-        let enum_type = GraphQLType::NonNull(Box::new(GraphQLType::Enum(Arc::new(
-            GraphQLEnumType {
+        let enum_type =
+            GraphQLType::NonNull(Box::new(GraphQLType::Enum(Arc::new(GraphQLEnumType {
                 name: GraphQLName::new("Status".to_string()),
                 documentation: None,
                 values: vec![],
-            },
-        ))));
-        let input = make_one_of_input(
-            "MockOneOf",
-            vec![make_field("status", enum_type)],
-        );
+            }))));
+        let input = make_one_of_input("MockOneOf", vec![make_field("status", enum_type)]);
         let template = OneOfInputObjectTemplate {
             graphql_input_object: input,
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("case status(GraphQLEnum<Status>)"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("case status(GraphQLEnum<Status>)"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     // MARK: - Nullable field type test
@@ -527,7 +593,11 @@ mod tests {
         };
         let actual = render_body(&template);
         // render_as_input_value with in_nullable=false for oneOf case types
-        assert!(actual.contains("case fieldOne(String)"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("case fieldOne(String)"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     // MARK: - Custom name test
@@ -561,10 +631,26 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("// Renamed from GraphQL schema value: 'MyOneOf'"), "actual:\n{}", actual);
-        assert!(actual.contains("enum MyCustomOneOf: OneOfInputObject {"), "actual:\n{}", actual);
-        assert!(actual.contains("case myCustomField(String)"), "actual:\n{}", actual);
-        assert!(actual.contains("case .myCustomField(let value):"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("// Renamed from GraphQL schema value: 'MyOneOf'"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("enum MyCustomOneOf: OneOfInputObject {"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("case myCustomField(String)"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("case .myCustomField(let value):"),
+            "actual:\n{}",
+            actual
+        );
         assert!(actual.contains("\"myField\": value"), "actual:\n{}", actual);
     }
 
@@ -572,10 +658,7 @@ mod tests {
 
     #[test]
     fn test_render_reserved_keyword_field() {
-        let input = make_one_of_input(
-            "MockOneOf",
-            vec![make_field("class", make_string_type())],
-        );
+        let input = make_one_of_input("MockOneOf", vec![make_field("class", make_string_type())]);
         let config = make_config(
             r#"{
             "schemaNamespace": "TestSchema",
@@ -595,24 +678,33 @@ mod tests {
             config,
         };
         let actual = render_body(&template);
-        assert!(actual.contains("case `class`(String)"), "actual:\n{}", actual);
-        assert!(actual.contains("case .`class`(let value):"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("case `class`(String)"),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains("case .`class`(let value):"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     // MARK: - Type name suffix test
 
     #[test]
     fn test_render_reserved_keyword_type_name() {
-        let input = make_one_of_input(
-            "Type",
-            vec![make_field("fieldOne", make_string_type())],
-        );
+        let input = make_one_of_input("Type", vec![make_field("fieldOne", make_string_type())]);
         let template = OneOfInputObjectTemplate {
             graphql_input_object: input,
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("enum Type_InputObject: OneOfInputObject {"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("enum Type_InputObject: OneOfInputObject {"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     // MARK: - Casing test
@@ -628,7 +720,11 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.contains("enum MockOneOf: OneOfInputObject {"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("enum MockOneOf: OneOfInputObject {"),
+            "actual:\n{}",
+            actual
+        );
     }
 
     // MARK: - __data structure test
@@ -649,12 +745,16 @@ mod tests {
         let actual = render_body(&template);
         assert!(actual.contains("switch self {"), "actual:\n{}", actual);
         assert!(
-            actual.contains("case .fieldOne(let value):\n      return InputDict([\"fieldOne\": value])"),
+            actual.contains(
+                "case .fieldOne(let value):\n      return InputDict([\"fieldOne\": value])"
+            ),
             "actual:\n{}",
             actual
         );
         assert!(
-            actual.contains("case .fieldTwo(let value):\n      return InputDict([\"fieldTwo\": value])"),
+            actual.contains(
+                "case .fieldTwo(let value):\n      return InputDict([\"fieldTwo\": value])"
+            ),
             "actual:\n{}",
             actual
         );

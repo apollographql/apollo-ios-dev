@@ -36,17 +36,13 @@ impl TemplateRenderer for EnumTemplate {
         TemplateTarget::SchemaFile(SchemaFileType::Enum)
     }
 
-    fn render_body_template(
-        &self,
-        _non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
+    fn render_body_template(&self, _non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
         let mut parts: Vec<String> = Vec::new();
 
         // Documentation
-        if let Some(doc) = render_documentation(
-            self.graphql_enum.documentation.as_deref(),
-            &self.config,
-        ) {
+        if let Some(doc) =
+            render_documentation(self.graphql_enum.documentation.as_deref(), &self.config)
+        {
             parts.push(doc);
         }
 
@@ -58,7 +54,9 @@ impl TemplateRenderer for EnumTemplate {
         let access_control = self.access_control_renderer(Scope::Parent).render();
         let typename = render_named_type(
             &GraphQLNamedType::Enum(Arc::clone(&self.graphql_enum)),
-            &RenderContext::Typename { is_input_value: false },
+            &RenderContext::Typename {
+                is_input_value: false,
+            },
         );
 
         // Render enum cases
@@ -74,7 +72,9 @@ impl TemplateRenderer for EnumTemplate {
         parts.push(format!(
             "{}{}enum {}: String, EnumType {{\n{}\n}}\n",
             self.config.nonisolated_modifier(),
-            access_control, typename, cases_str,
+            access_control,
+            typename,
+            cases_str,
         ));
 
         parts.join("\n")
@@ -133,18 +133,10 @@ impl EnumTemplate {
     }
 
     fn case_definition(&self, value: &GraphQLEnumValue) -> String {
-        let case_name = render_enum_value(
-            value,
-            EnumRenderContext::EnumCase,
-            &self.config,
-        );
+        let case_name = render_enum_value(value, EnumRenderContext::EnumCase, &self.config);
 
         if self.config.options().conversion_strategies.enum_cases != EnumCases::None {
-            let raw_value = render_enum_value(
-                value,
-                EnumRenderContext::EnumRawValue,
-                &self.config,
-            );
+            let raw_value = render_enum_value(value, EnumRenderContext::EnumRawValue, &self.config);
             format!("  case {} = \"{}\"", case_name, raw_value)
         } else {
             format!("  case {}", case_name)
@@ -169,10 +161,12 @@ mod tests {
     const NONISOLATED: &str = "nonisolated ";
 
     fn with_nonisolated(expected: &str) -> String {
-        let mut out: Vec<String> = expected
+        let out: Vec<String> = expected
             .split('\n')
             .map(|line| {
-                if (line.starts_with("enum ") || line.starts_with("public enum ")) && !line.starts_with(NONISOLATED) {
+                if (line.starts_with("enum ") || line.starts_with("public enum "))
+                    && !line.starts_with(NONISOLATED)
+                {
                     format!("{}{}", NONISOLATED, line)
                 } else {
                     line.to_string()
@@ -252,7 +246,12 @@ mod tests {
         )
     }
 
-    fn config_with_options(deprecated: &str, docs: &str, warnings: &str, enum_cases: &str) -> ConfigurationContext {
+    fn config_with_options(
+        deprecated: &str,
+        docs: &str,
+        warnings: &str,
+        enum_cases: &str,
+    ) -> ConfigurationContext {
         make_config(&format!(
             r#"{{
             "schemaNamespace": "TestSchema",
@@ -316,10 +315,15 @@ mod tests {
 
     #[test]
     fn test_render_spm_public_access() {
-        let enum_type = make_enum("TestEnum", None, vec![
-            make_enum_value("ONE", None, None, None),
-            make_enum_value("TWO", None, None, None),
-        ], None);
+        let enum_type = make_enum(
+            "TestEnum",
+            None,
+            vec![
+                make_enum_value("ONE", None, None, None),
+                make_enum_value("TWO", None, None, None),
+            ],
+            None,
+        );
         let template = EnumTemplate {
             graphql_enum: enum_type,
             config: spm_config(),
@@ -334,10 +338,15 @@ mod tests {
 
     #[test]
     fn test_render_other_public_access() {
-        let enum_type = make_enum("TestEnum", None, vec![
-            make_enum_value("ONE", None, None, None),
-            make_enum_value("TWO", None, None, None),
-        ], None);
+        let enum_type = make_enum(
+            "TestEnum",
+            None,
+            vec![
+                make_enum_value("ONE", None, None, None),
+                make_enum_value("TWO", None, None, None),
+            ],
+            None,
+        );
         let template = EnumTemplate {
             graphql_enum: enum_type,
             config: other_config(),
@@ -352,10 +361,15 @@ mod tests {
 
     #[test]
     fn test_render_embedded_internal_no_access_prefix() {
-        let enum_type = make_enum("TestEnum", None, vec![
-            make_enum_value("ONE", None, None, None),
-            make_enum_value("TWO", None, None, None),
-        ], None);
+        let enum_type = make_enum(
+            "TestEnum",
+            None,
+            vec![
+                make_enum_value("ONE", None, None, None),
+                make_enum_value("TWO", None, None, None),
+            ],
+            None,
+        );
         let template = EnumTemplate {
             graphql_enum: enum_type,
             config: embedded_internal_config(),
@@ -366,20 +380,21 @@ mod tests {
             "actual:\n{}",
             actual
         );
-        assert!(
-            !actual.contains("public enum"),
-            "actual:\n{}",
-            actual
-        );
+        assert!(!actual.contains("public enum"), "actual:\n{}", actual);
     }
 
     #[test]
     fn test_render_embedded_public_no_access_prefix_on_parent() {
         // Embedded public: Parent scope returns empty string (no prefix)
-        let enum_type = make_enum("TestEnum", None, vec![
-            make_enum_value("ONE", None, None, None),
-            make_enum_value("TWO", None, None, None),
-        ], None);
+        let enum_type = make_enum(
+            "TestEnum",
+            None,
+            vec![
+                make_enum_value("ONE", None, None, None),
+                make_enum_value("TWO", None, None, None),
+            ],
+            None,
+        );
         let template = EnumTemplate {
             graphql_enum: enum_type,
             config: embedded_public_config(),
@@ -397,10 +412,15 @@ mod tests {
 
     #[test]
     fn test_render_enum_name_first_uppercased() {
-        let enum_type = make_enum("anEnum", None, vec![
-            make_enum_value("ONE", None, None, None),
-            make_enum_value("TWO", None, None, None),
-        ], None);
+        let enum_type = make_enum(
+            "anEnum",
+            None,
+            vec![
+                make_enum_value("ONE", None, None, None),
+                make_enum_value("TWO", None, None, None),
+            ],
+            None,
+        );
         let template = EnumTemplate {
             graphql_enum: enum_type,
             config: default_config(),
@@ -596,7 +616,12 @@ enum TestEnum: String, EnumType {
             make_enum_value("TWO", None, Some("Doc: Two"), None),
             make_enum_value("THREE", Some("Deprecated for tests"), None, None),
         ];
-        let enum_type = make_enum("TestEnum", None, values, Some("This is some great documentation!"));
+        let enum_type = make_enum(
+            "TestEnum",
+            None,
+            values,
+            Some("This is some great documentation!"),
+        );
         let template = EnumTemplate {
             graphql_enum: enum_type,
             config: config_with_options("include", "include", "include", "camelCase"),
@@ -625,7 +650,12 @@ enum TestEnum: String, EnumType {
             make_enum_value("TWO", None, Some("Doc: Two"), None),
             make_enum_value("THREE", Some("Deprecated for tests"), None, None),
         ];
-        let enum_type = make_enum("TestEnum", None, values, Some("This is some great documentation!"));
+        let enum_type = make_enum(
+            "TestEnum",
+            None,
+            values,
+            Some("This is some great documentation!"),
+        );
         let template = EnumTemplate {
             graphql_enum: enum_type,
             config: config_with_options("include", "include", "exclude", "camelCase"),
@@ -654,7 +684,12 @@ enum TestEnum: String, EnumType {
             make_enum_value("TWO", None, Some("Doc: Two"), None),
             make_enum_value("THREE", Some("Deprecated for tests"), None, None),
         ];
-        let enum_type = make_enum("TestEnum", None, values, Some("This is some great documentation!"));
+        let enum_type = make_enum(
+            "TestEnum",
+            None,
+            values,
+            Some("This is some great documentation!"),
+        );
         let template = EnumTemplate {
             graphql_enum: enum_type,
             config: config_with_options("include", "exclude", "exclude", "camelCase"),

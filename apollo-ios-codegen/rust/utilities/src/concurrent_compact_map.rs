@@ -30,10 +30,7 @@ where
     E: Send,
     F: Fn(&T) -> Result<Option<U>, E> + Sync,
 {
-    let results: Result<Vec<Option<U>>, E> = items
-        .par_iter()
-        .map(&transform)
-        .collect();
+    let results: Result<Vec<Option<U>>, E> = items.par_iter().map(&transform).collect();
 
     results.map(|opts| opts.into_iter().flatten().collect())
 }
@@ -52,9 +49,7 @@ mod tests {
     #[test]
     fn filters_none_results() {
         let input = vec![1, 2, 3];
-        let result = concurrent_compact_map(&input, |x| {
-            if *x > 1 { Some(*x) } else { None }
-        });
+        let result = concurrent_compact_map(&input, |x| if *x > 1 { Some(*x) } else { None });
         assert_eq!(result, vec![2, 3]);
     }
 
@@ -84,14 +79,13 @@ mod tests {
     #[test]
     fn result_variant_propagates_error() {
         let input = vec![1, 2, 3];
-        let result: Result<Vec<i32>, String> =
-            concurrent_compact_map_result(&input, |x| {
-                if *x == 2 {
-                    Err("error at 2".to_string())
-                } else {
-                    Ok(Some(*x))
-                }
-            });
+        let result: Result<Vec<i32>, String> = concurrent_compact_map_result(&input, |x| {
+            if *x == 2 {
+                Err("error at 2".to_string())
+            } else {
+                Ok(Some(*x))
+            }
+        });
         assert!(result.is_err());
     }
 }

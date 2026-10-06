@@ -33,12 +33,10 @@ impl GraphQLName {
     /// Returns documentation comment when a custom name is set.
     pub fn type_name_documentation(&self) -> Option<String> {
         match &self.custom_name {
-            Some(custom) if !custom.is_empty() => {
-                Some(format!(
-                    "// Renamed from GraphQL schema value: '{}'",
-                    self.schema_name
-                ))
-            }
+            Some(custom) if !custom.is_empty() => Some(format!(
+                "// Renamed from GraphQL schema value: '{}'",
+                self.schema_name
+            )),
             _ => None,
         }
     }

@@ -491,9 +491,7 @@ impl Hash for GraphQLField {
 
 impl PartialEq for GraphQLField {
     fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
-            && self.type_ == other.type_
-            && self.arguments == other.arguments
+        self.name == other.name && self.type_ == other.type_ && self.arguments == other.arguments
     }
 }
 

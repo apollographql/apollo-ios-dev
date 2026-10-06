@@ -4,19 +4,19 @@
 //! the entire builder pipeline end-to-end using programmatically constructed
 //! CompilationResult fixtures.
 //!
-//! D-33: Serialization tests validate deterministic canonical JSON output.
-//! D-34: Edge case tests for diamond fragment inheritance and recursive types.
+//! Serialization tests validate deterministic canonical JSON output.
+//! Edge case tests for diamond fragment inheritance and recursive types.
 
 use std::sync::Arc;
 
 use graphql_compiler::compilation_result::{
     CompilationResult, Field as CRField, FragmentDefinition, FragmentSpread,
-    InlineFragment, OperationDefinition, OperationType,
-    Selection, SelectionSet as CRSelectionSet, InclusionCondition as CRInclusionCondition,
+    InclusionCondition as CRInclusionCondition, InlineFragment, OperationDefinition, OperationType,
+    Selection, SelectionSet as CRSelectionSet,
 };
 use graphql_compiler::{
-    GraphQLCompositeType, GraphQLInterfaceType, GraphQLName, GraphQLNamedType,
-    GraphQLObjectType, GraphQLScalarType, GraphQLType, RootTypeDefinition,
+    GraphQLCompositeType, GraphQLInterfaceType, GraphQLName, GraphQLNamedType, GraphQLObjectType,
+    GraphQLScalarType, GraphQLType, RootTypeDefinition,
 };
 use indexmap::IndexMap;
 
@@ -88,7 +88,11 @@ fn make_scalar_field(name: &str) -> CRField {
     }
 }
 
-fn make_entity_field(name: &str, obj: &Arc<GraphQLObjectType>, selections: Vec<Selection>) -> CRField {
+fn make_entity_field(
+    name: &str,
+    obj: &Arc<GraphQLObjectType>,
+    selections: Vec<Selection>,
+) -> CRField {
     CRField {
         name: name.to_string(),
         alias: None,
@@ -149,10 +153,10 @@ fn make_compilation_result(
     })
 }
 
-// MARK: - Test 1: Simple Query (IR-01, IR-02)
+// MARK: - Test 1: Simple Query
 
-/// IR-01: IR builder constructs Operation from CompilationResult
-/// IR-02: Operation contains root_field with correct selection set
+/// IR builder constructs Operation from CompilationResult
+/// Operation contains root_field with correct selection set
 #[test]
 fn test_build_simple_query() {
     let query = make_object("Query");
@@ -186,7 +190,12 @@ fn test_build_simple_query() {
     assert_eq!(operation.root_field.underlying_field.name, "query");
 
     // root_field selection_set should contain "hero" entity field
-    let root_selections = operation.root_field.selection_set.selections.as_ref().unwrap();
+    let root_selections = operation
+        .root_field
+        .selection_set
+        .selections
+        .as_ref()
+        .unwrap();
     assert_eq!(root_selections.fields.len(), 1);
 
     let hero_field = root_selections.fields.get("hero").unwrap();
@@ -209,10 +218,10 @@ fn test_build_simple_query() {
     assert!(!operation.contains_deferred_fragment);
 }
 
-// MARK: - Test 2: Nested Entity Fields (IR-01, IR-05)
+// MARK: - Test 2: Nested Entity Fields
 
-/// IR-01: IR builder correctly constructs nested entity fields
-/// IR-05: Entity deduplication works for same field paths
+/// IR builder correctly constructs nested entity fields
+/// Entity deduplication works for same field paths
 #[test]
 fn test_build_nested_entity_fields() {
     let query = make_object("Query");
@@ -247,7 +256,12 @@ fn test_build_nested_entity_fields() {
     let operation = builder.build_operation(&op_def);
 
     // Navigate: root -> hero -> friends -> name
-    let root_sel = operation.root_field.selection_set.selections.as_ref().unwrap();
+    let root_sel = operation
+        .root_field
+        .selection_set
+        .selections
+        .as_ref()
+        .unwrap();
     let hero_field = match root_sel.fields.get("hero").unwrap() {
         Field::Entity(ef) => ef,
         _ => panic!("Expected entity field 'hero'"),
@@ -269,11 +283,11 @@ fn test_build_nested_entity_fields() {
     assert!(operation.entity_storage.entities_for_fields.len() >= 3);
 }
 
-// MARK: - Test 3: Build Fragment (IR-01, IR-03, IR-06)
+// MARK: - Test 3: Build Fragment
 
-/// IR-01: IRBuilder can build fragments
-/// IR-03: Fragment caching works via BuiltFragmentStorage
-/// IR-06: NamedFragment implements Definition trait
+/// IRBuilder can build fragments
+/// Fragment caching works via BuiltFragmentStorage
+/// NamedFragment implements Definition trait
 #[test]
 fn test_build_fragment() {
     let query = make_object("Query");
@@ -308,14 +322,19 @@ fn test_build_fragment() {
     assert_eq!(fragment1.name(), "HeroFields");
 
     // Fragment root_field should have "name" scalar field
-    let root_sel = fragment1.root_field.selection_set.selections.as_ref().unwrap();
+    let root_sel = fragment1
+        .root_field
+        .selection_set
+        .selections
+        .as_ref()
+        .unwrap();
     assert!(root_sel.fields.contains_key("name"));
 
     // Build same fragment again -- should return cached Arc (pointer equality)
     let fragment2 = builder.build_fragment(&frag_def);
     assert!(Arc::ptr_eq(&fragment1, &fragment2));
 
-    // Verify Definition trait works (IR-06)
+    // Verify Definition trait works
     let def: &dyn Definition = fragment1.as_ref();
     assert_eq!(def.name(), "HeroFields");
     assert!(!def.is_local_cache_mutation());
@@ -323,10 +342,10 @@ fn test_build_fragment() {
     let _ = def.entity_storage();
 }
 
-// MARK: - Test 4: Operation with Fragment Spread (IR-02, IR-03)
+// MARK: - Test 4: Operation with Fragment Spread
 
-/// IR-02: Operation correctly references fragments
-/// IR-03: Fragment spread appears in DirectSelections
+/// Operation correctly references fragments
+/// Fragment spread appears in DirectSelections
 #[test]
 fn test_build_operation_with_fragment_spread() {
     let query = make_object("Query");
@@ -391,7 +410,12 @@ fn test_build_operation_with_fragment_spread() {
     );
 
     // hero's DirectSelections should have the named fragment spread
-    let root_sel = operation.root_field.selection_set.selections.as_ref().unwrap();
+    let root_sel = operation
+        .root_field
+        .selection_set
+        .selections
+        .as_ref()
+        .unwrap();
     let hero_field = match root_sel.fields.get("hero").unwrap() {
         Field::Entity(ef) => ef,
         _ => panic!("Expected entity field 'hero'"),
@@ -401,10 +425,10 @@ fn test_build_operation_with_fragment_spread() {
     assert!(hero_sel.named_fragments.contains_key("CharacterFields"));
 }
 
-// MARK: - Test 5: Inline Fragment (IR-01, IR-02)
+// MARK: - Test 5: Inline Fragment
 
-/// IR-01: IRBuilder handles inline fragments
-/// IR-02: Inline fragments appear in DirectSelections with correct type conditions
+/// IRBuilder handles inline fragments
+/// Inline fragments appear in DirectSelections with correct type conditions
 #[test]
 fn test_build_inline_fragment() {
     let query = make_object("Query");
@@ -419,7 +443,7 @@ fn test_build_inline_fragment() {
             GraphQLNamedType::Object(Arc::clone(&human)),
         ],
         vec![{
-            let mut op = make_operation_def(
+            make_operation_def(
                 "InlineFragmentQuery",
                 &query,
                 vec![Selection::Field(make_entity_field(
@@ -435,8 +459,7 @@ fn test_build_inline_fragment() {
                         defer_condition: None,
                     })],
                 ))],
-            );
-            op
+            )
         }],
         vec![],
     );
@@ -446,7 +469,12 @@ fn test_build_inline_fragment() {
     let operation = builder.build_operation(&op_def);
 
     // Navigate to hero's selections
-    let root_sel = operation.root_field.selection_set.selections.as_ref().unwrap();
+    let root_sel = operation
+        .root_field
+        .selection_set
+        .selections
+        .as_ref()
+        .unwrap();
     let hero_field = match root_sel.fields.get("hero").unwrap() {
         Field::Entity(ef) => ef,
         _ => panic!("Expected entity field 'hero'"),
@@ -456,22 +484,32 @@ fn test_build_inline_fragment() {
 
     // Should have an inline fragment for the Human type condition
     // The inline fragment's scope condition key has type_: Some(Human)
-    assert!(!hero_sel.inline_fragments.is_empty(),
+    assert!(
+        !hero_sel.inline_fragments.is_empty(),
         "Expected inline fragments, got keys: {:?}",
-        hero_sel.inline_fragments.keys().collect::<Vec<_>>());
+        hero_sel.inline_fragments.keys().collect::<Vec<_>>()
+    );
 
     // Find the Human type condition inline fragment by checking scope condition keys
     let has_human_inline = hero_sel.inline_fragments.keys().any(|sc| {
-        sc.type_.as_ref().map_or(false, |t| t.name().schema_name == "Human")
+        sc.type_
+            .as_ref()
+            .is_some_and(|t| t.name().schema_name == "Human")
     });
-    assert!(has_human_inline,
+    assert!(
+        has_human_inline,
         "Expected inline fragment with Human type condition, got keys: {:?}",
-        hero_sel.inline_fragments.keys().map(|k| format!("{}", k)).collect::<Vec<_>>());
+        hero_sel
+            .inline_fragments
+            .keys()
+            .map(|k| format!("{}", k))
+            .collect::<Vec<_>>()
+    );
 }
 
-// MARK: - Test 6: Inclusion Conditions (IR-01)
+// MARK: - Test 6: Inclusion Conditions
 
-/// IR-01: Fields with @include/@skip directives have correct inclusion conditions
+/// Fields with @include/@skip directives have correct inclusion conditions
 #[test]
 fn test_inclusion_conditions() {
     let query = make_object("Query");
@@ -527,7 +565,12 @@ fn test_inclusion_conditions() {
     let operation = builder.build_operation(&op_def);
 
     // Navigate to hero -> name field
-    let root_sel = operation.root_field.selection_set.selections.as_ref().unwrap();
+    let root_sel = operation
+        .root_field
+        .selection_set
+        .selections
+        .as_ref()
+        .unwrap();
     let hero_field = match root_sel.fields.get("hero").unwrap() {
         Field::Entity(ef) => ef,
         _ => panic!("Expected entity field 'hero'"),
@@ -538,19 +581,24 @@ fn test_inclusion_conditions() {
 
     // The name field should have inclusion conditions
     let conditions = name_field.inclusion_conditions();
-    assert!(conditions.is_some(), "Expected inclusion conditions on 'name' field");
+    assert!(
+        conditions.is_some(),
+        "Expected inclusion conditions on 'name' field"
+    );
 
     let any_of = conditions.unwrap();
     // Should contain a condition for "showName"
     let has_show_name = any_of.elements.iter().any(|conds| {
-        conds.iter().any(|c| c.variable == "showName" && !c.is_inverted)
+        conds
+            .iter()
+            .any(|c| c.variable == "showName" && !c.is_inverted)
     });
     assert!(has_show_name, "Expected @include(if: $showName) condition");
 }
 
-// MARK: - Test 7: Field Collector (IR-04)
+// MARK: - Test 7: Field Collector
 
-/// IR-04: FieldCollector tracks fields per type during IR construction
+/// FieldCollector tracks fields per type during IR construction
 #[test]
 fn test_field_collector() {
     let query = make_object("Query");
@@ -586,14 +634,18 @@ fn test_field_collector() {
     let collected = builder.field_collector.collected_fields_for(&hero_type);
 
     // Should have collected "age" and "name" (sorted)
-    assert!(collected.len() >= 2, "Expected at least 2 collected fields, got {}", collected.len());
+    assert!(
+        collected.len() >= 2,
+        "Expected at least 2 collected fields, got {}",
+        collected.len()
+    );
     assert_eq!(collected[0].0, "age");
     assert_eq!(collected[1].0, "name");
 }
 
-// MARK: - Test 8: Entity Deduplication (IR-05)
+// MARK: - Test 8: Entity Deduplication
 
-/// IR-05: Same entity paths in different selections produce same Arc<Entity> (dedup)
+/// Same entity paths in different selections produce same Arc<Entity> (dedup)
 #[test]
 fn test_entity_deduplication() {
     let query = make_object("Query");
@@ -611,13 +663,11 @@ fn test_entity_deduplication() {
         vec![make_operation_def(
             "DeduplicationQuery",
             &query,
-            vec![
-                Selection::Field(make_entity_field(
-                    "hero",
-                    &hero,
-                    vec![Selection::Field(make_scalar_field("name"))],
-                )),
-            ],
+            vec![Selection::Field(make_entity_field(
+                "hero",
+                &hero,
+                vec![Selection::Field(make_scalar_field("name"))],
+            ))],
         )],
         vec![],
     );
@@ -629,20 +679,38 @@ fn test_entity_deduplication() {
     // The entity_storage should deduplicate entities by location
     // Building the same operation again should produce entities at the same locations
     let entity_count = operation.entity_storage.entities_for_fields.len();
-    assert!(entity_count >= 2, "Expected at least 2 entities (root + hero)");
+    assert!(
+        entity_count >= 2,
+        "Expected at least 2 entities (root + hero)"
+    );
 
     // Verify that looking up the same location gives the same Arc
-    let locations: Vec<_> = operation.entity_storage.entities_for_fields.keys().collect();
+    let locations: Vec<_> = operation
+        .entity_storage
+        .entities_for_fields
+        .keys()
+        .collect();
     for loc in &locations {
-        let e1 = operation.entity_storage.entities_for_fields.get(*loc).unwrap();
-        let e2 = operation.entity_storage.entities_for_fields.get(*loc).unwrap();
-        assert!(Arc::ptr_eq(e1, e2), "Same location should return same Arc<Entity>");
+        let e1 = operation
+            .entity_storage
+            .entities_for_fields
+            .get(*loc)
+            .unwrap();
+        let e2 = operation
+            .entity_storage
+            .entities_for_fields
+            .get(*loc)
+            .unwrap();
+        assert!(
+            Arc::ptr_eq(e1, e2),
+            "Same location should return same Arc<Entity>"
+        );
     }
 }
 
-// MARK: - Test 9: Definition Trait Unified (IR-06)
+// MARK: - Test 9: Definition Trait Unified
 
-/// IR-06: Both Operation and NamedFragment implement the Definition trait
+/// Both Operation and NamedFragment implement the Definition trait
 #[test]
 fn test_definition_trait_unified() {
     let query = make_object("Query");
@@ -695,9 +763,9 @@ fn test_definition_trait_unified() {
     let _ = definitions[1].entity_storage();
 }
 
-// MARK: - Test 10: IR Serialization (D-33)
+// MARK: - Test 10: IR Serialization
 
-/// D-33: IR serialization produces deterministic canonical JSON output
+/// IR serialization produces deterministic canonical JSON output
 #[test]
 fn test_ir_serialization() {
     let query = make_object("Query");
@@ -730,10 +798,22 @@ fn test_ir_serialization() {
 
     // JSON should contain expected keys
     assert!(json.contains("\"name\""), "JSON should contain name key");
-    assert!(json.contains("SerializationQuery"), "JSON should contain operation name");
-    assert!(json.contains("\"root_field\""), "JSON should contain root_field key");
-    assert!(json.contains("\"referenced_fragments\""), "JSON should contain referenced_fragments key");
-    assert!(json.contains("\"entity_count\""), "JSON should contain entity_count key");
+    assert!(
+        json.contains("SerializationQuery"),
+        "JSON should contain operation name"
+    );
+    assert!(
+        json.contains("\"root_field\""),
+        "JSON should contain root_field key"
+    );
+    assert!(
+        json.contains("\"referenced_fragments\""),
+        "JSON should contain referenced_fragments key"
+    );
+    assert!(
+        json.contains("\"entity_count\""),
+        "JSON should contain entity_count key"
+    );
 
     // JSON should be valid (parse succeeds)
     let parsed: Result<serde_json::Value, _> = serde_json::from_str(&json);
@@ -744,9 +824,9 @@ fn test_ir_serialization() {
     assert_eq!(json, json2, "Serialization should be deterministic");
 }
 
-// MARK: - Test 11: Diamond Fragment Inheritance (D-34)
+// MARK: - Test 11: Diamond Fragment Inheritance
 
-/// D-34: Diamond fragment inheritance -- two fragments on overlapping types
+/// Diamond fragment inheritance -- two fragments on overlapping types
 /// both spread inside a query, with correct selection merging
 #[test]
 fn test_diamond_fragment_inheritance() {
@@ -830,32 +910,53 @@ fn test_diamond_fragment_inheritance() {
     // referenced_fragments should contain both fragments
     assert_eq!(operation.referenced_fragments.len(), 2);
 
-    let frag_names: Vec<&str> = operation.referenced_fragments.iter().map(|f| f.name()).collect();
-    assert!(frag_names.contains(&"FragmentA"), "Should reference FragmentA");
-    assert!(frag_names.contains(&"FragmentB"), "Should reference FragmentB");
+    let frag_names: Vec<&str> = operation
+        .referenced_fragments
+        .iter()
+        .map(|f| f.name())
+        .collect();
+    assert!(
+        frag_names.contains(&"FragmentA"),
+        "Should reference FragmentA"
+    );
+    assert!(
+        frag_names.contains(&"FragmentB"),
+        "Should reference FragmentB"
+    );
 
     // pet field should have both fragment spreads in named_fragments
-    let root_sel = operation.root_field.selection_set.selections.as_ref().unwrap();
+    let root_sel = operation
+        .root_field
+        .selection_set
+        .selections
+        .as_ref()
+        .unwrap();
     let pet_field = match root_sel.fields.get("pet").unwrap() {
         Field::Entity(ef) => ef,
         _ => panic!("Expected entity field 'pet'"),
     };
 
     let pet_sel = pet_field.selection_set.selections.as_ref().unwrap();
-    assert_eq!(pet_sel.named_fragments.len(), 2,
-        "Pet should have 2 named fragment spreads");
+    assert_eq!(
+        pet_sel.named_fragments.len(),
+        2,
+        "Pet should have 2 named fragment spreads"
+    );
 
     // No duplicate entity entries for the shared type path
     // (pet entity should appear only once in storage)
-    let pet_entities: Vec<_> = operation.entity_storage.entities_for_fields.values()
+    let pet_entities: Vec<_> = operation
+        .entity_storage
+        .entities_for_fields
+        .values()
         .filter(|e| e.root_type().name().schema_name == "Pet")
         .collect();
     assert_eq!(pet_entities.len(), 1, "Pet entity should be deduplicated");
 }
 
-// MARK: - Test 12: Recursive Type References (D-34)
+// MARK: - Test 12: Recursive Type References
 
-/// D-34: Recursive type references (TreeNode -> children: [TreeNode])
+/// Recursive type references (TreeNode -> children: [TreeNode])
 /// should not cause infinite loops or stack overflow
 #[test]
 fn test_recursive_type_references() {
@@ -898,11 +999,19 @@ fn test_recursive_type_references() {
     // entity_storage should have distinct Entity entries for each nesting level
     let entity_count = operation.entity_storage.entities_for_fields.len();
     // root entity + root TreeNode + children TreeNode + children.children TreeNode = 4
-    assert!(entity_count >= 4,
-        "Expected at least 4 entities for recursive type, got {}", entity_count);
+    assert!(
+        entity_count >= 4,
+        "Expected at least 4 entities for recursive type, got {}",
+        entity_count
+    );
 
     // Navigate the recursive path: root -> children -> children -> name
-    let root_sel = operation.root_field.selection_set.selections.as_ref().unwrap();
+    let root_sel = operation
+        .root_field
+        .selection_set
+        .selections
+        .as_ref()
+        .unwrap();
     let root_node = match root_sel.fields.get("root").unwrap() {
         Field::Entity(ef) => ef,
         _ => panic!("Expected entity field 'root'"),
@@ -930,7 +1039,10 @@ fn test_recursive_type_references() {
     let json = ir::serialize_operation_to_json(&operation);
     assert!(json.contains("RecursiveQuery"));
     let parsed: Result<serde_json::Value, _> = serde_json::from_str(&json);
-    assert!(parsed.is_ok(), "Recursive type serialization should produce valid JSON");
+    assert!(
+        parsed.is_ok(),
+        "Recursive type serialization should produce valid JSON"
+    );
 }
 
 // MARK: - Test 13: Entity Selection Tree Populated (04-06)
@@ -970,7 +1082,12 @@ fn test_entity_selection_tree_populated() {
     // Verify entity selection tree is populated by building a ComputedSelectionSet
     // for the hero's selection set. If the entity's tree was populated by
     // build_direct_selections (via RwLock write), merged selections will be non-empty.
-    let root_sel = operation.root_field.selection_set.selections.as_ref().unwrap();
+    let root_sel = operation
+        .root_field
+        .selection_set
+        .selections
+        .as_ref()
+        .unwrap();
     let hero_field = match root_sel.fields.get("hero").unwrap() {
         Field::Entity(ef) => ef,
         _ => panic!("Expected entity field 'hero'"),
@@ -980,15 +1097,25 @@ fn test_entity_selection_tree_populated() {
         &hero_field.selection_set,
         MergingStrategy::ALL,
         operation.entity_storage,
-    ).build();
+    )
+    .build();
 
     // The root entity's tree (Query) was populated, so when computing merged selections
     // for the hero's selection set, we should get selections from ancestor merging.
     // At minimum, the direct selections ("name", "age") are present.
-    assert!(computed.direct.is_some(), "hero should have direct selections");
+    assert!(
+        computed.direct.is_some(),
+        "hero should have direct selections"
+    );
     let direct = computed.direct.as_ref().unwrap();
-    assert!(direct.fields.contains_key("name"), "hero should have 'name' direct field");
-    assert!(direct.fields.contains_key("age"), "hero should have 'age' direct field");
+    assert!(
+        direct.fields.contains_key("name"),
+        "hero should have 'name' direct field"
+    );
+    assert!(
+        direct.fields.contains_key("age"),
+        "hero should have 'age' direct field"
+    );
 }
 
 // MARK: - Test 14: Computed Selection Set Has Merged Selections (04-06)
@@ -1037,7 +1164,12 @@ fn test_computed_selection_set_has_merged_selections() {
     let operation = builder.build_operation(&op_def);
 
     // Navigate to hero field
-    let root_sel = operation.root_field.selection_set.selections.as_ref().unwrap();
+    let root_sel = operation
+        .root_field
+        .selection_set
+        .selections
+        .as_ref()
+        .unwrap();
     let hero_field = match root_sel.fields.get("hero").unwrap() {
         Field::Entity(ef) => ef,
         _ => panic!("Expected entity field 'hero'"),
@@ -1045,32 +1177,42 @@ fn test_computed_selection_set_has_merged_selections() {
 
     // hero should have inline fragments for Human type narrowing
     let hero_sel = hero_field.selection_set.selections.as_ref().unwrap();
-    assert!(!hero_sel.inline_fragments.is_empty(),
-        "hero should have inline fragments for type narrowing");
+    assert!(
+        !hero_sel.inline_fragments.is_empty(),
+        "hero should have inline fragments for type narrowing"
+    );
 
     // Build a ComputedSelectionSet for the Human inline fragment's selection set
     // to verify that merged selections include the "name" field from the parent scope.
-    let human_inline = hero_sel.inline_fragments.values().next()
+    let human_inline = hero_sel
+        .inline_fragments
+        .values()
+        .next()
         .expect("Should have at least one inline fragment");
 
     let computed = computed_selection_set::Builder::from_selection_set(
         &human_inline.selection_set,
         MergingStrategy::ALL,
         operation.entity_storage,
-    ).build();
+    )
+    .build();
 
     // The Human inline fragment should have "height" as direct selection
     if let Some(ref direct) = computed.direct {
-        assert!(direct.fields.contains_key("height"),
-            "Human inline fragment should have 'height' as direct selection");
+        assert!(
+            direct.fields.contains_key("height"),
+            "Human inline fragment should have 'height' as direct selection"
+        );
     }
 
     // The merged selections should include "name" from the ancestor scope
     // (inherited from the Character parent selection set)
     let has_name_in_merged = computed.merged.fields.contains_key("name");
-    assert!(has_name_in_merged,
+    assert!(
+        has_name_in_merged,
         "Merged selections should include 'name' from ancestor scope. Merged fields: {:?}",
-        computed.merged.fields.keys().collect::<Vec<_>>());
+        computed.merged.fields.keys().collect::<Vec<_>>()
+    );
 }
 
 // MARK: - Test 15: Fragment Tree Merging (04-06)
@@ -1142,7 +1284,12 @@ fn test_fragment_tree_merging() {
     // Verify fragment tree merging by building a ComputedSelectionSet.
     // If merge_all_selections_into_entity_selection_trees worked, the entity's tree
     // should contain selections from the fragment, visible as merged selections.
-    let root_sel = operation.root_field.selection_set.selections.as_ref().unwrap();
+    let root_sel = operation
+        .root_field
+        .selection_set
+        .selections
+        .as_ref()
+        .unwrap();
     let hero_field = match root_sel.fields.get("hero").unwrap() {
         Field::Entity(ef) => ef,
         _ => panic!("Expected entity field 'hero'"),
@@ -1152,21 +1299,31 @@ fn test_fragment_tree_merging() {
         &hero_field.selection_set,
         MergingStrategy::ALL,
         operation.entity_storage,
-    ).build();
+    )
+    .build();
 
     // Direct selections should include "homeWorld" and the named fragment spread
-    assert!(computed.direct.is_some(), "hero should have direct selections");
+    assert!(
+        computed.direct.is_some(),
+        "hero should have direct selections"
+    );
     let direct = computed.direct.as_ref().unwrap();
-    assert!(direct.fields.contains_key("homeWorld"),
-        "hero should have 'homeWorld' as direct field");
-    assert!(direct.named_fragments.contains_key("HeroFields"),
-        "hero should have 'HeroFields' fragment spread");
+    assert!(
+        direct.fields.contains_key("homeWorld"),
+        "hero should have 'homeWorld' as direct field"
+    );
+    assert!(
+        direct.named_fragments.contains_key("HeroFields"),
+        "hero should have 'HeroFields' fragment spread"
+    );
 
     // Merged selections should include "name" and/or "age" from the fragment
     // (via fragment tree merging into the entity's selection tree)
-    let has_fragment_merged = computed.merged.fields.contains_key("name")
-        || computed.merged.fields.contains_key("age");
-    assert!(has_fragment_merged,
+    let has_fragment_merged =
+        computed.merged.fields.contains_key("name") || computed.merged.fields.contains_key("age");
+    assert!(
+        has_fragment_merged,
         "Merged selections should include fragment fields ('name'/'age'). Merged keys: {:?}",
-        computed.merged.fields.keys().collect::<Vec<_>>());
+        computed.merged.fields.keys().collect::<Vec<_>>()
+    );
 }

@@ -9,8 +9,8 @@ use std::path::Path;
 
 use clap::{Args, ValueEnum};
 
-use apollo_codegen_lib::config::ApolloCodegenConfiguration;
 use apollo_codegen_lib::config::validation::validate_config_values;
+use apollo_codegen_lib::config::ApolloCodegenConfiguration;
 
 use crate::constants;
 use crate::error::CliError;
@@ -142,8 +142,8 @@ impl Initialize {
         );
 
         // Swift decodes the template and runs `ApolloCodegen._validate` on it before any output.
-        let config: ApolloCodegenConfiguration =
-            serde_json::from_str(&json).map_err(|e| CliError::InvalidConfiguration { source: e })?;
+        let config: ApolloCodegenConfiguration = serde_json::from_str(&json)
+            .map_err(|e| CliError::InvalidConfiguration { source: e })?;
         validate_config_values(&config).map_err(|e| CliError::Validation {
             message: format!("{}", e),
         })?;
@@ -164,10 +164,7 @@ impl Initialize {
         if let Some(parent) = Path::new(&self.path).parent() {
             if !parent.as_os_str().is_empty() {
                 std::fs::create_dir_all(parent).map_err(|e| CliError::Generic {
-                    description: format!(
-                        "Failed to create directory for '{}': {}",
-                        self.path, e
-                    ),
+                    description: format!("Failed to create directory for '{}': {}", self.path, e),
                 })?;
             }
         }
@@ -182,7 +179,7 @@ impl Initialize {
     fn validate(&mut self) -> Result<(), CliError> {
         // embeddedInTarget requires --target-name (checked first, as in Swift's `validate()`)
         if matches!(self.module_type, CliModuleType::EmbeddedInTarget)
-            && self.target_name.as_deref().map_or(true, |n| n.is_empty())
+            && self.target_name.as_deref().is_none_or(|n| n.is_empty())
         {
             return Err(CliError::Validation {
                 message: "Target name is required when using \"embeddedInTarget\" module type. \
@@ -193,7 +190,9 @@ impl Initialize {
 
         // Handle deprecated --schema-name (the warning goes to stdout, like `Swift.print`)
         if let Some(ref schema_name) = self.schema_name {
-            println!("Warning: --schema-name is deprecated, please use --schema-namespace instead.");
+            println!(
+                "Warning: --schema-name is deprecated, please use --schema-namespace instead."
+            );
 
             if !self.schema_namespace.is_empty() {
                 return Err(CliError::Validation {
@@ -216,7 +215,10 @@ mod tests {
 
     #[test]
     fn test_cli_module_type_raw_values_match_swift() {
-        assert_eq!(CliModuleType::EmbeddedInTarget.raw_value(), "embeddedInTarget");
+        assert_eq!(
+            CliModuleType::EmbeddedInTarget.raw_value(),
+            "embeddedInTarget"
+        );
         assert_eq!(CliModuleType::SwiftPackage.raw_value(), "swiftPackage");
         assert_eq!(CliModuleType::Other.raw_value(), "other");
     }
@@ -232,11 +234,19 @@ mod tests {
     #[test]
     fn test_minimal_json_matches_swift_template_without_target_name() {
         let json = minimal_json("X", &CliModuleType::Other, None);
-        assert!(json.contains("      \"moduleType\" : {\n        \"other\" : {\n        }\n      }\n"), "{}", json);
+        assert!(
+            json.contains("      \"moduleType\" : {\n        \"other\" : {\n        }\n      }\n"),
+            "{}",
+            json
+        );
         assert!(!json.ends_with('\n'));
         // Swift writes the target name for every module type when one is given.
         let json = minimal_json("X", &CliModuleType::SwiftPackage, Some("T"));
-        assert!(json.contains("        \"swiftPackage\" : {\n          \"name\" : \"T\"\n        }\n"), "{}", json);
+        assert!(
+            json.contains("        \"swiftPackage\" : {\n          \"name\" : \"T\"\n        }\n"),
+            "{}",
+            json
+        );
     }
 
     #[test]

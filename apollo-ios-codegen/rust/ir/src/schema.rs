@@ -95,8 +95,10 @@ impl ReferencedTypes {
         }
 
         // Build the type-to-union map: for each object, find all unions that include it
-        let mut type_to_union_map: IndexMap<Arc<GraphQLObjectType>, IndexSet<Arc<GraphQLUnionType>>> =
-            IndexMap::new();
+        let mut type_to_union_map: IndexMap<
+            Arc<GraphQLObjectType>,
+            IndexSet<Arc<GraphQLUnionType>>,
+        > = IndexMap::new();
         for obj in &objects {
             let containing_unions: IndexSet<Arc<GraphQLUnionType>> = unions
                 .iter()
@@ -159,13 +161,47 @@ impl fmt::Debug for ReferencedTypes {
 
 impl fmt::Display for ReferencedTypes {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "objects: {:?}", self.objects.iter().map(|t| &t.name).collect::<Vec<_>>())?;
-        writeln!(f, "interfaces: {:?}", self.interfaces.iter().map(|t| &t.name).collect::<Vec<_>>())?;
-        writeln!(f, "unions: {:?}", self.unions.iter().map(|t| &t.name).collect::<Vec<_>>())?;
-        writeln!(f, "scalars: {:?}", self.scalars.iter().map(|t| &t.name).collect::<Vec<_>>())?;
-        writeln!(f, "customScalars: {:?}", self.custom_scalars.iter().map(|t| &t.name).collect::<Vec<_>>())?;
-        writeln!(f, "enums: {:?}", self.enums.iter().map(|t| &t.name).collect::<Vec<_>>())?;
-        write!(f, "inputObjects: {:?}", self.input_objects.iter().map(|t| &t.name).collect::<Vec<_>>())
+        writeln!(
+            f,
+            "objects: {:?}",
+            self.objects.iter().map(|t| &t.name).collect::<Vec<_>>()
+        )?;
+        writeln!(
+            f,
+            "interfaces: {:?}",
+            self.interfaces.iter().map(|t| &t.name).collect::<Vec<_>>()
+        )?;
+        writeln!(
+            f,
+            "unions: {:?}",
+            self.unions.iter().map(|t| &t.name).collect::<Vec<_>>()
+        )?;
+        writeln!(
+            f,
+            "scalars: {:?}",
+            self.scalars.iter().map(|t| &t.name).collect::<Vec<_>>()
+        )?;
+        writeln!(
+            f,
+            "customScalars: {:?}",
+            self.custom_scalars
+                .iter()
+                .map(|t| &t.name)
+                .collect::<Vec<_>>()
+        )?;
+        writeln!(
+            f,
+            "enums: {:?}",
+            self.enums.iter().map(|t| &t.name).collect::<Vec<_>>()
+        )?;
+        write!(
+            f,
+            "inputObjects: {:?}",
+            self.input_objects
+                .iter()
+                .map(|t| &t.name)
+                .collect::<Vec<_>>()
+        )
     }
 }
 

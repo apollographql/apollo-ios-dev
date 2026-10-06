@@ -128,7 +128,8 @@ impl SelectionSet {
     ///
     /// Mirrors Swift `SelectionSet.updateScopePath(to:)`.
     pub fn updating_scope_path(&self, new_scope_path: LinkedList<ScopeDescriptor>) -> SelectionSet {
-        let mut type_info = TypeInfo::new(Arc::clone(&self.type_info.entity), new_scope_path.clone());
+        let mut type_info =
+            TypeInfo::new(Arc::clone(&self.type_info.entity), new_scope_path.clone());
         type_info.derived_from_merged_sources = self.type_info.derived_from_merged_sources.clone();
         let selections = self
             .selections
@@ -175,11 +176,7 @@ impl Hash for SelectionSet {
 
 impl fmt::Display for SelectionSet {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "SelectionSet on {}",
-            self.type_info.parent_type()
-        )?;
+        write!(f, "SelectionSet on {}", self.type_info.parent_type())?;
         if let Some(conditions) = self.type_info.inclusion_conditions() {
             write!(f, " {}", conditions)?;
         }

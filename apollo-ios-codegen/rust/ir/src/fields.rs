@@ -69,10 +69,7 @@ impl Field {
     }
 
     /// Sets the inclusion conditions of the field.
-    pub fn set_inclusion_conditions(
-        &mut self,
-        conditions: Option<AnyOf<InclusionConditions>>,
-    ) {
+    pub fn set_inclusion_conditions(&mut self, conditions: Option<AnyOf<InclusionConditions>>) {
         match self {
             Field::Scalar(f) => f.inclusion_conditions = conditions,
             Field::Entity(f) => f.inclusion_conditions = conditions,

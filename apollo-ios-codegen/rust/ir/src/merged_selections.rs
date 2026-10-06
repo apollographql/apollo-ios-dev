@@ -18,7 +18,7 @@ pub struct MergedSource {
     /// The `NamedFragment` that the merged `SelectionSet` was contained in.
     ///
     /// - Note: If `fragment` is present, the `typeInfo` is relative to the fragment,
-    /// instead of the operation directly.
+    ///   instead of the operation directly.
     pub fragment: Option<Arc<NamedFragment>>,
 }
 
@@ -38,7 +38,7 @@ impl Eq for MergedSource {}
 impl Hash for MergedSource {
     fn hash<H: Hasher>(&self, state: &mut H) {
         Arc::as_ptr(&self.type_info).hash(state);
-        self.fragment.as_ref().map(|f| Arc::as_ptr(f)).hash(state);
+        self.fragment.as_ref().map(Arc::as_ptr).hash(state);
     }
 }
 

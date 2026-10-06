@@ -7,11 +7,12 @@ use std::sync::Arc;
 
 use graphql_compiler::schema::{GraphQLInterfaceType, GraphQLNamedType};
 
-use crate::templates::rendering_helpers::graphql_name_rendering::{render_named_type, RenderContext};
+use crate::templates::rendering_helpers::graphql_name_rendering::{
+    render_named_type, RenderContext,
+};
 use crate::templates::rendering_helpers::template_string_documentation::render_documentation;
 use crate::templates::{
-    ConfigurationContext, NonFatalErrorRecorder, SchemaFileType, TemplateRenderer,
-    TemplateTarget,
+    ConfigurationContext, NonFatalErrorRecorder, SchemaFileType, TemplateRenderer, TemplateTarget,
 };
 
 /// Provides the format to convert a GraphQL Interface into Swift code.
@@ -31,10 +32,7 @@ impl TemplateRenderer for InterfaceTemplate {
         TemplateTarget::SchemaFile(SchemaFileType::Interface)
     }
 
-    fn render_body_template(
-        &self,
-        _non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
+    fn render_body_template(&self, _non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
         let mut parts: Vec<String> = Vec::new();
 
         // Documentation
@@ -52,7 +50,9 @@ impl TemplateRenderer for InterfaceTemplate {
 
         let typename = render_named_type(
             &GraphQLNamedType::Interface(Arc::clone(&self.graphql_interface)),
-            &RenderContext::Typename { is_input_value: false },
+            &RenderContext::Typename {
+                is_input_value: false,
+            },
         );
 
         let key_fields = self.render_key_fields();
@@ -101,7 +101,9 @@ impl InterfaceTemplate {
             .map(|obj| {
                 let type_name = render_named_type(
                     &GraphQLNamedType::Object(Arc::clone(obj)),
-                    &RenderContext::Typename { is_input_value: false },
+                    &RenderContext::Typename {
+                        is_input_value: false,
+                    },
                 );
                 format!("\"{}\"", type_name)
             })
@@ -126,8 +128,8 @@ impl InterfaceTemplate {
 mod tests {
     use super::*;
     use crate::config::ApolloCodegenConfiguration;
-    use crate::templates::ConfigurationContext;
     use crate::templates::rendering_helpers::string_casing::first_uppercased;
+    use crate::templates::ConfigurationContext;
     use graphql_compiler::graphql_name::GraphQLName;
     use graphql_compiler::schema::GraphQLObjectType;
     use indexmap::IndexMap;
@@ -219,16 +221,8 @@ mod tests {
             "actual:\n{}",
             actual
         );
-        assert!(
-            actual.contains("name: \"aDog\""),
-            "actual:\n{}",
-            actual
-        );
-        assert!(
-            actual.contains("keyFields: nil"),
-            "actual:\n{}",
-            actual
-        );
+        assert!(actual.contains("name: \"aDog\""), "actual:\n{}", actual);
+        assert!(actual.contains("keyFields: nil"), "actual:\n{}", actual);
         assert!(
             actual.contains("implementingObjects: []"),
             "actual:\n{}",
@@ -273,11 +267,7 @@ mod tests {
             config: config_with_docs(false),
         };
         let actual = render_body(&template);
-        assert!(
-            !actual.contains("///"),
-            "actual:\n{}",
-            actual
-        );
+        assert!(!actual.contains("///"), "actual:\n{}", actual);
         assert!(
             actual.starts_with("nonisolated static let Dog = ApolloAPI.Interface("),
             "actual:\n{}",
@@ -298,7 +288,10 @@ mod tests {
             let actual = render_body(&template);
             let expected_name = format!("{}_Interface", first_uppercased(keyword));
             assert!(
-                actual.contains(&format!("static let {} = ApolloAPI.Interface(", expected_name)),
+                actual.contains(&format!(
+                    "static let {} = ApolloAPI.Interface(",
+                    expected_name
+                )),
                 "keyword={}, actual:\n{}",
                 keyword,
                 actual
@@ -360,16 +353,8 @@ mod tests {
             "keyFields should appear in output, actual:\n{}",
             actual
         );
-        assert!(
-            actual.contains("\"parentID\""),
-            "actual:\n{}",
-            actual
-        );
-        assert!(
-            actual.contains("\"index\""),
-            "actual:\n{}",
-            actual
-        );
+        assert!(actual.contains("\"parentID\""), "actual:\n{}", actual);
+        assert!(actual.contains("\"index\""), "actual:\n{}", actual);
     }
 
     #[test]
@@ -380,11 +365,7 @@ mod tests {
             config: default_config(),
         };
         let actual = render_body(&template);
-        assert!(
-            actual.contains("keyFields: nil"),
-            "actual:\n{}",
-            actual
-        );
+        assert!(actual.contains("keyFields: nil"), "actual:\n{}", actual);
     }
 
     // MARK: - Implementing Objects Tests
@@ -404,16 +385,8 @@ mod tests {
             "implementingObjects should appear in output, actual:\n{}",
             actual
         );
-        assert!(
-            actual.contains("\"MyObject\""),
-            "actual:\n{}",
-            actual
-        );
-        assert!(
-            actual.contains("\"SecondObject\""),
-            "actual:\n{}",
-            actual
-        );
+        assert!(actual.contains("\"MyObject\""), "actual:\n{}", actual);
+        assert!(actual.contains("\"SecondObject\""), "actual:\n{}", actual);
     }
 
     #[test]

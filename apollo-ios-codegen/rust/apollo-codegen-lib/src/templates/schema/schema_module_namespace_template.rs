@@ -25,10 +25,7 @@ impl TemplateRenderer for SchemaModuleNamespaceTemplate {
         TemplateTarget::ModuleFile
     }
 
-    fn render_body_template(
-        &self,
-        _non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
+    fn render_body_template(&self, _non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
         let access_control = self.access_control_renderer(Scope::Namespace).render();
         let namespace = first_uppercased(self.config.schema_namespace());
         format!("{}enum {} {{ }}\n", access_control, namespace)

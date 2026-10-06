@@ -103,8 +103,6 @@
 //! - Documented skips: 6 (78 Swift test methods total)
 //! - Helper files (no tests): 4 + 1 (String+Data.swift has 0 methods)
 
-use pretty_assertions::assert_eq;
-
 // ============================================================================
 // DOCUMENTED SKIPS
 // ============================================================================
@@ -264,14 +262,14 @@ fn skip_file_manager_extension_tests() {}
 // ---------------------------------------------------------------------------
 // The Swift CompilationTests test the compile() flow through the JSC frontend.
 // The Rust adapter.rs already covers type registry building, type conversion,
-// field argument resolution, and GAP-01 through GAP-03. These gap-fill tests
+// field argument resolution, and the graphql-js gap fills. These gap-fill tests
 // cover apollo-compiler schema parsing and document validation matching the
 // behaviors tested in Swift's CompilationTests.
 mod compilation_tests {
     // Mirrors: Tests/ApolloCodegenTests/Frontend/CompilationTests.swift
 
-    use apollo_compiler::validation::Valid;
     use apollo_compiler::schema;
+    use apollo_compiler::validation::Valid;
 
     fn parse_and_validate(sdl: &str) -> Valid<schema::Schema> {
         schema::Schema::parse_and_validate(sdl, "test.graphql")
@@ -280,9 +278,8 @@ mod compilation_tests {
 
     #[test]
     fn test_compile_given_single_query_parses_successfully() {
-        let schema = parse_and_validate(
-            "type Query { hero: Character }\ntype Character { name: String }",
-        );
+        let schema =
+            parse_and_validate("type Query { hero: Character }\ntype Character { name: String }");
         let doc = apollo_compiler::ExecutableDocument::parse_and_validate(
             &schema,
             "query HeroQuery { hero { name } }",
@@ -341,8 +338,8 @@ mod compilation_tests {
 mod document_parsing_and_validation_tests {
     // Mirrors: Tests/ApolloCodegenTests/Frontend/DocumentParsingAndValidationTests.swift
 
-    use apollo_compiler::validation::Valid;
     use apollo_compiler::schema;
+    use apollo_compiler::validation::Valid;
 
     fn parse_and_validate(sdl: &str) -> Valid<schema::Schema> {
         schema::Schema::parse_and_validate(sdl, "test.graphql")
@@ -365,7 +362,7 @@ mod document_parsing_and_validation_tests {
         let schema = parse_and_validate("type Query { hero: String }");
         let doc = apollo_compiler::ExecutableDocument::parse_and_validate(
             &schema,
-            "query { hero",  // missing closing brace
+            "query { hero", // missing closing brace
             "operation.graphql",
         );
         assert!(doc.is_err(), "syntax error should produce an error");
@@ -425,10 +422,13 @@ mod schema_loading_tests {
     fn test_parse_schema_from_sdl_with_syntax_error() {
         // apollo-compiler's parse_and_validate should reject invalid SDL
         let result = apollo_compiler::Schema::parse_and_validate(
-            "type Query { hero }",  // missing type annotation
+            "type Query { hero }", // missing type annotation
             "schema.graphqls",
         );
-        assert!(result.is_err(), "SDL with syntax error should fail validation");
+        assert!(
+            result.is_err(),
+            "SDL with syntax error should fail validation"
+        );
     }
 
     #[test]
@@ -478,7 +478,8 @@ mod compilation_apollo_specific_directive_tests {
 
     #[test]
     fn test_build_network_request_source_strips_import_directive() {
-        let source = "query HeroQuery @import(module: \"HeroModule\") {\n  hero {\n    name\n  }\n}";
+        let source =
+            "query HeroQuery @import(module: \"HeroModule\") {\n  hero {\n    name\n  }\n}";
         let result = adapter::build_network_request_source(source, false);
         assert!(
             !result.contains("@import"),
@@ -493,7 +494,10 @@ mod compilation_apollo_specific_directive_tests {
             "test.graphql",
         ).unwrap();
         let registry = graphql_compiler::TypeRegistry::from_schema(&schema);
-        assert!(registry.get("Character").is_some(), "Character type should exist in registry");
+        assert!(
+            registry.get("Character").is_some(),
+            "Character type should exist in registry"
+        );
     }
 }
 
@@ -572,9 +576,8 @@ mod compilation_result_schema_documentation_tests {
 
     #[test]
     fn test_scalar_type_documentation_preserved() {
-        let registry = build_registry(
-            "\"A date-time string\"\nscalar DateTime\ntype Query { now: DateTime }",
-        );
+        let registry =
+            build_registry("\"A date-time string\"\nscalar DateTime\ntype Query { now: DateTime }");
         let scalar_type = registry.get("DateTime").expect("DateTime should exist");
         match scalar_type {
             GraphQLNamedType::Scalar(s) => {
@@ -593,7 +596,9 @@ mod compilation_result_schema_documentation_tests {
         let registry = build_registry(
             "\"Filter criteria\"\ninput SearchFilter { query: String }\ntype Query { search(f: SearchFilter): String }",
         );
-        let input_type = registry.get("SearchFilter").expect("SearchFilter should exist");
+        let input_type = registry
+            .get("SearchFilter")
+            .expect("SearchFilter should exist");
         match input_type {
             GraphQLNamedType::InputObject(io) => {
                 assert_eq!(
@@ -611,7 +616,9 @@ mod compilation_result_schema_documentation_tests {
         let registry = build_registry(
             "\"Search results\"\nunion SearchResult = Human | Droid\ntype Human { name: String }\ntype Droid { id: ID }\ntype Query { search: SearchResult }",
         );
-        let union_type = registry.get("SearchResult").expect("SearchResult should exist");
+        let union_type = registry
+            .get("SearchResult")
+            .expect("SearchResult should exist");
         match union_type {
             GraphQLNamedType::Union(u) => {
                 assert_eq!(
@@ -655,8 +662,8 @@ mod glob_tests {
     // Mirrors: Tests/ApolloCodegenTests/GlobTests.swift
 
     use apollo_codegen_lib::file_discovery;
-    use tempfile::TempDir;
     use std::fs;
+    use tempfile::TempDir;
 
     fn create_test_files(dir: &std::path::Path, names: &[&str]) {
         for name in names {
@@ -674,7 +681,10 @@ mod glob_tests {
         create_test_files(tmp.path(), &["file.txt"]);
         let pattern = format!("{}/**/*.graphql", tmp.path().display());
         let results = file_discovery::match_search_paths(&[pattern], None).unwrap();
-        assert!(results.is_empty(), "no .graphql files exist, should return empty");
+        assert!(
+            results.is_empty(),
+            "no .graphql files exist, should return empty"
+        );
     }
 
     #[test]
@@ -698,14 +708,21 @@ mod glob_tests {
     #[test]
     fn test_match_given_globstar_pattern_discovers_nested_files() {
         let tmp = TempDir::new().unwrap();
-        create_test_files(tmp.path(), &[
-            "schema.graphql",
-            "queries/hero.graphql",
-            "queries/deep/nested.graphql",
-        ]);
+        create_test_files(
+            tmp.path(),
+            &[
+                "schema.graphql",
+                "queries/hero.graphql",
+                "queries/deep/nested.graphql",
+            ],
+        );
         let pattern = format!("{}/**/*.graphql", tmp.path().display());
         let results = file_discovery::match_search_paths(&[pattern], None).unwrap();
-        assert_eq!(results.len(), 3, "globstar should find all nested .graphql files");
+        assert_eq!(
+            results.len(),
+            3,
+            "globstar should find all nested .graphql files"
+        );
     }
 
     #[test]
@@ -715,7 +732,11 @@ mod glob_tests {
         let pat1 = format!("{}/*.graphql", tmp.path().display());
         let pat2 = format!("{}/*.graphqls", tmp.path().display());
         let results = file_discovery::match_search_paths(&[pat1, pat2], None).unwrap();
-        assert_eq!(results.len(), 2, "both patterns should match different files");
+        assert_eq!(
+            results.len(),
+            2,
+            "both patterns should match different files"
+        );
     }
 }
 
@@ -761,8 +782,14 @@ mod schema_customization_tests {
 
         // Verify customization survives round-trip
         let custom_types = &deserialized.options.schema_customization.custom_type_names;
-        assert!(custom_types.contains_key("MyEnum"), "MyEnum custom name should survive round-trip");
-        assert!(custom_types.contains_key("MyObject"), "MyObject custom name should survive round-trip");
+        assert!(
+            custom_types.contains_key("MyEnum"),
+            "MyEnum custom name should survive round-trip"
+        );
+        assert!(
+            custom_types.contains_key("MyObject"),
+            "MyObject custom name should survive round-trip"
+        );
     }
 
     #[test]
@@ -784,7 +811,11 @@ mod schema_customization_tests {
         }"#;
         let config: ApolloCodegenConfiguration = serde_json::from_str(json).unwrap();
         assert!(
-            config.options.schema_customization.custom_type_names.is_empty(),
+            config
+                .options
+                .schema_customization
+                .custom_type_names
+                .is_empty(),
             "default customization should have empty custom type names"
         );
     }
@@ -822,7 +853,10 @@ mod reduce_generated_schema_types_tests {
             }
         }"#;
         let config: ApolloCodegenConfiguration = serde_json::from_str(json).unwrap();
-        assert!(config.options.prune_generated_files, "pruneGeneratedFiles should be true");
+        assert!(
+            config.options.prune_generated_files,
+            "pruneGeneratedFiles should be true"
+        );
     }
 
     #[test]
@@ -843,7 +877,10 @@ mod reduce_generated_schema_types_tests {
             }
         }"#;
         let config: ApolloCodegenConfiguration = serde_json::from_str(json).unwrap();
-        assert!(config.options.prune_generated_files, "default pruneGeneratedFiles should be true");
+        assert!(
+            config.options.prune_generated_files,
+            "default pruneGeneratedFiles should be true"
+        );
     }
 }
 
@@ -868,13 +905,17 @@ mod ir_root_field_builder_tests {
 
     #[test]
     fn test_build_schema_with_scalar_fields() {
-        let registry = build_registry(
-            "type Query { name: String age: Int active: Boolean }",
-        );
+        let registry = build_registry("type Query { name: String age: Int active: Boolean }");
         assert!(registry.get("Query").is_some(), "Query type should exist");
-        assert!(registry.get("String").is_some(), "String scalar should exist");
+        assert!(
+            registry.get("String").is_some(),
+            "String scalar should exist"
+        );
         assert!(registry.get("Int").is_some(), "Int scalar should exist");
-        assert!(registry.get("Boolean").is_some(), "Boolean scalar should exist");
+        assert!(
+            registry.get("Boolean").is_some(),
+            "Boolean scalar should exist"
+        );
     }
 
     #[test]
@@ -885,8 +926,14 @@ mod ir_root_field_builder_tests {
         let char_type = registry.get("Character").expect("Character should exist");
         match char_type {
             GraphQLNamedType::Object(obj) => {
-                assert!(obj.fields.contains_key("name"), "Character should have name field");
-                assert!(obj.fields.contains_key("friend"), "Character should have friend field");
+                assert!(
+                    obj.fields.contains_key("name"),
+                    "Character should have name field"
+                );
+                assert!(
+                    obj.fields.contains_key("friend"),
+                    "Character should have friend field"
+                );
             }
             _ => panic!("Character should be an object type"),
         }
@@ -897,7 +944,10 @@ mod ir_root_field_builder_tests {
         let registry = build_registry(
             "type Query { animal: Animal }\ninterface Animal { species: String }\ntype Cat implements Animal { species: String livesLeft: Int }\ntype Dog implements Animal { species: String breed: String }",
         );
-        assert!(registry.get("Animal").is_some(), "Animal interface should exist");
+        assert!(
+            registry.get("Animal").is_some(),
+            "Animal interface should exist"
+        );
         assert!(registry.get("Cat").is_some(), "Cat type should exist");
         assert!(registry.get("Dog").is_some(), "Dog type should exist");
 
@@ -913,7 +963,9 @@ mod ir_root_field_builder_tests {
         let registry = build_registry(
             "type Query { search: SearchResult }\nunion SearchResult = Human | Droid\ntype Human { name: String }\ntype Droid { primaryFunction: String }",
         );
-        let union_type = registry.get("SearchResult").expect("SearchResult should exist");
+        let union_type = registry
+            .get("SearchResult")
+            .expect("SearchResult should exist");
         match union_type {
             GraphQLNamedType::Union(u) => {
                 assert_eq!(u.types.len(), 2, "union should have 2 member types");
@@ -998,7 +1050,11 @@ mod ir_field_collector_tests {
             "type Query { search: SearchResult }\nunion SearchResult = Human | Droid\ntype Human { name: String }\ntype Droid { id: ID }",
         );
         if let Some(GraphQLNamedType::Union(union)) = registry.get("SearchResult") {
-            assert_eq!(union.types.len(), 2, "SearchResult should have 2 member types");
+            assert_eq!(
+                union.types.len(),
+                2,
+                "SearchResult should have 2 member types"
+            );
         } else {
             panic!("SearchResult should be a union type");
         }
@@ -1006,12 +1062,15 @@ mod ir_field_collector_tests {
 
     #[test]
     fn test_field_arguments_collected() {
-        let registry = build_registry(
-            "type Query { search(query: String!, limit: Int = 10): [String] }",
-        );
+        let registry =
+            build_registry("type Query { search(query: String!, limit: Int = 10): [String] }");
         if let Some(GraphQLNamedType::Object(obj)) = registry.get("Query") {
             let search_field = obj.fields.get("search").expect("search field should exist");
-            assert_eq!(search_field.arguments.len(), 2, "search should have 2 arguments");
+            assert_eq!(
+                search_field.arguments.len(),
+                2,
+                "search should have 2 arguments"
+            );
         } else {
             panic!("Query should be an object type");
         }

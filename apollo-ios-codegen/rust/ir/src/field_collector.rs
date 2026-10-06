@@ -1,29 +1,30 @@
 //! FieldCollector -- tracks fields per type using Mutex-based interior mutability.
 //!
 //! Mirrors `IR.FieldCollector` from `IR+FieldCollector.swift` (59 lines).
-//! Uses Mutex per D-31 (Swift actor -> Rust Mutex).
+//! Uses Mutex (Swift actor -> Rust Mutex).
 
 use std::sync::Mutex;
 
-use graphql_compiler::{compilation_result, GraphQLCompositeType, GraphQLInterfaceType, GraphQLType};
+use graphql_compiler::{
+    compilation_result, GraphQLCompositeType, GraphQLInterfaceType, GraphQLType,
+};
 use indexmap::IndexMap;
 
 // MARK: - FieldCollector
 
 /// Collects fields referenced per type during IR construction.
 ///
-/// In Swift this is an `actor`. In Rust we use `Mutex` per D-31.
-/// All async functions become synchronous per D-32.
+/// In Swift this is an `actor`. In Rust we use `Mutex`.
+/// All async functions become synchronous.
 ///
 /// Mirrors `IR.FieldCollector` from `IR+FieldCollector.swift`.
 pub struct FieldCollector {
-    collected_fields: Mutex<
-        IndexMap<
-            GraphQLCompositeType,
-            IndexMap<String, (GraphQLType, Option<String>)>,
-        >,
-    >,
+    collected_fields: Mutex<CollectedFields>,
 }
+
+/// Collected fields per composite type: response key -> (type, deprecation reason).
+type CollectedFields =
+    IndexMap<GraphQLCompositeType, IndexMap<String, (GraphQLType, Option<String>)>>;
 
 /// Collected field tuple: (response_key, type, deprecation_reason).
 pub type CollectedField = (String, GraphQLType, Option<String>);
@@ -61,15 +62,15 @@ impl FieldCollector {
     fn add_field_to_map(
         field: &compilation_result::Field,
         type_: &GraphQLCompositeType,
-        fields: &mut IndexMap<GraphQLCompositeType, IndexMap<String, (GraphQLType, Option<String>)>>,
+        fields: &mut IndexMap<
+            GraphQLCompositeType,
+            IndexMap<String, (GraphQLType, Option<String>)>,
+        >,
     ) {
-        let type_fields = fields.entry(type_.clone()).or_insert_with(IndexMap::new);
+        let type_fields = fields.entry(type_.clone()).or_default();
         let key = field.response_key().to_string();
         if !type_fields.contains_key(&key) {
-            type_fields.insert(
-                key,
-                (field.type_.clone(), field.deprecation_reason.clone()),
-            );
+            type_fields.insert(key, (field.type_.clone(), field.deprecation_reason.clone()));
         }
     }
 
@@ -77,10 +78,7 @@ impl FieldCollector {
     ///
     /// Returns fields sorted by field name.
     /// Mirrors Swift's `collectedFields(for:)`.
-    pub fn collected_fields_for(
-        &self,
-        type_: &GraphQLCompositeType,
-    ) -> Vec<CollectedField> {
+    pub fn collected_fields_for(&self, type_: &GraphQLCompositeType) -> Vec<CollectedField> {
         let fields = self.collected_fields.lock().expect("lock poisoned");
 
         let mut result: IndexMap<String, (GraphQLType, Option<String>)> =
@@ -135,9 +133,7 @@ fn get_interfaces(type_: &GraphQLCompositeType) -> Vec<&std::sync::Arc<GraphQLIn
 #[cfg(test)]
 mod tests {
     use super::*;
-    use graphql_compiler::{
-        GraphQLName, GraphQLObjectType, GraphQLScalarType,
-    };
+    use graphql_compiler::{GraphQLName, GraphQLObjectType, GraphQLScalarType};
     use std::sync::Arc;
 
     fn make_scalar_type() -> GraphQLType {
@@ -211,9 +207,10 @@ mod tests {
 
         let ss = compilation_result::SelectionSet {
             parent_type: parent_type.clone(),
-            selections: vec![
-                compilation_result::Selection::Field(make_field("name", make_scalar_type())),
-            ],
+            selections: vec![compilation_result::Selection::Field(make_field(
+                "name",
+                make_scalar_type(),
+            ))],
         };
 
         collector.collect_fields(&ss);
@@ -237,9 +234,10 @@ mod tests {
 
         let ss = compilation_result::SelectionSet {
             parent_type: parent_type.clone(),
-            selections: vec![
-                compilation_result::Selection::Field(make_field("name", make_scalar_type())),
-            ],
+            selections: vec![compilation_result::Selection::Field(make_field(
+                "name",
+                make_scalar_type(),
+            ))],
         };
 
         collector.collect_fields(&ss);

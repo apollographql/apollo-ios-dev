@@ -7,12 +7,13 @@ use std::sync::Arc;
 
 use graphql_compiler::schema::{GraphQLNamedType, GraphQLObjectType};
 
-use crate::templates::rendering_helpers::graphql_name_rendering::{render_named_type, RenderContext};
+use crate::templates::rendering_helpers::graphql_name_rendering::{
+    render_named_type, RenderContext,
+};
 use crate::templates::rendering_helpers::string_casing::first_uppercased;
 use crate::templates::rendering_helpers::template_string_documentation::render_documentation;
 use crate::templates::{
-    ConfigurationContext, NonFatalErrorRecorder, SchemaFileType, TemplateRenderer,
-    TemplateTarget,
+    ConfigurationContext, NonFatalErrorRecorder, SchemaFileType, TemplateRenderer, TemplateTarget,
 };
 
 /// Provides the format to convert a GraphQL Object into Swift code.
@@ -32,17 +33,13 @@ impl TemplateRenderer for ObjectTemplate {
         TemplateTarget::SchemaFile(SchemaFileType::Object)
     }
 
-    fn render_body_template(
-        &self,
-        _non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
+    fn render_body_template(&self, _non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
         let mut parts: Vec<String> = Vec::new();
 
         // Documentation
-        if let Some(doc) = render_documentation(
-            self.graphql_object.documentation.as_deref(),
-            &self.config,
-        ) {
+        if let Some(doc) =
+            render_documentation(self.graphql_object.documentation.as_deref(), &self.config)
+        {
             parts.push(doc);
         }
 
@@ -53,7 +50,9 @@ impl TemplateRenderer for ObjectTemplate {
 
         let typename = render_named_type(
             &GraphQLNamedType::Object(Arc::clone(&self.graphql_object)),
-            &RenderContext::Typename { is_input_value: false },
+            &RenderContext::Typename {
+                is_input_value: false,
+            },
         );
 
         let implemented_interfaces = self.render_implemented_interfaces();
@@ -102,7 +101,9 @@ impl ObjectTemplate {
             .map(|iface| {
                 let iface_name = render_named_type(
                     &GraphQLNamedType::Interface(Arc::clone(iface)),
-                    &RenderContext::Typename { is_input_value: false },
+                    &RenderContext::Typename {
+                        is_input_value: false,
+                    },
                 );
                 format!("{}Interfaces.{}.self", namespace_prefix, iface_name)
             })
@@ -265,7 +266,11 @@ mod tests {
             config: default_config(),
         };
         let actual = render_body(&template);
-        assert!(actual.ends_with("\n)"), "Should end with closing paren, got:\n{}", actual);
+        assert!(
+            actual.ends_with("\n)"),
+            "Should end with closing paren, got:\n{}",
+            actual
+        );
     }
 
     // MARK: - Class Definition Tests
@@ -283,19 +288,12 @@ mod tests {
             "actual:\n{}",
             actual
         );
-        assert!(
-            actual.contains("typename: \"dog\""),
-            "actual:\n{}",
-            actual
-        );
+        assert!(actual.contains("typename: \"dog\""), "actual:\n{}", actual);
     }
 
     #[test]
     fn test_render_interfaces_embedded_in_target_has_schema_namespace() {
-        let interfaces = vec![
-            make_interface("Animal", None),
-            make_interface("Pet", None),
-        ];
+        let interfaces = vec![make_interface("Animal", None), make_interface("Pet", None)];
         let obj = make_object("Dog", None, interfaces, None, None);
         let template = ObjectTemplate {
             graphql_object: obj,
@@ -316,10 +314,7 @@ mod tests {
 
     #[test]
     fn test_render_interfaces_not_embedded_no_schema_namespace() {
-        let interfaces = vec![
-            make_interface("Animal", None),
-            make_interface("Pet", None),
-        ];
+        let interfaces = vec![make_interface("Animal", None), make_interface("Pet", None)];
         let obj = make_object("Dog", None, interfaces, None, None);
         let template = ObjectTemplate {
             graphql_object: obj,
@@ -361,13 +356,7 @@ mod tests {
 
     #[test]
     fn test_render_single_key_field() {
-        let obj = make_object(
-            "Dog",
-            None,
-            vec![],
-            Some(vec!["id".to_string()]),
-            None,
-        );
+        let obj = make_object("Dog", None, vec![], Some(vec!["id".to_string()]), None);
         let template = ObjectTemplate {
             graphql_object: obj,
             config: default_config(),
@@ -439,11 +428,7 @@ mod tests {
             config: config_with_docs(false),
         };
         let actual = render_body(&template);
-        assert!(
-            !actual.contains("///"),
-            "actual:\n{}",
-            actual
-        );
+        assert!(!actual.contains("///"), "actual:\n{}", actual);
         assert!(
             actual.starts_with("nonisolated static let Dog"),
             "actual:\n{}",

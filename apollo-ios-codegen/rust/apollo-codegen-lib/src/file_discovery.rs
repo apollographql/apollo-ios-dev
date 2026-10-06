@@ -85,8 +85,8 @@ pub fn match_search_paths(
         // depth-first descent, so group its matches by parent directory, keeping
         // directories in order of first appearance (root first).
         let mut dir_order: Vec<std::path::PathBuf> = Vec::new();
-        let mut by_dir: std::collections::HashMap<std::path::PathBuf, Vec<String>> =
-            std::collections::HashMap::new();
+        let mut by_dir: indexmap::IndexMap<std::path::PathBuf, Vec<String>> =
+            indexmap::IndexMap::new();
         // Links are followed so that symlinked files and directories (how Bazel sandboxes
         // and `ctx.actions.symlink` present inputs) are discovered like regular ones.
         for entry in WalkDir::new(base)
@@ -117,7 +117,7 @@ pub fn match_search_paths(
             }
         }
         for dir in dir_order {
-            if let Some(files) = by_dir.remove(&dir) {
+            if let Some(files) = by_dir.swap_remove(&dir) {
                 for m in files {
                     results.insert(m);
                 }
@@ -166,7 +166,7 @@ fn make_absolute(path: &Path) -> String {
 
 /// Whether the pattern contains glob metacharacters (`*`, `?` or `[`).
 fn has_glob_characters(pattern: &str) -> bool {
-    pattern.contains(|c: char| c == '*' || c == '?' || c == '[')
+    pattern.contains(['*', '?', '['])
 }
 
 /// Extracts the base directory from a glob pattern.
@@ -175,7 +175,7 @@ fn has_glob_characters(pattern: &str) -> bool {
 /// If no wildcard is found, returns the pattern's parent directory.
 fn extract_base_dir(pattern: &str) -> String {
     // Find first glob special character
-    let first_special = pattern.find(|c: char| c == '*' || c == '?' || c == '[');
+    let first_special = pattern.find(['*', '?', '[']);
     let prefix = match first_special {
         Some(pos) => &pattern[..pos],
         None => pattern,
@@ -239,7 +239,10 @@ mod tests {
         assert_eq!(candidate_path("./schema.graphqls", true), "schema.graphqls");
         assert_eq!(candidate_path("./a/b.graphql", true), "a/b.graphql");
         assert_eq!(candidate_path("schema.graphqls", true), "schema.graphqls");
-        assert_eq!(candidate_path("./schema.graphqls", false), "./schema.graphqls");
+        assert_eq!(
+            candidate_path("./schema.graphqls", false),
+            "./schema.graphqls"
+        );
         assert_eq!(candidate_path("sub/x.graphql", false), "sub/x.graphql");
     }
 
@@ -282,11 +285,8 @@ mod tests {
 
     #[test]
     fn test_match_search_paths_nonexistent_dir_returns_empty() {
-        let result = match_search_paths(
-            &["/nonexistent/path/**/*.graphql".to_string()],
-            None,
-        )
-        .unwrap();
+        let result =
+            match_search_paths(&["/nonexistent/path/**/*.graphql".to_string()], None).unwrap();
         assert!(result.is_empty());
     }
 
@@ -342,11 +342,8 @@ mod tests {
         std::fs::create_dir_all(schema_file.parent().unwrap()).unwrap();
         std::fs::write(&schema_file, "type Query { id: ID }").unwrap();
 
-        let result = match_search_paths(
-            &["src/**/*.graphql".to_string()],
-            Some(dir.path()),
-        )
-        .unwrap();
+        let result =
+            match_search_paths(&["src/**/*.graphql".to_string()], Some(dir.path())).unwrap();
         assert_eq!(result.len(), 1);
     }
     /// Bazel sandboxes and `ctx.actions.symlink` present inputs as symlinks: a literal
@@ -365,29 +362,46 @@ mod tests {
 
         let staged = tempdir().unwrap();
         // literal path -> file symlink
-        symlink(real.path().join("schema.graphqls"), staged.path().join("schema.graphqls")).unwrap();
+        symlink(
+            real.path().join("schema.graphqls"),
+            staged.path().join("schema.graphqls"),
+        )
+        .unwrap();
         // file symlink inside a walked directory
         std::fs::create_dir_all(staged.path().join("linked-files")).unwrap();
-        symlink(real.path().join("ops/Q.graphql"), staged.path().join("linked-files/Q.graphql")).unwrap();
+        symlink(
+            real.path().join("ops/Q.graphql"),
+            staged.path().join("linked-files/Q.graphql"),
+        )
+        .unwrap();
         // directory symlink
         symlink(real.path().join("ops"), staged.path().join("linked-dir")).unwrap();
 
         let schema = match_search_paths(
-            &[staged.path().join("schema.graphqls").to_string_lossy().to_string()],
+            &[staged
+                .path()
+                .join("schema.graphqls")
+                .to_string_lossy()
+                .to_string()],
             None,
         )
         .unwrap();
         assert_eq!(schema.len(), 1, "{:?}", schema);
         assert!(schema.iter().next().unwrap().ends_with("/schema.graphqls"));
 
-        let ops = match_search_paths(
-            &[format!("{}/**/*.graphql", staged.path().display())],
-            None,
-        )
-        .unwrap();
+        let ops = match_search_paths(&[format!("{}/**/*.graphql", staged.path().display())], None)
+            .unwrap();
         assert_eq!(ops.len(), 2, "{:?}", ops);
-        assert!(ops.iter().any(|p| p.ends_with("/linked-files/Q.graphql")), "{:?}", ops);
-        assert!(ops.iter().any(|p| p.ends_with("/linked-dir/Q.graphql")), "{:?}", ops);
+        assert!(
+            ops.iter().any(|p| p.ends_with("/linked-files/Q.graphql")),
+            "{:?}",
+            ops
+        );
+        assert!(
+            ops.iter().any(|p| p.ends_with("/linked-dir/Q.graphql")),
+            "{:?}",
+            ops
+        );
     }
 
     #[test]
@@ -397,11 +411,19 @@ mod tests {
         let dir = tempdir().unwrap();
         std::fs::write(dir.path().join("schema.graphqls"), "type Query { a: Int }").unwrap();
         std::fs::create_dir_all(dir.path().join("sub")).unwrap();
-        std::fs::write(dir.path().join("sub/other.graphqls"), "type Query { b: Int }").unwrap();
+        std::fs::write(
+            dir.path().join("sub/other.graphqls"),
+            "type Query { b: Int }",
+        )
+        .unwrap();
 
         // Exact file: found without walking the directory (the sibling is not matched).
         let found = match_search_paths(
-            &[dir.path().join("schema.graphqls").to_string_lossy().to_string()],
+            &[dir
+                .path()
+                .join("schema.graphqls")
+                .to_string_lossy()
+                .to_string()],
             None,
         )
         .unwrap();
@@ -410,7 +432,11 @@ mod tests {
 
         // Missing file: no match, no error.
         let missing = match_search_paths(
-            &[dir.path().join("missing.graphqls").to_string_lossy().to_string()],
+            &[dir
+                .path()
+                .join("missing.graphqls")
+                .to_string_lossy()
+                .to_string()],
             None,
         )
         .unwrap();
@@ -425,7 +451,8 @@ mod tests {
         assert!(directory.is_empty());
 
         // Relative literal resolved against `relative_to`.
-        let relative = match_search_paths(&["schema.graphqls".to_string()], Some(dir.path())).unwrap();
+        let relative =
+            match_search_paths(&["schema.graphqls".to_string()], Some(dir.path())).unwrap();
         assert_eq!(relative.len(), 1, "{:?}", relative);
     }
 }

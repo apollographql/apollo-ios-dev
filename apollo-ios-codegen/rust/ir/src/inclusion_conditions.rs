@@ -106,13 +106,6 @@ impl InclusionConditions {
         InclusionConditions::from_set(conditions)
     }
 
-    /// Appends all conditions from another `InclusionConditions` (mutating).
-    pub(crate) fn append_conditions(&mut self, other: &InclusionConditions) {
-        for condition in &other.conditions {
-            self.conditions.insert(condition.clone());
-        }
-    }
-
     /// Returns a new `InclusionConditions` with all conditions from `other` appended.
     pub fn appending_conditions(&self, other: &InclusionConditions) -> InclusionConditions {
         let mut conditions = self.conditions.clone();
@@ -223,10 +216,7 @@ impl InclusionResult {
     /// Applies `&&` with a compilation-result inclusion condition.
     ///
     /// Converts the compilation-result condition to an IR condition and delegates.
-    pub fn and_compilation_condition(
-        self,
-        rhs: &compilation_result::InclusionCondition,
-    ) -> Self {
+    pub fn and_compilation_condition(self, rhs: &compilation_result::InclusionCondition) -> Self {
         match rhs {
             compilation_result::InclusionCondition::Skipped => InclusionResult::Skipped,
             compilation_result::InclusionCondition::Included => self,
@@ -297,7 +287,7 @@ impl<T: Hash + Eq> AnyOf<T> {
     }
 
     /// Creates an `AnyOf` from an iterator of elements.
-    pub fn from_iter(elements: impl IntoIterator<Item = T>) -> Self {
+    pub fn from_elements(elements: impl IntoIterator<Item = T>) -> Self {
         AnyOf {
             elements: elements.into_iter().collect(),
         }
@@ -421,7 +411,8 @@ mod tests {
 
     #[test]
     fn conditions_append_adds_condition() {
-        let mut conditions = InclusionConditions::new(InclusionCondition::include_if("a".to_string()));
+        let mut conditions =
+            InclusionConditions::new(InclusionCondition::include_if("a".to_string()));
         conditions.append(InclusionCondition::skip_if("b".to_string()));
         assert_eq!(conditions.len(), 2);
     }
@@ -454,7 +445,8 @@ mod tests {
 
     #[test]
     fn conditions_display() {
-        let mut conditions = InclusionConditions::new(InclusionCondition::include_if("a".to_string()));
+        let mut conditions =
+            InclusionConditions::new(InclusionCondition::include_if("a".to_string()));
         conditions.append(InclusionCondition::skip_if("b".to_string()));
         assert_eq!(conditions.to_string(), "@include(if: $a) && @skip(if: $b)");
     }
@@ -469,9 +461,8 @@ mod tests {
 
     #[test]
     fn all_of_ir_with_one_variable_returns_conditional() {
-        let result = InclusionResult::all_of_ir(
-            vec![InclusionCondition::include_if("x".to_string())],
-        );
+        let result =
+            InclusionResult::all_of_ir(vec![InclusionCondition::include_if("x".to_string())]);
         match &result {
             InclusionResult::Conditional(conds) => {
                 assert_eq!(conds.len(), 1);
@@ -506,17 +497,15 @@ mod tests {
 
     #[test]
     fn and_condition_skipped_stays_skipped() {
-        let result = InclusionResult::Skipped.and_condition(
-            &InclusionCondition::include_if("x".to_string()),
-        );
+        let result = InclusionResult::Skipped
+            .and_condition(&InclusionCondition::include_if("x".to_string()));
         assert_eq!(result, InclusionResult::Skipped);
     }
 
     #[test]
     fn and_condition_included_becomes_conditional() {
-        let result = InclusionResult::Included.and_condition(
-            &InclusionCondition::include_if("x".to_string()),
-        );
+        let result = InclusionResult::Included
+            .and_condition(&InclusionCondition::include_if("x".to_string()));
         match &result {
             InclusionResult::Conditional(conds) => {
                 assert_eq!(conds.len(), 1);
@@ -537,9 +526,9 @@ mod tests {
 
     #[test]
     fn result_conditions_returns_some_for_conditional() {
-        let result = InclusionResult::Conditional(
-            InclusionConditions::new(InclusionCondition::include_if("x".to_string())),
-        );
+        let result = InclusionResult::Conditional(InclusionConditions::new(
+            InclusionCondition::include_if("x".to_string()),
+        ));
         assert!(result.conditions().is_some());
     }
 
@@ -547,17 +536,17 @@ mod tests {
 
     #[test]
     fn all_of_compilation_with_included_returns_included() {
-        let result = InclusionResult::all_of_compilation(
-            vec![compilation_result::InclusionCondition::Included],
-        );
+        let result = InclusionResult::all_of_compilation(vec![
+            compilation_result::InclusionCondition::Included,
+        ]);
         assert_eq!(result, InclusionResult::Included);
     }
 
     #[test]
     fn all_of_compilation_with_skipped_returns_skipped() {
-        let result = InclusionResult::all_of_compilation(
-            vec![compilation_result::InclusionCondition::Skipped],
-        );
+        let result = InclusionResult::all_of_compilation(vec![
+            compilation_result::InclusionCondition::Skipped,
+        ]);
         assert_eq!(result, InclusionResult::Skipped);
     }
 
@@ -620,14 +609,14 @@ mod tests {
 
     #[test]
     fn any_of_from_iter_multiple() {
-        let any = AnyOf::from_iter(vec![1, 2, 3]);
+        let any = AnyOf::from_elements(vec![1, 2, 3]);
         assert_eq!(any.elements.len(), 3);
     }
 
     #[test]
     fn any_of_append_contents_of() {
         let mut a = AnyOf::new(1);
-        let b = AnyOf::from_iter(vec![2, 3]);
+        let b = AnyOf::from_elements(vec![2, 3]);
         a.append_contents_of(&b);
         assert_eq!(a.elements.len(), 3);
     }
@@ -642,28 +631,28 @@ mod tests {
 
     #[test]
     fn any_of_or_none_lhs_returns_none() {
-        let rhs = Some(AnyOf::new(
-            InclusionConditions::new(InclusionCondition::include_if("x".to_string())),
-        ));
+        let rhs = Some(AnyOf::new(InclusionConditions::new(
+            InclusionCondition::include_if("x".to_string()),
+        )));
         assert!(any_of_or(None, rhs).is_none());
     }
 
     #[test]
     fn any_of_or_none_rhs_returns_none() {
-        let lhs = Some(AnyOf::new(
-            InclusionConditions::new(InclusionCondition::include_if("x".to_string())),
-        ));
+        let lhs = Some(AnyOf::new(InclusionConditions::new(
+            InclusionCondition::include_if("x".to_string()),
+        )));
         assert!(any_of_or(lhs, None).is_none());
     }
 
     #[test]
     fn any_of_or_both_some_merges() {
-        let lhs = Some(AnyOf::new(
-            InclusionConditions::new(InclusionCondition::include_if("a".to_string())),
-        ));
-        let rhs = Some(AnyOf::new(
-            InclusionConditions::new(InclusionCondition::include_if("b".to_string())),
-        ));
+        let lhs = Some(AnyOf::new(InclusionConditions::new(
+            InclusionCondition::include_if("a".to_string()),
+        )));
+        let rhs = Some(AnyOf::new(InclusionConditions::new(
+            InclusionCondition::include_if("b".to_string()),
+        )));
         let result = any_of_or(lhs, rhs);
         assert!(result.is_some());
         assert_eq!(result.unwrap().elements.len(), 2);

@@ -27,7 +27,7 @@ use crate::file_discovery;
 use crate::file_generators::manifest::{OperationManifestFileGenerator, OperationManifestItem};
 use crate::file_generators::operation_identifier::{compute_identifier, OperationDescriptor};
 use crate::file_generators::{
-    generate_files_concurrently, find_existing_generated_file_paths, delete_extraneous_files,
+    delete_extraneous_files, find_existing_generated_file_paths, generate_files_concurrently,
     ApolloFileManager, CustomScalarFileGenerator, EnumFileGenerator, FileGenerator,
     FragmentFileGenerator, InputObjectFileGenerator, InterfaceFileGenerator,
     MockInterfacesFileGenerator, MockObjectFileGenerator, MockUnionsFileGenerator,
@@ -40,8 +40,8 @@ use crate::codegen_logger::{CodegenLogger, LogLevel};
 use crate::templates::rendering_helpers::string_casing::first_lowercased;
 
 use graphql_compiler::adapter::{
-    self, TypeRegistry, build_network_request_source, collect_referenced_fragments,
-    collect_referenced_types, convert_directives, try_convert_selection_set,
+    self, build_network_request_source, collect_referenced_fragments, collect_referenced_types,
+    convert_directives, try_convert_selection_set, TypeRegistry,
 };
 use graphql_compiler::{
     validate_operations, DisallowedFieldNames, OperationSource, ValidationOptions,
@@ -50,8 +50,7 @@ use graphql_compiler::{
 // depending on graphql-compiler directly.
 pub use graphql_compiler::compilation_result::CompilationResult;
 use graphql_compiler::compilation_result::{
-    FragmentDefinition, OperationDefinition, OperationType,
-    RootTypeDefinition,
+    FragmentDefinition, OperationDefinition, OperationType, RootTypeDefinition,
 };
 use graphql_compiler::{GraphQLCompositeType, GraphQLNamedType};
 
@@ -144,7 +143,7 @@ pub trait CodegenProvider {
 // MARK: - CompileResult
 
 /// Intermediate compilation artifacts that can be cached across
-/// worker requests (D-89). Contains the compiled schema/operations
+/// worker requests. Contains the compiled schema/operations
 /// result and built IR.
 pub struct CompileResult {
     pub compilation_result: Arc<CompilationResult>,
@@ -175,10 +174,7 @@ impl CodegenProvider for ApolloCodegen {
         root_url: Option<&Path>,
         items_to_generate: ItemsToGenerate,
     ) -> Result<(), CodegenError> {
-        let context = ConfigurationContext::new(
-            config.clone(),
-            root_url.map(PathBuf::from),
-        );
+        let context = ConfigurationContext::new(config.clone(), root_url.map(PathBuf::from));
         ApolloCodegen::build_with_context(&context, items_to_generate)
     }
 }
@@ -214,7 +210,7 @@ impl ApolloCodegen {
     /// validation, and IR construction.
     ///
     /// Returns a `CompileResult` containing the parsed schema and built IR,
-    /// suitable for caching across worker requests (D-89).
+    /// suitable for caching across worker requests.
     ///
     /// Used by:
     /// - `build_with_context()` for one-shot CLI mode (calls this then generate_from_ir)
@@ -232,11 +228,7 @@ impl ApolloCodegen {
         let parsed_schema = parse_schema(&schema_matches)?;
 
         // Stage 4-5: Operation parsing + CompilationResult construction
-        let compilation_result = compile_graphql(
-            &parsed_schema,
-            &operation_matches,
-            config,
-        )?;
+        let compilation_result = compile_graphql(&parsed_schema, &operation_matches, config)?;
 
         let compilation_result = Arc::new(compilation_result);
 
@@ -247,7 +239,10 @@ impl ApolloCodegen {
         // Stage 7: IR construction
         let ir = IRBuilder::new(compilation_result.clone());
 
-        Ok(CompileResult { compilation_result, ir })
+        Ok(CompileResult {
+            compilation_result,
+            ir,
+        })
     }
 
     /// Stage 1-2: Config validation and file discovery (cheap, ~ms).
@@ -281,15 +276,14 @@ impl ApolloCodegen {
         operation_matches: &indexmap::IndexSet<String>,
         config: &ConfigurationContext,
     ) -> Result<CompileResult, CodegenError> {
-        let compilation_result = compile_graphql(
-            &schema.parsed_schema,
-            operation_matches,
-            config,
-        )?;
+        let compilation_result = compile_graphql(&schema.parsed_schema, operation_matches, config)?;
         let compilation_result = Arc::new(compilation_result);
         validate_against_schema(config, &compilation_result)?;
         let ir = IRBuilder::new(compilation_result.clone());
-        Ok(CompileResult { compilation_result, ir })
+        Ok(CompileResult {
+            compilation_result,
+            ir,
+        })
     }
 
     /// Constructs a `CompileResult` from a cached `Arc<CompilationResult>`.
@@ -297,11 +291,12 @@ impl ApolloCodegen {
     /// Creates a fresh `IRBuilder` (cheap: Arc bump + IndexSet construction)
     /// to avoid state leakage from `BuiltFragmentStorage`/`FieldCollector`
     /// accumulated during prior generation passes.
-    pub fn compile_result_from_cached(
-        compilation_result: Arc<CompilationResult>,
-    ) -> CompileResult {
+    pub fn compile_result_from_cached(compilation_result: Arc<CompilationResult>) -> CompileResult {
         let ir = IRBuilder::new(compilation_result.clone());
-        CompileResult { compilation_result, ir }
+        CompileResult {
+            compilation_result,
+            ir,
+        }
     }
 
     /// Runs pipeline stages 8-12: schema customizations, code generation,
@@ -660,7 +655,12 @@ fn validate_operation_documents(
         Ok(()) => Ok(()),
         Err(errors) => {
             let lines: Vec<String> = errors.iter().map(|e| e.log_line()).collect();
-            CodegenLogger::log(&lines.join("\n"), LogLevel::Error, "ApolloCodegen.swift", 185);
+            CodegenLogger::log(
+                &lines.join("\n"),
+                LogLevel::Error,
+                "ApolloCodegen.swift",
+                185,
+            );
             Err(CodegenError::GraphQLSourceValidationFailure { lines })
         }
     }
@@ -735,9 +735,11 @@ fn compile_graphql(
     let parsed_files: Vec<ParsedFile> = file_contents
         .iter()
         .map(|(path, content)| {
-            let doc = executable::ExecutableDocument::parse(schema, content, path)
-                .map_err(|diag| CodegenError::GraphQLSourceValidationFailure {
-                    lines: diag.errors.iter().map(|d| d.error.to_string()).collect(),
+            let doc =
+                executable::ExecutableDocument::parse(schema, content, path).map_err(|diag| {
+                    CodegenError::GraphQLSourceValidationFailure {
+                        lines: diag.errors.iter().map(|d| d.error.to_string()).collect(),
+                    }
                 })?;
 
             Ok(ParsedFile {
@@ -813,12 +815,13 @@ fn build_root_types(
         .as_ref()
         .map(|n| n.as_str().to_string());
 
-    let query_type = registry
-        .get(&query_name)
-        .cloned()
-        .ok_or_else(|| CodegenError::InvalidConfiguration {
-            message: format!("Query type '{}' not found in schema", query_name),
-        })?;
+    let query_type =
+        registry
+            .get(&query_name)
+            .cloned()
+            .ok_or_else(|| CodegenError::InvalidConfiguration {
+                message: format!("Query type '{}' not found in schema", query_name),
+            })?;
 
     let mutation_type = mutation_name.and_then(|name| registry.get(&name).cloned());
     let subscription_type = subscription_name.and_then(|name| registry.get(&name).cloned());
@@ -874,10 +877,8 @@ fn build_fragment_definitions(
             )
             .map_err(|e| adapter_error(pf.abs_path(), e))?;
 
-            let referenced = collect_referenced_fragments(
-                &frag.selection_set.selections,
-                &fragment_defs,
-            );
+            let referenced =
+                collect_referenced_fragments(&frag.selection_set.selections, &fragment_defs);
 
             let full = Arc::new(FragmentDefinition {
                 name: name.as_str().to_string(),
@@ -1000,7 +1001,10 @@ fn build_operation_definitions(
                         name: var.name.as_str().to_string(),
                         type_: adapter::try_convert_type(&var.ty, registry)
                             .map_err(|e| adapter_error(pf.abs_path(), e))?,
-                        default_value: var.default_value.as_ref().map(|v| adapter::convert_value(v)),
+                        default_value: var
+                            .default_value
+                            .as_ref()
+                            .map(|v| adapter::convert_value(v)),
                     })
                 })
                 .collect::<Result<Vec<_>, CodegenError>>()?;
@@ -1068,7 +1072,11 @@ fn resolve_composite_type(
             Ok(GraphQLCompositeType::Union(Arc::clone(union_)))
         }
         Some(other) => Err(CodegenError::InvalidConfiguration {
-            message: format!("Type '{}' is not a composite type: {:?}", name, other.name()),
+            message: format!(
+                "Type '{}' is not a composite type: {:?}",
+                name,
+                other.name()
+            ),
         }),
         None => Err(CodegenError::InvalidConfiguration {
             message: format!("Type '{}' not found in registry", name),
@@ -1086,7 +1094,11 @@ fn validate_against_schema(
     // Check if schema namespace conflicts with any type name in the schema
     let schema_namespace = &config.config.schema_namespace;
     for named_type in &compilation_result.referenced_types {
-        if named_type.name().schema_name.eq_ignore_ascii_case(schema_namespace) {
+        if named_type
+            .name()
+            .schema_name
+            .eq_ignore_ascii_case(schema_namespace)
+        {
             return Err(CodegenError::SchemaNameConflict {
                 name: schema_namespace.clone(),
             });
@@ -1272,13 +1284,8 @@ fn generate_all_files(
     let mut non_fatal_errors = NonFatalErrors::new();
 
     // Generate operation and fragment files
-    let definition_errors = generate_graph_ql_definition_files(
-        compilation_result,
-        ir,
-        config,
-        file_manager,
-        None,
-    )?;
+    let definition_errors =
+        generate_graph_ql_definition_files(compilation_result, ir, config, file_manager, None)?;
     non_fatal_errors.merge(definition_errors);
 
     // Generate schema type files
@@ -1348,7 +1355,7 @@ fn generate_graph_ql_definition_files(
 
     // Build fragment file generators
     for fragment in &compilation_result.fragments {
-        if !filter.map_or(true, |f| f.matches(&fragment.file_path)) {
+        if !filter.is_none_or(|f| f.matches(&fragment.file_path)) {
             continue;
         }
 
@@ -1371,7 +1378,7 @@ fn generate_graph_ql_definition_files(
 
     // Build operation file generators
     for operation in &compilation_result.operations {
-        if !filter.map_or(true, |f| f.matches(&operation.file_path)) {
+        if !filter.is_none_or(|f| f.matches(&operation.file_path)) {
             continue;
         }
 
@@ -1531,7 +1538,12 @@ fn generate_schema_files(
 
     // Mock objects (scoped by `output.testMocks`; everything by default)
     if config.config.output.test_mocks != TestMockFileOutput::None {
-        generators.extend(test_mock_file_generators(compilation_result, ir, config, None)?);
+        generators.extend(test_mock_file_generators(
+            compilation_result,
+            ir,
+            config,
+            None,
+        )?);
     }
 
     // Enum types
@@ -1599,7 +1611,10 @@ fn generate_schema_files(
 
     eprintln!(
         "  [perf:schema] generators={} setup={:.1}ms render+write={:.1}ms total={:.1}ms",
-        generators.len(), setup_ms, render_ms, t_start.elapsed().as_secs_f64() * 1000.0
+        generators.len(),
+        setup_ms,
+        render_ms,
+        t_start.elapsed().as_secs_f64() * 1000.0
     );
 
     let mut non_fatal_errors = NonFatalErrors::new();
@@ -1682,23 +1697,40 @@ fn generate_operation_manifest(
 pub enum CodegenError {
     /// Operation validation failed; `lines` are Swift's `GraphQLError.logLines`
     /// (`<path>:<line>:error:<message>`).
-    GraphQLSourceValidationFailure { lines: Vec<String> },
+    GraphQLSourceValidationFailure {
+        lines: Vec<String>,
+    },
     /// The schema could not be parsed or is invalid (Swift: `GraphQLSchemaValidationError`).
-    SchemaValidationFailure { messages: Vec<String> },
+    SchemaValidationFailure {
+        messages: Vec<String>,
+    },
     TestMocksInvalidSwiftPackageConfiguration,
     /// `output.testMocks.includeTypes` (or `--bazel-mocks-for`) names a type that no
     /// operation references, so there is nothing to mock.
-    TestMocksUnknownIncludeType { name: String },
+    TestMocksUnknownIncludeType {
+        name: String,
+    },
     /// Test mocks were requested (`--bazel-mode test_mocks`, `--bazel-mocks-*`) but
     /// `output.testMocks` is `none`.
     TestMocksNotConfigured,
-    InputSearchPathInvalid { path: String },
-    SchemaNameConflict { name: String },
+    InputSearchPathInvalid {
+        path: String,
+    },
+    SchemaNameConflict {
+        name: String,
+    },
     CannotLoadSchema,
     CannotLoadOperations,
-    InvalidConfiguration { message: String },
-    InvalidSchemaName { name: String, message: String },
-    TargetNameConflict { name: String },
+    InvalidConfiguration {
+        message: String,
+    },
+    InvalidSchemaName {
+        name: String,
+        message: String,
+    },
+    TargetNameConflict {
+        name: String,
+    },
     FieldMergingIncompatibility,
     NonFatalErrors(NonFatalErrors),
     Io(std::io::Error),
@@ -1845,7 +1877,7 @@ impl From<crate::config::validation::ConfigError> for CodegenError {
 /// Aggregation of non-fatal errors by file name.
 ///
 /// Mirrors Swift's `ApolloCodegen.NonFatalErrors` from `ApolloCodegen+Errors.swift`.
-/// Uses `BTreeMap` for deterministic ordering per FNDN-05.
+/// Uses `BTreeMap` for deterministic ordering.
 #[derive(Debug)]
 pub struct NonFatalErrors {
     pub errors_by_file: BTreeMap<String, Vec<NonFatalError>>,
@@ -1888,6 +1920,7 @@ impl fmt::Display for NonFatalErrors {
 }
 
 #[cfg(test)]
+#[allow(non_snake_case)] // test names mirror the Swift test suite
 mod tests {
     use super::*;
 
@@ -2031,7 +2064,10 @@ mod tests {
             swift_string_array(&["a/b.graphql:1:error:Unknown fragment \"X\".".to_string()]),
             "[\"a/b.graphql:1:error:Unknown fragment \\\"X\\\".\"]"
         );
-        assert_eq!(swift_string_array(&["x\\y\n".to_string()]), "[\"x\\\\y\\n\"]");
+        assert_eq!(
+            swift_string_array(&["x\\y\n".to_string()]),
+            "[\"x\\\\y\\n\"]"
+        );
     }
 
     #[test]
@@ -2064,7 +2100,9 @@ mod tests {
     fn test_codegen_error_display_test_mocks_invalid() {
         let err = CodegenError::TestMocksInvalidSwiftPackageConfiguration;
         let msg = format!("{}", err);
-        assert!(msg.contains("Schema Types must be generated with module type 'swiftPackageManager'"));
+        assert!(
+            msg.contains("Schema Types must be generated with module type 'swiftPackageManager'")
+        );
     }
 
     #[test]
@@ -2164,12 +2202,18 @@ mod tests {
         assert!(!result.contains("directive @typePolicy"));
         // user definitions win
         let own = "directive @defer(label: String!) on INLINE_FRAGMENT\ntype Query { id: ID }";
-        assert_eq!(prepend_custom_directive_stubs(own).matches("directive @defer").count(), 1);
+        assert_eq!(
+            prepend_custom_directive_stubs(own)
+                .matches("directive @defer")
+                .count(),
+            1
+        );
     }
 
     #[test]
     fn test_prepend_custom_directive_stubs_existing_directive_not_duplicated() {
-        let sdl = "directive @oneOf on INPUT_OBJECT\ntype Query { id: ID }\ninput I @oneOf { a: String }";
+        let sdl =
+            "directive @oneOf on INPUT_OBJECT\ntype Query { id: ID }\ninput I @oneOf { a: String }";
         let result = prepend_custom_directive_stubs(sdl);
         // Should not add a duplicate
         assert_eq!(
@@ -2187,25 +2231,40 @@ mod tests {
 
     #[test]
     fn test_matches_prefix_exact_with_slash() {
-        assert!(matches_prefix("Features/Account/Query.graphql", Some("Features/Account")));
-        assert!(matches_prefix("Shared/Fragments/Foo.graphql", Some("Shared/Fragments")));
+        assert!(matches_prefix(
+            "Features/Account/Query.graphql",
+            Some("Features/Account")
+        ));
+        assert!(matches_prefix(
+            "Shared/Fragments/Foo.graphql",
+            Some("Shared/Fragments")
+        ));
     }
 
     #[test]
     fn test_matches_prefix_rejects_partial() {
         // "Features/AccountInfo" should NOT match prefix "Features/Account"
-        assert!(!matches_prefix("Features/AccountInfo/Query.graphql", Some("Features/Account")));
+        assert!(!matches_prefix(
+            "Features/AccountInfo/Query.graphql",
+            Some("Features/Account")
+        ));
     }
 
     #[test]
     fn test_matches_prefix_rejects_no_slash() {
         // Exact match without trailing slash should not match
-        assert!(!matches_prefix("Features/Account", Some("Features/Account")));
+        assert!(!matches_prefix(
+            "Features/Account",
+            Some("Features/Account")
+        ));
     }
 
     #[test]
     fn test_matches_prefix_rejects_different_path() {
-        assert!(!matches_prefix("Shared/Fragments/Foo.graphql", Some("Features/Account")));
+        assert!(!matches_prefix(
+            "Shared/Fragments/Foo.graphql",
+            Some("Features/Account")
+        ));
     }
 
     #[test]

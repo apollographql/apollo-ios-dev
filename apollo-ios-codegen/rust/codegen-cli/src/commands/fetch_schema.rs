@@ -1,4 +1,4 @@
-//! Fetch schema command implementation (stub per D-69).
+//! Fetch schema command implementation (stub).
 //!
 //! Mirrors Swift's `Sources/CodegenCLI/Commands/FetchSchema.swift`.
 //! In the Rust CLI, schema downloading is not yet supported. This command

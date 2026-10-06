@@ -2,7 +2,7 @@
 //
 // This crate provides Swift-equivalent GraphQL type system types and a
 // conversion adapter from apollo-compiler parsed types. No apollo-compiler
-// types are exposed in the public API (per D-19).
+// types are exposed in the public API.
 
 pub mod adapter;
 pub mod compilation_result;

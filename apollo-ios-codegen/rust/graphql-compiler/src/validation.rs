@@ -16,17 +16,17 @@
 //! Nothing in this module panics on malformed input: every problem becomes a
 //! [`ValidationError`].
 
-use std::collections::HashMap;
+use indexmap::IndexMap;
 use std::fmt;
 use std::sync::Arc;
 
+use crate::validation_options::ValidationOptions;
 use apollo_compiler::ast;
 use apollo_compiler::diagnostic::ToCliReport;
 use apollo_compiler::executable;
 use apollo_compiler::parser::{FileId, Parser, SourceFile, SourceMap, SourceSpan};
 use apollo_compiler::schema::{ExtendedType, Schema};
 use apollo_compiler::validation::{DiagnosticData, Valid};
-use crate::validation_options::ValidationOptions;
 
 /// One operation source file to validate.
 #[derive(Debug, Clone, Copy)]
@@ -87,7 +87,7 @@ pub fn validate_operations(
     sources: &[OperationSource<'_>],
     options: &ValidationOptions,
 ) -> Result<(), Vec<ValidationError>> {
-    let file_order: HashMap<&str, usize> = sources
+    let file_order: IndexMap<&str, usize> = sources
         .iter()
         .enumerate()
         .map(|(i, s)| (s.path, i))
@@ -155,7 +155,7 @@ pub fn validate_operations(
 }
 
 /// Stable sort by (file order, line); errors on the same line keep their reporting order.
-fn sort_errors(errors: &mut [ValidationError], file_order: &HashMap<&str, usize>) {
+fn sort_errors(errors: &mut [ValidationError], file_order: &IndexMap<&str, usize>) {
     errors.sort_by_key(|e| {
         let file = e
             .file_path
@@ -195,7 +195,9 @@ fn locate(span: Option<SourceSpan>, sources: &SourceMap) -> (Option<String>, Opt
     let file_path = sources
         .get(&span.file_id())
         .map(|file| file.path().display().to_string());
-    let line = span.line_column_range(sources).map(|range| range.start.line);
+    let line = span
+        .line_column_range(sources)
+        .map(|range| range.start.line);
     (file_path, line)
 }
 
@@ -292,7 +294,11 @@ fn apollo_selection_rules(
                     if inline.type_condition.is_none() {
                         report(inline.location(), DEFER_NO_TYPE_CONDITION.to_string());
                     }
-                    if !directive.arguments.iter().any(|a| a.name.as_str() == "label") {
+                    if !directive
+                        .arguments
+                        .iter()
+                        .any(|a| a.name.as_str() == "label")
+                    {
                         report(inline.location(), DEFER_MISSING_LABEL.to_string());
                     }
                 }
@@ -341,9 +347,15 @@ fn namespace_conflicts(
                             | Some(ExtendedType::Union(_))
                     );
                     let conflicts = if is_list {
-                        options.disallowed_field_names.entity_list.contains(&response_key)
+                        options
+                            .disallowed_field_names
+                            .entity_list
+                            .contains(&response_key)
                     } else if is_composite {
-                        options.disallowed_field_names.entity.contains(&response_key)
+                        options
+                            .disallowed_field_names
+                            .entity
+                            .contains(&response_key)
                     } else {
                         false
                     };
@@ -425,7 +437,10 @@ mod tests {
         ValidationOptions {
             schema_namespace: "Inv".to_string(),
             disallowed_field_names: DisallowedFieldNames {
-                all_fields: ["__data", "fragments"].into_iter().map(String::from).collect(),
+                all_fields: ["__data", "fragments"]
+                    .into_iter()
+                    .map(String::from)
+                    .collect(),
                 entity: IndexSet::from(["inv".to_string()]),
                 entity_list: IndexSet::from(["invs".to_string()]),
             },
@@ -454,7 +469,10 @@ mod tests {
 
     #[test]
     fn valid_document_passes() {
-        assert_eq!(validate(&[("q.graphql", "query Q { pets { id name } }")]), Ok(()));
+        assert_eq!(
+            validate(&[("q.graphql", "query Q { pets { id name } }")]),
+            Ok(())
+        );
     }
 
     #[test]
@@ -493,11 +511,37 @@ mod tests {
             "q.graphql",
             "query Q($c: Nope) { pets @nope { nope } pet(nope: 1) { id } }",
         )]);
-        assert!(errors.iter().any(|l| l.contains("Unknown type \"Nope\".")), "{:?}", errors);
-        assert!(errors.iter().any(|l| l.contains("Unknown directive \"@nope\".")), "{:?}", errors);
-        assert!(errors.iter().any(|l| l.contains("Cannot query field \"nope\" on type \"Pet\".")), "{:?}", errors);
-        assert!(errors.iter().any(|l| l.contains("Unknown argument \"nope\" on field \"Query.pet\".")), "{:?}", errors);
-        assert!(errors.iter().all(|l| l.starts_with("q.graphql:1:error:")), "{:?}", errors);
+        assert!(
+            errors.iter().any(|l| l.contains("Unknown type \"Nope\".")),
+            "{:?}",
+            errors
+        );
+        assert!(
+            errors
+                .iter()
+                .any(|l| l.contains("Unknown directive \"@nope\".")),
+            "{:?}",
+            errors
+        );
+        assert!(
+            errors
+                .iter()
+                .any(|l| l.contains("Cannot query field \"nope\" on type \"Pet\".")),
+            "{:?}",
+            errors
+        );
+        assert!(
+            errors
+                .iter()
+                .any(|l| l.contains("Unknown argument \"nope\" on field \"Query.pet\".")),
+            "{:?}",
+            errors
+        );
+        assert!(
+            errors.iter().all(|l| l.starts_with("q.graphql:1:error:")),
+            "{:?}",
+            errors
+        );
     }
 
     #[test]
@@ -506,14 +550,24 @@ mod tests {
             "q.graphql",
             "fragment A on Dog { ...B } fragment B on Dog { ...A } query Q { pets { ...A } }",
         )]);
-        assert!(errors.iter().any(|l| l.contains("Cannot spread fragment \"A\" within itself")), "{:?}", errors);
+        assert!(
+            errors
+                .iter()
+                .any(|l| l.contains("Cannot spread fragment \"A\" within itself")),
+            "{:?}",
+            errors
+        );
     }
 
     #[test]
     fn syntax_error_is_reported_with_graphql_js_prefix() {
         let errors = lines(&[("q.graphql", "query Q { pets { id ")]);
         assert_eq!(errors.len(), 1, "{:?}", errors);
-        assert!(errors[0].starts_with("q.graphql:1:error:Syntax Error: "), "{:?}", errors);
+        assert!(
+            errors[0].starts_with("q.graphql:1:error:Syntax Error: "),
+            "{:?}",
+            errors
+        );
     }
 
     #[test]
@@ -542,11 +596,23 @@ mod tests {
             ]
         );
         assert_eq!(
-            validate(&[("q.graphql", "query Q { pets { ... on Dog @defer(label: \"x\") { bark } } }")]),
+            validate(&[(
+                "q.graphql",
+                "query Q { pets { ... on Dog @defer(label: \"x\") { bark } } }"
+            )]),
             Ok(())
         );
-        let errors = lines(&[("q.graphql", "query Q { pets { ... on Dog @defer(label: \"x\", if: 3) { bark } } }")]);
-        assert!(errors.iter().any(|l| l.contains("Boolean cannot represent value: 3")), "{:?}", errors);
+        let errors = lines(&[(
+            "q.graphql",
+            "query Q { pets { ... on Dog @defer(label: \"x\", if: 3) { bark } } }",
+        )]);
+        assert!(
+            errors
+                .iter()
+                .any(|l| l.contains("Boolean cannot represent value: 3")),
+            "{:?}",
+            errors
+        );
     }
 
     #[test]
@@ -555,21 +621,52 @@ mod tests {
             "q.graphql",
             "query Q($self: Int, $inv: Int) { me { fragments: name __data: id friends(first: $self) { id } friends(first: $inv) { id } } }",
         )]);
-        assert!(errors.iter().any(|l| l.contains("Input Parameter name \"self\" is not allowed")), "{:?}", errors);
-        assert!(errors.iter().any(|l| l.contains("Input Parameter name \"inv\" is not allowed")), "{:?}", errors);
-        assert!(errors.iter().any(|l| l.contains("Field name \"fragments\" is not allowed")), "{:?}", errors);
-        assert!(errors.iter().any(|l| l.contains("Field name \"__data\" is not allowed")), "{:?}", errors);
+        assert!(
+            errors
+                .iter()
+                .any(|l| l.contains("Input Parameter name \"self\" is not allowed")),
+            "{:?}",
+            errors
+        );
+        assert!(
+            errors
+                .iter()
+                .any(|l| l.contains("Input Parameter name \"inv\" is not allowed")),
+            "{:?}",
+            errors
+        );
+        assert!(
+            errors
+                .iter()
+                .any(|l| l.contains("Field name \"fragments\" is not allowed")),
+            "{:?}",
+            errors
+        );
+        assert!(
+            errors
+                .iter()
+                .any(|l| l.contains("Field name \"__data\" is not allowed")),
+            "{:?}",
+            errors
+        );
     }
 
     #[test]
     fn schema_namespace_conflicts_with_entity_fields() {
         let errors = lines(&[("q.graphql", "query Q { inv: me { id } }")]);
         assert_eq!(errors.len(), 1, "{:?}", errors);
-        assert!(errors[0].contains("Schema name \"Inv\" conflicts with name of a generated object API"), "{:?}", errors);
+        assert!(
+            errors[0].contains("Schema name \"Inv\" conflicts with name of a generated object API"),
+            "{:?}",
+            errors
+        );
         let errors = lines(&[("q.graphql", "query Q { invs: pets { id } }")]);
         assert_eq!(errors.len(), 1, "{:?}", errors);
         // Scalar fields never conflict.
-        assert_eq!(validate(&[("q.graphql", "query Q { me { inv: name } }")]), Ok(()));
+        assert_eq!(
+            validate(&[("q.graphql", "query Q { me { inv: name } }")]),
+            Ok(())
+        );
     }
 
     #[test]

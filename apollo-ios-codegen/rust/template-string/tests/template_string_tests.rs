@@ -17,7 +17,6 @@
 /// - empty_line_removal_tests: line removal and lastLineWasRemoved behavior
 /// - indentation_tests: multi-level indentation tracking
 /// - combined_tests: real-world template patterns
-
 use template_string::{template_string, TemplateString, TemplateStringBuilder};
 
 mod literal_tests {
@@ -160,14 +159,16 @@ mod if_let_tests {
     #[test]
     fn none_removes_line() {
         let opt: Option<String> = None;
-        let result = template_string!("line1\n  " {ifLet: opt, |_v| "content".to_string()} "\nline3");
+        let result =
+            template_string!("line1\n  " {ifLet: opt, |_v| "content".to_string()} "\nline3");
         assert_eq!(result.description(), "line1\nline3");
     }
 
     #[test]
     fn none_with_else() {
         let opt: Option<String> = None;
-        let result = template_string!({ifLet: opt, |_v| "unreachable".to_string(), else: "fallback"});
+        let result =
+            template_string!({ifLet: opt, |_v| "unreachable".to_string(), else: "fallback"});
         assert_eq!(result.description(), "fallback");
     }
 
@@ -192,7 +193,8 @@ mod for_each_in_tests {
     #[test]
     fn custom_separator() {
         let items = vec!["a", "b", "c"];
-        let result = template_string!({forEachIn: items.into_iter(), |s| s.to_string(), separator: " | "});
+        let result =
+            template_string!({forEachIn: items.into_iter(), |s| s.to_string(), separator: " | "});
         assert_eq!(result.description(), "a | b | c");
     }
 
@@ -241,10 +243,7 @@ mod list_tests {
         let mut builder = TemplateStringBuilder::new();
         builder.append_list(&["item1", "item2", "item3"], ",\n", None);
         let result = builder.build();
-        assert_eq!(
-            result.description(),
-            "\n  item1,\n  item2,\n  item3\n"
-        );
+        assert_eq!(result.description(), "\n  item1,\n  item2,\n  item3\n");
     }
 
     #[test]
@@ -335,10 +334,7 @@ mod documentation_tests {
     fn multi_line_doc() {
         let mut builder = TemplateStringBuilder::new();
         builder.append_documentation(Some("line1\nline2"));
-        assert_eq!(
-            builder.build().description(),
-            "/// line1\n/// line2"
-        );
+        assert_eq!(builder.build().description(), "/// line1\n/// line2");
     }
 
     #[test]
@@ -481,7 +477,7 @@ mod indentation_tests {
     #[test]
     fn flat_template_no_extra_indentation() {
         let value = "hello";
-        let result = template_string!({value});
+        let result = template_string!({ value });
         assert_eq!(result.description(), "hello");
     }
 
@@ -521,10 +517,7 @@ mod indentation_tests {
     fn indentation_after_newline_in_literal() {
         let value = "first\nsecond";
         let result = template_string!("struct Foo {\n  " {value} "\n}");
-        assert_eq!(
-            result.description(),
-            "struct Foo {\n  first\n  second\n}"
-        );
+        assert_eq!(result.description(), "struct Foo {\n  first\n  second\n}");
     }
 
     #[test]
@@ -581,7 +574,11 @@ mod combined_tests {
 
     #[test]
     fn enum_case_rendering_pattern() {
-        let cases = vec![("north", "\"NORTH\""), ("south", "\"SOUTH\""), ("east", "\"EAST\"")];
+        let cases = vec![
+            ("north", "\"NORTH\""),
+            ("south", "\"SOUTH\""),
+            ("east", "\"EAST\""),
+        ];
 
         let mut builder = TemplateStringBuilder::new();
         builder.append_literal("enum Direction: String {\n");

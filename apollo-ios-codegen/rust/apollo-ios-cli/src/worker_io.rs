@@ -2,7 +2,7 @@
 //!
 //! Reads WorkRequest messages from stdin and writes WorkResponse
 //! messages to stdout using varint length-delimited encoding.
-//! All non-protocol output goes to stderr (WRKR-04, D-96).
+//! All non-protocol output goes to stderr.
 
 use prost::Message;
 use std::io::{self, Read, Write};
@@ -12,7 +12,7 @@ use crate::worker_proto::{WorkRequest, WorkResponse};
 /// Reads a single length-delimited WorkRequest from the reader.
 ///
 /// Returns `Ok(Some(request))` on success, `Ok(None)` on EOF
-/// (stdin closed = graceful shutdown per D-95), or `Err` on
+/// (stdin closed = graceful shutdown), or `Err` on
 /// protocol errors.
 ///
 /// The varint length prefix follows protobuf's standard encoding:
@@ -75,7 +75,7 @@ pub fn read_work_request(reader: &mut impl Read) -> io::Result<Option<WorkReques
 /// Writes a single length-delimited WorkResponse to the writer.
 ///
 /// Only WorkResponse bytes appear on the writer (stdout).
-/// All other output must go to stderr (WRKR-04, D-96).
+/// All other output must go to stderr.
 pub fn write_work_response(writer: &mut impl Write, response: &WorkResponse) -> io::Result<()> {
     let encoded = response.encode_length_delimited_to_vec();
     writer.write_all(&encoded)?;

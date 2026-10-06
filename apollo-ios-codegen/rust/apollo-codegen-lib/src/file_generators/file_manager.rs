@@ -61,7 +61,7 @@ impl std::error::Error for FileManagerError {
 
 /// Thread-safe file manager that tracks written files.
 ///
-/// Uses `Arc<Mutex<BTreeSet<PathBuf>>>` for thread-safe file tracking (per D-65/FNDN-05).
+/// Uses `Arc<Mutex<BTreeSet<PathBuf>>>` for thread-safe file tracking.
 ///
 /// Mirrors Swift's `ApolloFileManager` class from `FileManager+Apollo.swift`.
 pub struct ApolloFileManager {

@@ -1,11 +1,11 @@
-//! Benchmarks for Bazel worker mode (PERF-02, PERF-03).
+//! Benchmarks for Bazel worker mode.
 //!
-//! PERF-02: Warm-start worker is faster than cold one-shot mode.
-//! PERF-03: RSS memory does not grow unboundedly across requests.
+//! Warm-start worker is faster than cold one-shot mode.
+//! RSS memory does not grow unboundedly across requests.
 //!
-//! These are integration tests (run via `cargo test`) that use the
-//! AnimalKingdomAPI fixtures. They measure real codegen performance,
-//! not mocked operations.
+//! These are timing-sensitive integration tests on the AnimalKingdomAPI fixtures and are
+//! `#[ignore]`d in the regular suite; run them explicitly with
+//! `cargo test --release -p apollo-ios-cli -- --ignored bench_`.
 
 #[cfg(test)]
 mod tests {
@@ -136,7 +136,7 @@ mod tests {
         }
     }
 
-    /// PERF-02: Warm-start is faster than cold-start.
+    /// Warm-start is faster than cold-start.
     ///
     /// Measures:
     /// 1. Cold: compile_schema_and_ir() + generate_from_ir() (full pipeline)
@@ -144,11 +144,12 @@ mod tests {
     ///
     /// Asserts warm is strictly faster than cold.
     #[test]
+    #[ignore = "timing-sensitive benchmark; run with `cargo test --release -p apollo-ios-cli -- --ignored bench_`"]
     fn bench_warm_vs_cold() {
         let context = match create_bench_config() {
             Some(c) => c,
             None => {
-                eprintln!("PERF-02 benchmark skipped: test fixtures not available");
+                eprintln!("benchmark skipped: test fixtures not available");
                 return;
             }
         };
@@ -158,27 +159,19 @@ mod tests {
         let compile_result = match ApolloCodegen::compile_schema_and_ir(&context) {
             Ok(r) => r,
             Err(e) => {
-                eprintln!("PERF-02 benchmark skipped: compilation error: {}", e);
+                eprintln!("benchmark skipped: compilation error: {}", e);
                 return;
             }
         };
-        let _ = ApolloCodegen::generate_from_ir(
-            &compile_result,
-            &context,
-            ItemsToGenerate::CODE,
-        );
+        let _ = ApolloCodegen::generate_from_ir(&compile_result, &context, ItemsToGenerate::CODE);
         let cold_duration = cold_start.elapsed();
 
         // Warm start: only generate_from_ir (reuse compile_result)
         let warm_start = Instant::now();
-        let _ = ApolloCodegen::generate_from_ir(
-            &compile_result,
-            &context,
-            ItemsToGenerate::CODE,
-        );
+        let _ = ApolloCodegen::generate_from_ir(&compile_result, &context, ItemsToGenerate::CODE);
         let warm_duration = warm_start.elapsed();
 
-        eprintln!("PERF-02 Results:");
+        eprintln!("Results:");
         eprintln!("  Cold start (compile + generate): {:?}", cold_duration);
         eprintln!("  Warm start (generate only):      {:?}", warm_duration);
         eprintln!(
@@ -189,13 +182,13 @@ mod tests {
         // Assert warm is faster than cold
         assert!(
             warm_duration < cold_duration,
-            "PERF-02 FAILED: warm ({:?}) should be faster than cold ({:?})",
+            "FAILED: warm ({:?}) should be faster than cold ({:?})",
             warm_duration,
             cold_duration,
         );
     }
 
-    /// PERF-03: RSS does not grow unboundedly across repeated requests.
+    /// RSS does not grow unboundedly across repeated requests.
     ///
     /// Runs warm-up iterations to let the allocator stabilize, then
     /// runs N measurement iterations of generate_from_ir() using the
@@ -203,11 +196,12 @@ mod tests {
     /// Asserts that RSS in the last half of measurement samples does
     /// not exceed the first half by more than 20%.
     #[test]
+    #[ignore = "timing-sensitive benchmark; run with `cargo test --release -p apollo-ios-cli -- --ignored bench_`"]
     fn bench_memory_stability() {
         let context = match create_bench_config() {
             Some(c) => c,
             None => {
-                eprintln!("PERF-03 benchmark skipped: test fixtures not available");
+                eprintln!("benchmark skipped: test fixtures not available");
                 return;
             }
         };
@@ -216,7 +210,7 @@ mod tests {
         let compile_result = match ApolloCodegen::compile_schema_and_ir(&context) {
             Ok(r) => r,
             Err(e) => {
-                eprintln!("PERF-03 benchmark skipped: compilation error: {}", e);
+                eprintln!("benchmark skipped: compilation error: {}", e);
                 return;
             }
         };
@@ -226,11 +220,8 @@ mod tests {
         // counting initial heap growth as "unbounded growth".
         let warmup_iterations = 5;
         for _ in 0..warmup_iterations {
-            let _ = ApolloCodegen::generate_from_ir(
-                &compile_result,
-                &context,
-                ItemsToGenerate::CODE,
-            );
+            let _ =
+                ApolloCodegen::generate_from_ir(&compile_result, &context, ItemsToGenerate::CODE);
         }
 
         let iterations = 20;
@@ -242,11 +233,8 @@ mod tests {
 
         for i in 0..iterations {
             // Run generate_from_ir (the per-request work)
-            let _ = ApolloCodegen::generate_from_ir(
-                &compile_result,
-                &context,
-                ItemsToGenerate::CODE,
-            );
+            let _ =
+                ApolloCodegen::generate_from_ir(&compile_result, &context, ItemsToGenerate::CODE);
 
             // Sample RSS every sample_interval iterations
             if i % sample_interval == 0 {
@@ -257,27 +245,28 @@ mod tests {
         // Final sample
         rss_samples.push(get_rss_bytes());
 
-        eprintln!("PERF-03 Results (RSS in MB, after {} warm-up iterations):", warmup_iterations);
+        eprintln!(
+            "Results (RSS in MB, after {} warm-up iterations):",
+            warmup_iterations
+        );
         for (i, &rss) in rss_samples.iter().enumerate() {
             eprintln!("  Sample {}: {:.1} MB", i, rss as f64 / (1024.0 * 1024.0));
         }
 
-        // Assert no unbounded growth (D-94)
+        // Assert no unbounded growth
         // Compare average RSS of second half vs first half of steady-state samples.
         // Using halves instead of quarters gives more data points per bucket.
         let half = rss_samples.len() / 2;
         if half == 0 {
-            eprintln!("PERF-03: Not enough samples for growth analysis");
+            eprintln!("Not enough samples for growth analysis");
             return;
         }
 
         let first_half: Vec<usize> = rss_samples[..half].to_vec();
         let last_half: Vec<usize> = rss_samples[half..].to_vec();
 
-        let first_avg =
-            first_half.iter().sum::<usize>() as f64 / first_half.len() as f64;
-        let last_avg =
-            last_half.iter().sum::<usize>() as f64 / last_half.len() as f64;
+        let first_avg = first_half.iter().sum::<usize>() as f64 / first_half.len() as f64;
+        let last_avg = last_half.iter().sum::<usize>() as f64 / last_half.len() as f64;
 
         let growth_pct = if first_avg > 0.0 {
             ((last_avg - first_avg) / first_avg) * 100.0
@@ -297,7 +286,7 @@ mod tests {
         // assertion is that it doesn't KEEP growing -- it should plateau.
         assert!(
             growth_pct < 20.0,
-            "PERF-03 FAILED: RSS grew by {:.1}% between first and last half (max 20% allowed)",
+            "FAILED: RSS grew by {:.1}% between first and last half (max 20% allowed)",
             growth_pct,
         );
     }
@@ -305,6 +294,7 @@ mod tests {
     /// Verifies that multiple cold starts produce consistent timing
     /// (no performance regression from repeated full pipeline runs).
     #[test]
+    #[ignore = "timing-sensitive benchmark; run with `cargo test --release -p apollo-ios-cli -- --ignored bench_`"]
     fn bench_cold_consistency() {
         let context = match create_bench_config() {
             Some(c) => c,
@@ -325,11 +315,8 @@ mod tests {
                     return;
                 }
             };
-            let _ = ApolloCodegen::generate_from_ir(
-                &compile_result,
-                &context,
-                ItemsToGenerate::CODE,
-            );
+            let _ =
+                ApolloCodegen::generate_from_ir(&compile_result, &context, ItemsToGenerate::CODE);
             durations.push(start.elapsed());
         }
 

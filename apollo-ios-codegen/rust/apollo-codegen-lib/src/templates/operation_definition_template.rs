@@ -13,19 +13,17 @@ use crate::config::operation_document_format::OperationDocumentFormat;
 use crate::templates::rendering_helpers::ir_definition_rendering::{
     generated_definition_name_capitalized, rendered_selection_set_type,
 };
-use crate::templates::rendering_helpers::operation_template_renderer::{
-    self, VariableDefinition,
-};
+use crate::templates::rendering_helpers::operation_template_renderer::{self, VariableDefinition};
 use crate::templates::rendering_helpers::string_single_line::converted_to_single_line;
 use crate::templates::rendering_helpers::string_swift_name_escaping::as_fragment_name;
 use crate::templates::{
-    AccessControlRenderer, ConfigurationContext, NonFatalErrorRecorder, Scope,
-    TemplateRenderer, TemplateTarget,
+    AccessControlRenderer, ConfigurationContext, NonFatalErrorRecorder, Scope, TemplateRenderer,
+    TemplateTarget,
 };
 
 use super::deferred_fragments_metadata_template::DeferredFragmentsMetadataTemplate;
-use super::selection_set_template::SelectionSetTemplate;
 use super::rendering_helpers::selection_set_initializer_check::should_generate_selection_set_initializers;
+use super::selection_set_template::SelectionSetTemplate;
 
 /// Template for generating Swift code for a GraphQL operation definition.
 ///
@@ -57,10 +55,7 @@ impl TemplateRenderer for OperationDefinitionTemplate {
         }
     }
 
-    fn render_body_template(
-        &self,
-        non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
+    fn render_body_template(&self, non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
         let member_access = self.access_control_renderer(Scope::Member);
         let parent_access = self.access_control_renderer(Scope::Parent);
 
@@ -76,10 +71,8 @@ impl TemplateRenderer for OperationDefinitionTemplate {
         // Variable properties (section: blank line before if non-empty)
         let variables = self.convert_variables();
         if !variables.is_empty() {
-            let var_props = operation_template_renderer::render_variable_properties(
-                &variables,
-                &self.config,
-            );
+            let var_props =
+                operation_template_renderer::render_variable_properties(&variables, &self.config);
             result.push('\n');
             result.push_str(&indent(&var_props, 2));
             result.push('\n');
@@ -104,11 +97,8 @@ impl TemplateRenderer for OperationDefinitionTemplate {
         result.push('\n');
 
         // Variable accessors
-        let var_accessors = operation_template_renderer::render_variable_accessors(
-            &variables,
-            &self.config,
-            true,
-        );
+        let var_accessors =
+            operation_template_renderer::render_variable_accessors(&variables, &self.config, true);
         if !var_accessors.is_empty() {
             result.push('\n');
             result.push_str(&indent(&var_accessors, 2));
@@ -116,8 +106,7 @@ impl TemplateRenderer for OperationDefinitionTemplate {
         }
 
         // Selection set (Data struct)
-        let selection_set_type =
-            rendered_selection_set_type(&self.config, false);
+        let selection_set_type = rendered_selection_set_type(&self.config, false);
         let generate_initializers = should_generate_selection_set_initializers(
             &self.config.config,
             self.operation.as_ref(),
@@ -214,10 +203,7 @@ impl OperationDefinitionTemplate {
                 .operation_identifier
                 .as_deref()
                 .expect("operationIdentifier is missing.");
-            result.push_str(&format!(
-                "    operationIdentifier: \"{}\"",
-                op_id
-            ));
+            result.push_str(&format!("    operationIdentifier: \"{}\"", op_id));
             if include_definition {
                 result.push(',');
             }
@@ -229,7 +215,10 @@ impl OperationDefinitionTemplate {
                 "#\"{}\"#",
                 converted_to_single_line(&self.operation.definition.source)
             );
-            result.push_str(&format!("    definition: .init(\n      {}", formatted_source));
+            result.push_str(&format!(
+                "    definition: .init(\n      {}",
+                formatted_source
+            ));
 
             if include_fragments {
                 result.push_str(",\n      fragments: [");
@@ -237,7 +226,12 @@ impl OperationDefinitionTemplate {
                     .operation
                     .referenced_fragments
                     .iter()
-                    .map(|f| format!("{}.self", as_fragment_name(&f.name(), &self.config.capitalizer)))
+                    .map(|f| {
+                        format!(
+                            "{}.self",
+                            as_fragment_name(f.name(), &self.config.capitalizer)
+                        )
+                    })
                     .collect();
                 result.push_str(&fragment_refs.join(", "));
                 result.push(']');

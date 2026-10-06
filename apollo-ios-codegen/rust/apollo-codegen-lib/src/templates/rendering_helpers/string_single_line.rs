@@ -8,39 +8,39 @@
 ///
 /// Mirrors Swift's `String.convertedToSingleLine()` method.
 pub fn converted_to_single_line(s: &str) -> String {
-  s.lines()
-    .map(|line| line.trim())
-    .collect::<Vec<_>>()
-    .join(" ")
+    s.lines()
+        .map(|line| line.trim())
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn test_single_line() {
-    assert_eq!(converted_to_single_line("hello"), "hello");
-  }
+    #[test]
+    fn test_single_line() {
+        assert_eq!(converted_to_single_line("hello"), "hello");
+    }
 
-  #[test]
-  fn test_multi_line() {
-    assert_eq!(
-      converted_to_single_line("hello\n  world\n  foo"),
-      "hello world foo"
-    );
-  }
+    #[test]
+    fn test_multi_line() {
+        assert_eq!(
+            converted_to_single_line("hello\n  world\n  foo"),
+            "hello world foo"
+        );
+    }
 
-  #[test]
-  fn test_empty() {
-    assert_eq!(converted_to_single_line(""), "");
-  }
+    #[test]
+    fn test_empty() {
+        assert_eq!(converted_to_single_line(""), "");
+    }
 
-  #[test]
-  fn test_with_leading_trailing_whitespace() {
-    assert_eq!(
-      converted_to_single_line("  hello  \n  world  "),
-      "hello world"
-    );
-  }
+    #[test]
+    fn test_with_leading_trailing_whitespace() {
+        assert_eq!(
+            converted_to_single_line("  hello  \n  world  "),
+            "hello world"
+        );
+    }
 }

@@ -24,9 +24,9 @@ pub mod schema_metadata;
 pub mod schema_module;
 pub mod union_;
 
-pub use file_manager::ApolloFileManager;
 pub use custom_scalar::CustomScalarFileGenerator;
 pub use enum_::EnumFileGenerator;
+pub use file_manager::ApolloFileManager;
 pub use fragment::FragmentFileGenerator;
 pub use input_object::InputObjectFileGenerator;
 pub use interface::InterfaceFileGenerator;
@@ -299,15 +299,10 @@ impl FileTarget {
             match &config.output().test_mocks {
                 TestMockFileOutput::None => PathBuf::new(),
                 TestMockFileOutput::SwiftPackage { target_name, .. } => {
-                    let name = target_name
-                        .as_deref()
-                        .unwrap_or("TestMocks");
-                    resolve_url(&config.output().schema_types.path, config.root_url())
-                        .join(name)
+                    let name = target_name.as_deref().unwrap_or("TestMocks");
+                    resolve_url(&config.output().schema_types.path, config.root_url()).join(name)
                 }
-                TestMockFileOutput::Absolute { path, .. } => {
-                    resolve_url(path, config.root_url())
-                }
+                TestMockFileOutput::Absolute { path, .. } => resolve_url(path, config.root_url()),
             }
         }
     }
@@ -495,10 +490,7 @@ pub fn find_existing_generated_file_paths(
     };
 
     // Walk schema types path
-    let schema_path = resolve_url(
-        &config.output().schema_types.path,
-        config.root_url(),
-    );
+    let schema_path = resolve_url(&config.output().schema_types.path, config.root_url());
     walk_dir(&schema_path, &mut paths);
 
     // Walk operations path if absolute
@@ -700,14 +692,20 @@ mod tests {
     fn test_resolve_schema_path_spm_in_schema_object() {
         let config = spm_in_schema_config("/root");
         let path = FileTarget::Object.resolve_path(&config);
-        assert_eq!(path, PathBuf::from("/root/SchemaModule/Sources/Schema/Objects"));
+        assert_eq!(
+            path,
+            PathBuf::from("/root/SchemaModule/Sources/Schema/Objects")
+        );
     }
 
     #[test]
     fn test_resolve_schema_path_spm_in_schema_enum() {
         let config = spm_in_schema_config("/root");
         let path = FileTarget::Enum.resolve_path(&config);
-        assert_eq!(path, PathBuf::from("/root/SchemaModule/Sources/Schema/Enums"));
+        assert_eq!(
+            path,
+            PathBuf::from("/root/SchemaModule/Sources/Schema/Enums")
+        );
     }
 
     #[test]
@@ -724,7 +722,10 @@ mod tests {
     fn test_resolve_schema_path_spm_in_schema_union() {
         let config = spm_in_schema_config("/root");
         let path = FileTarget::Union.resolve_path(&config);
-        assert_eq!(path, PathBuf::from("/root/SchemaModule/Sources/Schema/Unions"));
+        assert_eq!(
+            path,
+            PathBuf::from("/root/SchemaModule/Sources/Schema/Unions")
+        );
     }
 
     #[test]
@@ -780,10 +781,7 @@ mod tests {
     fn test_resolve_schema_path_other_in_schema_interface() {
         let config = other_in_schema_config("/root");
         let path = FileTarget::Interface.resolve_path(&config);
-        assert_eq!(
-            path,
-            PathBuf::from("/root/SchemaModule/Schema/Interfaces")
-        );
+        assert_eq!(path, PathBuf::from("/root/SchemaModule/Schema/Interfaces"));
     }
 
     #[test]
@@ -924,10 +922,7 @@ mod tests {
             is_local_cache_mutation: false,
         };
         let path = target.resolve_path(&config);
-        assert_eq!(
-            path,
-            PathBuf::from("/root/SchemaModule/Sources/Fragments")
-        );
+        assert_eq!(path, PathBuf::from("/root/SchemaModule/Sources/Fragments"));
     }
 
     #[test]
@@ -1066,7 +1061,8 @@ mod tests {
 
     #[test]
     fn test_resolve_filename_no_suffix() {
-        let config = make_config(r#"{
+        let config = make_config(
+            r#"{
             "schemaNamespace": "TestSchema",
             "input": {},
             "output": {
@@ -1074,13 +1070,20 @@ mod tests {
                 "operations": {"inSchemaModule": {}},
                 "testMocks": {"none": {}}
             }
-        }"#);
+        }"#,
+        );
 
         struct TestGen;
         impl FileGenerator for TestGen {
-            fn file_name(&self) -> String { "dog".to_string() }
-            fn template(&self) -> Box<dyn TemplateRenderer + '_> { unimplemented!() }
-            fn target(&self) -> FileTarget { FileTarget::Object }
+            fn file_name(&self) -> String {
+                "dog".to_string()
+            }
+            fn template(&self) -> Box<dyn TemplateRenderer + '_> {
+                unimplemented!()
+            }
+            fn target(&self) -> FileTarget {
+                FileTarget::Object
+            }
         }
 
         let gen = TestGen;
@@ -1090,7 +1093,8 @@ mod tests {
     #[test]
     fn test_resolve_filename_with_suffix_disabled() {
         // append_schema_type_filename_suffix defaults to false
-        let config = make_config(r#"{
+        let config = make_config(
+            r#"{
             "schemaNamespace": "TestSchema",
             "input": {},
             "output": {
@@ -1098,14 +1102,23 @@ mod tests {
                 "operations": {"inSchemaModule": {}},
                 "testMocks": {"none": {}}
             }
-        }"#);
+        }"#,
+        );
 
         struct TestGen;
         impl FileGenerator for TestGen {
-            fn file_name(&self) -> String { "dog".to_string() }
-            fn file_suffix(&self) -> Option<&str> { Some(".object") }
-            fn template(&self) -> Box<dyn TemplateRenderer + '_> { unimplemented!() }
-            fn target(&self) -> FileTarget { FileTarget::Object }
+            fn file_name(&self) -> String {
+                "dog".to_string()
+            }
+            fn file_suffix(&self) -> Option<&str> {
+                Some(".object")
+            }
+            fn template(&self) -> Box<dyn TemplateRenderer + '_> {
+                unimplemented!()
+            }
+            fn target(&self) -> FileTarget {
+                FileTarget::Object
+            }
         }
 
         let gen = TestGen;
@@ -1115,7 +1128,8 @@ mod tests {
 
     #[test]
     fn test_resolve_filename_with_suffix_enabled() {
-        let config = make_config(r#"{
+        let config = make_config(
+            r#"{
             "schemaNamespace": "TestSchema",
             "input": {},
             "output": {
@@ -1126,14 +1140,23 @@ mod tests {
             "options": {
                 "appendSchemaTypeFilenameSuffix": true
             }
-        }"#);
+        }"#,
+        );
 
         struct TestGen;
         impl FileGenerator for TestGen {
-            fn file_name(&self) -> String { "dog".to_string() }
-            fn file_suffix(&self) -> Option<&str> { Some(".object") }
-            fn template(&self) -> Box<dyn TemplateRenderer + '_> { unimplemented!() }
-            fn target(&self) -> FileTarget { FileTarget::Object }
+            fn file_name(&self) -> String {
+                "dog".to_string()
+            }
+            fn file_suffix(&self) -> Option<&str> {
+                Some(".object")
+            }
+            fn template(&self) -> Box<dyn TemplateRenderer + '_> {
+                unimplemented!()
+            }
+            fn target(&self) -> FileTarget {
+                FileTarget::Object
+            }
         }
 
         let gen = TestGen;
@@ -1142,7 +1165,8 @@ mod tests {
 
     #[test]
     fn test_resolve_filename_with_suffix_enabled_but_no_suffix() {
-        let config = make_config(r#"{
+        let config = make_config(
+            r#"{
             "schemaNamespace": "TestSchema",
             "input": {},
             "output": {
@@ -1153,12 +1177,17 @@ mod tests {
             "options": {
                 "appendSchemaTypeFilenameSuffix": true
             }
-        }"#);
+        }"#,
+        );
 
         struct TestGen;
         impl FileGenerator for TestGen {
-            fn file_name(&self) -> String { "allAnimalsQuery".to_string() }
-            fn template(&self) -> Box<dyn TemplateRenderer + '_> { unimplemented!() }
+            fn file_name(&self) -> String {
+                "allAnimalsQuery".to_string()
+            }
+            fn template(&self) -> Box<dyn TemplateRenderer + '_> {
+                unimplemented!()
+            }
             fn target(&self) -> FileTarget {
                 FileTarget::Operation {
                     operation_type: OperationType::Query,
@@ -1211,7 +1240,7 @@ mod tests {
         assert_eq!(normalize_path(&path), PathBuf::from("/a/b/c"));
     }
 
-    // MARK: - Path traversal safety test (T-08-01)
+    // MARK: - Path traversal safety test
 
     #[test]
     fn test_path_traversal_constrained_by_root_url() {

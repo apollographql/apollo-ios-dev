@@ -9,21 +9,19 @@
 use std::sync::Arc;
 
 use graphql_compiler::graphql_type::GraphQLType;
-use graphql_compiler::schema::{
-    GraphQLCompositeType, GraphQLNamedType, GraphQLObjectType,
-};
+use graphql_compiler::schema::{GraphQLCompositeType, GraphQLNamedType, GraphQLObjectType};
 
 use crate::config::composition::Composition;
 use crate::config::ApolloCodegenConfiguration;
+use crate::templates::rendering_helpers::for_each_in::for_each_in_joined;
 use crate::templates::rendering_helpers::graphql_name_rendering::{
     render_enum_value, render_named_type, EnumRenderContext, RenderContext,
 };
 use crate::templates::rendering_helpers::graphql_type_rendered::{rendered, TypeRenderContext};
-use crate::templates::rendering_helpers::for_each_in::for_each_in_joined;
 use crate::templates::rendering_helpers::string_casing::first_uppercased;
 use crate::templates::rendering_helpers::string_swift_name_escaping::{
-    as_test_mock_initializer_parameter_name, render_as_test_mock_field_property_name,
-    escaped_swift_string_special_characters, is_conflicting_test_mock_field_name,
+    as_test_mock_initializer_parameter_name, escaped_swift_string_special_characters,
+    is_conflicting_test_mock_field_name, render_as_test_mock_field_property_name,
 };
 use crate::templates::{
     ConfigurationContext, NonFatalErrorRecorder, Scope, TemplateRenderer, TemplateTarget,
@@ -67,13 +65,12 @@ impl TemplateRenderer for MockObjectTemplate {
         TemplateTarget::TestMockFile
     }
 
-    fn render_body_template(
-        &self,
-        _non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
+    fn render_body_template(&self, _non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
         let object_name = render_named_type(
             &GraphQLNamedType::Object(Arc::clone(&self.graphql_object)),
-            &RenderContext::Typename { is_input_value: false },
+            &RenderContext::Typename {
+                is_input_value: false,
+            },
         );
 
         let mut sorted_fields = self.fields.clone();
@@ -108,22 +105,19 @@ impl TemplateRenderer for MockObjectTemplate {
             template_fields
                 .iter()
                 .map(|f| {
-                    let deprecation_line = render_deprecation(
-                        f.deprecation_reason.as_deref(),
-                        &self.config.config,
-                    );
+                    let deprecation_line =
+                        render_deprecation(f.deprecation_reason.as_deref(), &self.config.config);
                     let field_type = rendered(
                         &f.graphql_type,
-                        &TypeRenderContext::TestMockField { force_non_null: true },
+                        &TypeRenderContext::TestMockField {
+                            force_non_null: true,
+                        },
                         None,
                         &self.config.config,
                     );
                     format!(
                         "{}    @Field<{}>(\"{}\") public var {}",
-                        deprecation_line,
-                        field_type,
-                        f.response_key,
-                        f.property_name,
+                        deprecation_line, field_type, f.response_key, f.property_name,
                     )
                 })
                 .collect::<Vec<_>>()
@@ -136,11 +130,15 @@ impl TemplateRenderer for MockObjectTemplate {
         result.push_str(&format!(
             "{}{}final class {}: MockObject {{\n",
             self.config.nonisolated_modifier(),
-            parent_access, object_name,
+            parent_access,
+            object_name,
         ));
         result.push_str(&format!(
             "  {}static let objectType: {}.Object = {}.Objects.{}\n",
-            member_access, self.config.apollo_api_target_name(), schema_ns, object_name,
+            member_access,
+            self.config.apollo_api_target_name(),
+            schema_ns,
+            object_name,
         ));
         result.push_str(&format!(
             "  {}static let _mockFields = MockFields()\n",
@@ -222,7 +220,10 @@ fn render_deprecation(
     deprecation_reason: Option<&str>,
     config: &ApolloCodegenConfiguration,
 ) -> String {
-    match (deprecation_reason, config.options.warnings_on_deprecated_usage) {
+    match (
+        deprecation_reason,
+        config.options.warnings_on_deprecated_usage,
+    ) {
         (Some(reason), Composition::Include) => {
             // `\(deprecationReason:config:)` escapes Swift string special characters and the
             // annotation line is indented like the field it precedes.
@@ -265,7 +266,9 @@ fn default_mock_value(graphql_type: &GraphQLType, config: &ConfigurationContext)
             GraphQLCompositeType::Object(obj) => {
                 let name = render_named_type(
                     &GraphQLNamedType::Object(Arc::clone(obj)),
-                    &RenderContext::Typename { is_input_value: false },
+                    &RenderContext::Typename {
+                        is_input_value: false,
+                    },
                 );
                 format!("Mock<{}>()", name)
             }
@@ -336,7 +339,9 @@ fn mock_type_name(graphql_type: &GraphQLType, config: &ApolloCodegenConfiguratio
                     GraphQLCompositeType::Object(obj) => {
                         let name = render_named_type(
                             &GraphQLNamedType::Object(Arc::clone(obj)),
-                            &RenderContext::Typename { is_input_value: false },
+                            &RenderContext::Typename {
+                                is_input_value: false,
+                            },
                         );
                         format!("Mock<{}>", name)
                     }
@@ -350,7 +355,9 @@ fn mock_type_name(graphql_type: &GraphQLType, config: &ApolloCodegenConfiguratio
             GraphQLType::Scalar(_) | GraphQLType::Enum(_) | GraphQLType::InputObject(_) => {
                 let type_str = rendered(
                     graphql_type,
-                    &TypeRenderContext::TestMockField { force_non_null: true },
+                    &TypeRenderContext::TestMockField {
+                        force_non_null: true,
+                    },
                     None,
                     config,
                 );
@@ -409,12 +416,19 @@ fn conflicting_field_name_properties(fields: &[TemplateField]) -> String {
     }
     let indented: Vec<String> = joined
         .split('\n')
-        .map(|line| if line.is_empty() { String::new() } else { format!("  {}", line) })
+        .map(|line| {
+            if line.is_empty() {
+                String::new()
+            } else {
+                format!("  {}", line)
+            }
+        })
         .collect();
     format!("{}\n\n", indented.join("\n"))
 }
 
 #[cfg(test)]
+#[allow(non_snake_case)] // test names mirror the Swift test suite
 mod tests {
     use super::*;
     use crate::config::ApolloCodegenConfiguration;
@@ -639,7 +653,10 @@ mod tests {
 
         // The number of trailing newlines varies by version and is covered by the file-level
         // parity harness.
-        assert_eq!(actual.trim_end_matches('\n'), expected.trim_end_matches('\n'));
+        assert_eq!(
+            actual.trim_end_matches('\n'),
+            expected.trim_end_matches('\n')
+        );
     }
 
     // MARK: - Casing Tests
@@ -649,14 +666,18 @@ mod tests {
         let subject = build_subject("dog", None, vec![], swift_package_config());
         let actual = render_body(&subject);
 
-        assert!(actual.contains(&class_decl("public ", "Dog")), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&class_decl("public ", "Dog")),
+            "actual:\n{}",
+            actual
+        );
         assert!(actual.contains("TestSchema.Objects.Dog"));
         assert!(actual.contains("Array<Mock<Dog>>"));
     }
 
     #[test]
-    fn test__render__given_lowercased_schema_name_generates_first_uppercased_schema_name_references()
-    {
+    fn test__render__given_lowercased_schema_name_generates_first_uppercased_schema_name_references(
+    ) {
         let config = make_config_json(
             "lowercased",
             r#"{"swiftPackage": {"targetName": null}}"#,
@@ -698,8 +719,7 @@ mod tests {
 
     #[test]
     fn test__render__given_schema_type_generates_field_accessors() {
-        let cat_entity =
-            GraphQLType::Entity(GraphQLCompositeType::Object(mock_object("Cat")));
+        let cat_entity = GraphQLType::Entity(GraphQLCompositeType::Object(mock_object("Cat")));
 
         let fields = vec![
             ("string", non_null_string(), None),
@@ -732,19 +752,23 @@ mod tests {
         let subject = build_subject("Dog", None, fields, swift_package_config());
         let actual = render_body(&subject);
 
-        assert!(actual.contains(r#"@Field<TestSchema.CustomScalar>("customScalar") public var customScalar"#));
+        assert!(actual.contains(
+            r#"@Field<TestSchema.CustomScalar>("customScalar") public var customScalar"#
+        ));
         assert!(actual.contains(r#"@Field<Cat>("object") public var object"#));
         assert!(actual.contains(r#"@Field<[Cat]>("objectList") public var objectList"#));
-        assert!(actual.contains(r#"@Field<[[Cat]]>("objectNestedList") public var objectNestedList"#));
-        assert!(actual.contains(r#"@Field<[Cat?]>("objectOptionalList") public var objectOptionalList"#));
+        assert!(
+            actual.contains(r#"@Field<[[Cat]]>("objectNestedList") public var objectNestedList"#)
+        );
+        assert!(actual
+            .contains(r#"@Field<[Cat?]>("objectOptionalList") public var objectOptionalList"#));
         assert!(actual.contains(r#"@Field<String>("optionalString") public var optionalString"#));
         assert!(actual.contains(r#"@Field<String>("string") public var string"#));
     }
 
     #[test]
     fn test__render__given_fields_with_lowercase_type_names_generates_field_accessors() {
-        let cat_entity =
-            GraphQLType::Entity(GraphQLCompositeType::Object(mock_object("cat")));
+        let cat_entity = GraphQLType::Entity(GraphQLCompositeType::Object(mock_object("cat")));
 
         let fields = vec![
             (
@@ -763,22 +787,74 @@ mod tests {
         let subject = build_subject("Dog", None, fields, swift_package_config());
         let actual = render_body(&subject);
 
-        assert!(actual.contains(r#"@Field<TestSchema.CustomScalar>("customScalar") public var customScalar"#));
-        assert!(actual.contains(r#"@Field<GraphQLEnum<TestSchema.EnumType>>("enumType") public var enumType"#));
+        assert!(actual.contains(
+            r#"@Field<TestSchema.CustomScalar>("customScalar") public var customScalar"#
+        ));
+        assert!(actual.contains(
+            r#"@Field<GraphQLEnum<TestSchema.EnumType>>("enumType") public var enumType"#
+        ));
         assert!(actual.contains(r#"@Field<Cat>("object") public var object"#));
     }
 
     #[test]
-    fn test__render__given_fields_with_swift_reserved_keyword_names_generates_fields_escaped_with_backticks()
-    {
+    fn test__render__given_fields_with_swift_reserved_keyword_names_generates_fields_escaped_with_backticks(
+    ) {
         let keywords = vec![
-            "associatedtype", "class", "deinit", "enum", "extension", "fileprivate", "func",
-            "import", "init", "inout", "internal", "let", "operator", "private",
-            "precedencegroup", "protocol", "Protocol", "public", "rethrows", "static", "struct",
-            "subscript", "typealias", "var", "break", "case", "catch", "continue", "default",
-            "defer", "do", "else", "fallthrough", "for", "guard", "if", "in", "repeat", "return",
-            "throw", "switch", "where", "while", "as", "false", "is", "nil", "self", "Self",
-            "super", "throws", "true", "try", "Type", "Any",
+            "associatedtype",
+            "class",
+            "deinit",
+            "enum",
+            "extension",
+            "fileprivate",
+            "func",
+            "import",
+            "init",
+            "inout",
+            "internal",
+            "let",
+            "operator",
+            "private",
+            "precedencegroup",
+            "protocol",
+            "Protocol",
+            "public",
+            "rethrows",
+            "static",
+            "struct",
+            "subscript",
+            "typealias",
+            "var",
+            "break",
+            "case",
+            "catch",
+            "continue",
+            "default",
+            "defer",
+            "do",
+            "else",
+            "fallthrough",
+            "for",
+            "guard",
+            "if",
+            "in",
+            "repeat",
+            "return",
+            "throw",
+            "switch",
+            "where",
+            "while",
+            "as",
+            "false",
+            "is",
+            "nil",
+            "self",
+            "Self",
+            "super",
+            "throws",
+            "true",
+            "try",
+            "Type",
+            "Any",
         ];
 
         let fields: Vec<(&str, GraphQLType, Option<&str>)> = keywords
@@ -801,8 +877,10 @@ mod tests {
 
     #[test]
     fn test__render__given_field_type_interface_named_actor_generates_fields_with_namespace() {
-        let actor_interface =
-            GraphQLType::Entity(GraphQLCompositeType::Interface(mock_interface("Actor", &[])));
+        let actor_interface = GraphQLType::Entity(GraphQLCompositeType::Interface(mock_interface(
+            "Actor",
+            &[],
+        )));
 
         let fields = vec![("actor", actor_interface, None)];
         let subject = build_subject("Dog", None, fields, swift_package_config());
@@ -825,8 +903,7 @@ mod tests {
 
     #[test]
     fn test__render__given_field_type_object_named_actor_generates_fields_without_namespace() {
-        let actor_object =
-            GraphQLType::Entity(GraphQLCompositeType::Object(mock_object("Actor")));
+        let actor_object = GraphQLType::Entity(GraphQLCompositeType::Object(mock_object("Actor")));
 
         let fields = vec![("actor", actor_object, None)];
         let subject = build_subject("Dog", None, fields, swift_package_config());
@@ -843,7 +920,11 @@ mod tests {
         let subject = build_subject("Dog", None, fields, swift_package_config());
         let actual = render_body(&subject);
 
-        assert!(actual.contains("var hash: String? {"), "actual:\n{}", actual);
+        assert!(
+            actual.contains("var hash: String? {"),
+            "actual:\n{}",
+            actual
+        );
         assert!(actual.contains(r#"get { _data["hash"] as? String }"#));
         assert!(actual.contains(r"set { _setScalar(newValue, for: \.hash) }"));
     }
@@ -883,9 +964,9 @@ mod tests {
             ),
             (
                 "customScalarList",
-                GraphQLType::List(Box::new(GraphQLType::NonNull(Box::new(GraphQLType::Scalar(
-                    mock_scalar("CustomScalar"),
-                ))))),
+                GraphQLType::List(Box::new(GraphQLType::NonNull(Box::new(
+                    GraphQLType::Scalar(mock_scalar("CustomScalar")),
+                )))),
                 None,
             ),
             (
@@ -973,11 +1054,33 @@ mod tests {
         // Verify the extension is present
         assert!(actual.contains("public extension Mock where O == Dog {"));
         // Verify sorted init params with correct types
-        assert!(actual.contains(&required_param("customScalar", "TestSchema.CustomScalar", CUSTOM_SCALAR_DEFAULT)), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&required_param(
+                "customScalar",
+                "TestSchema.CustomScalar",
+                CUSTOM_SCALAR_DEFAULT
+            )),
+            "actual:\n{}",
+            actual
+        );
         assert!(actual.contains("customScalarList: [TestSchema.CustomScalar]? = nil"));
-        assert!(actual.contains(&format!("customScalarOptionalList: [{}]? = nil", nested_optional("TestSchema.CustomScalar"))), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&format!(
+                "customScalarOptionalList: [{}]? = nil",
+                nested_optional("TestSchema.CustomScalar")
+            )),
+            "actual:\n{}",
+            actual
+        );
         assert!(actual.contains("enumList: [GraphQLEnum<TestSchema.EnumType>]? = nil"));
-        assert!(actual.contains(&format!("enumOptionalList: [{}]? = nil", nested_optional("GraphQLEnum<TestSchema.EnumType>"))), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&format!(
+                "enumOptionalList: [{}]? = nil",
+                nested_optional("GraphQLEnum<TestSchema.EnumType>")
+            )),
+            "actual:\n{}",
+            actual
+        );
         assert!(actual.contains("enumType: GraphQLEnum<TestSchema.EnumType>? = nil"));
         assert!(actual.contains("interface: (any AnyMock)? = nil"));
         assert!(actual.contains("interfaceList: [(any AnyMock)]? = nil"));
@@ -988,10 +1091,28 @@ mod tests {
         assert!(actual.contains("objectNestedList: [[Mock<Cat>]]? = nil"));
         assert!(actual.contains("objectOptionalList: [Mock<Cat>?]? = nil"));
         assert!(actual.contains("optionalString: String? = nil"));
-        assert!(actual.contains(&required_param("string", "String", "\"\"")), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&required_param("string", "String", "\"\"")),
+            "actual:\n{}",
+            actual
+        );
         assert!(actual.contains("stringList: [String]? = nil"));
-        assert!(actual.contains(&format!("stringNestedList: [{}]? = nil", nested_optional("[String]"))), "actual:\n{}", actual);
-        assert!(actual.contains(&format!("stringOptionalList: [{}]? = nil", nested_optional("String"))), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&format!(
+                "stringNestedList: [{}]? = nil",
+                nested_optional("[String]")
+            )),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&format!(
+                "stringOptionalList: [{}]? = nil",
+                nested_optional("String")
+            )),
+            "actual:\n{}",
+            actual
+        );
         assert!(actual.contains("union: (any AnyMock)? = nil"));
         assert!(actual.contains("unionList: [(any AnyMock)]? = nil"));
         assert!(actual.contains("unionNestedList: [[(any AnyMock)]]? = nil"));
@@ -1008,8 +1129,8 @@ mod tests {
     }
 
     #[test]
-    fn test__render__given_schema_type_and_default_parameter_flag_on_generates_default_value_for_required_fields()
-    {
+    fn test__render__given_schema_type_and_default_parameter_flag_on_generates_default_value_for_required_fields(
+    ) {
         let aardvark = GraphQLType::Entity(GraphQLCompositeType::Object(mock_object("aardvark")));
         let cat = GraphQLType::Entity(GraphQLCompositeType::Object(mock_object("Cat")));
         let duck = mock_object("Duck");
@@ -1025,7 +1146,11 @@ mod tests {
         )));
 
         let fields = vec![
-            ("string", GraphQLType::NonNull(Box::new(string_type())), None),
+            (
+                "string",
+                GraphQLType::NonNull(Box::new(string_type())),
+                None,
+            ),
             (
                 "stringList",
                 GraphQLType::NonNull(Box::new(GraphQLType::List(Box::new(non_null_string())))),
@@ -1121,7 +1246,10 @@ mod tests {
             (
                 "enumList",
                 GraphQLType::NonNull(Box::new(GraphQLType::List(Box::new(GraphQLType::NonNull(
-                    Box::new(GraphQLType::Enum(mock_enum_type("enumType", &["foo", "bar"]))),
+                    Box::new(GraphQLType::Enum(mock_enum_type(
+                        "enumType",
+                        &["foo", "bar"],
+                    ))),
                 ))))),
                 None,
             ),
@@ -1130,23 +1258,127 @@ mod tests {
         let subject = build_subject("Dog", None, fields, swift_package_config());
         let actual = render_body(&subject);
 
-        assert!(actual.contains(&required_param("customScalar", "TestSchema.CustomScalar", CUSTOM_SCALAR_DEFAULT)), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("customScalarList", "[TestSchema.CustomScalar]", "[]")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("enumList", "[GraphQLEnum<TestSchema.EnumType>]", "[]")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("enumType", "GraphQLEnum<TestSchema.EnumType>", ".case(.foo)")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("interface", "(any AnyMock)", "Mock<Duck>()")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("interfaceList", "[(any AnyMock)]", "[]")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("interfaceNestedList", "[[(any AnyMock)]]", "[]")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("lowercaseObject", "Mock<Aardvark>", "Mock<Aardvark>()")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("object", "Mock<Cat>", "Mock<Cat>()")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("objectList", "[Mock<Cat>]", "[]")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("objectNestedList", "[[Mock<Cat>]]", "[]")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("string", "String", "\"\"")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("stringList", "[String]", "[]")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("stringNestedList", "[[String]]", "[]")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("union", "(any AnyMock)", "Mock<Goldfish>()")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("unionList", "[(any AnyMock)]", "[]")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("unionNestedList", "[[(any AnyMock)]]", "[]")), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&required_param(
+                "customScalar",
+                "TestSchema.CustomScalar",
+                CUSTOM_SCALAR_DEFAULT
+            )),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param(
+                "customScalarList",
+                "[TestSchema.CustomScalar]",
+                "[]"
+            )),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param(
+                "enumList",
+                "[GraphQLEnum<TestSchema.EnumType>]",
+                "[]"
+            )),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param(
+                "enumType",
+                "GraphQLEnum<TestSchema.EnumType>",
+                ".case(.foo)"
+            )),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param(
+                "interface",
+                "(any AnyMock)",
+                "Mock<Duck>()"
+            )),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param("interfaceList", "[(any AnyMock)]", "[]")),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param(
+                "interfaceNestedList",
+                "[[(any AnyMock)]]",
+                "[]"
+            )),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param(
+                "lowercaseObject",
+                "Mock<Aardvark>",
+                "Mock<Aardvark>()"
+            )),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param("object", "Mock<Cat>", "Mock<Cat>()")),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param("objectList", "[Mock<Cat>]", "[]")),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param("objectNestedList", "[[Mock<Cat>]]", "[]")),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param("string", "String", "\"\"")),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param("stringList", "[String]", "[]")),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param("stringNestedList", "[[String]]", "[]")),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param(
+                "union",
+                "(any AnyMock)",
+                "Mock<Goldfish>()"
+            )),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param("unionList", "[(any AnyMock)]", "[]")),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param(
+                "unionNestedList",
+                "[[(any AnyMock)]]",
+                "[]"
+            )),
+            "actual:\n{}",
+            actual
+        );
     }
 
     #[test]
@@ -1161,16 +1393,64 @@ mod tests {
     }
 
     #[test]
-    fn test__render__given_fields_with_swift_reserved_keyword_names_generates_convenience_initializer_parameters_escaped_with_backticks_and_internal_names()
-    {
+    fn test__render__given_fields_with_swift_reserved_keyword_names_generates_convenience_initializer_parameters_escaped_with_backticks_and_internal_names(
+    ) {
         let keywords = vec![
-            "associatedtype", "class", "deinit", "enum", "extension", "fileprivate", "func",
-            "import", "init", "inout", "internal", "let", "operator", "private",
-            "precedencegroup", "protocol", "Protocol", "public", "rethrows", "static", "struct",
-            "subscript", "typealias", "var", "break", "case", "catch", "continue", "default",
-            "defer", "do", "else", "fallthrough", "for", "guard", "if", "in", "repeat", "return",
-            "throw", "switch", "where", "while", "as", "false", "is", "nil", "self", "Self",
-            "super", "throws", "true", "try", "Type", "Any",
+            "associatedtype",
+            "class",
+            "deinit",
+            "enum",
+            "extension",
+            "fileprivate",
+            "func",
+            "import",
+            "init",
+            "inout",
+            "internal",
+            "let",
+            "operator",
+            "private",
+            "precedencegroup",
+            "protocol",
+            "Protocol",
+            "public",
+            "rethrows",
+            "static",
+            "struct",
+            "subscript",
+            "typealias",
+            "var",
+            "break",
+            "case",
+            "catch",
+            "continue",
+            "default",
+            "defer",
+            "do",
+            "else",
+            "fallthrough",
+            "for",
+            "guard",
+            "if",
+            "in",
+            "repeat",
+            "return",
+            "throw",
+            "switch",
+            "where",
+            "while",
+            "as",
+            "false",
+            "is",
+            "nil",
+            "self",
+            "Self",
+            "super",
+            "throws",
+            "true",
+            "try",
+            "Type",
+            "Any",
         ];
 
         let fields: Vec<(&str, GraphQLType, Option<&str>)> = keywords
@@ -1182,16 +1462,44 @@ mod tests {
         let actual = render_body(&subject);
 
         // Check the "self" field gets special treatment
-        assert!(actual.contains(&required_param("`self` self_value", "String", "\"\"")), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&required_param("`self` self_value", "String", "\"\"")),
+            "actual:\n{}",
+            actual
+        );
         assert!(actual.contains(r"_setScalar(self_value, for: \.`self`)"));
 
         // Check backtick-escaped params
-        assert!(actual.contains(&required_param("`Any`", "String", "\"\"")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("`Protocol`", "String", "\"\"")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("`Self`", "String", "\"\"")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("`Type`", "String", "\"\"")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("`class`", "String", "\"\"")), "actual:\n{}", actual);
-        assert!(actual.contains(&required_param("`var`", "String", "\"\"")), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&required_param("`Any`", "String", "\"\"")),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param("`Protocol`", "String", "\"\"")),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param("`Self`", "String", "\"\"")),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param("`Type`", "String", "\"\"")),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param("`class`", "String", "\"\"")),
+            "actual:\n{}",
+            actual
+        );
+        assert!(
+            actual.contains(&required_param("`var`", "String", "\"\"")),
+            "actual:\n{}",
+            actual
+        );
 
         // Check _setScalar calls use backticked names
         assert!(actual.contains(r"_setScalar(`Any`, for: \.`Any`)"));
@@ -1201,37 +1509,49 @@ mod tests {
     // MARK: - Access Level Tests
 
     #[test]
-    fn test__render__given_schema_type_and_fields_when_test_mocks_is_swift_package_should_render_with_public_access()
-    {
+    fn test__render__given_schema_type_and_fields_when_test_mocks_is_swift_package_should_render_with_public_access(
+    ) {
         let fields = vec![("string", non_null_string(), None)];
         let subject = build_subject("Dog", None, fields, swift_package_config());
         let actual = render_body(&subject);
 
-        assert!(actual.contains(&class_decl("public ", "Dog")), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&class_decl("public ", "Dog")),
+            "actual:\n{}",
+            actual
+        );
         assert!(actual.contains("public static let objectType"));
         assert!(actual.contains(&format!("public {}", MOCK_FIELDS_DECL)));
         assert!(actual.contains("public extension Mock where O == Dog {"));
     }
 
     #[test]
-    fn test__render__given_schema_type_when_test_mocks_absolute_with_public_access_modifier_should_render_with_public_access()
-    {
+    fn test__render__given_schema_type_when_test_mocks_absolute_with_public_access_modifier_should_render_with_public_access(
+    ) {
         let fields = vec![("string", non_null_string(), None)];
         let subject = build_subject("Dog", None, fields, absolute_public_config());
         let actual = render_body(&subject);
 
-        assert!(actual.contains(&class_decl("public ", "Dog")), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&class_decl("public ", "Dog")),
+            "actual:\n{}",
+            actual
+        );
         assert!(actual.contains("public extension Mock where O == Dog {"));
     }
 
     #[test]
-    fn test__render__given_schema_type_when_test_mocks_absolute_with_internal_access_modifier_should_render_with_internal_access()
-    {
+    fn test__render__given_schema_type_when_test_mocks_absolute_with_internal_access_modifier_should_render_with_internal_access(
+    ) {
         let fields = vec![("string", non_null_string(), None)];
         let subject = build_subject("Dog", None, fields, absolute_internal_config());
         let actual = render_body(&subject);
 
-        assert!(actual.contains(&class_decl("", "Dog")), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&class_decl("", "Dog")),
+            "actual:\n{}",
+            actual
+        );
         assert!(!actual.contains(&class_decl("public ", "Dog")));
         assert!(actual.contains("static let objectType"));
         assert!(actual.contains(MOCK_FIELDS_DECL));
@@ -1242,18 +1562,14 @@ mod tests {
     // MARK: - Deprecation Warning Tests
 
     #[test]
-    fn test__render__given_warnings_on_deprecated_usage_include_has_deprecated_field_should_generate_warning()
-    {
+    fn test__render__given_warnings_on_deprecated_usage_include_has_deprecated_field_should_generate_warning(
+    ) {
         let config = make_config_json(
             "TestSchema",
             r#"{"swiftPackage": {"targetName": null}}"#,
             "include",
         );
-        let fields = vec![(
-            "string",
-            non_null_string(),
-            Some("Cause I said so!"),
-        )];
+        let fields = vec![("string", non_null_string(), Some("Cause I said so!"))];
         let subject = build_subject("Dog", None, fields, config);
         let actual = render_body(&subject);
 
@@ -1262,13 +1578,9 @@ mod tests {
     }
 
     #[test]
-    fn test__render__given_warnings_on_deprecated_usage_exclude_has_deprecated_field_should_not_generate_warning()
-    {
-        let fields = vec![(
-            "string",
-            non_null_string(),
-            Some("Cause I said so!"),
-        )];
+    fn test__render__given_warnings_on_deprecated_usage_exclude_has_deprecated_field_should_not_generate_warning(
+    ) {
+        let fields = vec![("string", non_null_string(), Some("Cause I said so!"))];
         let subject = build_subject("Dog", None, fields, swift_package_config());
         let actual = render_body(&subject);
 
@@ -1301,10 +1613,19 @@ mod tests {
 
     #[test]
     fn test__render__given_mock_object_with_custom_name_should_render_with_custom_name() {
-        let subject = build_subject("MyObject", Some("MyCustomObject"), vec![], swift_package_config());
+        let subject = build_subject(
+            "MyObject",
+            Some("MyCustomObject"),
+            vec![],
+            swift_package_config(),
+        );
         let actual = render_body(&subject);
 
-        assert!(actual.contains(&class_decl("public ", "MyCustomObject")), "actual:\n{}", actual);
+        assert!(
+            actual.contains(&class_decl("public ", "MyCustomObject")),
+            "actual:\n{}",
+            actual
+        );
         assert!(actual.contains("TestSchema.Objects.MyCustomObject"));
         assert!(actual.contains("Array<Mock<MyCustomObject>>"));
     }

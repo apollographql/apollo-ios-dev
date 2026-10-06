@@ -13,7 +13,10 @@ pub enum CliError {
     /// Mirrors Swift's `Error { errorDescription }`.
     Generic { description: String },
     /// Cannot read config file at path.
-    CannotReadFile { path: String, source: std::io::Error },
+    CannotReadFile {
+        path: String,
+        source: std::io::Error,
+    },
     /// Config JSON is invalid.
     InvalidConfiguration { source: serde_json::Error },
     /// File already exists and --overwrite not passed.

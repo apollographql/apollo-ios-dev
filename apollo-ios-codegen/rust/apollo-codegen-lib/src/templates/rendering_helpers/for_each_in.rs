@@ -9,30 +9,30 @@
 /// Joins `elements` exactly like `TemplateString.StringInterpolation.appendInterpolation(forEachIn:)`.
 pub fn for_each_in_joined<I, S>(elements: I, separator: &str) -> String
 where
-  I: IntoIterator<Item = S>,
-  S: AsRef<str>,
+    I: IntoIterator<Item = S>,
+    S: AsRef<str>,
 {
-  let mut result = String::new();
-  for element in elements {
-    let element = element.as_ref();
-    if result.is_empty() {
-      result.push_str(element);
-    } else {
-      result.push_str(separator);
-      result.push_str(element);
+    let mut result = String::new();
+    for element in elements {
+        let element = element.as_ref();
+        if result.is_empty() {
+            result.push_str(element);
+        } else {
+            result.push_str(separator);
+            result.push_str(element);
+        }
     }
-  }
-  result
+    result
 }
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn leading_empty_elements_are_dropped_but_trailing_ones_add_separators() {
-    assert_eq!(for_each_in_joined(["", "", "a", "", ""], "\n"), "a\n\n");
-    assert_eq!(for_each_in_joined(["a", "b"], ",\n"), "a,\nb");
-    assert_eq!(for_each_in_joined(["", ""], "\n"), "");
-  }
+    #[test]
+    fn leading_empty_elements_are_dropped_but_trailing_ones_add_separators() {
+        assert_eq!(for_each_in_joined(["", "", "a", "", ""], "\n"), "a\n\n");
+        assert_eq!(for_each_in_joined(["a", "b"], ",\n"), "a,\nb");
+        assert_eq!(for_each_in_joined(["", ""], "\n"), "");
+    }
 }

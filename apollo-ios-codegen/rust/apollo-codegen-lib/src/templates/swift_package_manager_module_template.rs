@@ -56,10 +56,7 @@ impl SwiftPackageManagerModuleTemplate {
                     Some((cased.clone(), format!("./{}", cased)))
                 } else {
                     let namespace = first_uppercased(self.config.schema_namespace());
-                    Some((
-                        format!("{}TestMocks", namespace),
-                        "./TestMocks".to_string(),
-                    ))
+                    Some((format!("{}TestMocks", namespace), "./TestMocks".to_string()))
                 }
             }
         }
@@ -83,12 +80,11 @@ impl TemplateRenderer for SwiftPackageManagerModuleTemplate {
         None
     }
 
-    fn render_body_template(
-        &self,
-        _non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
+    fn render_body_template(&self, _non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
         let cased_schema_namespace = first_uppercased(self.config.schema_namespace());
-        let dependency_string = self.apollo_sdk_dependency.dependency_string(CODEGEN_VERSION);
+        let dependency_string = self
+            .apollo_sdk_dependency
+            .dependency_string(CODEGEN_VERSION);
 
         let test_mock_product = if let Some((ref target_name, _)) = self.test_mock_target() {
             format!(
@@ -178,7 +174,11 @@ mod tests {
         let result = template.render();
         let body = result.body;
 
-        assert!(body.contains("// swift-tools-version:6.1"), "body:\n{}", body);
+        assert!(
+            body.contains("// swift-tools-version:6.1"),
+            "body:\n{}",
+            body
+        );
         assert!(body.contains("name: \"MySchema\""));
         assert!(body.contains(".library(name: \"MySchema\", targets: [\"MySchema\"])"));
         assert!(body.contains(".product(name: \"ApolloAPI\", package: \"apollo-ios\")"));
@@ -193,7 +193,11 @@ mod tests {
             body
         );
         // 2.0.0+: Swift 6 package with both language modes
-        assert!(body.contains("swiftLanguageModes: [.v6, .v5]"), "body:\n{}", body);
+        assert!(
+            body.contains("swiftLanguageModes: [.v6, .v5]"),
+            "body:\n{}",
+            body
+        );
         // No test mock target
         assert!(!body.contains("ApolloTestSupport"));
     }

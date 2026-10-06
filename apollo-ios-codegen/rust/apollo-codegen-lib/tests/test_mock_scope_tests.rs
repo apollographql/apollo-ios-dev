@@ -27,12 +27,30 @@ union SearchResult = Shop | Rock
 "#;
 
 const FILES: &[(&str, &str)] = &[
-    ("Shared/PetBits.graphql", "fragment PetBits on Pet { id name }"),
-    ("Features/Pets/PetsQuery.graphql", "query PetsQuery { pets { ...PetBits } }"),
-    ("Features/Account/MeQuery.graphql", "query MeQuery { me { id name } }"),
-    ("Features/Rocks/RocksQuery.graphql", "query RocksQuery { rocks { id } }"),
-    ("Features/Search/SearchQuery.graphql", "query SearchQuery { search { ... on Shop { id } } }"),
-    ("Features/Adopt/AdoptMutation.graphql", "mutation Adopt($input: AdoptInput!) { adopt(input: $input) { id } }"),
+    (
+        "Shared/PetBits.graphql",
+        "fragment PetBits on Pet { id name }",
+    ),
+    (
+        "Features/Pets/PetsQuery.graphql",
+        "query PetsQuery { pets { ...PetBits } }",
+    ),
+    (
+        "Features/Account/MeQuery.graphql",
+        "query MeQuery { me { id name } }",
+    ),
+    (
+        "Features/Rocks/RocksQuery.graphql",
+        "query RocksQuery { rocks { id } }",
+    ),
+    (
+        "Features/Search/SearchQuery.graphql",
+        "query SearchQuery { search { ... on Shop { id } } }",
+    ),
+    (
+        "Features/Adopt/AdoptMutation.graphql",
+        "mutation Adopt($input: AdoptInput!) { adopt(input: $input) { id } }",
+    ),
 ];
 
 fn write_fixture(root: &Path) {
@@ -68,7 +86,12 @@ fn names(set: &indexmap::IndexSet<String>) -> Vec<&str> {
 }
 
 fn files(paths: &[&str], root: &Path) -> GenerationFilter {
-    GenerationFilter::Files(paths.iter().map(|p| root.join(p).to_string_lossy().to_string()).collect())
+    GenerationFilter::Files(
+        paths
+            .iter()
+            .map(|p| root.join(p).to_string_lossy().to_string())
+            .collect(),
+    )
 }
 
 #[test]
@@ -94,7 +117,11 @@ fn unfiltered_referenced_objects_equal_the_configuration_objects() {
     let mut want: Vec<&str> = expected.iter().map(String::as_str).collect();
     want.sort_unstable();
     assert_eq!(got, want);
-    assert!(all.contains("Dog") && all.contains("Shop") && all.contains("Mutation"), "{:?}", all);
+    assert!(
+        all.contains("Dog") && all.contains("Shop") && all.contains("Mutation"),
+        "{:?}",
+        all
+    );
 }
 
 #[test]
@@ -106,20 +133,35 @@ fn referenced_scope_follows_interfaces_unions_and_fragments() {
 
     // pets: [Pet] through a fragment spread: every Pet implementor, and through
     // Dog/Cat's WarmBlooded interface nothing new (its implementors are pets too).
-    let pets = referenced_object_types(cr, Some(&files(&["Features/Pets/PetsQuery.graphql"], tmp.path())));
+    let pets = referenced_object_types(
+        cr,
+        Some(&files(&["Features/Pets/PetsQuery.graphql"], tmp.path())),
+    );
     assert_eq!(names(&pets), ["Query", "Dog", "Cat", "Fish"]);
 
     // me: User only.
-    let me = referenced_object_types(cr, Some(&files(&["Features/Account/MeQuery.graphql"], tmp.path())));
+    let me = referenced_object_types(
+        cr,
+        Some(&files(&["Features/Account/MeQuery.graphql"], tmp.path())),
+    );
     assert_eq!(names(&me), ["Query", "User"]);
 
     // search: [SearchResult] union: both members even though only Shop is selected.
-    let search = referenced_object_types(cr, Some(&files(&["Features/Search/SearchQuery.graphql"], tmp.path())));
+    let search = referenced_object_types(
+        cr,
+        Some(&files(&["Features/Search/SearchQuery.graphql"], tmp.path())),
+    );
     assert_eq!(names(&search), ["Query", "Shop", "Rock"]);
 
     // adopt: Dog -> its interfaces Pet and WarmBlooded -> their implementors; the
     // input object contributes no objects.
-    let adopt = referenced_object_types(cr, Some(&files(&["Features/Adopt/AdoptMutation.graphql"], tmp.path())));
+    let adopt = referenced_object_types(
+        cr,
+        Some(&files(
+            &["Features/Adopt/AdoptMutation.graphql"],
+            tmp.path(),
+        )),
+    );
     assert_eq!(names(&adopt), ["Mutation", "Dog", "Cat", "Fish"]);
 
     // A fragment file selected on its own contributes its type condition's closure.
@@ -127,7 +169,15 @@ fn referenced_scope_follows_interfaces_unions_and_fragments() {
     assert_eq!(names(&shared), ["Dog", "Cat", "Fish"]);
 
     // Prefix selection works too.
-    let prefix = referenced_object_types(cr, Some(&GenerationFilter::Prefix(tmp.path().join("Features/Rocks").to_string_lossy().to_string())));
+    let prefix = referenced_object_types(
+        cr,
+        Some(&GenerationFilter::Prefix(
+            tmp.path()
+                .join("Features/Rocks")
+                .to_string_lossy()
+                .to_string(),
+        )),
+    );
     assert_eq!(names(&prefix), ["Query", "Rock"]);
 }
 
@@ -140,7 +190,11 @@ fn select_applies_scope_include_and_exclude_in_configuration_order() {
     let filter = files(&["Features/Account/MeQuery.graphql"], tmp.path());
 
     let all = select_mock_object_types(cr, &TestMockScoping::default(), Some(&filter)).unwrap();
-    assert_eq!(names(&all), names(&referenced_object_types(cr, None)), "scope all ignores the filter");
+    assert_eq!(
+        names(&all),
+        names(&referenced_object_types(cr, None)),
+        "scope all ignores the filter"
+    );
 
     let scoping = TestMockScoping {
         scope: TestMockScope::ReferencedByOperations,
@@ -158,7 +212,11 @@ fn select_applies_scope_include_and_exclude_in_configuration_order() {
         ..Default::default()
     };
     let base = select_mock_object_types(cr, &everything_but, None).unwrap();
-    assert!(!base.contains("Dog") && !base.contains("Cat") && base.contains("Fish"), "{:?}", base);
+    assert!(
+        !base.contains("Dog") && !base.contains("Cat") && base.contains("Fish"),
+        "{:?}",
+        base
+    );
 }
 
 #[test]

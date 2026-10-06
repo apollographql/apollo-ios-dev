@@ -82,15 +82,13 @@ impl DirectSelections {
     }
 
     /// Merges two entity fields with the same response key.
-    fn merge_entity_fields(
-        new_field: &EntityField,
-        existing_field: &EntityField,
-    ) -> EntityField {
+    fn merge_entity_fields(new_field: &EntityField, existing_field: &EntityField) -> EntityField {
         if existing_field.inclusion_conditions == new_field.inclusion_conditions {
             // Same conditions: merge selections directly
-            if let (Some(existing_sel), Some(new_sel)) =
-                (&existing_field.selection_set.selections, &new_field.selection_set.selections)
-            {
+            if let (Some(existing_sel), Some(new_sel)) = (
+                &existing_field.selection_set.selections,
+                &new_field.selection_set.selections,
+            ) {
                 // Clone the existing selections and merge in the new ones
                 let mut merged = existing_sel.as_ref().clone();
                 merged.merge_in_all(new_sel.as_ref());
@@ -128,7 +126,7 @@ impl DirectSelections {
         });
 
         let type_info = Arc::new(TypeInfo::new(
-            Arc::clone(&existing_field.entity()),
+            Arc::clone(existing_field.entity()),
             wrapper_scope,
         ));
 
@@ -160,15 +158,15 @@ impl DirectSelections {
         wrapper_field: &mut EntityField,
     ) {
         if let Some(new_field_conditions) = new_field.selection_set.inclusion_conditions() {
-            let new_scope_path = wrapper_field.selection_set.scope_path.mutating_last(|scope| {
-                scope.appending_conditions(new_field_conditions.clone())
-            });
+            let new_scope_path = wrapper_field
+                .selection_set
+                .scope_path
+                .mutating_last(|scope| scope.appending_conditions(new_field_conditions.clone()));
 
             // Mirrors Swift `newField.selectionSet.updateScopePath(to:)`, which also
             // updates the scope paths of every nested selection set.
-            let new_selection_set = Arc::new(
-                new_field.selection_set.updating_scope_path(new_scope_path),
-            );
+            let new_selection_set =
+                Arc::new(new_field.selection_set.updating_scope_path(new_scope_path));
 
             let inline_fragment = InlineFragmentSpread::new(new_selection_set);
 
@@ -204,8 +202,7 @@ impl DirectSelections {
 
         for field in result.fields.values_mut() {
             if let Field::Entity(ef) = field {
-                let child_path =
-                    new_parent_scope_path.appending(ef.selection_set.scope().clone());
+                let child_path = new_parent_scope_path.appending(ef.selection_set.scope().clone());
                 ef.selection_set = Arc::new(ef.selection_set.updating_scope_path(child_path));
             }
         }
@@ -219,8 +216,11 @@ impl DirectSelections {
                 .clone();
             let child_path = new_parent_scope_path
                 .mutating_last(|scope| scope.appending(last_condition.clone()));
-            inline_fragment.selection_set =
-                Arc::new(inline_fragment.selection_set.updating_scope_path(child_path));
+            inline_fragment.selection_set = Arc::new(
+                inline_fragment
+                    .selection_set
+                    .updating_scope_path(child_path),
+            );
         }
 
         for named_fragment in result.named_fragments.values_mut() {
@@ -241,9 +241,10 @@ impl DirectSelections {
         let scope_condition = fragment.selection_set.scope().scope_path.last().clone();
 
         if let Some(existing) = self.inline_fragments.get(&scope_condition) {
-            if let (Some(existing_sel), Some(new_sel)) =
-                (&existing.selection_set.selections, &fragment.selection_set.selections)
-            {
+            if let (Some(existing_sel), Some(new_sel)) = (
+                &existing.selection_set.selections,
+                &fragment.selection_set.selections,
+            ) {
                 let mut merged = existing_sel.as_ref().clone();
                 merged.merge_in_all(new_sel.as_ref());
                 let updated = InlineFragmentSpread::new(Arc::new(SelectionSet::new(
@@ -301,7 +302,9 @@ impl DirectSelections {
     // MARK: - Scope path updates
 
     /// Updates the parent scope path for all nested selections.
-    #[deprecated(note = "Scope path updates handled during IR construction. Will be removed in future cleanup.")]
+    #[deprecated(
+        note = "Scope path updates handled during IR construction. Will be removed in future cleanup."
+    )]
     #[allow(dead_code)]
     pub fn update_parent_scope_path(
         &self,
@@ -357,8 +360,10 @@ impl fmt::Display for DirectSelections {
 /// Mirrors `DirectSelections.GroupedByInclusionCondition` from `IR+DirectSelections.swift`.
 pub struct GroupedByInclusionCondition {
     pub unconditional_selections: DirectSelections,
-    pub inclusion_condition_groups:
-        IndexMap<crate::inclusion_conditions::AnyOf<crate::inclusion_conditions::InclusionConditions>, DirectSelections>,
+    pub inclusion_condition_groups: IndexMap<
+        crate::inclusion_conditions::AnyOf<crate::inclusion_conditions::InclusionConditions>,
+        DirectSelections,
+    >,
 }
 
 impl GroupedByInclusionCondition {
@@ -373,7 +378,7 @@ impl GroupedByInclusionCondition {
             if let Some(conditions) = field.inclusion_conditions() {
                 groups
                     .entry(conditions.clone())
-                    .or_insert_with(DirectSelections::new)
+                    .or_default()
                     .fields
                     .insert(key.clone(), field.clone());
             } else {
@@ -386,7 +391,7 @@ impl GroupedByInclusionCondition {
                 let any_of = crate::inclusion_conditions::AnyOf::new(conditions.clone());
                 groups
                     .entry(any_of)
-                    .or_insert_with(DirectSelections::new)
+                    .or_default()
                     .inline_fragments
                     .insert(key.clone(), fragment.clone());
             } else {
@@ -400,7 +405,7 @@ impl GroupedByInclusionCondition {
             if let Some(conditions) = &fragment.inclusion_conditions {
                 groups
                     .entry(conditions.clone())
-                    .or_insert_with(DirectSelections::new)
+                    .or_default()
                     .named_fragments
                     .insert(key.clone(), fragment.clone());
             } else {
@@ -452,10 +457,7 @@ mod tests {
         })
     }
 
-    fn make_scalar_field(
-        name: &str,
-        conditions: Option<AnyOf<InclusionConditions>>,
-    ) -> Field {
+    fn make_scalar_field(name: &str, conditions: Option<AnyOf<InclusionConditions>>) -> Field {
         Field::Scalar(ScalarField::new(make_compilation_field(name), conditions))
     }
 
@@ -472,12 +474,12 @@ mod tests {
     fn merge_two_fields_same_key_ors_inclusion_conditions() {
         let mut selections = DirectSelections::new();
 
-        let cond_a = AnyOf::new(InclusionConditions::new(
-            InclusionCondition::include_if("flagA".to_string()),
-        ));
-        let cond_b = AnyOf::new(InclusionConditions::new(
-            InclusionCondition::include_if("flagB".to_string()),
-        ));
+        let cond_a = AnyOf::new(InclusionConditions::new(InclusionCondition::include_if(
+            "flagA".to_string(),
+        )));
+        let cond_b = AnyOf::new(InclusionConditions::new(InclusionCondition::include_if(
+            "flagB".to_string(),
+        )));
 
         let field_a = make_scalar_field("name", Some(cond_a));
         let field_b = make_scalar_field("name", Some(cond_b));
@@ -496,9 +498,9 @@ mod tests {
     fn merge_unconditional_field_makes_result_unconditional() {
         let mut selections = DirectSelections::new();
 
-        let cond = AnyOf::new(InclusionConditions::new(
-            InclusionCondition::include_if("flag".to_string()),
-        ));
+        let cond = AnyOf::new(InclusionConditions::new(InclusionCondition::include_if(
+            "flag".to_string(),
+        )));
 
         let field_conditional = make_scalar_field("name", Some(cond));
         let field_unconditional = make_scalar_field("name", None);

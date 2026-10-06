@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+indexmap = { workspace = true }
 codegen-cli = { path = "../codegen-cli" }
 apollo-codegen-lib = { path = "../apollo-codegen-lib" }
 clap = { workspace = true }
@@ -15,7 +16,6 @@ serde_json = { workspace = true }
 
 [dev-dependencies]
 libc = "0.2"
-indexmap = { workspace = true }
 tempfile = "3"
 
 [build-dependencies]

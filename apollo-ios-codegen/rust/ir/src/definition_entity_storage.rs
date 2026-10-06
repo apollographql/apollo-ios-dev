@@ -13,7 +13,7 @@ use crate::selection_set::TypeInfo;
 ///
 /// Ensures that only one `Entity` instance exists per location (dedup by location).
 /// Entity constructors are `pub(crate)` to enforce that only `DefinitionEntityStorage`
-/// creates entities (per RESEARCH.md Pitfall 2 / T-04-07).
+/// creates entities.
 ///
 /// Mirrors `IR.DefinitionEntityStorage` from `IR+DefinitionEntityStorage.swift`.
 #[derive(Debug, Clone)]
@@ -50,12 +50,10 @@ impl DefinitionEntityStorage {
             "Enclosing entity from other source definition is invalid."
         );
 
-        let location = on_enclosing_entity
-            .location
-            .appending(FieldComponent::new(
-                field.response_key().to_string(),
-                field.type_.clone(),
-            ));
+        let location = on_enclosing_entity.location.appending(FieldComponent::new(
+            field.response_key().to_string(),
+            field.type_.clone(),
+        ));
 
         if let Some(existing) = self.entities_for_fields.get(&location) {
             return Arc::clone(existing);
@@ -105,11 +103,7 @@ impl DefinitionEntityStorage {
 
         // Build root type path: take the spread entity's path and append
         // the fragment entity's path (minus the first element which is the fragment root)
-        let other_root_type_path_iter = entity_in_fragment
-            .root_type_path()
-            .iter()
-            .skip(1)
-            .cloned();
+        let other_root_type_path_iter = entity_in_fragment.root_type_path().iter().skip(1).cloned();
         let root_type_path = fragment_spread_type_info
             .entity
             .root_type_path()
@@ -127,12 +121,10 @@ impl DefinitionEntityStorage {
         field: &compilation_result::Field,
         on_enclosing_entity: &Entity,
     ) -> Arc<Entity> {
-        let location = on_enclosing_entity
-            .location
-            .appending(FieldComponent::new(
-                field.response_key().to_string(),
-                field.type_.clone(),
-            ));
+        let location = on_enclosing_entity.location.appending(FieldComponent::new(
+            field.response_key().to_string(),
+            field.type_.clone(),
+        ));
 
         if let Some(existing) = self.entities_for_fields.get(&location) {
             return Arc::clone(existing);
@@ -172,11 +164,12 @@ impl DefinitionEntityStorage {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use graphql_compiler::{
-        GraphQLCompositeType, GraphQLName, GraphQLObjectType, GraphQLScalarType,
-        GraphQLType,
+    use graphql_compiler::compilation_result::{
+        self, OperationDefinition, OperationType, SelectionSet as CRSelectionSet,
     };
-    use graphql_compiler::compilation_result::{self, OperationDefinition, OperationType, SelectionSet as CRSelectionSet};
+    use graphql_compiler::{
+        GraphQLCompositeType, GraphQLName, GraphQLObjectType, GraphQLScalarType, GraphQLType,
+    };
     use indexmap::IndexMap;
 
     fn make_object(name: &str) -> Arc<GraphQLObjectType> {
@@ -189,7 +182,10 @@ mod tests {
         })
     }
 
-    fn make_operation_def(name: &str, root_type: Arc<GraphQLObjectType>) -> Arc<OperationDefinition> {
+    fn make_operation_def(
+        name: &str,
+        root_type: Arc<GraphQLObjectType>,
+    ) -> Arc<OperationDefinition> {
         Arc::new(OperationDefinition {
             name: name.to_string(),
             operation_type: OperationType::Query,
@@ -242,7 +238,10 @@ mod tests {
         let storage = DefinitionEntityStorage::new(Arc::clone(&root_entity));
         assert_eq!(storage.entities_for_fields.len(), 1);
         assert!(Arc::ptr_eq(
-            storage.entities_for_fields.get(&root_entity.location).unwrap(),
+            storage
+                .entities_for_fields
+                .get(&root_entity.location)
+                .unwrap(),
             &root_entity,
         ));
     }

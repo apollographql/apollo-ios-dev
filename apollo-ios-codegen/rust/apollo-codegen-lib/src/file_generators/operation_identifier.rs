@@ -10,7 +10,9 @@
 
 use std::collections::BTreeSet;
 
-use graphql_compiler::compilation_result::{FragmentDefinition, OperationDefinition, OperationType};
+use graphql_compiler::compilation_result::{
+    FragmentDefinition, OperationDefinition, OperationType,
+};
 use sha2::{Digest, Sha256};
 
 use crate::templates::rendering_helpers::string_single_line::converted_to_single_line;
@@ -206,7 +208,11 @@ mod tests {
     // Test 1: compute_identifier returns 64-char hex string
     #[test]
     fn test_compute_identifier_returns_64_char_hex_string() {
-        let op = make_operation("TestQuery", "query TestQuery { allAnimals { species } }", vec![]);
+        let op = make_operation(
+            "TestQuery",
+            "query TestQuery { allAnimals { species } }",
+            vec![],
+        );
         let descriptor = OperationDescriptor::new(&op);
         let id = compute_identifier(&descriptor);
         assert_eq!(id.len(), 64, "SHA256 hex should be 64 characters");
@@ -221,7 +227,11 @@ mod tests {
     // Test 2: same input produces same hash (determinism)
     #[test]
     fn test_compute_identifier_is_deterministic() {
-        let op = make_operation("TestQuery", "query TestQuery { allAnimals { species } }", vec![]);
+        let op = make_operation(
+            "TestQuery",
+            "query TestQuery { allAnimals { species } }",
+            vec![],
+        );
         let descriptor1 = OperationDescriptor::new(&op);
         let descriptor2 = OperationDescriptor::new(&op);
         let id1 = compute_identifier(&descriptor1);
@@ -232,11 +242,7 @@ mod tests {
     // Test 3: source_text RawSource has "\n" between fragments
     #[test]
     fn test_source_text_raw_source_has_newline_between_fragments() {
-        let frag_a = make_fragment(
-            "FragA",
-            "fragment FragA on Animal {\n  species\n}",
-            vec![],
-        );
+        let frag_a = make_fragment("FragA", "fragment FragA on Animal {\n  species\n}", vec![]);
         let op = make_operation(
             "TestQuery",
             "query TestQuery {\n  ...FragA\n}",
@@ -255,11 +261,7 @@ mod tests {
     // Test 4: source_text ManifestJsonBody has "\\n" and escaped quotes
     #[test]
     fn test_source_text_manifest_json_body_has_escaped_newline_and_quotes() {
-        let frag_a = make_fragment(
-            "FragA",
-            "fragment FragA on Animal {\n  species\n}",
-            vec![],
-        );
+        let frag_a = make_fragment("FragA", "fragment FragA on Animal {\n  species\n}", vec![]);
         let op = make_operation(
             "TestQuery",
             "query TestQuery {\n  ...FragA\n}",
@@ -285,11 +287,7 @@ mod tests {
     #[test]
     fn test_all_referenced_fragments_deduplicates_and_sorts() {
         // Create fragment C (leaf)
-        let frag_c = make_fragment(
-            "FragC",
-            "fragment FragC on Animal { height }",
-            vec![],
-        );
+        let frag_c = make_fragment("FragC", "fragment FragC on Animal { height }", vec![]);
         // Create fragment B that references C
         let frag_b = make_fragment(
             "FragB",
@@ -334,8 +332,7 @@ mod tests {
         let descriptor = OperationDescriptor::new(&op);
         let source = descriptor.source_text(SourceFormat::RawSource);
         assert_eq!(
-            source,
-            "query SimpleQuery { allAnimals { species } }",
+            source, "query SimpleQuery { allAnimals { species } }",
             "Should be single-line operation source with no fragment appendage"
         );
     }

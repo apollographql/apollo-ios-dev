@@ -86,9 +86,7 @@ impl Parse for TemplateInput {
                 let node = parse_interpolation(&content)?;
                 nodes.push(node);
             } else {
-                return Err(input.error(
-                    "expected string literal or {interpolation} block",
-                ));
+                return Err(input.error("expected string literal or {interpolation} block"));
             }
         }
 

@@ -1,9 +1,7 @@
 use std::fmt;
 use std::sync::{Arc, RwLock};
 
-use graphql_compiler::{
-    compilation_result, GraphQLCompositeType, GraphQLType,
-};
+use graphql_compiler::{compilation_result, GraphQLCompositeType, GraphQLType};
 use utilities::linked_list::LinkedList;
 
 use crate::entity_selection_tree::EntitySelectionTree;
@@ -19,7 +17,7 @@ use crate::entity_selection_tree::EntitySelectionTree;
 pub struct Entity {
     /// The selections that are selected for the entity across all type scopes in the operation.
     /// Represented as a tree.
-    /// Wrapped in RwLock per D-30 to allow mutation through Arc during IR construction.
+    /// Wrapped in RwLock to allow mutation through Arc during IR construction.
     pub(crate) selection_tree: RwLock<EntitySelectionTree>,
 
     /// The path of root types from the definition root to this entity.
@@ -57,7 +55,10 @@ impl Entity {
     }
 
     /// Creates an entity at a specific location with a given root type path.
-    pub(crate) fn new(location: Location, root_type_path: LinkedList<GraphQLCompositeType>) -> Self {
+    pub(crate) fn new(
+        location: Location,
+        root_type_path: LinkedList<GraphQLCompositeType>,
+    ) -> Self {
         Entity {
             location,
             selection_tree: RwLock::new(EntitySelectionTree::new(root_type_path.clone())),

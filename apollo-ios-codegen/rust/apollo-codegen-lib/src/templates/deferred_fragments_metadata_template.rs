@@ -8,7 +8,7 @@
 //! Mirrors Swift's `DeferredFragmentsMetadataTemplate.swift` from
 //! `Sources/ApolloCodegenLib/Templates/DeferredFragmentsMetadataTemplate.swift`.
 
-use std::collections::HashSet;
+use indexmap::IndexSet;
 
 use graphql_compiler::DeferCondition;
 
@@ -55,7 +55,11 @@ impl<'a> DeferredFragmentsMetadataTemplate<'a> {
     /// has no deferred fragments.
     pub fn render(&self) -> String {
         let path_type_info = self.collect_deferred_paths(
-            self.operation.root_field.selection_set.selections.as_deref(),
+            self.operation
+                .root_field
+                .selection_set
+                .selections
+                .as_deref(),
             &[],
         );
 
@@ -79,7 +83,7 @@ impl<'a> DeferredFragmentsMetadataTemplate<'a> {
         result.push_str("enum DeferredFragmentIdentifiers {\n");
 
         // Deduplicate by (path, label) key
-        let mut seen: HashSet<(Vec<String>, String)> = HashSet::new();
+        let mut seen: IndexSet<(Vec<String>, String)> = IndexSet::new();
         for info in infos {
             let key = info.path_defer_condition_key();
             if !seen.insert(key) {
@@ -157,7 +161,7 @@ impl<'a> DeferredFragmentsMetadataTemplate<'a> {
                     fragment.type_info(),
                     None,
                     crate::templates::rendering_helpers::selection_set_name_generator::NameFormat::OmittingRoot,
-                    &self.config,
+                    self.config,
                 );
 
                 infos.push(DeferredPathTypeInfo {
@@ -167,16 +171,16 @@ impl<'a> DeferredFragmentsMetadataTemplate<'a> {
                 });
             }
 
-            infos.extend(self.collect_deferred_paths(
-                fragment.selection_set.selections.as_deref(),
-                path,
-            ));
+            infos.extend(
+                self.collect_deferred_paths(fragment.selection_set.selections.as_deref(), path),
+            );
         }
 
         // Process named fragments
         for fragment in direct_selections.named_fragments.values() {
             if let Some(defer_condition) = fragment.type_info.defer_condition() {
-                let frag_name = as_fragment_name(&fragment.fragment.definition.name, &self.config.capitalizer);
+                let frag_name =
+                    as_fragment_name(&fragment.fragment.definition.name, &self.config.capitalizer);
                 infos.push(DeferredPathTypeInfo {
                     path: path.to_vec(),
                     defer_condition: defer_condition.clone(),
@@ -184,10 +188,17 @@ impl<'a> DeferredFragmentsMetadataTemplate<'a> {
                 });
             }
 
-            infos.extend(self.collect_deferred_paths(
-                fragment.fragment.root_field.selection_set.selections.as_deref(),
-                path,
-            ));
+            infos.extend(
+                self.collect_deferred_paths(
+                    fragment
+                        .fragment
+                        .root_field
+                        .selection_set
+                        .selections
+                        .as_deref(),
+                    path,
+                ),
+            );
         }
 
         infos

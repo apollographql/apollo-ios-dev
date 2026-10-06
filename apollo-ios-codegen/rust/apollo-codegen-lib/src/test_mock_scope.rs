@@ -9,13 +9,11 @@
 //! templates Apollo renders, so the union of a partition's modules is file-for-file
 //! identical to the unscoped output.
 
-use std::collections::{HashMap, HashSet};
-
 use graphql_compiler::compilation_result::{
     CompilationResult, FragmentDefinition, Selection, SelectionSet,
 };
 use graphql_compiler::schema::{GraphQLCompositeType, GraphQLNamedType};
-use indexmap::IndexSet;
+use indexmap::{IndexMap, IndexSet};
 
 use crate::codegen::{CodegenError, GenerationFilter};
 use crate::config::test_mock_file_output::{TestMockScope, TestMockScoping};
@@ -36,7 +34,7 @@ pub fn referenced_object_types(
     let mut walker = ReferencedObjectWalker::new(compilation_result);
 
     for operation in &compilation_result.operations {
-        if !filter.map_or(true, |f| f.matches(&operation.file_path)) {
+        if !filter.is_none_or(|f| f.matches(&operation.file_path)) {
             continue;
         }
         for variable in &operation.variables {
@@ -46,7 +44,7 @@ pub fn referenced_object_types(
         walker.walk_selection_set(&operation.selection_set);
     }
     for fragment in &compilation_result.fragments {
-        if !filter.map_or(true, |f| f.matches(&fragment.file_path)) {
+        if !filter.is_none_or(|f| f.matches(&fragment.file_path)) {
             continue;
         }
         walker.walk_fragment(fragment);
@@ -93,7 +91,7 @@ pub fn select_mock_object_types(
         }
     }
 
-    let excluded: HashSet<&str> = scoping.exclude_types.iter().map(String::as_str).collect();
+    let excluded: IndexSet<&str> = scoping.exclude_types.iter().map(String::as_str).collect();
     Ok(all_objects
         .iter()
         .filter(|name| {
@@ -108,16 +106,16 @@ struct ReferencedObjectWalker<'a> {
     /// Every named type the configuration references, in Apollo's order.
     types: &'a [GraphQLNamedType],
     /// The same types by schema name.
-    by_name: HashMap<&'a str, &'a GraphQLNamedType>,
+    by_name: IndexMap<&'a str, &'a GraphQLNamedType>,
     /// Schema names of the referenced object types.
-    objects: HashSet<&'a str>,
+    objects: IndexSet<&'a str>,
     names: IndexSet<String>,
-    walked_fragments: HashSet<&'a str>,
+    walked_fragments: IndexSet<&'a str>,
 }
 
 impl<'a> ReferencedObjectWalker<'a> {
     fn new(compilation_result: &'a CompilationResult) -> Self {
-        let by_name: HashMap<&str, &GraphQLNamedType> = compilation_result
+        let by_name: IndexMap<&str, &GraphQLNamedType> = compilation_result
             .referenced_types
             .iter()
             .map(|t| (t.name().schema_name.as_str(), t))
@@ -135,7 +133,7 @@ impl<'a> ReferencedObjectWalker<'a> {
             by_name,
             objects,
             names: IndexSet::new(),
-            walked_fragments: HashSet::new(),
+            walked_fragments: IndexSet::new(),
         }
     }
 
@@ -191,8 +189,11 @@ impl<'a> ReferencedObjectWalker<'a> {
                 }
             }
             GraphQLNamedType::Object(o) => {
-                let interfaces: Vec<String> =
-                    o.interfaces.iter().map(|i| i.name.schema_name.clone()).collect();
+                let interfaces: Vec<String> = o
+                    .interfaces
+                    .iter()
+                    .map(|i| i.name.schema_name.clone())
+                    .collect();
                 for interface in interfaces {
                     self.add_name(&interface);
                 }

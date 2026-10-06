@@ -192,7 +192,10 @@ impl<T> LinkedList<T> {
     /// Returns a NodeRef to the head (first) node.
     /// Matches Swift's `list.head` which returns a Node.
     pub fn head_node(&self) -> NodeRef<'_, T> {
-        NodeRef { list: self, index: 0 }
+        NodeRef {
+            list: self,
+            index: 0,
+        }
     }
 
     /// Returns a NodeRef to the last node.

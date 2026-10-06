@@ -103,12 +103,10 @@ impl OperationDefinition {
     /// Returns `true` if this operation is a local cache mutation.
     /// Computed from directives checking for "apollo_client_ios_localCacheMutation".
     pub fn is_local_cache_mutation(&self) -> bool {
-        self.directives
-            .as_ref()
-            .is_some_and(|dirs| {
-                dirs.iter()
-                    .any(|d| d.name == directive_names::LOCAL_CACHE_MUTATION)
-            })
+        self.directives.as_ref().is_some_and(|dirs| {
+            dirs.iter()
+                .any(|d| d.name == directive_names::LOCAL_CACHE_MUTATION)
+        })
     }
 
     /// Returns the sorted set of module import names.
@@ -171,12 +169,10 @@ pub struct FragmentDefinition {
 impl FragmentDefinition {
     /// Returns `true` if this fragment is a local cache mutation.
     pub fn is_local_cache_mutation(&self) -> bool {
-        self.directives
-            .as_ref()
-            .is_some_and(|dirs| {
-                dirs.iter()
-                    .any(|d| d.name == directive_names::LOCAL_CACHE_MUTATION)
-            })
+        self.directives.as_ref().is_some_and(|dirs| {
+            dirs.iter()
+                .any(|d| d.name == directive_names::LOCAL_CACHE_MUTATION)
+        })
     }
 
     /// Returns the sorted set of module import names.
@@ -473,7 +469,7 @@ impl fmt::Display for Directive {
 /// A condition that determines whether a selection is included.
 /// Mirrors `CompilationResult.InclusionCondition` from `CompilationResult.swift`.
 ///
-/// Has exactly 3 variants per D-23:
+/// Has exactly 3 variants:
 /// - `Included`: always included
 /// - `Skipped`: always skipped
 /// - `Variable { name, is_inverted }`: conditionally included based on a variable
@@ -507,7 +503,7 @@ impl InclusionCondition {
 /// A condition for a deferred fragment.
 /// Mirrors `CompilationResult.DeferCondition` from `CompilationResult.swift`.
 ///
-/// Per D-24: `label: String`, `variable: Option<String>`.
+/// `label: String`, `variable: Option<String>`.
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize)]
 pub struct DeferCondition {
     pub label: String,
@@ -663,9 +659,7 @@ fn get_import_module_names(
 mod tests {
     use super::*;
     use crate::graphql_name::GraphQLName;
-    use crate::schema::{
-        GraphQLObjectType, GraphQLScalarType,
-    };
+    use crate::schema::{GraphQLObjectType, GraphQLScalarType};
     use indexmap::IndexMap;
 
     fn make_scalar(name: &str) -> Arc<GraphQLScalarType> {
@@ -830,7 +824,9 @@ mod tests {
                 parent_type: make_composite_object("User"),
                 selections: vec![],
             },
-            inclusion_conditions: Some(vec![InclusionCondition::include_if("showUser".to_string())]),
+            inclusion_conditions: Some(vec![InclusionCondition::include_if(
+                "showUser".to_string(),
+            )]),
             directives: None,
             defer_condition: Some(DeferCondition {
                 label: "userDetails".to_string(),
@@ -1135,7 +1131,10 @@ mod tests {
             schema_documentation: Some("Test schema".to_string()),
         };
 
-        assert_eq!(result.schema_root_types.query_type.name().schema_name, "Query");
+        assert_eq!(
+            result.schema_root_types.query_type.name().schema_name,
+            "Query"
+        );
         assert!(result.schema_root_types.mutation_type.is_none());
         assert_eq!(result.referenced_types.len(), 1);
         assert!(result.operations.is_empty());

@@ -11,7 +11,9 @@ use indexmap::IndexSet;
 
 use graphql_compiler::schema::{GraphQLNamedType, GraphQLUnionType};
 
-use crate::templates::rendering_helpers::graphql_name_rendering::{render_named_type, RenderContext};
+use crate::templates::rendering_helpers::graphql_name_rendering::{
+    render_named_type, RenderContext,
+};
 use crate::templates::{
     ConfigurationContext, NonFatalErrorRecorder, Scope, TemplateRenderer, TemplateTarget,
 };
@@ -33,10 +35,7 @@ impl TemplateRenderer for MockUnionsTemplate {
         TemplateTarget::TestMockFile
     }
 
-    fn render_body_template(
-        &self,
-        _non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
+    fn render_body_template(&self, _non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
         let access = self.access_control_renderer(Scope::Parent).render();
 
         let lines: Vec<String> = self
@@ -45,7 +44,9 @@ impl TemplateRenderer for MockUnionsTemplate {
             .map(|u| {
                 let name = render_named_type(
                     &GraphQLNamedType::Union(Arc::clone(u)),
-                    &RenderContext::Typename { is_input_value: false },
+                    &RenderContext::Typename {
+                        is_input_value: false,
+                    },
                 );
                 format!("  typealias {} = Union", name)
             })
@@ -60,6 +61,7 @@ impl TemplateRenderer for MockUnionsTemplate {
 }
 
 #[cfg(test)]
+#[allow(non_snake_case)] // test names mirror the Swift test suite
 mod tests {
     use super::*;
     use crate::config::ApolloCodegenConfiguration;
@@ -162,8 +164,8 @@ mod tests {
     }
 
     #[test]
-    fn test__render__given_multiple_union_types_generates_extension_with_typealiases_correctly_cased()
-    {
+    fn test__render__given_multiple_union_types_generates_extension_with_typealiases_correctly_cased(
+    ) {
         let union_a = mock_union("UnionA");
         let union_b = mock_union("unionB");
         let union_c = mock_union("Unionc");
@@ -183,8 +185,8 @@ mod tests {
     // MARK: - Access Level Tests
 
     #[test]
-    fn test__render__given_union_type_when_test_mocks_is_swift_package_should_render_with_public_access()
-    {
+    fn test__render__given_union_type_when_test_mocks_is_swift_package_should_render_with_public_access(
+    ) {
         let pet = mock_union("Pet");
         let mut unions = IndexSet::new();
         unions.insert(pet);
@@ -195,8 +197,8 @@ mod tests {
     }
 
     #[test]
-    fn test__render__given_union_type_when_test_mocks_absolute_with_public_access_modifier_should_render_with_public_access()
-    {
+    fn test__render__given_union_type_when_test_mocks_absolute_with_public_access_modifier_should_render_with_public_access(
+    ) {
         let pet = mock_union("Pet");
         let mut unions = IndexSet::new();
         unions.insert(pet);
@@ -207,8 +209,8 @@ mod tests {
     }
 
     #[test]
-    fn test__render__given_union_type_when_test_mocks_absolute_with_internal_access_modifier_should_render_with_internal_access()
-    {
+    fn test__render__given_union_type_when_test_mocks_absolute_with_internal_access_modifier_should_render_with_internal_access(
+    ) {
         let pet = mock_union("Pet");
         let mut unions = IndexSet::new();
         unions.insert(pet);
@@ -258,8 +260,7 @@ mod tests {
         unions.insert(union);
         let subject = build_subject(unions, swift_package_config());
 
-        let expected =
-            "public extension MockObject {\n  typealias MyCustomUnion = Union\n}\n";
+        let expected = "public extension MockObject {\n  typealias MyCustomUnion = Union\n}\n";
 
         let actual = render_body(&subject);
         assert_eq!(actual, expected);

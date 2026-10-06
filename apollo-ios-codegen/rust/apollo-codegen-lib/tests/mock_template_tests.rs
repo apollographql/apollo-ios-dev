@@ -143,9 +143,7 @@ fn get_object_type(name: &str, registry: &TypeRegistry) -> Arc<GraphQLObjectType
 /// Collects all fields from a GraphQLObjectType's schema-defined fields as tuples.
 ///
 /// Returns Vec<(response_key, GraphQLType, Option<deprecation_reason>)>.
-fn collect_schema_fields(
-    obj: &GraphQLObjectType,
-) -> Vec<(String, GraphQLType, Option<String>)> {
+fn collect_schema_fields(obj: &GraphQLObjectType) -> Vec<(String, GraphQLType, Option<String>)> {
     obj.fields
         .iter()
         .map(|(name, field)| {
@@ -330,17 +328,23 @@ fn test_dog_mock() {
     assert!(rendered.contains(r#"@Field<Bird>("livesWith") public var livesWith"#));
 
     // Custom scalars
-    assert!(rendered.contains(r#"@Field<AnimalKingdomAPI.CustomDate>("birthdate") public var birthdate"#));
+    assert!(rendered
+        .contains(r#"@Field<AnimalKingdomAPI.CustomDate>("birthdate") public var birthdate"#));
 
     // houseDetails is custom scalar "Object"
-    assert!(rendered.contains(r#"@Field<AnimalKingdomAPI.Object>("houseDetails") public var houseDetails"#));
+    assert!(rendered
+        .contains(r#"@Field<AnimalKingdomAPI.Object>("houseDetails") public var houseDetails"#));
 
     // Convenience init
     assert!(rendered.contains("public extension Mock where O == Dog {"));
 
     // Verify entity mock types in convenience init
     // height is Height! (non-null) -> default value Mock<Height>()
-    assert!(rendered.contains(&required_param("height", "Mock<Height>", "Mock<Height>()")), "actual:\n{}", rendered);
+    assert!(
+        rendered.contains(&required_param("height", "Mock<Height>", "Mock<Height>()")),
+        "actual:\n{}",
+        rendered
+    );
     // owner is Human (nullable) -> optional
     assert!(rendered.contains("owner: Mock<Human>? = nil"));
     // bestFriend is HousePet (interface, nullable) -> (any AnyMock)?
@@ -459,11 +463,35 @@ fn test_height_mock() {
     assert!(rendered.contains("public extension Mock where O == Height {"));
 
     // Verify default values for non-null fields in convenience init
-    assert!(rendered.contains(&required_param("centimeters", "Double", "0.0")), "actual:\n{}", rendered);
-    assert!(rendered.contains(&required_param("feet", "Int", "0")), "actual:\n{}", rendered);
-    assert!(rendered.contains(&required_param("meters", "Int", "0")), "actual:\n{}", rendered);
-    assert!(rendered.contains(&required_param("yards", "Int", "0")), "actual:\n{}", rendered);
-    assert!(rendered.contains(&required_param("relativeSize", "GraphQLEnum<AnimalKingdomAPI.RelativeSize>", ".case(.large)")), "actual:\n{}", rendered);
+    assert!(
+        rendered.contains(&required_param("centimeters", "Double", "0.0")),
+        "actual:\n{}",
+        rendered
+    );
+    assert!(
+        rendered.contains(&required_param("feet", "Int", "0")),
+        "actual:\n{}",
+        rendered
+    );
+    assert!(
+        rendered.contains(&required_param("meters", "Int", "0")),
+        "actual:\n{}",
+        rendered
+    );
+    assert!(
+        rendered.contains(&required_param("yards", "Int", "0")),
+        "actual:\n{}",
+        rendered
+    );
+    assert!(
+        rendered.contains(&required_param(
+            "relativeSize",
+            "GraphQLEnum<AnimalKingdomAPI.RelativeSize>",
+            ".case(.large)"
+        )),
+        "actual:\n{}",
+        rendered
+    );
     assert!(rendered.contains("inches: Int? = nil")); // nullable
 }
 
@@ -554,7 +582,16 @@ fn test_mock_interfaces() {
 fn test_all_object_mocks_use_expected_class_declaration() {
     let parsed = parse_animal_kingdom_schema();
     let type_names = [
-        "Bird", "Cat", "Dog", "Human", "Fish", "Rat", "PetRock", "Crocodile", "Height", "Query",
+        "Bird",
+        "Cat",
+        "Dog",
+        "Human",
+        "Fish",
+        "Rat",
+        "PetRock",
+        "Crocodile",
+        "Height",
+        "Query",
         "Mutation",
     ];
 
@@ -572,7 +609,16 @@ fn test_all_object_mocks_use_expected_class_declaration() {
 fn test_all_object_mocks_use_expected_mock_fields_declaration() {
     let parsed = parse_animal_kingdom_schema();
     let type_names = [
-        "Bird", "Cat", "Dog", "Human", "Fish", "Rat", "PetRock", "Crocodile", "Height", "Query",
+        "Bird",
+        "Cat",
+        "Dog",
+        "Human",
+        "Fish",
+        "Rat",
+        "PetRock",
+        "Crocodile",
+        "Height",
+        "Query",
         "Mutation",
     ];
 
@@ -581,7 +627,9 @@ fn test_all_object_mocks_use_expected_mock_fields_declaration() {
         let decl = rendered
             .lines()
             .find(|line| line.contains("struct MockFields"))
-            .unwrap_or_else(|| panic!("{} mock has no MockFields declaration:\n{}", name, rendered));
+            .unwrap_or_else(|| {
+                panic!("{} mock has no MockFields declaration:\n{}", name, rendered)
+            });
         assert_eq!(decl.trim_start(), MOCK_FIELDS_DECL);
     }
 }

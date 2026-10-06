@@ -7,7 +7,9 @@ use std::sync::Arc;
 
 use graphql_compiler::schema::{GraphQLNamedType, GraphQLScalarType};
 
-use crate::templates::rendering_helpers::graphql_name_rendering::{render_named_type, RenderContext};
+use crate::templates::rendering_helpers::graphql_name_rendering::{
+    render_named_type, RenderContext,
+};
 use crate::templates::rendering_helpers::template_string_documentation::render_documentation;
 use crate::templates::{
     ConfigurationContext, HeaderCommentTemplate, NonFatalErrorRecorder, SchemaFileType, Scope,
@@ -40,10 +42,7 @@ impl TemplateRenderer for CustomScalarTemplate {
         ))
     }
 
-    fn render_body_template(
-        &self,
-        _non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
+    fn render_body_template(&self, _non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
         let mut parts: Vec<String> = Vec::new();
 
         // Documentation (includes specifiedByURL if present)
@@ -60,7 +59,9 @@ impl TemplateRenderer for CustomScalarTemplate {
         let access_control = self.access_control_renderer(Scope::Parent).render();
         let typename = render_named_type(
             &GraphQLNamedType::Scalar(Arc::clone(&self.graphql_scalar)),
-            &RenderContext::Typename { is_input_value: false },
+            &RenderContext::Typename {
+                is_input_value: false,
+            },
         );
 
         parts.push(format!(
@@ -225,7 +226,9 @@ mod tests {
         );
         // 2.0.0+: custom scalar files import ApolloAPI with the Internal and Execution SPIs
         assert!(
-            result.body.contains("@_spi(Internal) @_spi(Execution) import ApolloAPI"),
+            result
+                .body
+                .contains("@_spi(Internal) @_spi(Execution) import ApolloAPI"),
             "body:\n{}",
             result.body
         );
@@ -335,11 +338,7 @@ mod tests {
             "actual:\n{}",
             actual
         );
-        assert!(
-            !actual.contains("public"),
-            "actual:\n{}",
-            actual
-        );
+        assert!(!actual.contains("public"), "actual:\n{}", actual);
     }
 
     #[test]

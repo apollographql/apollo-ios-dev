@@ -24,11 +24,11 @@ use ir::scope_descriptor::{ScopeCondition, ScopeDescriptor};
 use ir::selection_set::{SelectionSet, TypeInfo};
 use utilities::linked_list::LinkedList;
 
-use crate::templates::SPI;
 use crate::config::composition::Composition;
 use crate::config::field_merging::FieldMerging;
 use crate::templates::rendering_helpers::composite_type_namespace::schema_types_namespace;
 use crate::templates::rendering_helpers::field_argument_rendering::render_input_value_literal;
+use crate::templates::rendering_helpers::for_each_in::for_each_in_joined;
 use crate::templates::rendering_helpers::graphql_name_rendering::{
     render_named_type, RenderContext,
 };
@@ -40,13 +40,13 @@ use crate::templates::rendering_helpers::selection_set_name_generator::{
     self, NameFormat, SelectionSetNameCache, SelectionSetNameGenerator,
 };
 use crate::templates::rendering_helpers::string_casing::{first_lowercased, first_uppercased};
-use crate::templates::rendering_helpers::for_each_in::for_each_in_joined;
 use crate::templates::rendering_helpers::string_swift_name_escaping::{
     as_fragment_name, escaped_swift_string_special_characters, render_as_field_property_name,
     render_as_initializer_parameter_accessor_name, render_as_initializer_parameter_name,
 };
 use crate::templates::rendering_helpers::template_string_deprecation::render_field_argument_warning;
 use crate::templates::rendering_helpers::template_string_documentation::render_documentation;
+use crate::templates::SPI;
 use crate::templates::{AccessControlRenderer, ConfigurationContext, NonFatalErrorRecorder};
 
 // MARK: - SelectionSetTemplate
@@ -118,10 +118,8 @@ impl<'a> SelectionSetTemplate<'a> {
     ///
     /// Mirrors Swift's `SelectionSetTemplate.renderBody()`.
     pub fn render_body(&self) -> String {
-        let ctx = self.create_selection_set_context(
-            &self.definition.root_field().selection_set,
-            None,
-        );
+        let ctx =
+            self.create_selection_set_context(&self.definition.root_field().selection_set, None);
         self.body_template(&ctx)
     }
 
@@ -149,7 +147,11 @@ impl<'a> SelectionSetTemplate<'a> {
         let doc = self.selection_set_name_documentation(selection_set);
         let body = self.body_template(context);
 
-        let identifiable = if selection_set.is_identifiable() { ", Identifiable" } else { "" };
+        let identifiable = if selection_set.is_identifiable() {
+            ", Identifiable"
+        } else {
+            ""
+        };
 
         Some(format!(
             "{doc}\
@@ -173,12 +175,19 @@ impl<'a> SelectionSetTemplate<'a> {
         let inline_fragment = &context.selection_set;
         let type_name = rendered_type_name(&inline_fragment.type_info);
         let composite = if is_composite_inline_fragment(inline_fragment) {
-            format!(", {}.CompositeInlineFragment", self.config.apollo_api_target_name())
+            format!(
+                ", {}.CompositeInlineFragment",
+                self.config.apollo_api_target_name()
+            )
         } else {
             String::new()
         };
 
-        let identifiable = if inline_fragment.is_identifiable() { ", Identifiable" } else { "" };
+        let identifiable = if inline_fragment.is_identifiable() {
+            ", Identifiable"
+        } else {
+            ""
+        };
 
         let doc = self.selection_set_name_documentation(inline_fragment);
         let body = self.body_template(context);
@@ -223,15 +232,14 @@ impl<'a> SelectionSetTemplate<'a> {
             &selection_set.type_info,
             None,
             NameFormat::OmittingRoot,
-            &self.config,
+            self.config,
         );
 
         let mut result = format!("/// {}\n", name);
 
         if self.config.options().schema_documentation == Composition::Include {
-            let parent_type_name = render_composite_type_as_typename(
-                selection_set.type_info.parent_type(),
-            );
+            let parent_type_name =
+                render_composite_type_as_typename(selection_set.type_info.parent_type());
             result.push_str(&format!("///\n/// Parent Type: `{}`\n", parent_type_name));
         }
 
@@ -271,10 +279,8 @@ impl<'a> SelectionSetTemplate<'a> {
         }
         result.push_str(&self.parent_type_template(selection_set.type_info.parent_type()));
         if let Some(ref direct) = selection_set.direct {
-            let sel_meta = self.direct_selections_metadata_template(
-                direct,
-                selection_set.type_info.scope(),
-            );
+            let sel_meta =
+                self.direct_selections_metadata_template(direct, selection_set.type_info.scope());
             if !sel_meta.is_empty() {
                 result.push('\n');
                 result.push_str(&sel_meta);
@@ -354,7 +360,8 @@ impl<'a> SelectionSetTemplate<'a> {
     fn data_property_template(&self) -> String {
         format!(
             "{}{} __data: DataDict",
-            self.access_control_renderer.render_with_spis(&[SPI::Unsafe]),
+            self.access_control_renderer
+                .render_with_spis(&[SPI::Unsafe]),
             if self.is_mutable() { "var" } else { "let" }
         )
     }
@@ -367,11 +374,18 @@ impl<'a> SelectionSetTemplate<'a> {
                 // The interpolated statements are indented by the template (non-empty lines only).
                 let indented: Vec<String> = props
                     .split('\n')
-                    .map(|line| if line.is_empty() { String::new() } else { format!("  {}", line) })
+                    .map(|line| {
+                        if line.is_empty() {
+                            String::new()
+                        } else {
+                            format!("  {}", line)
+                        }
+                    })
                     .collect();
                 return format!(
                     "{}init(_dataDict: DataDict) {{\n  {}\n{}\n}}",
-                    self.access_control_renderer.render_with_spis(&[SPI::Unsafe]),
+                    self.access_control_renderer
+                        .render_with_spis(&[SPI::Unsafe]),
                     data_init,
                     indented.join("\n")
                 );
@@ -380,7 +394,8 @@ impl<'a> SelectionSetTemplate<'a> {
 
         format!(
             "{}init(_dataDict: DataDict) {{ {} }}",
-            self.access_control_renderer.render_with_spis(&[SPI::Unsafe]),
+            self.access_control_renderer
+                .render_with_spis(&[SPI::Unsafe]),
             data_init
         )
     }
@@ -400,7 +415,7 @@ impl<'a> SelectionSetTemplate<'a> {
                     .head_node(),
             ),
             NameFormat::FullyQualified,
-            &self.config,
+            self.config,
         );
         format!(
             "{}typealias RootEntityType = {}",
@@ -412,7 +427,8 @@ impl<'a> SelectionSetTemplate<'a> {
     fn parent_type_template(&self, type_: &GraphQLCompositeType) -> String {
         format!(
             "{}static var __parentType: any {}.ParentType {{ {} }}",
-            self.access_control_renderer.render_with_spis(&[SPI::Execution]),
+            self.access_control_renderer
+                .render_with_spis(&[SPI::Execution]),
             self.config.apollo_api_target_name(),
             self.generated_schema_type_reference(type_)
         )
@@ -432,12 +448,13 @@ impl<'a> SelectionSetTemplate<'a> {
         let items: Vec<String> = merged_sources
             .iter()
             .map(|source| {
-                let name = SelectionSetNameGenerator::generated_selection_set_name_for_merged_source(
-                    source,
-                    None,
-                    NameFormat::FullyQualified,
-                    &self.config,
-                );
+                let name =
+                    SelectionSetNameGenerator::generated_selection_set_name_for_merged_source(
+                        source,
+                        None,
+                        NameFormat::FullyQualified,
+                        self.config,
+                    );
                 format!("  {}.self", name)
             })
             .collect();
@@ -446,7 +463,8 @@ impl<'a> SelectionSetTemplate<'a> {
             "{}static var __mergedSources: [any {}.SelectionSet.Type] {{ [
 {}
 ] }}",
-            self.access_control_renderer.render_with_spis(&[SPI::Execution]),
+            self.access_control_renderer
+                .render_with_spis(&[SPI::Execution]),
             self.config.apollo_api_target_name(),
             items.join(",\n")
         )
@@ -460,24 +478,27 @@ impl<'a> SelectionSetTemplate<'a> {
     ) -> String {
         let mut fulfilled_fragments: IndexSet<String> = IndexSet::new();
 
-        let mut current_node =
-            Some(selection_set.type_info.scope_path.last().scope_path.head_node());
+        let mut current_node = Some(
+            selection_set
+                .type_info
+                .scope_path
+                .last()
+                .scope_path
+                .head_node(),
+        );
         while let Some(node) = current_node {
             let name = SelectionSetNameGenerator::generated_selection_set_name_for_computed(
                 selection_set,
                 Some(node),
                 NameFormat::FullyQualified,
-                &self.config,
+                self.config,
             );
             fulfilled_fragments.insert(name);
             current_node = node.next();
         }
 
         for source in &selection_set.merged.merged_sources {
-            let names = generated_selection_set_names_of_fulfilled_fragments(
-                source,
-                &self.config,
-            );
+            let names = generated_selection_set_names_of_fulfilled_fragments(source, self.config);
             for name in names {
                 fulfilled_fragments.insert(name);
             }
@@ -490,16 +511,14 @@ impl<'a> SelectionSetTemplate<'a> {
 
         format!(
             "{}static var __fulfilledFragments: [any {}.SelectionSet.Type] {{ [\n{}\n] }}",
-            self.access_control_renderer.render_with_spis(&[SPI::Execution]),
+            self.access_control_renderer
+                .render_with_spis(&[SPI::Execution]),
             self.config.apollo_api_target_name(),
             items.join(",\n")
         )
     }
 
-    fn deferred_fragments_metadata_template(
-        &self,
-        selection_set: &ComputedSelectionSet,
-    ) -> String {
+    fn deferred_fragments_metadata_template(&self, selection_set: &ComputedSelectionSet) -> String {
         let direct_selections = match &selection_set.direct {
             Some(d) => d,
             None => return String::new(),
@@ -513,7 +532,7 @@ impl<'a> SelectionSetTemplate<'a> {
                     &inline_frag.selection_set.type_info,
                     None,
                     NameFormat::FullyQualified,
-                    &self.config,
+                    self.config,
                 );
                 deferred_fragments.insert(name);
             }
@@ -521,9 +540,10 @@ impl<'a> SelectionSetTemplate<'a> {
 
         for named_frag in direct_selections.named_fragments.values() {
             if named_frag.type_info.defer_condition().is_some() {
-                deferred_fragments.insert(
-                    generated_fragment_definition_name_capitalized(named_frag.fragment.name(), &self.config.capitalizer),
-                );
+                deferred_fragments.insert(generated_fragment_definition_name_capitalized(
+                    named_frag.fragment.name(),
+                    &self.config.capitalizer,
+                ));
             }
         }
 
@@ -538,7 +558,8 @@ impl<'a> SelectionSetTemplate<'a> {
 
         format!(
             "{}static var __deferredFragments: [any ApolloAPI.Deferrable.Type] {{ [\n{}\n] }}",
-            self.access_control_renderer.render_with_spis(&[SPI::Execution]),
+            self.access_control_renderer
+                .render_with_spis(&[SPI::Execution]),
             items.join(",\n")
         )
     }
@@ -574,15 +595,8 @@ impl<'a> SelectionSetTemplate<'a> {
             &mut deprecated_arguments,
             track_deprecated,
         );
-        for (i, sel) in unconditional.iter().enumerate() {
-            let comma = if i < unconditional.len() - 1
-                || !grouped.inclusion_condition_groups.is_empty()
-            {
-                ","
-            } else {
-                ","
-            };
-            selection_items.push(format!("  {}{}", sel, comma));
+        for sel in &unconditional {
+            selection_items.push(format!("  {},", sel));
         }
 
         // Conditional selection groups
@@ -606,10 +620,7 @@ impl<'a> SelectionSetTemplate<'a> {
                         inner.join("\n")
                     ));
                 } else if let Some(single) = rendered.first() {
-                    selection_items.push(format!(
-                        "  .include(if: {}, {}),",
-                        cond_expr, single
-                    ));
+                    selection_items.push(format!("  .include(if: {}, {}),", cond_expr, single));
                 }
             } else {
                 for sel in &rendered {
@@ -634,7 +645,8 @@ impl<'a> SelectionSetTemplate<'a> {
 
         result.push_str(&format!(
             "{}static var __selections: [{}.Selection] {{ [\n{}\n] }}",
-            self.access_control_renderer.render_with_spis(&[SPI::Execution]),
+            self.access_control_renderer
+                .render_with_spis(&[SPI::Execution]),
             self.config.apollo_api_target_name(),
             selection_items.join("\n")
         ));
@@ -679,12 +691,8 @@ impl<'a> SelectionSetTemplate<'a> {
 
         if let Some(args) = field.arguments() {
             if !args.is_empty() {
-                let rendered_args = self.render_arguments(
-                    args,
-                    field.name(),
-                    deprecated_args,
-                    track_deprecated,
-                );
+                let rendered_args =
+                    self.render_arguments(args, field.name(), deprecated_args, track_deprecated);
                 parts.push(format!(", arguments: {}", rendered_args));
             }
         }
@@ -762,7 +770,7 @@ impl<'a> SelectionSetTemplate<'a> {
     }
 
     fn inline_fragment_selection_template(&self, inline_fragment: &SelectionSet) -> String {
-        if let Some(ref defer_condition) = inline_fragment.type_info.defer_condition() {
+        if let Some(defer_condition) = inline_fragment.type_info.defer_condition() {
             return self.deferred_inline_fragment_selection_template(defer_condition);
         }
         let type_name = rendered_type_name(&inline_fragment.type_info);
@@ -773,7 +781,7 @@ impl<'a> SelectionSetTemplate<'a> {
         if let Some(defer_condition) = fragment.type_info.defer_condition() {
             return self.deferred_named_fragment_selection_template(defer_condition, fragment);
         }
-        let name = as_fragment_name(&fragment.fragment.name(), &self.config.capitalizer);
+        let name = as_fragment_name(fragment.fragment.name(), &self.config.capitalizer);
         format!(".fragment({}.self)", name)
     }
 
@@ -804,7 +812,7 @@ impl<'a> SelectionSetTemplate<'a> {
             .as_ref()
             .map(|v| format!("if: \"{}\", ", v))
             .unwrap_or_default();
-        let name = as_fragment_name(&fragment.fragment.name(), &self.config.capitalizer);
+        let name = as_fragment_name(fragment.fragment.name(), &self.config.capitalizer);
         format!(
             ".deferred({}{}.self, label: \"{}\")",
             var_part, name, defer_condition.label
@@ -854,8 +862,7 @@ impl<'a> SelectionSetTemplate<'a> {
 
         let is_conditionally_included = is_field_conditionally_included(field, scope);
         let type_name = self.type_name_for_field(field, is_conditionally_included);
-        let property_name =
-            render_as_field_property_name(field.response_key(), &self.config);
+        let property_name = render_as_field_property_name(field.response_key(), self.config);
 
         if self.is_mutable() {
             result.push_str(&format!(
@@ -893,10 +900,7 @@ impl<'a> SelectionSetTemplate<'a> {
         lines.join("\n")
     }
 
-    fn inline_fragment_accessor_template(
-        &self,
-        inline_fragment: &ComputedSelectionSet,
-    ) -> String {
+    fn inline_fragment_accessor_template(&self, inline_fragment: &ComputedSelectionSet) -> String {
         if inline_fragment.type_info.scope().is_deferred() {
             return String::new();
         }
@@ -911,15 +915,15 @@ impl<'a> SelectionSetTemplate<'a> {
     }
 
     fn fragment_accessors_template(&self, selection_set: &ComputedSelectionSet) -> String {
-        let has_direct_named =
-            selection_set.direct.as_ref().map_or(true, |d| d.named_fragments.is_empty());
+        let has_direct_named = selection_set
+            .direct
+            .as_ref()
+            .is_none_or(|d| d.named_fragments.is_empty());
         let has_merged_named = selection_set.merged.named_fragments.is_empty();
         let has_deferred_inline = selection_set
             .direct
             .as_ref()
-            .map_or(false, |d| {
-                contains_deferred_inline_fragment(&d.inline_fragments)
-            });
+            .is_some_and(|d| contains_deferred_inline_fragment(&d.inline_fragments));
 
         if has_direct_named && has_merged_named && !has_deferred_inline {
             return String::new();
@@ -948,15 +952,14 @@ impl<'a> SelectionSetTemplate<'a> {
         // Deferred fragment accessors from inline fragments
         if let Some(ref direct) = selection_set.direct {
             for inline_frag in direct.inline_fragments.values() {
-                if let Some(ref defer_cond) = inline_frag.selection_set.type_info.defer_condition()
-                {
-                    let type_name = selection_set_name_generator::defer_condition_rendered_type_name(
-                        defer_cond,
+                if let Some(defer_cond) = inline_frag.selection_set.type_info.defer_condition() {
+                    let type_name =
+                        selection_set_name_generator::defer_condition_rendered_type_name(
+                            defer_cond,
+                        );
+                    accessors.push(
+                        self.deferred_fragment_accessor_template(&defer_cond.label, &type_name),
                     );
-                    accessors.push(self.deferred_fragment_accessor_template(
-                        &defer_cond.label,
-                        &type_name,
-                    ));
                 }
             }
         }
@@ -977,11 +980,12 @@ impl<'a> SelectionSetTemplate<'a> {
         // Swift 1.24.0+: deferred fragments merged in from other selection sets are initialized
         // here too (direct inline, direct named, then merged named fragments).
         let direct = selection_set.direct.as_ref();
-        let has_deferred = direct.map_or(false, |d| {
-            contains_deferred_inline_fragment(&d.inline_fragments)
-                || contains_deferred_named_fragment(&d.named_fragments)
-        }) || contains_deferred_inline_fragment(&selection_set.merged.inline_fragments)
-            || contains_deferred_named_fragment(&selection_set.merged.named_fragments);
+        let has_deferred =
+            direct.is_some_and(|d| {
+                contains_deferred_inline_fragment(&d.inline_fragments)
+                    || contains_deferred_named_fragment(&d.named_fragments)
+            }) || contains_deferred_inline_fragment(&selection_set.merged.inline_fragments)
+                || contains_deferred_named_fragment(&selection_set.merged.named_fragments);
         if !has_deferred {
             return self.designated_initializer_template(None);
         }
@@ -1016,16 +1020,20 @@ impl<'a> SelectionSetTemplate<'a> {
             ));
         }
         blocks.push(for_each_in_joined(
-            selection_set.merged.named_fragments.values().map(|named_frag| {
-                if named_frag.type_info.defer_condition().is_some() {
-                    format!(
-                        "_{} = Deferred(_dataDict: _dataDict)",
-                        first_lowercased(named_frag.fragment.name())
-                    )
-                } else {
-                    String::new()
-                }
-            }),
+            selection_set
+                .merged
+                .named_fragments
+                .values()
+                .map(|named_frag| {
+                    if named_frag.type_info.defer_condition().is_some() {
+                        format!(
+                            "_{} = Deferred(_dataDict: _dataDict)",
+                            first_lowercased(named_frag.fragment.name())
+                        )
+                    } else {
+                        String::new()
+                    }
+                }),
             "\n",
         ));
         let blocks: Vec<String> = blocks.into_iter().filter(|s| !s.is_empty()).collect();
@@ -1056,9 +1064,7 @@ impl<'a> SelectionSetTemplate<'a> {
 
         if self.is_mutable() {
             let modify_body = if is_optional {
-                format!(
-                    "if let newData = f?.__data {{ __data = newData }}",
-                )
+                "if let newData = f?.__data { __data = newData }".to_string()
             } else {
                 "__data = f.__data".to_string()
             };
@@ -1082,11 +1088,7 @@ impl<'a> SelectionSetTemplate<'a> {
         }
     }
 
-    fn deferred_fragment_accessor_template(
-        &self,
-        property_name: &str,
-        type_name: &str,
-    ) -> String {
+    fn deferred_fragment_accessor_template(&self, property_name: &str, type_name: &str) -> String {
         format!("@Deferred public var {}: {}?", property_name, type_name)
     }
 
@@ -1119,7 +1121,7 @@ impl<'a> SelectionSetTemplate<'a> {
         result.push_str("    ");
         result.push_str(&data_dict);
         result.push_str("\n  ])\n");
-        result.push_str("}");
+        result.push('}');
         result
     }
 
@@ -1141,10 +1143,7 @@ impl<'a> SelectionSetTemplate<'a> {
         }
 
         for field in &all_fields {
-            parts.push(self.initializer_parameter_template(
-                field,
-                selection_set.type_info.scope(),
-            ));
+            parts.push(self.initializer_parameter_template(field, selection_set.type_info.scope()));
         }
 
         // Join with ",\n  " to put commas at end of each param except the last
@@ -1155,8 +1154,7 @@ impl<'a> SelectionSetTemplate<'a> {
         let is_optional =
             field.type_().is_nullable() || is_field_conditionally_included(field, scope);
         let type_name = self.type_name_for_field(field, is_optional);
-        let param_name =
-            render_as_initializer_parameter_name(field.response_key(), &self.config);
+        let param_name = render_as_initializer_parameter_name(field.response_key(), self.config);
         let default = if is_optional { " = nil" } else { "" };
         format!("{}: {}{}", param_name, type_name, default)
     }
@@ -1187,12 +1185,15 @@ impl<'a> SelectionSetTemplate<'a> {
 
     fn initializer_data_dict_field_template(&self, field: &Field) -> String {
         let is_entity_field = matches!(field.type_().inner_type(), GraphQLType::Entity(_));
-        let accessor_name = render_as_initializer_parameter_accessor_name(
-            field.response_key(),
-            &self.config,
-        );
+        let accessor_name =
+            render_as_initializer_parameter_accessor_name(field.response_key(), self.config);
         let field_data = if is_entity_field { "._fieldData" } else { "" };
-        format!("\"{}\": {}{},", field.response_key(), accessor_name, field_data)
+        format!(
+            "\"{}\": {}{},",
+            field.response_key(),
+            accessor_name,
+            field_data
+        )
     }
 
     // MARK: - Nested Selection Sets
@@ -1209,8 +1210,7 @@ impl<'a> SelectionSetTemplate<'a> {
 
         let mut rendered: Vec<String> = Vec::new();
         for field in entity_fields {
-            let child_ctx =
-                self.create_selection_set_context(&field.selection_set, Some(context));
+            let child_ctx = self.create_selection_set_context(&field.selection_set, Some(context));
             if let Some(rendered_child) = self.render_child_entity(&child_ctx) {
                 rendered.push(rendered_child);
             }
@@ -1219,10 +1219,7 @@ impl<'a> SelectionSetTemplate<'a> {
         rendered.join("\n\n")
     }
 
-    fn child_type_case_selection_sets(
-        &self,
-        inline_fragments: &[SelectionSetContext],
-    ) -> String {
+    fn child_type_case_selection_sets(&self, inline_fragments: &[SelectionSetContext]) -> String {
         let rendered: Vec<String> = inline_fragments
             .iter()
             .map(|ctx| self.render_inline_fragment(ctx))
@@ -1245,7 +1242,7 @@ struct DeprecatedArgument {
     reason: String,
 }
 
-// MARK: - Free functions (D-53)
+// MARK: - Free functions
 
 /// Returns `true` if the selection set is a composite inline fragment.
 ///
@@ -1253,7 +1250,7 @@ struct DeprecatedArgument {
 pub fn is_composite_inline_fragment(sel: &ComputedSelectionSet) -> bool {
     !sel.type_info.is_entity_root()
         && !sel.type_info.is_user_defined()
-        && sel.direct.as_ref().map_or(true, |d| d.is_empty())
+        && sel.direct.as_ref().is_none_or(|d| d.is_empty())
 }
 
 /// Returns the name for a referenced selection set, if the selection set is a reference
@@ -1280,9 +1277,7 @@ pub fn name_for_referenced_selection_set(
 ///
 /// Mirrors Swift's `IR.SelectionSet.TypeInfo.renderedTypeName` extension.
 pub fn rendered_type_name(type_info: &TypeInfo) -> String {
-    selection_set_name_generator::selection_set_name_component(
-        type_info.scope().scope_path.last(),
-    )
+    selection_set_name_generator::selection_set_name_component(type_info.scope().scope_path.last())
 }
 
 /// Generates the full qualified name path for a merged source.
@@ -1417,12 +1412,7 @@ fn generated_selection_set_name_for_merged_entity_in_fragment(
     )];
 
     let root_entity_scope_path = source.type_info.scope_path.head_node();
-    if let Some(root_cond_next) = root_entity_scope_path
-        .value()
-        .scope_path
-        .head_node()
-        .next()
-    {
+    if let Some(root_cond_next) = root_entity_scope_path.value().scope_path.head_node().next() {
         components.push(SelectionSetNameGenerator::condition_path(root_cond_next));
     }
 
@@ -1436,13 +1426,15 @@ fn generated_selection_set_name_for_merged_entity_in_fragment(
             .unwrap();
         let field_node = field_path.head_node();
 
-        components.push(SelectionSetNameGenerator::generated_selection_set_name_from_nodes(
-            fragment_nested,
-            None,
-            Some(field_node),
-            false,
-            config,
-        ));
+        components.push(
+            SelectionSetNameGenerator::generated_selection_set_name_from_nodes(
+                fragment_nested,
+                None,
+                Some(field_node),
+                false,
+                config,
+            ),
+        );
     }
 
     components.join(".")
@@ -1455,22 +1447,18 @@ pub fn generated_selection_set_names_of_fulfilled_fragments(
     source: &MergedSource,
     config: &ConfigurationContext,
 ) -> Vec<String> {
-    let entity_root_name = SelectionSetNameGenerator::generated_selection_set_name_for_merged_source(
-        source,
-        Some(source.type_info.scope_path.last().scope_path.head_node()),
-        NameFormat::FullyQualified,
-        config,
-    );
+    let entity_root_name =
+        SelectionSetNameGenerator::generated_selection_set_name_for_merged_source(
+            source,
+            Some(source.type_info.scope_path.last().scope_path.head_node()),
+            NameFormat::FullyQualified,
+            config,
+        );
 
     let mut fulfilled: Vec<String> = vec![entity_root_name.clone()];
     let mut name_components: Vec<String> = vec![entity_root_name];
 
-    let mut current_node = source
-        .type_info
-        .scope_path
-        .last()
-        .scope_path
-        .head_node();
+    let mut current_node = source.type_info.scope_path.last().scope_path.head_node();
     while let Some(next) = current_node.next() {
         name_components.push(selection_set_name_generator::selection_set_name_component(
             next.value(),
@@ -1489,9 +1477,7 @@ pub fn condition_variable_expression(any_of: &AnyOf<InclusionConditions>) -> Str
     let parts: Vec<String> = any_of
         .elements
         .iter()
-        .map(|conds| {
-            conditions_variable_expression(conds, any_of.elements.len() > 1)
-        })
+        .map(|conds| conditions_variable_expression(conds, any_of.elements.len() > 1))
         .collect();
     parts.join(" || ")
 }
@@ -1535,10 +1521,9 @@ pub fn contains_deferred_inline_fragment(
 /// Returns `true` if the named fragments map contains a deferred fragment.
 ///
 /// Mirrors Swift's `OrderedDictionary<String, NamedFragmentSpread>.containsDeferredFragment`.
-pub fn contains_deferred_named_fragment(
-    map: &IndexMap<String, NamedFragmentSpread>,
-) -> bool {
-    map.values().any(|v| v.type_info.defer_condition().is_some())
+pub fn contains_deferred_named_fragment(map: &IndexMap<String, NamedFragmentSpread>) -> bool {
+    map.values()
+        .any(|v| v.type_info.defer_condition().is_some())
 }
 
 /// Returns `true` if a field is conditionally included in the given scope.
@@ -1557,21 +1542,27 @@ fn should_include_typename_selection(scope: &ScopeDescriptor) -> bool {
         return false;
     }
     let root_types = &scope.all_types_in_schema;
-    !root_types.schema_root_types.all_root_types().iter().any(|rt| {
-        // Compare GraphQLNamedType with GraphQLCompositeType by name
-        match (rt, &scope.type_) {
-            (graphql_compiler::GraphQLNamedType::Object(o), GraphQLCompositeType::Object(so)) => {
-                o.name == so.name
+    !root_types
+        .schema_root_types
+        .all_root_types()
+        .iter()
+        .any(|rt| {
+            // Compare GraphQLNamedType with GraphQLCompositeType by name
+            match (rt, &scope.type_) {
+                (
+                    graphql_compiler::GraphQLNamedType::Object(o),
+                    GraphQLCompositeType::Object(so),
+                ) => o.name == so.name,
+                (
+                    graphql_compiler::GraphQLNamedType::Interface(i),
+                    GraphQLCompositeType::Interface(si),
+                ) => i.name == si.name,
+                (graphql_compiler::GraphQLNamedType::Union(u), GraphQLCompositeType::Union(su)) => {
+                    u.name == su.name
+                }
+                _ => false,
             }
-            (graphql_compiler::GraphQLNamedType::Interface(i), GraphQLCompositeType::Interface(si)) => {
-                i.name == si.name
-            }
-            (graphql_compiler::GraphQLNamedType::Union(u), GraphQLCompositeType::Union(su)) => {
-                u.name == su.name
-            }
-            _ => false,
-        }
-    })
+        })
 }
 
 /// Renders a GraphQLCompositeType as a typename string.
@@ -1585,7 +1576,12 @@ fn render_composite_type_as_typename(type_: &GraphQLCompositeType) -> String {
         }
         GraphQLCompositeType::Union(u) => graphql_compiler::GraphQLNamedType::Union(u.clone()),
     };
-    render_named_type(&named, &RenderContext::Typename { is_input_value: false })
+    render_named_type(
+        &named,
+        &RenderContext::Typename {
+            is_input_value: false,
+        },
+    )
 }
 
 /// Converts FieldMerging config flags to MergingStrategy IR flags.
@@ -1634,8 +1630,8 @@ mod tests {
         };
         use indexmap::{IndexMap, IndexSet};
         use ir::entity::{Entity, SourceDefinition};
-        use ir::scope_descriptor::ScopeDescriptor;
         use ir::schema::ReferencedTypes;
+        use ir::scope_descriptor::ScopeDescriptor;
         use std::sync::Arc;
         use utilities::linked_list::LinkedList;
 
@@ -1679,13 +1675,15 @@ mod tests {
         let entity = Arc::new(Entity::new_root(SourceDefinition::Operation(op_def)));
         let mut type_info_data = TypeInfo::new(entity, scope_path);
         // Mark as derived from merged source (not user defined)
-        type_info_data.derived_from_merged_sources.push(MergedSource {
-            type_info: Arc::new(TypeInfo::new(
-                type_info_data.entity.clone(),
-                type_info_data.scope_path.clone(),
-            )),
-            fragment: None,
-        });
+        type_info_data
+            .derived_from_merged_sources
+            .push(MergedSource {
+                type_info: Arc::new(TypeInfo::new(
+                    type_info_data.entity.clone(),
+                    type_info_data.scope_path.clone(),
+                )),
+                fragment: None,
+            });
         let type_info = Arc::new(type_info_data);
 
         let css = ComputedSelectionSet {
@@ -1706,10 +1704,7 @@ mod tests {
     #[test]
     fn test_condition_variable_expression_single_include() {
         let cond = InclusionCondition::include_if("showField".to_string());
-        assert_eq!(
-            condition_variable_expression_single(&cond),
-            "\"showField\""
-        );
+        assert_eq!(condition_variable_expression_single(&cond), "\"showField\"");
     }
 
     #[test]
@@ -1723,18 +1718,13 @@ mod tests {
 
     #[test]
     fn test_conditions_variable_expression_single() {
-        let conds =
-            InclusionConditions::new(InclusionCondition::include_if("flag".to_string()));
-        assert_eq!(
-            conditions_variable_expression(&conds, false),
-            "\"flag\""
-        );
+        let conds = InclusionConditions::new(InclusionCondition::include_if("flag".to_string()));
+        assert_eq!(conditions_variable_expression(&conds, false), "\"flag\"");
     }
 
     #[test]
     fn test_conditions_variable_expression_multiple_wrapped() {
-        let mut conds =
-            InclusionConditions::new(InclusionCondition::include_if("a".to_string()));
+        let mut conds = InclusionConditions::new(InclusionCondition::include_if("a".to_string()));
         conds.append(InclusionCondition::skip_if("b".to_string()));
         assert_eq!(
             conditions_variable_expression(&conds, true),
@@ -1744,15 +1734,10 @@ mod tests {
 
     #[test]
     fn test_condition_variable_expression_any_of() {
-        let conds_a =
-            InclusionConditions::new(InclusionCondition::include_if("a".to_string()));
-        let conds_b =
-            InclusionConditions::new(InclusionCondition::include_if("b".to_string()));
-        let any_of = AnyOf::from_iter(vec![conds_a, conds_b]);
-        assert_eq!(
-            condition_variable_expression(&any_of),
-            "\"a\" || \"b\""
-        );
+        let conds_a = InclusionConditions::new(InclusionCondition::include_if("a".to_string()));
+        let conds_b = InclusionConditions::new(InclusionCondition::include_if("b".to_string()));
+        let any_of = AnyOf::from_elements(vec![conds_a, conds_b]);
+        assert_eq!(condition_variable_expression(&any_of), "\"a\" || \"b\"");
     }
 
     #[test]
@@ -1769,9 +1754,8 @@ mod tests {
 
     #[test]
     fn test_field_merging_to_merging_strategy_partial() {
-        let result = field_merging_to_merging_strategy(
-            FieldMerging::ANCESTORS | FieldMerging::SIBLINGS,
-        );
+        let result =
+            field_merging_to_merging_strategy(FieldMerging::ANCESTORS | FieldMerging::SIBLINGS);
         assert_eq!(
             result,
             MergingStrategy::ANCESTORS | MergingStrategy::SIBLINGS
@@ -1808,8 +1792,8 @@ mod tests {
         };
         use indexmap::IndexMap;
         use ir::entity::{Entity, SourceDefinition};
-        use ir::scope_descriptor::ScopeDescriptor;
         use ir::schema::ReferencedTypes;
+        use ir::scope_descriptor::ScopeDescriptor;
         use std::sync::Arc;
         use utilities::linked_list::LinkedList;
 

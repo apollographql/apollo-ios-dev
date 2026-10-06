@@ -2,9 +2,9 @@
 //!
 //! Mirrors Swift's `Sources/apollo-ios-cli/Apollo_iOS_CLI.swift`.
 //! Registers 4 subcommands: init, generate, fetch-schema, generate-operation-manifest.
-//! Exit codes: 0 = success, 1 = any error (D-77).
+//! Exit codes: 0 = success, 1 = any error.
 //!
-//! When invoked with `--persistent_worker`, enters Bazel worker mode (D-87).
+//! When invoked with `--persistent_worker`, enters Bazel worker mode.
 
 mod worker;
 mod worker_io;
@@ -70,7 +70,7 @@ fn expand_response_files(args: Vec<String>) -> Vec<String> {
 }
 
 fn main() {
-    // D-87: Check for --persistent_worker before clap parsing.
+    // Check for --persistent_worker before clap parsing.
     // Bazel passes this flag when spawning persistent workers.
     // Must be checked in raw args because Bazel may also pass
     // arguments that clap doesn't understand.
@@ -94,7 +94,7 @@ fn main() {
         Commands::GenerateOperationManifest(cmd) => cmd.run(),
     };
 
-    // D-77: Exit codes match Swift -- 0 = success, 1 = any error
+    // Exit codes match Swift -- 0 = success, 1 = any error
     match result {
         Ok(()) => std::process::exit(0),
         Err(e) => {

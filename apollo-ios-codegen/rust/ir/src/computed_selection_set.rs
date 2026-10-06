@@ -10,6 +10,7 @@ use indexmap::IndexMap;
 
 use graphql_compiler::GraphQLCompositeType;
 
+use crate::definition_entity_storage::DefinitionEntityStorage;
 use crate::direct_selections::DirectSelections;
 use crate::entity_selection_tree::EntityTreeScopeSelections;
 use crate::fields::{EntityField, Field};
@@ -19,7 +20,6 @@ use crate::named_fragment_spread::NamedFragmentSpread;
 use crate::scope_descriptor::ScopeCondition;
 use crate::scoped_selection_set_hashable::ScopedSelectionSetHashable;
 use crate::selection_set::{SelectionSet, TypeInfo};
-use crate::definition_entity_storage::DefinitionEntityStorage;
 
 use indexmap::IndexSet;
 
@@ -39,8 +39,7 @@ impl ComputedSelectionSet {
     /// Returns an iterator over all fields (direct first, then merged).
     /// Mirrors Swift's `makeFieldIterator()`.
     pub fn make_field_iterator(&self) -> impl Iterator<Item = &Field> {
-        let direct_iter = self.direct.iter()
-            .flat_map(|d| d.fields.values());
+        let direct_iter = self.direct.iter().flat_map(|d| d.fields.values());
         let merged_iter = self.merged.fields.values();
         direct_iter.chain(merged_iter)
     }
@@ -51,8 +50,7 @@ impl ComputedSelectionSet {
         &'a self,
         filter: F,
     ) -> impl Iterator<Item = &'a Field> {
-        let direct_iter = self.direct.iter()
-            .flat_map(|d| d.fields.values());
+        let direct_iter = self.direct.iter().flat_map(|d| d.fields.values());
         let merged_iter = self.merged.fields.values();
         direct_iter.chain(merged_iter).filter(move |f| filter(f))
     }
@@ -60,8 +58,7 @@ impl ComputedSelectionSet {
     /// Returns an iterator over all inline fragments (direct first, then merged).
     /// Mirrors Swift's `makeInlineFragmentIterator()`.
     pub fn make_inline_fragment_iterator(&self) -> impl Iterator<Item = &InlineFragmentSpread> {
-        let direct_iter = self.direct.iter()
-            .flat_map(|d| d.inline_fragments.values());
+        let direct_iter = self.direct.iter().flat_map(|d| d.inline_fragments.values());
         let merged_iter = self.merged.inline_fragments.values();
         direct_iter.chain(merged_iter)
     }
@@ -69,8 +66,7 @@ impl ComputedSelectionSet {
     /// Returns an iterator over all named fragments (direct first, then merged).
     /// Mirrors Swift's `makeNamedFragmentIterator()`.
     pub fn make_named_fragment_iterator(&self) -> impl Iterator<Item = &NamedFragmentSpread> {
-        let direct_iter = self.direct.iter()
-            .flat_map(|d| d.named_fragments.values());
+        let direct_iter = self.direct.iter().flat_map(|d| d.named_fragments.values());
         let merged_iter = self.merged.named_fragments.values();
         direct_iter.chain(merged_iter)
     }
@@ -79,7 +75,10 @@ impl ComputedSelectionSet {
     /// is identifiable (has key_fields == ["id"]).
     /// Mirrors Swift's `ComputedSelectionSet.isIdentifiable`.
     pub fn is_identifiable(&self) -> bool {
-        let has_id_field = self.direct.as_ref().map_or(false, |d| d.fields.contains_key("id"))
+        let has_id_field = self
+            .direct
+            .as_ref()
+            .is_some_and(|d| d.fields.contains_key("id"))
             || self.merged.fields.contains_key("id");
         if !has_id_field {
             return false;
@@ -92,12 +91,14 @@ impl ComputedSelectionSet {
 /// Mirrors Swift's `GraphQLCompositeType.isIdentifiable`.
 fn is_composite_type_identifiable(ty: &GraphQLCompositeType) -> bool {
     match ty {
-        GraphQLCompositeType::Object(obj) => {
-            obj.key_fields.as_ref().map_or(false, |kf| kf.len() == 1 && kf[0] == "id")
-        }
-        GraphQLCompositeType::Interface(iface) => {
-            iface.key_fields.as_ref().map_or(false, |kf| kf.len() == 1 && kf[0] == "id")
-        }
+        GraphQLCompositeType::Object(obj) => obj
+            .key_fields
+            .as_ref()
+            .is_some_and(|kf| kf.len() == 1 && kf[0] == "id"),
+        GraphQLCompositeType::Interface(iface) => iface
+            .key_fields
+            .as_ref()
+            .is_some_and(|kf| kf.len() == 1 && kf[0] == "id"),
         GraphQLCompositeType::Union(_) => false,
     }
 }
@@ -204,23 +205,28 @@ impl Builder {
             MergingStrategy,
         )> = Vec::new();
 
-        type_info.entity.selection_tree.read().expect("selection_tree lock poisoned").add_merged_selections(
-            &type_info,
-            &mut |scope_selections, source, source_merge_strategy| {
-                merge_ops.push((
-                    scope_selections.clone(),
-                    source.clone(),
-                    source_merge_strategy,
-                ));
-            },
-            &mut |condition, condition_selections, merge_strategy| {
-                inline_ops.push((
-                    condition.clone(),
-                    condition_selections.clone(),
-                    merge_strategy,
-                ));
-            },
-        );
+        type_info
+            .entity
+            .selection_tree
+            .read()
+            .expect("selection_tree lock poisoned")
+            .add_merged_selections(
+                &type_info,
+                &mut |scope_selections, source, source_merge_strategy| {
+                    merge_ops.push((
+                        scope_selections.clone(),
+                        source.clone(),
+                        source_merge_strategy,
+                    ));
+                },
+                &mut |condition, condition_selections, merge_strategy| {
+                    inline_ops.push((
+                        condition.clone(),
+                        condition_selections.clone(),
+                        merge_strategy,
+                    ));
+                },
+            );
 
         // Now apply all collected operations
         for (scope_selections, source, strategy) in &merge_ops {
@@ -267,7 +273,7 @@ impl Builder {
         source: &MergedSource,
         source_merge_strategy: MergingStrategy,
     ) -> bool {
-        self.should_merge_in_sources(&[source.clone()], source_merge_strategy)
+        self.should_merge_in_sources(std::slice::from_ref(source), source_merge_strategy)
     }
 
     fn should_merge_in_sources(
@@ -280,10 +286,15 @@ impl Builder {
         }
 
         for source in sources {
-            if self.type_info.derived_from_merged_sources.iter().any(|derived| {
-                derived.type_info.scope_path == source.type_info.scope_path
-                    && derived.fragment == source.fragment
-            }) {
+            if self
+                .type_info
+                .derived_from_merged_sources
+                .iter()
+                .any(|derived| {
+                    derived.type_info.scope_path == source.type_info.scope_path
+                        && derived.fragment == source.fragment
+                })
+            {
                 return true;
             }
         }
@@ -312,17 +323,27 @@ impl Builder {
                     Arc::clone(&new_entity_field.selection_set.type_info.entity),
                     new_entity_field.selection_set.type_info.scope_path.clone(),
                 );
-                new_type_info_data.derived_from_merged_sources =
-                    new_entity_field.selection_set.type_info.derived_from_merged_sources.clone();
+                new_type_info_data.derived_from_merged_sources = new_entity_field
+                    .selection_set
+                    .type_info
+                    .derived_from_merged_sources
+                    .clone();
                 // Deduplicate: only add the source if it's not already present
                 // (same fragment + same scope path). The entity selection tree can
                 // provide the same field from the same source multiple times.
-                let already_present = new_type_info_data.derived_from_merged_sources.iter().any(|existing| {
-                    existing.fragment == field_merged_source.fragment
-                        && existing.type_info.scope_path == field_merged_source.type_info.scope_path
-                });
+                let already_present =
+                    new_type_info_data
+                        .derived_from_merged_sources
+                        .iter()
+                        .any(|existing| {
+                            existing.fragment == field_merged_source.fragment
+                                && existing.type_info.scope_path
+                                    == field_merged_source.type_info.scope_path
+                        });
                 if !already_present {
-                    new_type_info_data.derived_from_merged_sources.push(field_merged_source);
+                    new_type_info_data
+                        .derived_from_merged_sources
+                        .push(field_merged_source);
                 }
                 let new_type_info = Arc::new(new_type_info_data);
                 new_entity_field.selection_set = Arc::new(SelectionSet::new(
@@ -375,8 +396,7 @@ impl Builder {
             }
         }
 
-        self.named_fragments
-            .insert(key_in_scope, fragment.clone());
+        self.named_fragments.insert(key_in_scope, fragment.clone());
         true
     }
 
@@ -401,7 +421,8 @@ impl Builder {
             }
         }
 
-        let inline_fragment = self.create_or_find_shallowly_merged_composite_inline_fragment(condition, &sources);
+        let inline_fragment =
+            self.create_or_find_shallowly_merged_composite_inline_fragment(condition, &sources);
         self.inline_fragments
             .insert(condition.clone(), inline_fragment);
     }
@@ -464,8 +485,8 @@ mod tests {
     use std::sync::Arc;
 
     use graphql_compiler::{
-        compilation_result, GraphQLName, GraphQLNamedType, GraphQLObjectType,
-        GraphQLInterfaceType, GraphQLScalarType, GraphQLType, GraphQLUnionType,
+        compilation_result, GraphQLInterfaceType, GraphQLName, GraphQLNamedType, GraphQLObjectType,
+        GraphQLScalarType, GraphQLType, GraphQLUnionType,
     };
     use indexmap::IndexMap;
 
@@ -542,7 +563,9 @@ mod tests {
         // Build a referenced types set containing the parent type
         let named_types: Vec<GraphQLNamedType> = match &parent_type {
             GraphQLCompositeType::Object(obj) => vec![GraphQLNamedType::Object(Arc::clone(obj))],
-            GraphQLCompositeType::Interface(iface) => vec![GraphQLNamedType::Interface(Arc::clone(iface))],
+            GraphQLCompositeType::Interface(iface) => {
+                vec![GraphQLNamedType::Interface(Arc::clone(iface))]
+            }
             GraphQLCompositeType::Union(u) => vec![GraphQLNamedType::Union(Arc::clone(u))],
         };
         let all_types = Arc::new(ReferencedTypes::new(&named_types, make_root_types()));
@@ -611,7 +634,10 @@ mod tests {
         let obj = make_object("Dog", None);
         let ti = make_type_info_with_parent(GraphQLCompositeType::Object(obj));
         let css = make_computed_selection_set(
-            vec![("name", make_scalar_field("name")), ("age", make_scalar_field("age"))],
+            vec![
+                ("name", make_scalar_field("name")),
+                ("age", make_scalar_field("age")),
+            ],
             vec![],
             ti,
         );
@@ -650,7 +676,10 @@ mod tests {
         let obj = make_object("Dog", None);
         let ti = make_type_info_with_parent(GraphQLCompositeType::Object(obj));
         let css = make_computed_selection_set(
-            vec![("name", make_scalar_field("name")), ("age", make_scalar_field("age"))],
+            vec![
+                ("name", make_scalar_field("name")),
+                ("age", make_scalar_field("age")),
+            ],
             vec![("species", make_scalar_field("species"))],
             ti,
         );
@@ -694,11 +723,7 @@ mod tests {
     fn is_identifiable_true_with_id_field_and_identifiable_object() {
         let obj = make_object("Dog", Some(vec!["id".to_string()]));
         let ti = make_type_info_with_parent(GraphQLCompositeType::Object(obj));
-        let css = make_computed_selection_set(
-            vec![("id", make_scalar_field("id"))],
-            vec![],
-            ti,
-        );
+        let css = make_computed_selection_set(vec![("id", make_scalar_field("id"))], vec![], ti);
         assert!(css.is_identifiable());
     }
 
@@ -706,11 +731,7 @@ mod tests {
     fn is_identifiable_true_with_id_in_merged() {
         let obj = make_object("Dog", Some(vec!["id".to_string()]));
         let ti = make_type_info_with_parent(GraphQLCompositeType::Object(obj));
-        let css = make_computed_selection_set(
-            vec![],
-            vec![("id", make_scalar_field("id"))],
-            ti,
-        );
+        let css = make_computed_selection_set(vec![], vec![("id", make_scalar_field("id"))], ti);
         assert!(css.is_identifiable());
     }
 
@@ -718,11 +739,8 @@ mod tests {
     fn is_identifiable_false_no_id_field() {
         let obj = make_object("Dog", Some(vec!["id".to_string()]));
         let ti = make_type_info_with_parent(GraphQLCompositeType::Object(obj));
-        let css = make_computed_selection_set(
-            vec![("name", make_scalar_field("name"))],
-            vec![],
-            ti,
-        );
+        let css =
+            make_computed_selection_set(vec![("name", make_scalar_field("name"))], vec![], ti);
         assert!(!css.is_identifiable());
     }
 
@@ -730,11 +748,7 @@ mod tests {
     fn is_identifiable_false_no_key_fields() {
         let obj = make_object("Dog", None);
         let ti = make_type_info_with_parent(GraphQLCompositeType::Object(obj));
-        let css = make_computed_selection_set(
-            vec![("id", make_scalar_field("id"))],
-            vec![],
-            ti,
-        );
+        let css = make_computed_selection_set(vec![("id", make_scalar_field("id"))], vec![], ti);
         assert!(!css.is_identifiable());
     }
 
@@ -742,11 +756,7 @@ mod tests {
     fn is_identifiable_false_wrong_key_fields() {
         let obj = make_object("Dog", Some(vec!["uuid".to_string()]));
         let ti = make_type_info_with_parent(GraphQLCompositeType::Object(obj));
-        let css = make_computed_selection_set(
-            vec![("id", make_scalar_field("id"))],
-            vec![],
-            ti,
-        );
+        let css = make_computed_selection_set(vec![("id", make_scalar_field("id"))], vec![], ti);
         assert!(!css.is_identifiable());
     }
 
@@ -754,11 +764,7 @@ mod tests {
     fn is_identifiable_interface_type() {
         let iface = make_interface("Animal", Some(vec!["id".to_string()]));
         let ti = make_type_info_with_parent(GraphQLCompositeType::Interface(iface));
-        let css = make_computed_selection_set(
-            vec![("id", make_scalar_field("id"))],
-            vec![],
-            ti,
-        );
+        let css = make_computed_selection_set(vec![("id", make_scalar_field("id"))], vec![], ti);
         assert!(css.is_identifiable());
     }
 
@@ -770,11 +776,7 @@ mod tests {
             types: Vec::new(),
         });
         let ti = make_type_info_with_parent(GraphQLCompositeType::Union(union_type));
-        let css = make_computed_selection_set(
-            vec![("id", make_scalar_field("id"))],
-            vec![],
-            ti,
-        );
+        let css = make_computed_selection_set(vec![("id", make_scalar_field("id"))], vec![], ti);
         assert!(!css.is_identifiable());
     }
 
@@ -783,24 +785,32 @@ mod tests {
     #[test]
     fn is_composite_type_identifiable_object_with_id() {
         let obj = make_object("Dog", Some(vec!["id".to_string()]));
-        assert!(is_composite_type_identifiable(&GraphQLCompositeType::Object(obj)));
+        assert!(is_composite_type_identifiable(
+            &GraphQLCompositeType::Object(obj)
+        ));
     }
 
     #[test]
     fn is_composite_type_identifiable_object_without_key_fields() {
         let obj = make_object("Dog", None);
-        assert!(!is_composite_type_identifiable(&GraphQLCompositeType::Object(obj)));
+        assert!(!is_composite_type_identifiable(
+            &GraphQLCompositeType::Object(obj)
+        ));
     }
 
     #[test]
     fn is_composite_type_identifiable_interface_with_id() {
         let iface = make_interface("Animal", Some(vec!["id".to_string()]));
-        assert!(is_composite_type_identifiable(&GraphQLCompositeType::Interface(iface)));
+        assert!(is_composite_type_identifiable(
+            &GraphQLCompositeType::Interface(iface)
+        ));
     }
 
     #[test]
     fn is_composite_type_identifiable_multiple_key_fields() {
         let obj = make_object("Dog", Some(vec!["id".to_string(), "name".to_string()]));
-        assert!(!is_composite_type_identifiable(&GraphQLCompositeType::Object(obj)));
+        assert!(!is_composite_type_identifiable(
+            &GraphQLCompositeType::Object(obj)
+        ));
     }
 }

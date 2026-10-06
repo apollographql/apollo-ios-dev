@@ -3,9 +3,8 @@
 //! This module is the core conversion layer. It imports apollo-compiler types
 //! internally and produces the Swift-equivalent types defined in `schema.rs`,
 //! `graphql_type.rs`, `graphql_value.rs`, etc. No apollo-compiler types are
-//! exposed past this module's boundary (per D-19).
+//! exposed past this module's boundary.
 
-use std::collections::HashSet;
 use std::sync::Arc;
 
 use apollo_compiler::ast;
@@ -38,7 +37,9 @@ pub struct AdapterError {
 
 impl AdapterError {
     fn new(message: impl Into<String>) -> Self {
-        Self { message: message.into() }
+        Self {
+            message: message.into(),
+        }
     }
 }
 
@@ -66,7 +67,7 @@ pub struct TypeRegistry {
     types: IndexMap<String, GraphQLNamedType>,
     /// Names of the types whose own definition carries a `@typePolicy` directive
     /// (graphql-js `type.astNode.directives`; inherited directives do not count).
-    type_policy_names: HashSet<String>,
+    type_policy_names: IndexSet<String>,
 }
 
 impl TypeRegistry {
@@ -166,7 +167,7 @@ impl TypeRegistry {
         // All type names are now resolvable.
         let full_registry = TypeRegistry {
             types: types.clone(),
-            type_policy_names: HashSet::new(),
+            type_policy_names: IndexSet::new(),
         };
 
         // Phase 3: Rebuild types that need field resolution.
@@ -204,7 +205,7 @@ impl TypeRegistry {
                 // Rebuild the full_registry snapshot to include rebuilt interfaces
                 let updated_registry = TypeRegistry {
                     types: types.clone(),
-                    type_policy_names: HashSet::new(),
+                    type_policy_names: IndexSet::new(),
                 };
                 let mut fields = IndexMap::new();
                 for (field_name, field_def) in &obj.fields {
@@ -214,9 +215,7 @@ impl TypeRegistry {
                 let interfaces: Vec<Arc<GraphQLInterfaceType>> = obj
                     .implements_interfaces
                     .iter()
-                    .filter_map(|iface_name| {
-                        interface_arcs.get(iface_name.as_str()).cloned()
-                    })
+                    .filter_map(|iface_name| interface_arcs.get(iface_name.as_str()).cloned())
                     .collect();
                 let obj_arc = Arc::new(GraphQLObjectType {
                     name: GraphQLName::new(name_str.clone()),
@@ -237,9 +236,7 @@ impl TypeRegistry {
                 let member_types: Vec<Arc<GraphQLObjectType>> = union
                     .members
                     .iter()
-                    .filter_map(|member_name| {
-                        object_arcs.get(member_name.as_str()).cloned()
-                    })
+                    .filter_map(|member_name| object_arcs.get(member_name.as_str()).cloned())
                     .collect();
                 let named = GraphQLNamedType::Union(Arc::new(GraphQLUnionType {
                     name: GraphQLName::new(name_str.clone()),
@@ -256,7 +253,7 @@ impl TypeRegistry {
             if let ExtendedType::InputObject(io) = ext_type {
                 let current_registry = TypeRegistry {
                     types: types.clone(),
-                    type_policy_names: HashSet::new(),
+                    type_policy_names: IndexSet::new(),
                 };
                 let mut fields = IndexMap::new();
                 for (field_name, field_def) in &io.fields {
@@ -286,7 +283,7 @@ impl TypeRegistry {
         // and unions using the now-complete registry to ensure Arc identity.
         let final_registry = TypeRegistry {
             types: types.clone(),
-            type_policy_names: HashSet::new(),
+            type_policy_names: IndexSet::new(),
         };
 
         // Phase 4a: Rebuild interfaces with resolved fields.
@@ -322,7 +319,10 @@ impl TypeRegistry {
             if let ExtendedType::Interface(iface) = ext_type {
                 if !iface.implements_interfaces.is_empty() {
                     let mut fields = IndexMap::new();
-                    let updated_registry = TypeRegistry { types: types.clone(), type_policy_names: HashSet::new() };
+                    let updated_registry = TypeRegistry {
+                        types: types.clone(),
+                        type_policy_names: IndexSet::new(),
+                    };
                     for (field_name, field_def) in &iface.fields {
                         let field = convert_field_definition(field_def, &updated_registry);
                         fields.insert(field_name.as_str().to_string(), field);
@@ -330,9 +330,7 @@ impl TypeRegistry {
                     let interfaces: Vec<Arc<GraphQLInterfaceType>> = iface
                         .implements_interfaces
                         .iter()
-                        .filter_map(|iface_name| {
-                            interface_arcs.get(iface_name.as_str()).cloned()
-                        })
+                        .filter_map(|iface_name| interface_arcs.get(iface_name.as_str()).cloned())
                         .collect();
                     let iface_arc = Arc::new(GraphQLInterfaceType {
                         name: GraphQLName::new(name_str.clone()),
@@ -353,7 +351,7 @@ impl TypeRegistry {
         // plus the just-rebuilt interfaces.
         let final_registry2 = TypeRegistry {
             types: types.clone(),
-            type_policy_names: HashSet::new(),
+            type_policy_names: IndexSet::new(),
         };
         for (name, ext_type) in &schema.types {
             let name_str = name.as_str().to_string();
@@ -366,9 +364,7 @@ impl TypeRegistry {
                 let interfaces: Vec<Arc<GraphQLInterfaceType>> = obj
                     .implements_interfaces
                     .iter()
-                    .filter_map(|iface_name| {
-                        interface_arcs.get(iface_name.as_str()).cloned()
-                    })
+                    .filter_map(|iface_name| interface_arcs.get(iface_name.as_str()).cloned())
                     .collect();
                 let obj_arc = Arc::new(GraphQLObjectType {
                     name: GraphQLName::new(name_str.clone()),
@@ -389,9 +385,7 @@ impl TypeRegistry {
                 let member_types: Vec<Arc<GraphQLObjectType>> = union
                     .members
                     .iter()
-                    .filter_map(|member_name| {
-                        object_arcs.get(member_name.as_str()).cloned()
-                    })
+                    .filter_map(|member_name| object_arcs.get(member_name.as_str()).cloned())
                     .collect();
                 let named = GraphQLNamedType::Union(Arc::new(GraphQLUnionType {
                     name: GraphQLName::new(name_str.clone()),
@@ -437,7 +431,7 @@ impl TypeRegistry {
         // `predators: [Animal!]!` would hold stale interface Arcs.
         let final_registry3 = TypeRegistry {
             types: types.clone(),
-            type_policy_names: HashSet::new(),
+            type_policy_names: IndexSet::new(),
         };
         object_arcs.clear();
         for (name, ext_type) in &schema.types {
@@ -451,9 +445,7 @@ impl TypeRegistry {
                 let interfaces: Vec<Arc<GraphQLInterfaceType>> = obj
                     .implements_interfaces
                     .iter()
-                    .filter_map(|iface_name| {
-                        interface_arcs.get(iface_name.as_str()).cloned()
-                    })
+                    .filter_map(|iface_name| interface_arcs.get(iface_name.as_str()).cloned())
                     .collect();
                 let obj_arc = Arc::new(GraphQLObjectType {
                     name: GraphQLName::new(name_str.clone()),
@@ -473,9 +465,7 @@ impl TypeRegistry {
                 let member_types: Vec<Arc<GraphQLObjectType>> = union
                     .members
                     .iter()
-                    .filter_map(|member_name| {
-                        object_arcs.get(member_name.as_str()).cloned()
-                    })
+                    .filter_map(|member_name| object_arcs.get(member_name.as_str()).cloned())
                     .collect();
                 let named = GraphQLNamedType::Union(Arc::new(GraphQLUnionType {
                     name: GraphQLName::new(name_str.clone()),
@@ -509,11 +499,17 @@ impl TypeRegistry {
                 match schema.types.get(name)? {
                     ExtendedType::Object(o) => (
                         &o.directives,
-                        o.implements_interfaces.iter().map(|i| i.name.to_string()).collect(),
+                        o.implements_interfaces
+                            .iter()
+                            .map(|i| i.name.to_string())
+                            .collect(),
                     ),
                     ExtendedType::Interface(i) => (
                         &i.directives,
-                        i.implements_interfaces.iter().map(|i| i.name.to_string()).collect(),
+                        i.implements_interfaces
+                            .iter()
+                            .map(|i| i.name.to_string())
+                            .collect(),
                     ),
                     _ => return None,
                 };
@@ -534,12 +530,10 @@ impl TypeRegistry {
                         (*ptr).key_fields = resolved;
                     }
                 }
-                GraphQLNamedType::Interface(iface) => {
-                    unsafe {
-                        let ptr = Arc::as_ptr(iface) as *mut GraphQLInterfaceType;
-                        (*ptr).key_fields = resolved;
-                    }
-                }
+                GraphQLNamedType::Interface(iface) => unsafe {
+                    let ptr = Arc::as_ptr(iface) as *mut GraphQLInterfaceType;
+                    (*ptr).key_fields = resolved;
+                },
                 _ => {}
             }
         }
@@ -551,14 +545,18 @@ impl TypeRegistry {
         // definition order.
         let interface_names: Vec<String> = types
             .iter()
-            .filter_map(|(n, t)| matches!(t, GraphQLNamedType::Interface(_)).then(|| n.clone()))
+            .filter(|(_, t)| matches!(t, GraphQLNamedType::Interface(_)))
+            .map(|(n, _)| n.clone())
             .collect();
         for iface_name in interface_names {
             let implementors: Vec<Arc<GraphQLObjectType>> = types
                 .values()
                 .filter_map(|t| match t {
                     GraphQLNamedType::Object(obj)
-                        if obj.interfaces.iter().any(|i| i.name.schema_name == iface_name) =>
+                        if obj
+                            .interfaces
+                            .iter()
+                            .any(|i| i.name.schema_name == iface_name) =>
                     {
                         Some(Arc::clone(obj))
                     }
@@ -574,7 +572,7 @@ impl TypeRegistry {
             }
         }
 
-        let type_policy_names: HashSet<String> = schema
+        let type_policy_names: IndexSet<String> = schema
             .types
             .iter()
             .filter(|(_, t)| match t {
@@ -585,7 +583,10 @@ impl TypeRegistry {
             .map(|(n, _)| n.as_str().to_string())
             .collect();
 
-        TypeRegistry { types, type_policy_names }
+        TypeRegistry {
+            types,
+            type_policy_names,
+        }
     }
 
     /// Whether the type's own definition declares a `@typePolicy` directive
@@ -619,10 +620,7 @@ impl TypeRegistry {
 
 /// Extracts the deprecation reason from a single `@deprecated` directive.
 fn deprecation_reason_from_directive(deprecated: &ast::Directive) -> Option<String> {
-    let reason_arg = deprecated
-        .arguments
-        .iter()
-        .find(|arg| arg.name == "reason");
+    let reason_arg = deprecated.arguments.iter().find(|arg| arg.name == "reason");
     match reason_arg {
         Some(arg) => match &*arg.value {
             ast::Value::String(s) => Some(s.clone()),
@@ -641,9 +639,7 @@ pub fn extract_deprecation_reason(directives: &ast::DirectiveList) -> Option<Str
 
 /// Extracts the deprecation reason from a `schema::DirectiveList`.
 /// Used for schema-level type directives (ScalarType, EnumType, etc.).
-pub fn extract_deprecation_reason_schema(
-    directives: &schema::DirectiveList,
-) -> Option<String> {
+pub fn extract_deprecation_reason_schema(directives: &schema::DirectiveList) -> Option<String> {
     let deprecated = directives.get("deprecated")?;
     deprecation_reason_from_directive(deprecated)
 }
@@ -664,7 +660,7 @@ pub fn extract_specified_by_url(directives: &schema::DirectiveList) -> Option<St
 // MARK: - Type Conversion
 
 /// Converts an apollo-compiler `ast::Type` (4 variants) to our `GraphQLType`
-/// (6 variants). Per RESEARCH.md Pitfall 3.
+/// (6 variants).
 ///
 /// Only for types taken from a validated schema (every named type exists there); use
 /// [`try_convert_type`] for types written in operation documents.
@@ -686,9 +682,7 @@ pub fn try_convert_type(
         ast::Type::NonNullList(inner) => GraphQLType::NonNull(Box::new(GraphQLType::List(
             Box::new(try_convert_type(inner, registry)?),
         ))),
-        ast::Type::List(inner) => {
-            GraphQLType::List(Box::new(try_convert_type(inner, registry)?))
-        }
+        ast::Type::List(inner) => GraphQLType::List(Box::new(try_convert_type(inner, registry)?)),
     })
 }
 
@@ -739,9 +733,9 @@ pub fn convert_value(value: &ast::Value) -> GraphQLValue {
             // degrades to a float like graphql-js' Number does instead of panicking.
             match int_val.as_str().parse::<i64>() {
                 Ok(val) => GraphQLValue::Int(val),
-                Err(_) => GraphQLValue::Float(
-                    int_val.as_str().parse::<f64>().unwrap_or(f64::INFINITY),
-                ),
+                Err(_) => {
+                    GraphQLValue::Float(int_val.as_str().parse::<f64>().unwrap_or(f64::INFINITY))
+                }
             }
         }
         ast::Value::Float(float_val) => {
@@ -797,10 +791,7 @@ pub fn convert_input_value_definition(
     input: &ast::InputValueDefinition,
     registry: &TypeRegistry,
 ) -> GraphQLInputField {
-    let default_value = input
-        .default_value
-        .as_ref()
-        .map(|v| convert_value(v));
+    let default_value = input.default_value.as_ref().map(|v| convert_value(v));
 
     GraphQLInputField {
         name: GraphQLName::new(input.name.as_str().to_string()),
@@ -815,7 +806,7 @@ pub fn convert_input_value_definition(
 
 /// Converts an apollo-compiler executable selection set to our `SelectionSet`.
 ///
-/// GAP-01: Filters out explicit `__typename` field selections. graphql-js strips
+/// Filters out explicit `__typename` field selections. graphql-js strips
 /// user-written `__typename` and injects it implicitly; apollo-rs preserves them.
 /// The IR builder must not see explicit `__typename` selections to match Swift behavior.
 ///
@@ -864,7 +855,7 @@ fn convert_selection(
         executable::Selection::Field(field) => {
             let field_name = field.name.as_str();
 
-            // GAP-01: filter __typename -- graphql-js strips explicit __typename
+            // filter __typename -- graphql-js strips explicit __typename
             if field_name == "__typename" {
                 return Ok(None);
             }
@@ -901,7 +892,9 @@ fn convert_selection(
                                 .arguments
                                 .iter()
                                 .find(|def_arg| def_arg.name == arg.name)
-                                .and_then(|def_arg| extract_deprecation_reason(&def_arg.directives));
+                                .and_then(|def_arg| {
+                                    extract_deprecation_reason(&def_arg.directives)
+                                });
 
                             compilation_result::Argument {
                                 name: arg.name.as_str().to_string(),
@@ -961,9 +954,8 @@ fn convert_selection(
                 .map(|tc| tc.as_str().to_string());
 
             let inline_parent = if let Some(ref tc_name) = type_condition_name {
-                resolve_composite_type(tc_name, registry).ok_or_else(|| {
-                    AdapterError::new(format!("Unknown type \"{}\".", tc_name))
-                })?
+                resolve_composite_type(tc_name, registry)
+                    .ok_or_else(|| AdapterError::new(format!("Unknown type \"{}\".", tc_name)))?
             } else {
                 // No type condition -- inherits parent type from enclosing selection set
                 parent_type.clone()
@@ -1034,10 +1026,8 @@ pub fn convert_directives(
                             .iter()
                             .map(|arg| {
                                 // Resolve argument types from built-in directive definitions.
-                                let arg_type = resolve_directive_arg_type(
-                                    d.name.as_str(),
-                                    arg.name.as_str(),
-                                );
+                                let arg_type =
+                                    resolve_directive_arg_type(d.name.as_str(), arg.name.as_str());
                                 compilation_result::Argument {
                                     name: arg.name.as_str().to_string(),
                                     type_: arg_type,
@@ -1064,17 +1054,13 @@ fn resolve_directive_arg_type(directive_name: &str, arg_name: &str) -> GraphQLTy
         }))
     };
     match (directive_name, arg_name) {
-        // GAP-04 re-verified: graphql-js produces NonNull(Boolean) for @include/@skip
+        // Verified: graphql-js produces NonNull(Boolean) for @include/@skip
         // (if: Boolean! is required) but nullable Boolean for @defer (if: Boolean is optional).
-        ("include", "if") | ("skip", "if") => {
-            GraphQLType::NonNull(Box::new(scalar("Boolean")))
-        }
+        ("include", "if") | ("skip", "if") => GraphQLType::NonNull(Box::new(scalar("Boolean"))),
         ("defer", "if") => scalar("Boolean"),
         ("defer", "label") => scalar("String"),
         ("deprecated", "reason") => scalar("String"),
-        ("specifiedBy", "url") => {
-            GraphQLType::NonNull(Box::new(scalar("String")))
-        }
+        ("specifiedBy", "url") => GraphQLType::NonNull(Box::new(scalar("String"))),
         _ => scalar("String"),
     }
 }
@@ -1145,10 +1131,7 @@ fn extract_inclusion_conditions(
 }
 
 /// Resolves a type name to a `GraphQLCompositeType`.
-fn resolve_composite_type(
-    name: &str,
-    registry: &TypeRegistry,
-) -> Option<GraphQLCompositeType> {
+fn resolve_composite_type(name: &str, registry: &TypeRegistry) -> Option<GraphQLCompositeType> {
     match registry.get(name)? {
         GraphQLNamedType::Object(t) => Some(GraphQLCompositeType::Object(Arc::clone(t))),
         GraphQLNamedType::Interface(t) => Some(GraphQLCompositeType::Interface(Arc::clone(t))),
@@ -1174,7 +1157,7 @@ impl GraphQLType {
 
 /// Collects only the **direct** (non-transitive) fragment references from a selection set.
 ///
-/// GAP-02: apollo-rs expands referenced_fragments to include transitive dependencies
+/// apollo-rs expands referenced_fragments to include transitive dependencies
 /// (if fragment A references fragment B, both A and B appear). graphql-js lists only
 /// direct references (only A appears for the operation, B only appears in A's own
 /// referenced_fragments). This function returns only fragment spreads found directly
@@ -1183,8 +1166,8 @@ pub fn collect_referenced_fragments(
     selections: &[executable::Selection],
     fragment_defs: &IndexMap<String, Arc<compilation_result::FragmentDefinition>>,
 ) -> Vec<Arc<compilation_result::FragmentDefinition>> {
-    // GAP-02: Only collect direct fragment spreads -- do NOT recurse into fragments
-    let mut seen = HashSet::new();
+    // Only collect direct fragment spreads -- do NOT recurse into fragments
+    let mut seen = IndexSet::new();
     let mut result = Vec::new();
 
     collect_direct_fragments(selections, fragment_defs, &mut seen, &mut result);
@@ -1199,7 +1182,7 @@ pub fn collect_referenced_fragments(
 fn collect_direct_fragments(
     selections: &[executable::Selection],
     fragment_defs: &IndexMap<String, Arc<compilation_result::FragmentDefinition>>,
-    seen: &mut HashSet<String>,
+    seen: &mut IndexSet<String>,
     result: &mut Vec<Arc<compilation_result::FragmentDefinition>>,
 ) {
     for selection in selections {
@@ -1263,14 +1246,12 @@ pub fn collect_referenced_types(
     fragments: &[compilation_result::FragmentDefinition],
     reduce_schema_types: bool,
 ) -> Vec<GraphQLNamedType> {
-    let fragment_map: IndexMap<&str, &compilation_result::FragmentDefinition> = fragments
-        .iter()
-        .map(|f| (f.name.as_str(), f))
-        .collect();
+    let fragment_map: IndexMap<&str, &compilation_result::FragmentDefinition> =
+        fragments.iter().map(|f| (f.name.as_str(), f)).collect();
     let mut collector = ReferencedTypeCollector {
         registry,
         names: IndexSet::new(),
-        compiled_fragments: HashSet::new(),
+        compiled_fragments: IndexSet::new(),
         fragment_map: &fragment_map,
         reduce_schema_types,
     };
@@ -1299,7 +1280,7 @@ pub fn collect_referenced_types(
 struct ReferencedTypeCollector<'a> {
     registry: &'a TypeRegistry,
     names: IndexSet<String>,
-    compiled_fragments: HashSet<String>,
+    compiled_fragments: IndexSet<String>,
     fragment_map: &'a IndexMap<&'a str, &'a compilation_result::FragmentDefinition>,
     reduce_schema_types: bool,
 }
@@ -1355,8 +1336,11 @@ impl<'a> ReferencedTypeCollector<'a> {
                 }
             }
             Some(GraphQLNamedType::Object(obj)) => {
-                let ifaces: Vec<String> =
-                    obj.interfaces.iter().map(|i| i.name.schema_name.clone()).collect();
+                let ifaces: Vec<String> = obj
+                    .interfaces
+                    .iter()
+                    .map(|i| i.name.schema_name.clone())
+                    .collect();
                 for iface in ifaces {
                     self.add(&iface);
                 }
@@ -1407,135 +1391,7 @@ fn composite_name(composite: &GraphQLCompositeType) -> &str {
     }
 }
 
-/// Collects type names referenced by a composite type.
-fn collect_types_from_composite(
-    composite: &GraphQLCompositeType,
-    names: &mut HashSet<String>,
-) {
-    match composite {
-        GraphQLCompositeType::Object(obj) => {
-            names.insert(obj.name.schema_name.clone());
-            for iface in &obj.interfaces {
-                names.insert(iface.name.schema_name.clone());
-            }
-        }
-        GraphQLCompositeType::Interface(iface) => {
-            names.insert(iface.name.schema_name.clone());
-        }
-        GraphQLCompositeType::Union(union) => {
-            names.insert(union.name.schema_name.clone());
-            for member in &union.types {
-                names.insert(member.name.schema_name.clone());
-            }
-        }
-    }
-}
-
-/// Collects type names referenced by a selection set (recursively).
-fn collect_types_from_selection_set(
-    selection_set: &compilation_result::SelectionSet,
-    names: &mut HashSet<String>,
-) {
-    collect_types_from_composite(&selection_set.parent_type, names);
-
-    for selection in &selection_set.selections {
-        match selection {
-            compilation_result::Selection::Field(field) => {
-                collect_types_from_graphql_type(&field.type_, names);
-                if let Some(ref sub_set) = field.selection_set {
-                    collect_types_from_selection_set(sub_set, names);
-                }
-                // Note: Field argument types are NOT collected here.
-                // Swift's graphql-js only includes types referenced by
-                // variable definitions and field return types, not by
-                // field argument types directly.
-            }
-            compilation_result::Selection::InlineFragment(inline) => {
-                collect_types_from_selection_set(&inline.selection_set, names);
-            }
-            compilation_result::Selection::FragmentSpread(spread) => {
-                collect_types_from_composite(&spread.fragment.type_, names);
-            }
-        }
-    }
-}
-
-/// Variant of collect_types_from_graphql_type that also pushes newly-discovered
-/// type names onto a worklist for transitive closure processing.
-fn collect_types_from_graphql_type_with_worklist(
-    graphql_type: &GraphQLType,
-    names: &mut HashSet<String>,
-    worklist: &mut Vec<String>,
-) {
-    match graphql_type {
-        GraphQLType::Scalar(s) => {
-            names.insert(s.name.schema_name.clone());
-        }
-        GraphQLType::Enum(e) => {
-            names.insert(e.name.schema_name.clone());
-        }
-        GraphQLType::InputObject(io) => {
-            if names.insert(io.name.schema_name.clone()) {
-                for field in io.fields.values() {
-                    collect_types_from_graphql_type_with_worklist(&field.type_, names, worklist);
-                }
-            }
-        }
-        GraphQLType::Entity(ct) => {
-            let type_name = match ct {
-                GraphQLCompositeType::Object(o) => o.name.schema_name.clone(),
-                GraphQLCompositeType::Interface(i) => i.name.schema_name.clone(),
-                GraphQLCompositeType::Union(u) => u.name.schema_name.clone(),
-            };
-            if names.insert(type_name.clone()) {
-                worklist.push(type_name);
-            }
-        }
-        GraphQLType::NonNull(inner) => {
-            collect_types_from_graphql_type_with_worklist(inner, names, worklist);
-        }
-        GraphQLType::List(inner) => {
-            collect_types_from_graphql_type_with_worklist(inner, names, worklist);
-        }
-    }
-}
-
-/// Collects type names from a GraphQLType (unwrapping NonNull/List wrappers).
-/// For InputObject types, also recurses into their fields to collect
-/// transitively referenced types (matching graphql-js behavior).
-fn collect_types_from_graphql_type(
-    graphql_type: &GraphQLType,
-    names: &mut HashSet<String>,
-) {
-    match graphql_type {
-        GraphQLType::Scalar(s) => {
-            names.insert(s.name.schema_name.clone());
-        }
-        GraphQLType::Enum(e) => {
-            names.insert(e.name.schema_name.clone());
-        }
-        GraphQLType::InputObject(io) => {
-            // Only recurse if we haven't already visited this input object
-            // (prevents infinite recursion for self-referential input types)
-            if names.insert(io.name.schema_name.clone()) {
-                for field in io.fields.values() {
-                    collect_types_from_graphql_type(&field.type_, names);
-                }
-            }
-        }
-        GraphQLType::Entity(ct) => {
-            collect_types_from_composite(ct, names);
-        }
-        GraphQLType::NonNull(inner) => {
-            collect_types_from_graphql_type(inner, names);
-        }
-        GraphQLType::List(inner) => {
-            collect_types_from_graphql_type(inner, names);
-        }
-    }
-}
-
-// MARK: - Source Text Reconstruction (GAP-05)
+// MARK: - Source Text Reconstruction
 
 /// Parent node kind for determining __typename injection behavior.
 /// Mirrors graphql-js's parent kind check in SelectionSet visitor.
@@ -1578,10 +1434,8 @@ pub fn build_network_request_source(definition_text: &str, legacy_safelisting: b
                 // Strip Apollo-specific directives from the operation itself
                 new_op.directives = strip_apollo_directives_from_list(&op.directives);
                 // Transform selection set -- operation root does NOT get __typename
-                new_op.selection_set = transform_selections(
-                    &op.selection_set,
-                    ParentKind::OperationDefinition,
-                );
+                new_op.selection_set =
+                    transform_selections(&op.selection_set, ParentKind::OperationDefinition);
                 new_definitions.push(ast::Definition::OperationDefinition(
                     apollo_compiler::Node::new(new_op),
                 ));
@@ -1591,10 +1445,8 @@ pub fn build_network_request_source(definition_text: &str, legacy_safelisting: b
                 // Strip Apollo-specific directives from the fragment itself
                 new_frag.directives = strip_apollo_directives_from_list(&frag.directives);
                 // Transform selection set -- fragment definition DOES get __typename
-                new_frag.selection_set = transform_selections(
-                    &frag.selection_set,
-                    ParentKind::FragmentDefinition,
-                );
+                new_frag.selection_set =
+                    transform_selections(&frag.selection_set, ParentKind::FragmentDefinition);
                 new_definitions.push(ast::Definition::FragmentDefinition(
                     apollo_compiler::Node::new(new_frag),
                 ));
@@ -1664,7 +1516,9 @@ fn legacy_transform_selections(selections: &[ast::Selection]) -> Vec<ast::Select
                     sels.insert(0, make_typename_selection());
                     new_inline.selection_set = sels;
                 }
-                result.push(ast::Selection::InlineFragment(apollo_compiler::Node::new(new_inline)));
+                result.push(ast::Selection::InlineFragment(apollo_compiler::Node::new(
+                    new_inline,
+                )));
             }
             ast::Selection::FragmentSpread(_) => result.push(sel.clone()),
         }
@@ -1683,11 +1537,7 @@ const MAX_LINE_LENGTH: usize = 80;
 /// - Variable definitions always stay inline with commas
 /// - Object values use `{ key: val }` spacing
 fn print_graphql_js(doc: &ast::Document) -> String {
-    let parts: Vec<String> = doc
-        .definitions
-        .iter()
-        .map(print_definition)
-        .collect();
+    let parts: Vec<String> = doc.definitions.iter().map(print_definition).collect();
     parts.join("\n\n")
 }
 
@@ -1719,7 +1569,11 @@ fn print_operation(op: &ast::OperationDefinition) -> String {
         // separate lines when the inline form exceeds MAX_LINE_LENGTH, like
         // field arguments; Swift's convertedToSingleLine() then renders it as
         // `query Name( $a: A $b: B )`.
-        let vars: Vec<String> = op.variables.iter().map(|v| print_variable_def(v.as_ref())).collect();
+        let vars: Vec<String> = op
+            .variables
+            .iter()
+            .map(|v| print_variable_def(v.as_ref()))
+            .collect();
         // Block form only when an item is itself multi-line (graphql-js `hasMultilineItems`).
         if vars.iter().any(|v| v.contains('\n')) {
             let indented: Vec<String> = vars.iter().map(|v| v.replace('\n', "\n  ")).collect();
@@ -1837,7 +1691,11 @@ fn print_field(field: &ast::Field, indent: &str) -> String {
 
 /// Prints arguments with graphql-js wrapping: inline with commas if <=80 chars,
 /// otherwise multi-line with no commas.
-fn print_arguments(args: &[apollo_compiler::Node<ast::Argument>], prefix: &str, indent: &str) -> String {
+fn print_arguments(
+    args: &[apollo_compiler::Node<ast::Argument>],
+    prefix: &str,
+    indent: &str,
+) -> String {
     if args.is_empty() {
         return String::new();
     }
@@ -1960,12 +1818,15 @@ fn transform_selections(
     let mut result = Vec::new();
 
     // Determine if we should inject __typename
-    let should_inject = matches!(parent_kind, ParentKind::Field | ParentKind::FragmentDefinition);
+    let should_inject = matches!(
+        parent_kind,
+        ParentKind::Field | ParentKind::FragmentDefinition
+    );
 
     // Check if __typename already exists
-    let has_typename = selections.iter().any(|s| {
-        matches!(s, ast::Selection::Field(f) if f.name == "__typename")
-    });
+    let has_typename = selections
+        .iter()
+        .any(|s| matches!(s, ast::Selection::Field(f) if f.name == "__typename"));
 
     // Inject __typename as first selection if needed
     if should_inject && !has_typename {
@@ -1984,42 +1845,33 @@ fn transform_selections(
                     new_field.directives = ast::DirectiveList(vec![]);
                 } else {
                     // Strip Apollo-specific directives from non-typename fields
-                    new_field.directives =
-                        strip_apollo_directives_from_list(&field.directives);
+                    new_field.directives = strip_apollo_directives_from_list(&field.directives);
                 }
 
                 // Recursively transform sub-selection sets (parent is Field)
                 if !field.selection_set.is_empty() {
-                    new_field.selection_set = transform_selections(
-                        &field.selection_set,
-                        ParentKind::Field,
-                    );
+                    new_field.selection_set =
+                        transform_selections(&field.selection_set, ParentKind::Field);
                 }
 
-                result.push(ast::Selection::Field(
-                    apollo_compiler::Node::new(new_field),
-                ));
+                result.push(ast::Selection::Field(apollo_compiler::Node::new(new_field)));
             }
             ast::Selection::InlineFragment(inline) => {
                 let mut new_inline = inline.as_ref().clone();
-                new_inline.directives =
-                    strip_apollo_directives_from_list(&inline.directives);
+                new_inline.directives = strip_apollo_directives_from_list(&inline.directives);
                 // InlineFragment children: parent is InlineFragment -> do NOT inject __typename
-                new_inline.selection_set = transform_selections(
-                    &inline.selection_set,
-                    ParentKind::InlineFragment,
-                );
-                result.push(ast::Selection::InlineFragment(
-                    apollo_compiler::Node::new(new_inline),
-                ));
+                new_inline.selection_set =
+                    transform_selections(&inline.selection_set, ParentKind::InlineFragment);
+                result.push(ast::Selection::InlineFragment(apollo_compiler::Node::new(
+                    new_inline,
+                )));
             }
             ast::Selection::FragmentSpread(spread) => {
                 let mut new_spread = spread.as_ref().clone();
-                new_spread.directives =
-                    strip_apollo_directives_from_list(&spread.directives);
-                result.push(ast::Selection::FragmentSpread(
-                    apollo_compiler::Node::new(new_spread),
-                ));
+                new_spread.directives = strip_apollo_directives_from_list(&spread.directives);
+                result.push(ast::Selection::FragmentSpread(apollo_compiler::Node::new(
+                    new_spread,
+                )));
             }
         }
     }
@@ -2134,10 +1986,7 @@ mod tests {
         let query = registry.get("Query").unwrap();
         if let GraphQLNamedType::Object(obj) = query {
             let field = &obj.fields["old"];
-            assert_eq!(
-                field.deprecation_reason.as_deref(),
-                Some("Use new field")
-            );
+            assert_eq!(field.deprecation_reason.as_deref(), Some("Use new field"));
         }
     }
 
@@ -2338,19 +2187,25 @@ mod tests {
     fn test_convert_value_all_variants() {
         // Variable
         let val = ast::Value::Variable(name("myVar"));
-        assert_eq!(convert_value(&val), GraphQLValue::Variable("myVar".to_string()));
+        assert_eq!(
+            convert_value(&val),
+            GraphQLValue::Variable("myVar".to_string())
+        );
 
         // Int
         let val = ast::Value::Int(42.into());
         assert_eq!(convert_value(&val), GraphQLValue::Int(42));
 
         // Float
-        let val = ast::Value::Float(3.14_f64.into());
-        assert_eq!(convert_value(&val), GraphQLValue::Float(3.14));
+        let val = ast::Value::Float(2.75_f64.into());
+        assert_eq!(convert_value(&val), GraphQLValue::Float(2.75));
 
         // String
         let val = ast::Value::String("hello".to_string());
-        assert_eq!(convert_value(&val), GraphQLValue::String("hello".to_string()));
+        assert_eq!(
+            convert_value(&val),
+            GraphQLValue::String("hello".to_string())
+        );
 
         // Boolean
         let val = ast::Value::Boolean(true);
@@ -2362,7 +2217,10 @@ mod tests {
 
         // Enum
         let val = ast::Value::Enum(name("ACTIVE"));
-        assert_eq!(convert_value(&val), GraphQLValue::Enum("ACTIVE".to_string()));
+        assert_eq!(
+            convert_value(&val),
+            GraphQLValue::Enum("ACTIVE".to_string())
+        );
     }
 
     #[test]
@@ -2427,8 +2285,15 @@ mod tests {
 
         // Verify enum deprecation
         if let Some(GraphQLNamedType::Enum(status)) = registry.get("UserStatus") {
-            let banned = status.values.iter().find(|v| v.name.schema_name == "BANNED").unwrap();
-            assert_eq!(banned.deprecation_reason.as_deref(), Some("Use SUSPENDED instead"));
+            let banned = status
+                .values
+                .iter()
+                .find(|v| v.name.schema_name == "BANNED")
+                .unwrap();
+            assert_eq!(
+                banned.deprecation_reason.as_deref(),
+                Some("Use SUSPENDED instead")
+            );
             assert!(banned.is_deprecated());
         }
 
@@ -2446,7 +2311,10 @@ mod tests {
         // Verify custom scalar
         if let Some(GraphQLNamedType::Scalar(dt)) = registry.get("DateTime") {
             assert!(dt.is_custom_scalar());
-            assert_eq!(dt.specified_by_url.as_deref(), Some("https://example.com/datetime"));
+            assert_eq!(
+                dt.specified_by_url.as_deref(),
+                Some("https://example.com/datetime")
+            );
         }
 
         // Verify input object default value
@@ -2480,9 +2348,12 @@ mod tests {
         }
     }
 
-    // MARK: - GAP-01 Tests (__typename filtering)
+    // MARK: - Tests: __typename filtering
 
-    fn parse_and_compile(sdl: &str, query_str: &str) -> (
+    fn parse_and_compile(
+        sdl: &str,
+        query_str: &str,
+    ) -> (
         TypeRegistry,
         apollo_compiler::validation::Valid<executable::ExecutableDocument>,
         Valid<schema::Schema>,
@@ -2537,7 +2408,7 @@ mod tests {
         if let compilation_result::Selection::Field(user_field) = &selection_set.selections[0] {
             assert_eq!(user_field.name, "user");
             let sub = user_field.selection_set.as_ref().unwrap();
-            // GAP-01: __typename should be filtered out, leaving only id and name
+            // __typename should be filtered out, leaving only id and name
             let field_names: Vec<&str> = sub
                 .selections
                 .iter()
@@ -2549,7 +2420,7 @@ mod tests {
             assert_eq!(field_names, vec!["id", "name"]);
             assert!(
                 !field_names.contains(&"__typename"),
-                "GAP-01: __typename should be filtered from selections"
+                "__typename should be filtered from selections"
             );
         } else {
             panic!("Expected Field selection");
@@ -2589,17 +2460,17 @@ mod tests {
 
         if let compilation_result::Selection::Field(user_field) = &selection_set.selections[0] {
             let sub = user_field.selection_set.as_ref().unwrap();
-            // GAP-01: Only __typename was selected, so after filtering, selections are empty
+            // Only __typename was selected, so after filtering, selections are empty
             assert!(
                 sub.selections.is_empty(),
-                "GAP-01: Filtering __typename from sole selection should leave empty set"
+                "Filtering __typename from sole selection should leave empty set"
             );
         } else {
             panic!("Expected Field selection");
         }
     }
 
-    // MARK: - GAP-02 Tests (direct fragment references only)
+    // MARK: - Tests: direct fragment references only
 
     #[test]
     fn gap02_only_direct_fragment_references_collected() {
@@ -2628,8 +2499,8 @@ mod tests {
                 email
             }
         "#;
-        let schema = schema::Schema::parse_and_validate(sdl, "test.graphql")
-            .expect("Schema should parse");
+        let schema =
+            schema::Schema::parse_and_validate(sdl, "test.graphql").expect("Schema should parse");
         let doc = executable::ExecutableDocument::parse_and_validate(
             &schema,
             query,
@@ -2679,9 +2550,13 @@ mod tests {
         let op = doc.operations.get(Some("GetUser")).unwrap();
         let refs = collect_referenced_fragments(&op.selection_set.selections, &fragment_defs);
 
-        // GAP-02: Only UserBasic should appear (direct spread in operation).
+        // Only UserBasic should appear (direct spread in operation).
         // UserEmail is referenced by UserBasic, but NOT directly by the operation.
-        assert_eq!(refs.len(), 1, "GAP-02: Only direct fragment references should be collected");
+        assert_eq!(
+            refs.len(),
+            1,
+            "Only direct fragment references should be collected"
+        );
         assert_eq!(refs[0].name, "UserBasic");
     }
 
@@ -2712,8 +2587,8 @@ mod tests {
                 email
             }
         "#;
-        let schema = schema::Schema::parse_and_validate(sdl, "test.graphql")
-            .expect("Schema should parse");
+        let schema =
+            schema::Schema::parse_and_validate(sdl, "test.graphql").expect("Schema should parse");
         let doc = executable::ExecutableDocument::parse_and_validate(
             &schema,
             query,
@@ -2760,13 +2635,17 @@ mod tests {
         let refs = collect_referenced_fragments(&op.selection_set.selections, &fragment_defs);
 
         // Both are direct references in the operation
-        assert_eq!(refs.len(), 2, "Both direct fragment spreads should be collected");
+        assert_eq!(
+            refs.len(),
+            2,
+            "Both direct fragment spreads should be collected"
+        );
         let names: Vec<&str> = refs.iter().map(|f| f.name.as_str()).collect();
         assert!(names.contains(&"UserBasic"));
         assert!(names.contains(&"UserEmail"));
     }
 
-    // MARK: - GAP-03 Tests (referenced types filtering)
+    // MARK: - Tests: referenced types filtering
 
     #[test]
     fn gap03_introspection_types_excluded() {
@@ -2827,12 +2706,12 @@ mod tests {
 
         let referenced = collect_referenced_types(&registry, &[op], &[], false);
 
-        // GAP-03: No introspection types should appear in the result
+        // No introspection types should appear in the result
         for rt in &referenced {
             let name = &rt.name().schema_name;
             assert!(
                 !name.starts_with("__"),
-                "GAP-03: Introspection type '{}' should be excluded from referenced_types",
+                "Introspection type '{}' should be excluded from referenced_types",
                 name
             );
         }
@@ -2914,17 +2793,23 @@ mod tests {
             .map(|rt| rt.name().schema_name.as_str())
             .collect();
 
-        // GAP-03: Only types actually referenced by the operation should appear
-        assert!(ref_names.contains(&"Query"), "Query root type should be included");
+        // Only types actually referenced by the operation should appear
+        assert!(
+            ref_names.contains(&"Query"),
+            "Query root type should be included"
+        );
         assert!(ref_names.contains(&"User"), "User type should be included");
-        assert!(ref_names.contains(&"String"), "String scalar (used by User.name) should be included");
+        assert!(
+            ref_names.contains(&"String"),
+            "String scalar (used by User.name) should be included"
+        );
         assert!(
             !ref_names.contains(&"UnusedType"),
-            "GAP-03: UnusedType should be excluded -- not referenced by any operation"
+            "UnusedType should be excluded -- not referenced by any operation"
         );
         assert!(
             !ref_names.contains(&"UnusedEnum"),
-            "GAP-03: UnusedEnum should be excluded -- not referenced by any operation"
+            "UnusedEnum should be excluded -- not referenced by any operation"
         );
     }
 
@@ -2986,22 +2871,25 @@ mod tests {
 
         assert!(
             ref_names.contains(&"UserStatus"),
-            "GAP-03: UserStatus referenced by fragment should be included"
+            "UserStatus referenced by fragment should be included"
         );
         assert!(
             ref_names.contains(&"User"),
-            "GAP-03: User (fragment type condition) should be included"
+            "User (fragment type condition) should be included"
         );
     }
 
-    // MARK: - build_network_request_source tests (GAP-05)
+    // MARK: - build_network_request_source tests
 
     #[test]
     fn test_build_network_request_source_simple_query() {
         let input = "query Foo {\n  hero {\n    name\n  }\n}";
         let result = super::build_network_request_source(input, false);
         let expected = "query Foo {\n  hero {\n    __typename\n    name\n  }\n}";
-        assert_eq!(result, expected, "Should inject __typename into field selection set");
+        assert_eq!(
+            result, expected,
+            "Should inject __typename into field selection set"
+        );
     }
 
     #[test]
@@ -3017,7 +2905,10 @@ mod tests {
         let input = "fragment F on Human {\n  name\n}";
         let result = super::build_network_request_source(input, false);
         let expected = "fragment F on Human {\n  __typename\n  name\n}";
-        assert_eq!(result, expected, "Should inject __typename into fragment definition");
+        assert_eq!(
+            result, expected,
+            "Should inject __typename into fragment definition"
+        );
     }
 
     #[test]
@@ -3025,12 +2916,22 @@ mod tests {
         let input = "query Q {\n  hero {\n    name\n  }\n  search {\n    name\n  }\n}";
         let result = super::build_network_request_source(input, false);
         // __typename should be inside hero and search, but NOT at operation root
-        assert!(result.contains("hero {\n    __typename\n    name\n  }"), "hero should get __typename");
-        assert!(result.contains("search {\n    __typename\n    name\n  }"), "search should get __typename");
+        assert!(
+            result.contains("hero {\n    __typename\n    name\n  }"),
+            "hero should get __typename"
+        );
+        assert!(
+            result.contains("search {\n    __typename\n    name\n  }"),
+            "search should get __typename"
+        );
         // Root level should not have __typename
         let lines: Vec<&str> = result.lines().collect();
         // The first line after "query Q {" should be "  hero {", not "__typename"
-        assert_eq!(lines[1].trim(), "hero {", "Root level should not have __typename injected");
+        assert_eq!(
+            lines[1].trim(),
+            "hero {",
+            "Root level should not have __typename injected"
+        );
     }
 
     #[test]
@@ -3039,7 +2940,10 @@ mod tests {
         let result = super::build_network_request_source(input, false);
         // __typename should be inside hero field, but NOT inside the inline fragment itself
         // The inline fragment's children (fields) should not get __typename at the inline-frag level
-        assert!(result.contains("hero {\n    __typename\n    ... on Human"), "hero field should get __typename");
+        assert!(
+            result.contains("hero {\n    __typename\n    ... on Human"),
+            "hero field should get __typename"
+        );
         // Inside ... on Human, there should NOT be __typename at the inline fragment level
         // but name is a leaf field so no sub-selection to worry about
     }
@@ -3048,15 +2952,27 @@ mod tests {
     fn test_build_network_request_source_strip_apollo_directives() {
         let input = "query Q @apollo_client_ios_localCacheMutation {\n  hero {\n    name\n  }\n}";
         let result = super::build_network_request_source(input, false);
-        assert!(!result.contains("apollo_client_ios_localCacheMutation"), "Should strip Apollo directive");
-        assert!(result.contains("query Q {"), "Query should remain without directive");
+        assert!(
+            !result.contains("apollo_client_ios_localCacheMutation"),
+            "Should strip Apollo directive"
+        );
+        assert!(
+            result.contains("query Q {"),
+            "Query should remain without directive"
+        );
     }
 
     #[test]
     fn test_build_network_request_source_nested_fields() {
         let input = "query Q {\n  hero {\n    friends {\n      name\n    }\n  }\n}";
         let result = super::build_network_request_source(input, false);
-        assert!(result.contains("hero {\n    __typename\n    friends"), "hero should get __typename");
-        assert!(result.contains("friends {\n      __typename\n      name"), "friends should get __typename");
+        assert!(
+            result.contains("hero {\n    __typename\n    friends"),
+            "hero should get __typename"
+        );
+        assert!(
+            result.contains("friends {\n      __typename\n      name"),
+            "friends should get __typename"
+        );
     }
 }

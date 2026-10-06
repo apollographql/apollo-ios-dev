@@ -19,11 +19,10 @@
 //! - swiftpm-test/Sources/swiftpm-test/swiftpm_test.swift (0 test methods) -> N/A (test fixture)
 
 use assert_cmd::Command;
-use predicates::prelude::*;
-use tempfile::TempDir;
 use std::fs;
-use std::sync::Once;
 use std::path::PathBuf;
+use std::sync::Once;
+use tempfile::TempDir;
 
 // Build the CLI binary once for all tests.
 // assert_cmd::Command::cargo_bin only works when the binary is in the same
@@ -54,9 +53,16 @@ fn cli_bin() -> Command {
     let bin = profile_dir.join(format!("apollo-ios-cli{}", std::env::consts::EXE_SUFFIX));
 
     BUILD_ONCE.call_once(|| {
-        let target_dir = profile_dir.parent().expect("target directory").to_path_buf();
+        let target_dir = profile_dir
+            .parent()
+            .expect("target directory")
+            .to_path_buf();
         let mut args = vec!["build", "--bin", "apollo-ios-cli"];
-        if profile_dir.file_name().map(|n| n == "release").unwrap_or(false) {
+        if profile_dir
+            .file_name()
+            .map(|n| n == "release")
+            .unwrap_or(false)
+        {
             args.push("--release");
         }
         let status = std::process::Command::new(env!("CARGO"))
@@ -67,7 +73,11 @@ fn cli_bin() -> Command {
             .status()
             .expect("failed to build apollo-ios-cli");
         assert!(status.success(), "cargo build --bin apollo-ios-cli failed");
-        assert!(bin.is_file(), "apollo-ios-cli not found at {}", bin.display());
+        assert!(
+            bin.is_file(),
+            "apollo-ios-cli not found at {}",
+            bin.display()
+        );
     });
 
     Command::new(bin)
@@ -139,10 +149,15 @@ fn minimal_config_json(schema_namespace: &str, output_path: &str) -> String {
             "operations": {"inSchemaModule": {}},
             "testMocks": {"none": {}}
         }
-    }).to_string()
+    })
+    .to_string()
 }
 
-fn minimal_config_with_manifest(schema_namespace: &str, output_path: &str, manifest_path: &str) -> String {
+fn minimal_config_with_manifest(
+    schema_namespace: &str,
+    output_path: &str,
+    manifest_path: &str,
+) -> String {
     serde_json::json!({
         "schemaNamespace": schema_namespace,
         "input": {
@@ -162,7 +177,8 @@ fn minimal_config_with_manifest(schema_namespace: &str, output_path: &str, manif
             "version": "persistedQueries",
             "generateManifestOnCodeGeneration": false
         }
-    }).to_string()
+    })
+    .to_string()
 }
 
 // ============================================================================
@@ -229,7 +245,7 @@ mod generate_tests {
 
     #[test]
     fn test_generate_with_fetch_schema_flag_returns_stub_error() {
-        // --fetch-schema is accepted but returns a stub error (D-70)
+        // --fetch-schema is accepted but returns a stub error
         let tmp = TempDir::new().unwrap();
         let config = minimal_config_json("TestSchema", "./generated");
         let config_path = tmp.path().join("apollo-codegen-config.json");
@@ -242,7 +258,9 @@ mod generate_tests {
             .arg(config_path.to_str().unwrap())
             .assert()
             .failure()
-            .stderr(predicates::str::contains("Schema downloading is not yet supported"));
+            .stderr(predicates::str::contains(
+                "Schema downloading is not yet supported",
+            ));
     }
 
     #[test]
@@ -303,10 +321,13 @@ mod initialize_tests {
             .success();
 
         let content = fs::read_to_string(&config_path).unwrap();
-        let json: serde_json::Value = serde_json::from_str(&content)
-            .expect("output should be valid JSON");
+        let json: serde_json::Value =
+            serde_json::from_str(&content).expect("output should be valid JSON");
 
-        assert!(json.get("schemaNamespace").is_some(), "should have schemaNamespace");
+        assert!(
+            json.get("schemaNamespace").is_some(),
+            "should have schemaNamespace"
+        );
         assert!(json.get("input").is_some(), "should have input");
         assert!(json.get("output").is_some(), "should have output");
         assert_eq!(

@@ -28,6 +28,10 @@ use crate::selection_set::TypeInfo;
 
 // MARK: - EntitySelectionTree
 
+/// Callback invoked for every merged inline-fragment scope while walking the tree.
+type InlineFragmentFn<'a> = dyn FnMut(&ScopeCondition, &IndexMap<MergedSource, EntityTreeScopeSelections>, MergingStrategy)
+    + 'a;
+
 /// Represents the selections for an entity at different nested type scopes in a tree.
 ///
 /// Mirrors `EntitySelectionTree` from Swift's IR module.
@@ -100,7 +104,7 @@ impl EntitySelectionTree {
         root_type_path: &LinkedList<GraphQLCompositeType>,
         depth: usize,
     ) -> &'a mut EntityNode {
-        // T-04-08: Recursion limit check
+        // Recursion limit check
         assert!(
             depth <= 100,
             "EntitySelectionTree recursion depth exceeded 100. No valid GraphQL query nests this deep."
@@ -214,16 +218,8 @@ impl EntitySelectionTree {
     pub(crate) fn add_merged_selections(
         &self,
         type_info: &TypeInfo,
-        merge_fn: &mut dyn FnMut(
-            &EntityTreeScopeSelections,
-            &MergedSource,
-            MergingStrategy,
-        ),
-        inline_fragment_fn: &mut dyn FnMut(
-            &ScopeCondition,
-            &IndexMap<MergedSource, EntityTreeScopeSelections>,
-            MergingStrategy,
-        ),
+        merge_fn: &mut dyn FnMut(&EntityTreeScopeSelections, &MergedSource, MergingStrategy),
+        inline_fragment_fn: &mut InlineFragmentFn<'_>,
     ) {
         let root_type_path = type_info.scope_path.head_node();
         let entity_type_scope_path = root_type_path.value().scope_path.head_node();
@@ -257,7 +253,8 @@ pub struct EntityNode {
     /// Scope condition children (type cases, inclusion conditions).
     scope_conditions: Option<IndexMap<ScopeCondition, EntityNode>>,
     /// Fragment trees that have been merged into this node.
-    merged_fragment_trees: IndexMap<NamedFragmentSpreadKey, (NamedFragmentSpread, EntitySelectionTree)>,
+    merged_fragment_trees:
+        IndexMap<NamedFragmentSpreadKey, (NamedFragmentSpread, EntitySelectionTree)>,
 }
 
 /// Key type for fragment spread lookups in merged_fragment_trees.
@@ -350,19 +347,6 @@ impl EntityNode {
         });
     }
 
-    fn merge_in_scope_selections(
-        &mut self,
-        selections: &EntityTreeScopeSelections,
-        source: MergedSource,
-    ) {
-        self.update_selections(|entity_selections| {
-            let scope_selections = entity_selections
-                .entry(source)
-                .or_insert_with(EntityTreeScopeSelections::new);
-            scope_selections.merge_in(selections);
-        });
-    }
-
     fn update_selections(
         &mut self,
         block: impl FnOnce(&mut IndexMap<MergedSource, EntityTreeScopeSelections>),
@@ -434,11 +418,8 @@ impl EntityNode {
             .clone()
             .unwrap_or_else(|| self.type_.clone());
 
-        let new_node = EntityNode::with_scope(
-            node_condition.clone(),
-            node_type,
-            self.root_type_path_index,
-        );
+        let new_node =
+            EntityNode::with_scope(node_condition.clone(), node_type, self.root_type_path_index);
 
         scope_conditions.insert(node_condition.clone(), new_node);
         scope_conditions.get_mut(&node_condition).unwrap()
@@ -470,10 +451,7 @@ impl EntityNode {
             .scope_path
             .head_node();
 
-        let root_node_ref = Self::find_or_create_from_fragment_scope(
-            fragment_scope_path,
-            self,
-        );
+        let root_node_ref = Self::find_or_create_from_fragment_scope(fragment_scope_path, self);
 
         let fragment_type = fragment_spread.type_info.parent_type();
         let root_types_match = root_node_ref.type_ == *fragment_type;
@@ -499,9 +477,8 @@ impl EntityNode {
             let node_for_merge = if root_types_match {
                 root_node_ref
             } else {
-                root_node_ref.scope_condition_node(&ScopeCondition::with_type(
-                    fragment_type.clone(),
-                ))
+                root_node_ref
+                    .scope_condition_node(&ScopeCondition::with_type(fragment_type.clone()))
             };
             let key = NamedFragmentSpreadKey::new(fragment_spread);
             node_for_merge
@@ -520,16 +497,8 @@ impl EntityNode {
         target_type_info: &TypeInfo,
         current_merge_strategy: MergingStrategy,
         transform_source: Option<&dyn Fn(&MergedSource) -> MergedSource>,
-        merge_fn: &mut dyn FnMut(
-            &EntityTreeScopeSelections,
-            &MergedSource,
-            MergingStrategy,
-        ),
-        inline_fragment_fn: &mut dyn FnMut(
-            &ScopeCondition,
-            &IndexMap<MergedSource, EntityTreeScopeSelections>,
-            MergingStrategy,
-        ),
+        merge_fn: &mut dyn FnMut(&EntityTreeScopeSelections, &MergedSource, MergingStrategy),
+        inline_fragment_fn: &mut InlineFragmentFn<'_>,
     ) {
         match &self.child {
             Some(EntityNodeChild::Entity(entity_node)) => {
@@ -554,9 +523,8 @@ impl EntityNode {
             }
             Some(EntityNodeChild::Selections(selections)) => {
                 // Returns `true` if the current selection node represents the target's typeInfo exactly.
-                let is_targets_exact_scope =
-                    entity_type_scope_path.next().is_none()
-                        && current_merge_strategy == MergingStrategy::ANCESTORS;
+                let is_targets_exact_scope = entity_type_scope_path.next().is_none()
+                    && current_merge_strategy == MergingStrategy::ANCESTORS;
                 let merge_strategy = if is_targets_exact_scope {
                     MergingStrategy::empty()
                 } else {
@@ -612,11 +580,7 @@ impl EntityNode {
                     );
                 } else if let Some(EntityNodeChild::Selections(_)) = &self.child {
                     if let Some(EntityNodeChild::Selections(condition_selections)) = &node.child {
-                        inline_fragment_fn(
-                            condition,
-                            condition_selections,
-                            current_merge_strategy,
-                        );
+                        inline_fragment_fn(condition, condition_selections, current_merge_strategy);
                     }
                 }
             }
@@ -706,8 +670,10 @@ impl EntityTreeScopeSelections {
     }
 
     fn merge_in_field(&mut self, field: &Field) {
-        self.fields
-            .insert(field.hash_for_selection_set_scope().to_string(), field.clone());
+        self.fields.insert(
+            field.hash_for_selection_set_scope().to_string(),
+            field.clone(),
+        );
     }
 
     fn merge_in_fragment(&mut self, fragment: &NamedFragmentSpread) {
@@ -780,11 +746,10 @@ fn clone_node(node: &EntityNode) -> EntityNode {
             EntityNodeChild::Entity(e) => EntityNodeChild::Entity(Box::new(clone_node(e))),
             EntityNodeChild::Selections(s) => EntityNodeChild::Selections(s.clone()),
         }),
-        scope_conditions: node.scope_conditions.as_ref().map(|sc| {
-            sc.iter()
-                .map(|(k, v)| (k.clone(), clone_node(v)))
-                .collect()
-        }),
+        scope_conditions: node
+            .scope_conditions
+            .as_ref()
+            .map(|sc| sc.iter().map(|(k, v)| (k.clone(), clone_node(v))).collect()),
         merged_fragment_trees: node
             .merged_fragment_trees
             .iter()
@@ -804,8 +769,8 @@ mod tests {
     use crate::schema::ReferencedTypes;
     use graphql_compiler::compilation_result;
     use graphql_compiler::{
-        GraphQLCompositeType, GraphQLName, GraphQLNamedType, GraphQLObjectType,
-        GraphQLScalarType, GraphQLType, RootTypeDefinition,
+        GraphQLCompositeType, GraphQLName, GraphQLNamedType, GraphQLObjectType, GraphQLScalarType,
+        GraphQLType, RootTypeDefinition,
     };
     use std::sync::Arc;
 

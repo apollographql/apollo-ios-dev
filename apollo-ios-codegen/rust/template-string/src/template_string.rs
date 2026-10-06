@@ -189,10 +189,7 @@ impl TemplateStringBuilder {
     {
         match optional {
             Some(val) => {
-                let passes_where = where_block
-                    .as_ref()
-                    .map(|w| w(&val))
-                    .unwrap_or(true);
+                let passes_where = where_block.as_ref().map(|w| w(&val)).unwrap_or(true);
                 if passes_where {
                     let t = include_block(val);
                     self.append_template(Some(&t));
@@ -232,10 +229,7 @@ impl TemplateStringBuilder {
 
         for element in sequence {
             // Apply where filter
-            let passes = where_block
-                .as_ref()
-                .map(|w| w(&element))
-                .unwrap_or(true);
+            let passes = where_block.as_ref().map(|w| w(&element)).unwrap_or(true);
             if !passes {
                 continue;
             }
@@ -331,11 +325,7 @@ impl TemplateStringBuilder {
     /// Scans buffer backwards from end to find the last newline,
     /// then extracts leading whitespace (spaces and tabs only).
     pub fn get_current_indent(&self) -> String {
-        let line_start = self
-            .buffer
-            .rfind('\n')
-            .map(|pos| pos + 1)
-            .unwrap_or(0);
+        let line_start = self.buffer.rfind('\n').map(|pos| pos + 1).unwrap_or(0);
 
         self.buffer[line_start..]
             .chars()
@@ -350,11 +340,7 @@ impl TemplateStringBuilder {
     /// of the current line. If everything from line start to end is
     /// whitespace, truncates the buffer and sets `last_line_was_removed`.
     pub fn remove_line_if_empty(&mut self) {
-        let line_start = self
-            .buffer
-            .rfind('\n')
-            .map(|pos| pos + 1)
-            .unwrap_or(0);
+        let line_start = self.buffer.rfind('\n').map(|pos| pos + 1).unwrap_or(0);
 
         let current_line = &self.buffer[line_start..];
         if current_line.chars().all(|c| c.is_whitespace()) {
@@ -733,13 +719,9 @@ mod tests {
     fn append_for_each_in_basic() {
         let mut builder = TemplateStringBuilder::new();
         let items = vec!["a", "b", "c"];
-        builder.append_for_each_in(
-            items.into_iter(),
-            ",\n",
-            None,
-            None::<fn(&&str) -> bool>,
-            |s| Some(TemplateString::new(s.to_string())),
-        );
+        builder.append_for_each_in(items, ",\n", None, None::<fn(&&str) -> bool>, |s| {
+            Some(TemplateString::new(s.to_string()))
+        });
         assert_eq!(builder.build().description(), "a,\nb,\nc");
     }
 
@@ -748,13 +730,9 @@ mod tests {
         let mut builder = TemplateStringBuilder::new();
         builder.append_literal("line1\n  ");
         let items: Vec<&str> = vec![];
-        builder.append_for_each_in(
-            items.into_iter(),
-            ",\n",
-            None,
-            None::<fn(&&str) -> bool>,
-            |s| Some(TemplateString::new(s.to_string())),
-        );
+        builder.append_for_each_in(items, ",\n", None, None::<fn(&&str) -> bool>, |s| {
+            Some(TemplateString::new(s.to_string()))
+        });
         assert_eq!(builder.build().description(), "line1");
     }
 
@@ -762,13 +740,9 @@ mod tests {
     fn append_for_each_in_with_terminator() {
         let mut builder = TemplateStringBuilder::new();
         let items = vec!["a", "b"];
-        builder.append_for_each_in(
-            items.into_iter(),
-            ", ",
-            Some(";"),
-            None::<fn(&&str) -> bool>,
-            |s| Some(TemplateString::new(s.to_string())),
-        );
+        builder.append_for_each_in(items, ", ", Some(";"), None::<fn(&&str) -> bool>, |s| {
+            Some(TemplateString::new(s.to_string()))
+        });
         assert_eq!(builder.build().description(), "a, b;");
     }
 

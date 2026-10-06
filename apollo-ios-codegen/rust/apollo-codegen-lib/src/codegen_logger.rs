@@ -1,7 +1,7 @@
 //! Logging infrastructure for Apollo codegen.
 //!
 //! Mirrors Swift's `CodegenLogger` from `Sources/ApolloCodegenLib/CodegenLogger.swift`.
-//! Uses `eprintln!` (stderr) per Rust CLI convention and Bazel worker protocol (WRKR-04).
+//! Uses `eprintln!` (stderr) per Rust CLI convention and Bazel worker protocol.
 
 use std::sync::atomic::{AtomicU8, Ordering};
 
@@ -43,7 +43,11 @@ impl CodegenLogger {
     ///
     /// When verbose is true, sets level to Debug; otherwise Warning.
     pub fn set_level(verbose: bool) {
-        let level = if verbose { LogLevel::Debug } else { LogLevel::Warning };
+        let level = if verbose {
+            LogLevel::Debug
+        } else {
+            LogLevel::Warning
+        };
         LOG_LEVEL.store(level as u8, Ordering::Relaxed);
     }
 

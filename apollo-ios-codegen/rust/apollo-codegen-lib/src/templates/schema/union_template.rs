@@ -7,12 +7,13 @@ use std::sync::Arc;
 
 use graphql_compiler::schema::{GraphQLNamedType, GraphQLUnionType};
 
-use crate::templates::rendering_helpers::graphql_name_rendering::{render_named_type, RenderContext};
+use crate::templates::rendering_helpers::graphql_name_rendering::{
+    render_named_type, RenderContext,
+};
 use crate::templates::rendering_helpers::string_casing::first_uppercased;
 use crate::templates::rendering_helpers::template_string_documentation::render_documentation;
 use crate::templates::{
-    ConfigurationContext, NonFatalErrorRecorder, SchemaFileType, TemplateRenderer,
-    TemplateTarget,
+    ConfigurationContext, NonFatalErrorRecorder, SchemaFileType, TemplateRenderer, TemplateTarget,
 };
 
 /// Provides the format to convert a GraphQL Union into Swift code.
@@ -32,17 +33,13 @@ impl TemplateRenderer for UnionTemplate {
         TemplateTarget::SchemaFile(SchemaFileType::Union)
     }
 
-    fn render_body_template(
-        &self,
-        _non_fatal_error_recorder: &NonFatalErrorRecorder,
-    ) -> String {
+    fn render_body_template(&self, _non_fatal_error_recorder: &NonFatalErrorRecorder) -> String {
         let mut parts: Vec<String> = Vec::new();
 
         // Documentation
-        if let Some(doc) = render_documentation(
-            self.graphql_union.documentation.as_deref(),
-            &self.config,
-        ) {
+        if let Some(doc) =
+            render_documentation(self.graphql_union.documentation.as_deref(), &self.config)
+        {
             parts.push(doc);
         }
 
@@ -53,7 +50,9 @@ impl TemplateRenderer for UnionTemplate {
 
         let typename = render_named_type(
             &GraphQLNamedType::Union(Arc::clone(&self.graphql_union)),
-            &RenderContext::Typename { is_input_value: false },
+            &RenderContext::Typename {
+                is_input_value: false,
+            },
         );
 
         let possible_types = self.render_possible_types();
@@ -90,7 +89,9 @@ impl UnionTemplate {
             .map(|obj_type| {
                 let type_name = render_named_type(
                     &GraphQLNamedType::Object(Arc::clone(obj_type)),
-                    &RenderContext::Typename { is_input_value: false },
+                    &RenderContext::Typename {
+                        is_input_value: false,
+                    },
                 );
                 format!("{}Objects.{}.self", namespace_prefix, type_name)
             })
@@ -396,11 +397,7 @@ mod tests {
             config: spm_config(),
         };
         let actual = render_body(&template);
-        assert!(
-            actual.contains("Objects.Cat.self"),
-            "actual:\n{}",
-            actual
-        );
+        assert!(actual.contains("Objects.Cat.self"), "actual:\n{}", actual);
         assert!(
             !actual.contains("TestSchema.Objects"),
             "actual:\n{}",
@@ -443,11 +440,7 @@ mod tests {
             config: config_with_docs(false),
         };
         let actual = render_body(&template);
-        assert!(
-            !actual.contains("///"),
-            "actual:\n{}",
-            actual
-        );
+        assert!(!actual.contains("///"), "actual:\n{}", actual);
     }
 
     // MARK: - Reserved Keyword Tests
@@ -504,11 +497,7 @@ mod tests {
             "actual:\n{}",
             actual
         );
-        assert!(
-            actual.contains("name: \"MyUnion\""),
-            "actual:\n{}",
-            actual
-        );
+        assert!(actual.contains("name: \"MyUnion\""), "actual:\n{}", actual);
         assert!(
             actual.contains("TestSchema.Objects.Cat.self"),
             "actual:\n{}",

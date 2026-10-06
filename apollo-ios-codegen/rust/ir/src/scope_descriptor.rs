@@ -66,7 +66,7 @@ impl ScopeCondition {
     /// Returns `true` if this scope condition has no type, no conditions, and no defer.
     pub fn is_empty(&self) -> bool {
         self.type_.is_none()
-            && self.conditions.as_ref().map_or(true, |c| c.is_empty())
+            && self.conditions.as_ref().is_none_or(|c| c.is_empty())
             && self.defer_condition.is_none()
     }
 
@@ -207,7 +207,11 @@ impl ScopeDescriptor {
     /// `matching_conditions`.
     pub fn appending(&self, scope_condition: ScopeCondition) -> ScopeDescriptor {
         let matching_types = if let Some(ref new_type) = scope_condition.type_ {
-            Self::type_scope_adding(new_type, Some(&self.matching_types), &self.all_types_in_schema)
+            Self::type_scope_adding(
+                new_type,
+                Some(&self.matching_types),
+                &self.all_types_in_schema,
+            )
         } else {
             self.matching_types.clone()
         };
@@ -269,11 +273,7 @@ impl ScopeDescriptor {
 
     /// Indicates if the receiver matches the given defer condition.
     pub fn matches_defer(&self, other_defer_condition: &DeferCondition) -> bool {
-        self.scope_path
-            .last()
-            .defer_condition
-            .as_ref()
-            .map_or(false, |dc| dc == other_defer_condition)
+        self.scope_path.last().defer_condition.as_ref() == Some(other_defer_condition)
     }
 
     /// Indicates if the receiver matches the given scope condition.

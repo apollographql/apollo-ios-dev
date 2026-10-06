@@ -14,8 +14,8 @@
 
 use std::path::{Path, PathBuf};
 
-use crate::config::operation_manifest::Version;
 use super::operation_identifier::{OperationDescriptor, SourceFormat};
+use crate::config::operation_manifest::Version;
 
 // MARK: - OperationManifestItem
 
@@ -209,8 +209,7 @@ impl OperationManifestFileGenerator {
 /// `OperationManifestFileGenerator.generate(operationManifest:fileManager:)`.
 fn resolve_manifest_path(manifest_path: &str, root_url: Option<&Path>) -> String {
     let relative_prefix = "./";
-    let mut resolved = if manifest_path.starts_with(relative_prefix) {
-        let relative_part = &manifest_path[relative_prefix.len()..];
+    let mut resolved = if let Some(relative_part) = manifest_path.strip_prefix(relative_prefix) {
         if let Some(root) = root_url {
             let joined = root.join(relative_part);
             // Normalize the path (resolve ".." components)
@@ -293,10 +292,7 @@ mod tests {
         }
     }
 
-    fn make_manifest_item<'a>(
-        op: &'a OperationDefinition,
-        id: &str,
-    ) -> OperationManifestItem<'a> {
+    fn make_manifest_item<'a>(op: &'a OperationDefinition, id: &str) -> OperationManifestItem<'a> {
         OperationManifestItem {
             operation: OperationDescriptor::new(op),
             identifier: id.to_string(),
@@ -453,11 +449,8 @@ mod tests {
     // Test 9: OperationManifestFileGenerator selects correct template for Legacy
     #[test]
     fn test_generator_selects_legacy_template() {
-        let generator = OperationManifestFileGenerator::new(
-            "/tmp/manifest.json",
-            Version::Legacy,
-            None,
-        );
+        let generator =
+            OperationManifestFileGenerator::new("/tmp/manifest.json", Version::Legacy, None);
         let op = make_operation(
             "GetDog",
             "query GetDog { dog { name } }",

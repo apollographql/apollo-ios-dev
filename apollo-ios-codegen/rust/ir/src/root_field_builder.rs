@@ -1,17 +1,17 @@
 //! RootFieldBuilder -- constructs entity fields and selection sets from CompilationResult.
 //!
 //! Mirrors `IR.RootFieldBuilder` from `IR+RootFieldBuilder.swift` (457 lines).
-//! All Swift `async` functions are synchronous in Rust per D-32.
+//! All Swift `async` functions are synchronous in Rust.
 
 use std::sync::Arc;
 
-use graphql_compiler::{compilation_result, GraphQLCompositeType, GraphQLType};
+use graphql_compiler::{compilation_result, GraphQLType};
 use indexmap::IndexSet;
 use utilities::linked_list::LinkedList;
 
 use crate::definition_entity_storage::DefinitionEntityStorage;
 use crate::direct_selections::DirectSelections;
-use crate::entity::{Entity, SourceDefinition};
+use crate::entity::Entity;
 use crate::fields::{EntityField, Field, ScalarField};
 use crate::inclusion_conditions::{AnyOf, InclusionConditions, InclusionResult};
 use crate::inline_fragment_spread::InlineFragmentSpread;
@@ -36,7 +36,7 @@ pub(crate) struct BuildResult {
 /// Builds the IR entity field graph from a CompilationResult field.
 ///
 /// Mirrors `IR.RootFieldBuilder` from `IR+RootFieldBuilder.swift`.
-/// All async functions from Swift are synchronous per D-32.
+/// All async functions from Swift are synchronous.
 pub(crate) struct RootFieldBuilder<'a> {
     ir: &'a crate::builder::IRBuilder,
     root_entity: Arc<Entity>,
@@ -67,10 +67,7 @@ impl<'a> RootFieldBuilder<'a> {
         &self.ir.schema
     }
 
-    fn build(
-        &mut self,
-        root_field: &compilation_result::Field,
-    ) -> BuildResult {
+    fn build(&mut self, root_field: &compilation_result::Field) -> BuildResult {
         let root_selection_set = root_field
             .selection_set
             .as_ref()
@@ -88,7 +85,8 @@ impl<'a> RootFieldBuilder<'a> {
             LinkedList::new(root_type_path),
         );
 
-        self.referenced_fragments.sort_by(|a, b| a.name().cmp(b.name()));
+        self.referenced_fragments
+            .sort_by(|a, b| a.name().cmp(b.name()));
 
         BuildResult {
             root_field: EntityField::new(
@@ -111,23 +109,13 @@ impl<'a> RootFieldBuilder<'a> {
         entity: &Arc<Entity>,
         scope_path: LinkedList<ScopeDescriptor>,
     ) -> SelectionSet {
-        let type_info = Arc::new(TypeInfo::new(
-            Arc::clone(entity),
-            scope_path,
-        ));
+        let type_info = Arc::new(TypeInfo::new(Arc::clone(entity), scope_path));
 
         let mut direct_selections = DirectSelections::new();
 
-        self.build_direct_selections(
-            &mut direct_selections,
-            &type_info,
-            compiled_selection_set,
-        );
+        self.build_direct_selections(&mut direct_selections, &type_info, compiled_selection_set);
 
-        SelectionSet::new(
-            type_info,
-            Some(Arc::new(direct_selections)),
-        )
+        SelectionSet::new(type_info, Some(Arc::new(direct_selections)))
     }
 
     fn build_direct_selections(
@@ -139,7 +127,7 @@ impl<'a> RootFieldBuilder<'a> {
         self.add_selections(selection_set, target, type_info);
 
         if type_info.defer_condition().is_none() {
-            // Merge direct selections into the entity's selection tree (per D-30).
+            // Merge direct selections into the entity's selection tree.
             // The entity's selection_tree is behind RwLock, allowing mutation through Arc.
             type_info
                 .entity
@@ -193,7 +181,9 @@ impl<'a> RootFieldBuilder<'a> {
     ) {
         let is_deferred = inline_fragment.defer_condition.is_some();
 
-        let Some(scope) = self.scope_condition_for_inline_fragment(inline_fragment, type_info, is_deferred) else {
+        let Some(scope) =
+            self.scope_condition_for_inline_fragment(inline_fragment, type_info, is_deferred)
+        else {
             return;
         };
 
@@ -216,11 +206,8 @@ impl<'a> RootFieldBuilder<'a> {
                 self.add_selections(inline_selection_set, target, type_info);
             }
             (false, Some(_)) => {
-                let ir_type_case = self.build_inline_fragment_spread_wrapping_selection(
-                    selection,
-                    &scope,
-                    type_info,
-                );
+                let ir_type_case = self
+                    .build_inline_fragment_spread_wrapping_selection(selection, &scope, type_info);
                 target.merge_in_inline_fragment(ir_type_case);
             }
         }
@@ -235,7 +222,9 @@ impl<'a> RootFieldBuilder<'a> {
     ) {
         let is_deferred = fragment_spread.defer_condition.is_some();
 
-        let Some(scope) = self.scope_condition_for_fragment_spread(fragment_spread, type_info, is_deferred) else {
+        let Some(scope) =
+            self.scope_condition_for_fragment_spread(fragment_spread, type_info, is_deferred)
+        else {
             return;
         };
 
@@ -255,11 +244,8 @@ impl<'a> RootFieldBuilder<'a> {
                 target.merge_in_named_fragment(ir_fragment_spread);
             }
             (false, Some(_)) => {
-                let ir_type_case = self.build_inline_fragment_spread_wrapping_selection(
-                    selection,
-                    &scope,
-                    type_info,
-                );
+                let ir_type_case = self
+                    .build_inline_fragment_spread_wrapping_selection(selection, &scope, type_info);
                 target.merge_in_inline_fragment(ir_type_case);
             }
             (false, None) => {
@@ -269,10 +255,7 @@ impl<'a> RootFieldBuilder<'a> {
                 };
 
                 let ir_type_case = self.build_inline_fragment_spread_from_selection_set(
-                    &inline_ss,
-                    &scope,
-                    type_info,
-                    None,
+                    &inline_ss, &scope, type_info, None,
                 );
 
                 // Extract selections for entity tree merge before moving ir_type_case
@@ -403,15 +386,12 @@ impl<'a> RootFieldBuilder<'a> {
         inclusion_conditions: &Option<InclusionConditions>,
         enclosing_type_info: &Arc<TypeInfo>,
     ) -> SelectionSet {
-        let field_selection_set = field
-            .selection_set
-            .as_ref()
-            .unwrap_or_else(|| {
-                panic!(
-                    "SelectionSet cannot be created for non-entity type field {}.",
-                    field.name
-                )
-            });
+        let field_selection_set = field.selection_set.as_ref().unwrap_or_else(|| {
+            panic!(
+                "SelectionSet cannot be created for non-entity type field {}.",
+                field.name
+            )
+        });
 
         let entity = self
             .entity_storage
@@ -478,11 +458,8 @@ impl<'a> RootFieldBuilder<'a> {
             selections: vec![selection.clone()],
         };
 
-        let ir_selection_set = self.build_selection_set(
-            &wrapping_ss,
-            &enclosing_type_info.entity,
-            type_path,
-        );
+        let ir_selection_set =
+            self.build_selection_set(&wrapping_ss, &enclosing_type_info.entity, type_path);
 
         InlineFragmentSpread::new(Arc::new(ir_selection_set))
     }
@@ -547,13 +524,12 @@ impl<'a> RootFieldBuilder<'a> {
         fragment_spread: &NamedFragmentSpread,
     ) {
         for (_, fragment_entity) in &fragment_spread.fragment.entity_storage.entities_for_fields {
-            let entity = self.entity_storage.entity_for_fragment_entity(
-                fragment_entity,
-                &fragment_spread.type_info,
-            );
+            let entity = self
+                .entity_storage
+                .entity_for_fragment_entity(fragment_entity, &fragment_spread.type_info);
 
             // Merge the fragment entity's selection tree into the operation entity's tree.
-            // Both selection_trees are behind RwLock per D-30.
+            // Both selection_trees are behind RwLock.
             let fragment_tree = fragment_entity
                 .selection_tree
                 .read()

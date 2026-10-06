@@ -26,7 +26,7 @@ pub struct NamedFragment {
     /// keyed by their relative location (ie. path) within the fragment.
     ///
     /// - Note: The FieldPath for an entity within a fragment will begin with a path component
-    /// with the fragment's name and type.
+    ///   with the fragment's name and type.
     pub entity_storage: DefinitionEntityStorage,
 
     /// `True` if any selection set, or nested selection set, within the fragment contains any
@@ -41,9 +41,12 @@ impl NamedFragment {
     /// Mirrors Swift `IR.NamedFragment.isIdentifiable` (1.18.0).
     pub fn is_identifiable(&self) -> bool {
         use graphql_compiler::compilation_result::Selection;
-        let selects_id = self.definition.selection_set.selections.iter().any(|sel| {
-            matches!(sel, Selection::Field(f) if f.name == "id")
-        });
+        let selects_id = self
+            .definition
+            .selection_set
+            .selections
+            .iter()
+            .any(|sel| matches!(sel, Selection::Field(f) if f.name == "id"));
         if !selects_id {
             return false;
         }
