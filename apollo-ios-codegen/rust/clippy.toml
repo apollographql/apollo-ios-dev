@@ -1,0 +1,4 @@
+disallowed-types = [
+    { path = "std::collections::HashMap", reason = "use IndexMap for deterministic output (FNDN-05)" },
+    { path = "std::collections::HashSet", reason = "use IndexSet for deterministic output (FNDN-05)" },
+]
