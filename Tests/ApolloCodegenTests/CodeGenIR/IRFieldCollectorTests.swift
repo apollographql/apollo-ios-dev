@@ -30,10 +30,11 @@ class IRFieldCollectorTests: XCTestCase {
 
   // MARK: - Helpers
 
-  func buildIR() async throws {
+  func buildIR(reverseOperationOrder: Bool = false) async throws {
     ir = try await .mock(schema: schemaSDL, document: document)
 
-    for operation in ir.compilationResult.operations {
+    let operations = ir.compilationResult.operations
+    for operation in reverseOperationOrder ? Array(operations.reversed()) : operations {
       _ = await ir.build(operation: operation)
     }
 
@@ -555,6 +556,324 @@ class IRFieldCollectorTests: XCTestCase {
     expect(dogActual).to(equal(dogExpected))
   }
 
+  func test__collectedFields__givenResponseKeySelectedWithDifferentTypes_collectsSameTypeRegardlessOfBuildOrder() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      book: Book!
+    }
+
+    type Book {
+      title: String!
+      subtitle: String
+      cover: Image
+      thumbnail: Thumbnail
+      gallery: [Image]
+      strictGallery: [Image!]!
+      thumbnails: [Image]!
+      strictThumbnails: [Image!]
+    }
+
+    type Image {
+      url: String
+    }
+
+    type Thumbnail {
+      url: String
+    }
+    """
+
+    document = """
+    query BookQuery {
+      book {
+        title
+        cover {
+          url
+        }
+        gallery {
+          url
+        }
+        thumbnails {
+          url
+        }
+      }
+    }
+
+    query AliasedBookQuery {
+      book {
+        title: subtitle
+        cover: thumbnail {
+          url
+        }
+        gallery: strictGallery {
+          url
+        }
+        thumbnails: strictThumbnails {
+          url
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildIR()
+    let Book = try schema[object: "Book"].xctUnwrapped()
+    let documentOrderActual = await subject.collectedFields(for: Book)
+
+    try await buildIR(reverseOperationOrder: true)
+    let reverseOrderActual = await subject.collectedFields(for: Book)
+
+    // then
+    let Image = try schema[object: "Image"].xctUnwrapped()
+
+    let expected: ReferencedFields = [
+      ("cover", .entity(Image), nil),
+      ("gallery", .list(.entity(Image)), nil),
+      ("thumbnails", .list(.nonNull(.entity(Image))), nil),
+      ("title", .string(), nil)
+    ]
+
+    expect(documentOrderActual).to(equal(expected))
+    expect(reverseOrderActual).to(equal(expected))
+  }
+
+  func test__collectedFields__givenResponseKeySelectedWithDifferentDeprecationReasons_collectsSameDeprecationReasonRegardlessOfBuildOrder() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      book: Book!
+    }
+
+    type Book {
+      title: String @deprecated(reason: "Use name.")
+      name: String
+      label: String @deprecated(reason: "Use caption.")
+      caption: String @deprecated(reason: "Use heading.")
+      status: String @deprecated(reason: "Use state.")
+      state: String!
+    }
+    """
+
+    document = """
+    query BookQuery {
+      book {
+        title
+        label
+        status
+      }
+    }
+
+    query AliasedBookQuery {
+      book {
+        title: name
+        label: caption
+        status: state
+      }
+    }
+    """
+
+    // when
+    try await buildIR()
+    let Book = try schema[object: "Book"].xctUnwrapped()
+    let documentOrderActual = await subject.collectedFields(for: Book)
+
+    try await buildIR(reverseOperationOrder: true)
+    let reverseOrderActual = await subject.collectedFields(for: Book)
+
+    // then
+    let expected: ReferencedFields = [
+      ("label", .string(), "Use caption."),
+      ("status", .string(), "Use state."),
+      ("title", .string(), nil)
+    ]
+
+    expect(documentOrderActual).to(equal(expected))
+    expect(reverseOrderActual).to(equal(expected))
+  }
+
+  func test__collectedFields__givenResponseKeySelectedWithCanonicallyEquivalentDeprecationReasons_collectsSameReasonRegardlessOfBuildOrder() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      book: Book!
+    }
+
+    type Book {
+      title: String @deprecated(reason: "Caf\\u00E9")
+      name: String @deprecated(reason: "Cafe\\u0301")
+    }
+    """
+
+    document = """
+    query BookQuery {
+      book {
+        title
+      }
+    }
+
+    query AliasedBookQuery {
+      book {
+        title: name
+      }
+    }
+    """
+
+    // when
+    try await buildIR()
+    let Book = try schema[object: "Book"].xctUnwrapped()
+    let documentOrderActual = await subject.collectedFields(for: Book)
+
+    try await buildIR(reverseOperationOrder: true)
+    let reverseOrderActual = await subject.collectedFields(for: Book)
+
+    // then
+    let expected: ReferencedFields = [
+      ("title", .string(), "Cafe\u{301}")
+    ]
+
+    expect(documentOrderActual).to(equal(expected))
+    expect(reverseOrderActual).to(equal(expected))
+  }
+
+  func test__collectedFields__givenResponseKeySelectedOnObjectAndInterfacesWithDifferentTypes_collectsSameTypeRegardlessOfWhereSelected() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      magazine: Magazine!
+      titled: Titled!
+      named: Named!
+    }
+
+    interface Titled {
+      title: String!
+      shortTitle: String
+    }
+
+    interface Named {
+      title: String!
+      shortTitle: String
+    }
+
+    type Book implements Titled & Named {
+      title: String!
+      shortTitle: String
+    }
+
+    type Magazine implements Named & Titled {
+      title: String!
+      shortTitle: String
+    }
+    """
+
+    document = """
+    query MagazineQuery {
+      magazine {
+        title
+      }
+    }
+
+    query TitledQuery {
+      titled {
+        title
+      }
+    }
+
+    query NamedQuery {
+      named {
+        title: shortTitle
+      }
+    }
+    """
+
+    // when
+    try await buildIR()
+    let Book = try schema[object: "Book"].xctUnwrapped()
+    let Magazine = try schema[object: "Magazine"].xctUnwrapped()
+    let documentOrderBookActual = await subject.collectedFields(for: Book)
+    let documentOrderMagazineActual = await subject.collectedFields(for: Magazine)
+
+    try await buildIR(reverseOperationOrder: true)
+    let reverseOrderBookActual = await subject.collectedFields(for: Book)
+    let reverseOrderMagazineActual = await subject.collectedFields(for: Magazine)
+
+    // then
+    let expected: ReferencedFields = [
+      ("title", .string(), nil)
+    ]
+
+    expect(documentOrderBookActual).to(equal(expected))
+    expect(documentOrderMagazineActual).to(equal(expected))
+    expect(reverseOrderBookActual).to(equal(expected))
+    expect(reverseOrderMagazineActual).to(equal(expected))
+  }
+
+  func test__collectedFields__givenInterfaceFieldNarrowedByObject_selectedOnObjectAndInterface_collectsObjectFieldType() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      titled: Titled!
+      book: Book!
+    }
+
+    interface Titled {
+      title: String
+      cover: Image
+    }
+
+    interface Image {
+      url: String
+    }
+
+    type Photo implements Image {
+      url: String
+    }
+
+    type Book implements Titled {
+      title: String!
+      cover: Photo
+    }
+    """
+
+    document = """
+    query TitledQuery {
+      titled {
+        title
+        cover {
+          url
+        }
+      }
+    }
+
+    query BookQuery {
+      book {
+        title
+        cover {
+          url
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildIR()
+    let Book = try schema[object: "Book"].xctUnwrapped()
+    let documentOrderActual = await subject.collectedFields(for: Book)
+
+    try await buildIR(reverseOperationOrder: true)
+    let reverseOrderActual = await subject.collectedFields(for: Book)
+
+    // then
+    let Photo = try schema[object: "Photo"].xctUnwrapped()
+
+    let expected: ReferencedFields = [
+      ("cover", .entity(Photo), nil),
+      ("title", .nonNull(.string()), nil)
+    ]
+
+    expect(documentOrderActual).to(equal(expected))
+    expect(reverseOrderActual).to(equal(expected))
+  }
+
   /// MARK: - Custom Matchers
   func equal(
     _ expected: ReferencedFields
@@ -567,14 +886,18 @@ class IRFieldCollectorTests: XCTestCase {
         return MatcherResult(status: .fail, message: message.appended(details: "Fields Did Not Match!"))
       }
 
-      for (index, field) in zip(expected, actual).enumerated() {
-        guard field.0.0 == field.1.0, field.0.1 == field.1.1 else {
-          return MatcherResult(
-            status: .fail,
-            message: message.appended(
-              details: "Expected fields[\(index)] to equal \(field.0), got \(field.1)."
-            )
-          )
+      for (index, (expectedField, actualField)) in zip(expected, actual).enumerated() {
+        let expectedReason = expectedField.deprecationReason.map { Array($0.utf8) }
+        let actualReason = actualField.deprecationReason.map { Array($0.utf8) }
+
+        guard expectedField.0 == actualField.0,
+              expectedField.1 == actualField.1,
+              expectedReason == actualReason else {
+          var details = "Expected fields[\(index)] to equal \(expectedField), got \(actualField)."
+          if expectedReason != actualReason {
+            details += " Deprecation reason UTF-8: expected \(expectedReason ?? []), got \(actualReason ?? [])."
+          }
+          return MatcherResult(status: .fail, message: message.appended(details: details))
         }
       }
 
