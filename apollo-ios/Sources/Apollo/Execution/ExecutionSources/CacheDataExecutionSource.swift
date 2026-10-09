@@ -59,15 +59,18 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
       
       switch fieldPolicyResult {
       case .single(let key):
-        return object[formatCacheKey(withInfo: key, andTypename: returnTypename)]
-      case .list(let keys):
-        var keyList: [JSONValue] = []
-        for key in keys {
-          if let cacheKey = object[formatCacheKey(withInfo: key, andTypename: returnTypename)] {
-            keyList.append(cacheKey)
-          }
+        let reference = CacheReference(formatCacheKey(withInfo: key, andTypename: returnTypename))
+        switch info.field.type {
+        case .list, .nonNull(.list):
+          return [reference] as [JSONValue] as JSONValue
+        default:
+          return reference
         }
-        return keyList as JSONValue
+      case .list(let keys):
+        let references: [JSONValue] = keys.map {
+          CacheReference(formatCacheKey(withInfo: $0, andTypename: returnTypename))
+        }
+        return references as JSONValue
       }
     }
     

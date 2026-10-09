@@ -1468,6 +1468,207 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting, @unchecked Send
     XCTAssertEqual(data.heroes[2].weight, 138.5)
   }
   
+  // MARK: - Records Stored Under Their Own Cache Key
+
+  func test_fieldPolicy_givenRecordStoredOnlyUnderItsOwnCacheKey_resolvesThatRecord() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("hero", Hero.self, arguments: ["name": .variable("name")], fieldPolicy: .init(keyArgs: ["name"]))
+      ]}
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("name", String.self)
+        ]}
+      }
+    }
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = ["name": "Luke"]
+
+    try await store.publish(records: [
+      "QUERY_ROOT": [:],
+      "Hero:Luke": [
+        "name": "Luke",
+        "__typename": "Hero",
+      ]
+    ])
+
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.hero?.name, "Luke")
+  }
+
+  func test_schemaConfiguration_givenFieldPolicyProvider_withRecordsStoredOnlyUnderTheirOwnCacheKeys_resolvesListInOrder() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("heroes", [Hero].self, arguments: ["names": .variable("names")])
+      ]}
+      var heroes: [Hero] { __data["heroes"] }
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("name", String.self)
+        ]}
+      }
+    }
+
+    await FieldPolicySchemaMetadata.stub_cacheKeyForField_ListReturn { _, inputData, _ in
+      guard let names: FieldPolicy.InputListData = inputData["names"] else {
+        return nil
+      }
+      return (0..<names.count).compactMap { (names[$0] as? String).map { CacheKeyInfo(id: $0) } }
+    }
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = ["names": ["Obi-Wan", "Anakin"]]
+
+    try await store.publish(records: [
+      "QUERY_ROOT": [:],
+      "Hero:Anakin": [
+        "name": "Anakin",
+        "__typename": "Hero",
+      ],
+      "Hero:Obi-Wan": [
+        "name": "Obi-Wan",
+        "__typename": "Hero",
+      ]
+    ])
+
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.heroes.map(\.name), ["Obi-Wan", "Anakin"])
+  }
+
+  func test_fieldPolicy_withSingleElementListKeyArgument_givenRecordStoredOnlyUnderItsOwnCacheKey_resolvesOneElementList() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("heroes", [Hero].self, arguments: ["names": .variable("names")], fieldPolicy: .init(keyArgs: ["names"]))
+      ]}
+      var heroes: [Hero] { __data["heroes"] }
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("name", String.self)
+        ]}
+      }
+    }
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = ["names": ["Luke"]]
+
+    try await store.publish(records: [
+      "QUERY_ROOT": [:],
+      "Hero:Luke": [
+        "name": "Luke",
+        "__typename": "Hero",
+      ]
+    ])
+
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.heroes.map(\.name), ["Luke"])
+  }
+
+  func test_fieldPolicy_withSingleElementNullableListKeyArgument_givenRecordStoredOnlyUnderItsOwnCacheKey_resolvesOneElementList() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("heroes", [Hero]?.self, arguments: ["names": .variable("names")], fieldPolicy: .init(keyArgs: ["names"]))
+      ]}
+      var heroes: [Hero]? { __data["heroes"] }
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("name", String.self)
+        ]}
+      }
+    }
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = ["names": ["Luke"]]
+
+    try await store.publish(records: [
+      "QUERY_ROOT": [:],
+      "Hero:Luke": [
+        "name": "Luke",
+        "__typename": "Hero",
+      ]
+    ])
+
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    XCTAssertEqual(graphQLResult?.source, .cache)
+    XCTAssertNil(graphQLResult?.errors)
+    let data = try XCTUnwrap(graphQLResult?.data)
+    XCTAssertEqual(data.heroes?.map(\.name), ["Luke"])
+  }
+
+  func test_schemaConfiguration_givenFieldPolicyProvider_withAnUncachedKeyInTheList_isACacheMiss() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("heroes", [Hero].self, arguments: ["names": .variable("names")])
+      ]}
+      var heroes: [Hero] { __data["heroes"] }
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("name", String.self)
+        ]}
+      }
+    }
+
+    await FieldPolicySchemaMetadata.stub_cacheKeyForField_ListReturn { _, inputData, _ in
+      guard let names: FieldPolicy.InputListData = inputData["names"] else {
+        return nil
+      }
+      return (0..<names.count).compactMap { (names[$0] as? String).map { CacheKeyInfo(id: $0) } }
+    }
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = ["names": ["Anakin", "Ahsoka"]]
+
+    try await store.publish(records: [
+      "QUERY_ROOT": [:],
+      "Hero:Anakin": [
+        "name": "Anakin",
+        "__typename": "Hero",
+      ]
+    ])
+
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    XCTAssertNil(graphQLResult)
+  }
+
 }
 
 class FieldPolicySchemaMetadata: SchemaMetadata {
@@ -1480,6 +1681,8 @@ class FieldPolicySchemaMetadata: SchemaMetadata {
   private static let testObserver = TestObserver() { _ in
     stub_objectTypeForTypeName(nil)
     stub_cacheKeyInfoForType_Object(nil)
+    stub_cacheKeyForField_SingleReturn(nil)
+    stub_cacheKeyForField_ListReturn(nil)
   }
 
   private nonisolated(unsafe) static var _objectTypeForTypeName: ((String) -> Object?)?
