@@ -14,7 +14,7 @@ struct SchemaModuleFileGenerator {
     let pathURL: URL = URL(
       fileURLWithPath: config.output.schemaTypes.path,
       relativeTo: config.rootURL
-    )
+    ).resolvingSymlinksInPath()
     let filePath: String
     let rendered: String
     let errors: [ApolloCodegen.NonFatalError]

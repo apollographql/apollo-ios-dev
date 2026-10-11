@@ -94,10 +94,14 @@ public class ApolloFileManager {
   public func createFile(atPath path: String, data: Data? = nil, overwrite: Bool = true) throws {
     try createContainingDirectoryIfNeeded(forPath: path)
 
-    if !overwrite && doesFileExist(atPath: path) { return }
+    if !overwrite && doesFileExist(atPath: path) {
+      CodegenLogger.log("Not overwriting \(path)", logLevel: .debug)
+      return
+    }
 
     adoptFileNameCasingIfNeeded(atPath: path)
 
+    CodegenLogger.log("Generating \(path)", logLevel: .debug)
     guard base.createFile(atPath: path, contents: data, attributes: nil) else {
       throw FileManagerPathError.cannotCreateFile(at: path)
     }
