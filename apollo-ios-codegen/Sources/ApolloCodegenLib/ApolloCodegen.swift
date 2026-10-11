@@ -666,9 +666,11 @@ public final class ApolloCodegen: Sendable {
       // behind is preferable to deleting fresh output.
       if caseFoldedWrittenFiles.contains(path.lowercased()),
         await fileManager.volumeSupportsCaseSensitiveNames(forPath: path) != true {
+        CodegenLogger.log("Skipping prune of \(path)", logLevel: .debug)
         continue
       }
 
+      CodegenLogger.log("Pruning \(path)", logLevel: .debug)
       try await fileManager.deleteFile(atPath: path)
     }
   }
