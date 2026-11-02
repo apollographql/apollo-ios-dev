@@ -1705,6 +1705,133 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting, @unchecked Send
     expect(graphQLResult).to(beNil())
   }
 
+  // MARK: - Stored Field Values
+
+  private func fetchFromServer<Root: RootSelectionSet>(
+    _ query: MockQuery<Root>,
+    response: JSONObject
+  ) async throws {
+    let serverRequestExpectation = await server.expect(MockQuery<Root>.self) { _ in
+      response
+    }
+
+    _ = try await client.fetch(query: query, cachePolicy: .networkOnly)
+    await fulfillment(of: [serverRequestExpectation], timeout: Self.defaultWaitTimeout)
+  }
+
+  private func stubTypePolicyKeyingById() async {
+    await FieldPolicySchemaMetadata.stub_cacheKeyInfoForType_Object { _, object in
+      try? CacheKeyInfo(jsonValue: object["id"])
+    }
+  }
+
+  func test_fieldPolicy__givenSameArgumentsWereFetched_andTypePolicyUsesDifferentKey__readsStoredValue() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("hero", Hero.self, arguments: ["name": .variable("name")], fieldPolicy: .init(keyArgs: ["name"]))
+      ]}
+      var hero: Hero { __data["hero"] }
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .field("name", String.self)
+        ]}
+      }
+    }
+
+    await stubTypePolicyKeyingById()
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = ["name": "Luke"]
+
+    try await fetchFromServer(query, response: [
+      "data": ["hero": ["__typename": "Hero", "id": "1000", "name": "Luke"]]
+    ])
+
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    expect(graphQLResult?.source) == .cache
+    expect(graphQLResult?.data?.hero.id) == "1000"
+    expect(graphQLResult?.data?.hero.name) == "Luke"
+  }
+
+  func test_fieldPolicy__givenSameArgumentsWereFetchedAsNull__readsStoredNullInsteadOfFieldPolicyRecord() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("hero", Hero?.self, arguments: ["name": .variable("name")], fieldPolicy: .init(keyArgs: ["name"]))
+      ]}
+      var hero: Hero? { __data["hero"] }
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("name", String.self)
+        ]}
+      }
+    }
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = ["name": "Luke"]
+
+    try await fetchFromServer(query, response: ["data": ["hero": NSNull()]])
+    try await store.publish(records: [
+      "Hero:Luke": ["name": "Luke", "__typename": "Hero"]
+    ])
+
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    expect(graphQLResult?.source) == .cache
+    expect(graphQLResult?.data).toNot(beNil())
+    expect(graphQLResult?.data?.hero).to(beNil())
+  }
+
+  func test_fieldPolicy_withListReturnType__givenSameArgumentsWereFetched_andTypePolicyUsesDifferentKey__readsStoredList() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("heroes", [Hero].self, arguments: ["names": .variable("names")], fieldPolicy: .init(keyArgs: ["names"]))
+      ]}
+      var heroes: [Hero] { __data["heroes"] }
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("id", String.self),
+          .field("name", String.self)
+        ]}
+      }
+    }
+
+    await stubTypePolicyKeyingById()
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = ["names": ["Luke", "Leia"]]
+
+    try await fetchFromServer(query, response: [
+      "data": [
+        "heroes": [
+          ["__typename": "Hero", "id": "1000", "name": "Luke"],
+          ["__typename": "Hero", "id": "1003", "name": "Leia"]
+        ]
+      ]
+    ])
+
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    expect(graphQLResult?.source) == .cache
+    expect(graphQLResult?.data?.heroes.map(\.name)) == ["Luke", "Leia"]
+  }
+
   // MARK: - Nested List Return Types
 
   class NestedHeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {

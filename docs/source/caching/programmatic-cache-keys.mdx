@@ -254,6 +254,6 @@ static func cacheKeyList(
 }
 ```
 
-Returning `nil` from either function falls back to the `@fieldPolicy` directive, if the field has one. Returning an empty array from `cacheKeyList` resolves the field to an empty list.
+If your app already fetched the field with the same arguments, the cache returns the stored value and does not call either function. Returning `nil` from either function falls back to the `@fieldPolicy` directive, if the field has one. Returning an empty array from `cacheKeyList` resolves the field to an empty list.
 
 Field policies are not applied to fields that return a nested list, such as `[[Hero]]`. Neither function is called for these fields; they are read from the cache using their arguments, the same as any field without a field policy.
