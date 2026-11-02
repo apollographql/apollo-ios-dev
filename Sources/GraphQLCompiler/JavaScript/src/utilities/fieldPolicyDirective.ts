@@ -8,6 +8,7 @@ import {
   GraphQLInputType,
   GraphQLInterfaceType,
   GraphQLObjectType,
+  GraphQLOutputType,
   GraphQLSchema,
   isInputObjectType,
   isInterfaceType,
@@ -88,10 +89,10 @@ export function applyFieldPoliciesFor(
     }
 
     // validate the provided key args match an input parameter
-    validateKeyArgs(actualField, keyArgs);
+    const listKeyArgs = validateKeyArgs(actualField, keyArgs);
 
     // List input and return type validation
-    validateListRules(actualField);
+    validateListRules(actualField, listKeyArgs);
 
     (actualField as any)._apolloFieldPolicies = keyArgs;
   }
@@ -167,19 +168,19 @@ function matchDirectiveArguments(
   );
 }
 
+/** Validates each key argument's path and returns the key arguments that resolve to a list. */
 function validateKeyArgs(
   actualField: GraphQLField<any, any>,
   keyArgs: string[]
-): void {
-  for (const keyArg of keyArgs) {
-    validateKeyArgPath(actualField, keyArg);
-  }
+): string[] {
+  return keyArgs.filter((keyArg) => validateKeyArgPath(actualField, keyArg));
 }
 
+/** Validates the key argument's path and returns whether it resolves to a list of values. */
 function validateKeyArgPath(
   field: GraphQLField<any, any>,
   keyArg: string
-): void {
+): boolean {
   const parts = keyArg.split(".").filter(Boolean);
   const [argName, ...path] = parts;
 
@@ -191,10 +192,24 @@ function validateKeyArgPath(
     );
   }
 
+  if (hasNestedList(arg.type)) {
+    throw new GraphQLError(
+      `@fieldPolicy does not allow nested list input parameters. Argument "${arg.name}" has type "${String(arg.type)}".`,
+      { nodes: field.astNode }
+    );
+  }
+
   let currentType: GraphQLInputType = getBaseInputType(arg.type);
+  let isListValued = isList(arg.type);
 
   for (let i = 0; i < path.length; i++) {
     const segment = path[i];
+    if (isListValued) {
+      throw new GraphQLError(
+        `@fieldPolicy key "${keyArg}" traverses "${segment}" through a list. A list is only supported as the last value of a key argument.`,
+        { nodes: field.astNode }
+      );
+    }
     if (!isInputObjectType(currentType)) {
       throw new GraphQLError(
         `@fieldPolicy key "${keyArg}" traverses "${segment}" on non-object input type "${String(currentType)}".`,
@@ -210,7 +225,14 @@ function validateKeyArgPath(
         { nodes: field.astNode }
       );
     }
+    if (hasNestedList(nextField.type)) {
+      throw new GraphQLError(
+        `@fieldPolicy does not allow nested list input parameters. Input field "${segment}" of key "${keyArg}" has type "${String(nextField.type)}".`,
+        { nodes: field.astNode }
+      );
+    }
     currentType = getBaseInputType(nextField.type);
+    isListValued = isList(nextField.type);
   }
 
   if (!parts.length || isInputObjectType(currentType)) {
@@ -219,17 +241,19 @@ function validateKeyArgPath(
       { nodes: field.astNode }
     );
   }
+
+  return isListValued;
 }
 
 function getBaseInputType(type: GraphQLInputType): GraphQLInputType {
   return getNamedType(type) as GraphQLInputType;
 }
 
-function isListArg(t: GraphQLInputType): boolean {
+function isList(t: GraphQLInputType | GraphQLOutputType): boolean {
   return isListType(getNullableType(t));
 }
 
-function hasNestedList(t: GraphQLInputType): boolean {
+function hasNestedList(t: GraphQLInputType | GraphQLOutputType): boolean {
   let outer: any = isNonNullType(t) ? t.ofType : t;
   if (!isListType(outer)) return false;
 
@@ -237,35 +261,37 @@ function hasNestedList(t: GraphQLInputType): boolean {
   return isListType(inner);
 }
 
-function validateListRules(field: GraphQLField<any, any>) {
-  const hasListReturnType = isListType(getNullableType(field.type));
-
-  let numListInputs = 0;
-
-  for (const arg of field.args) {
-    if (isListArg(arg.type)) {
-      numListInputs += 1;
-
-      if (hasNestedList(arg.type)) {
-        throw new GraphQLError(
-          `@fieldPolicy does not allow nested list input parameters. Argument "${arg.name}" has type "${String(arg.type)}".`,
-          { nodes: field.astNode }
-        );
-      }
-    }
-  }
-
-  if (numListInputs > 1) {
+function validateListRules(
+  field: GraphQLField<any, any>,
+  listKeyArgs: string[]
+) {
+  if (hasNestedList(field.type)) {
     throw new GraphQLError(
-      `@fieldPolicy can only have at most 1 List type input parameter.`,
+      `@fieldPolicy does not allow nested list return types. Field "${field.name}" has type "${String(field.type)}".`,
       { nodes: field.astNode }
     );
   }
 
-  if ((hasListReturnType && numListInputs !== 1) ||
-      (!hasListReturnType && numListInputs !== 0)) {
+  if (listKeyArgs.length > 1) {
     throw new GraphQLError(
-      `@fieldPolicy requires either both a List return type and exactly 1 List input parameter, or neither.`,
+      `@fieldPolicy can only have 1 key argument that resolves to a list. Key arguments "${listKeyArgs.join('", "')}" all resolve to lists.`,
+      { nodes: field.astNode }
+    );
+  }
+
+  const hasListReturnType = isList(field.type);
+  const listKeyArg = listKeyArgs[0];
+
+  if (hasListReturnType && !listKeyArg) {
+    throw new GraphQLError(
+      `@fieldPolicy on a field with a List return type requires a key argument that resolves to a list. Field "${field.name}" has type "${String(field.type)}".`,
+      { nodes: field.astNode }
+    );
+  }
+
+  if (!hasListReturnType && listKeyArg) {
+    throw new GraphQLError(
+      `@fieldPolicy key "${listKeyArg}" resolves to a list, which requires a List return type. Field "${field.name}" has type "${String(field.type)}".`,
       { nodes: field.astNode }
     );
   }
