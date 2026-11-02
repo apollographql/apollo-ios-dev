@@ -2347,6 +2347,88 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     expect(results[0].data?.reviewAdded?.commentary).to(equal("After two cycles"))
   }
 
+  func testResume__whenPausedConnectionReportsDisconnectAfterResume__shouldResubscribe() async throws {
+    let task1 = MockWebSocketTask()
+    setUpTransport(tasks: [task1, MockWebSocketTask()])
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+
+    let pausedConnection = await networkTransport.connection
+    await networkTransport.pause()
+    await networkTransport.resume()
+
+    // The paused connection's receive loop reports its disconnect on a separate actor hop, so it
+    // can arrive after resume() has replaced the connection.
+    await networkTransport.handleDisconnection(of: pausedConnection)
+
+    factory.currentTask.emit(.connectionAck(payload: nil))
+
+    await expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe").first?["id"] as? String)
+      .toEventually(equal(operationID))
+
+    factory.currentTask.emit(.next(id: operationID, payload: Self.reviewAddedPayload(stars: 5, commentary: "After resume")))
+    factory.currentTask.emit(.complete(id: operationID))
+
+    let results = try await subscription.getAllValues()
+
+    expect(results.map { $0.data?.reviewAdded?.commentary }).to(equal(["After resume"]))
+  }
+
+  func testResume__whenPausedConnectionDeliversAckAfterResume__shouldWaitForNewConnectionAck() async throws {
+    let task1 = MockWebSocketTask()
+    setUpTransport(tasks: [task1, MockWebSocketTask()])
+
+    task1.emit(.connectionAck(payload: nil))
+
+    let (subscription, operationID) = try await subscribe(on: task1, using: client)
+
+    let pausedConnection = await networkTransport.connection
+    await networkTransport.pause()
+    await networkTransport.resume()
+
+    // A message the paused connection received before closing can be handled after resume() has
+    // replaced the connection.
+    await networkTransport.didReceive(message: .string(#"{"type":"connection_ack"}"#), from: pausedConnection)
+
+    await expect { await self.networkTransport.connectionState }.to(equal(.connecting))
+    expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe")).to(beEmpty())
+
+    factory.currentTask.emit(.connectionAck(payload: nil))
+
+    await expect(self.factory.currentTask.clientSentMessages(ofType: "subscribe").first?["id"] as? String)
+      .toEventually(equal(operationID))
+
+    _ = subscription
+  }
+
+  func testPause__whenAckArrivesAfterPause__shouldStayPaused__andResumeShouldReconnect() async throws {
+    let task1 = MockWebSocketTask()
+    let task2 = MockWebSocketTask()
+    setUpTransport(tasks: [task1, task2])
+
+    // Without an ack the transport stays connecting.
+    let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
+    await expect { await self.networkTransport.connectionState }.toEventually(equal(.connecting))
+
+    let pausedConnection = await networkTransport.connection
+    await networkTransport.pause()
+
+    // pause() keeps the closed connection current, so an ack it received before closing can still
+    // be handled.
+    await networkTransport.didReceive(message: .string(#"{"type":"connection_ack"}"#), from: pausedConnection)
+
+    await expect { await self.networkTransport.connectionState }.to(equal(.paused))
+
+    await networkTransport.resume()
+    task2.emit(.connectionAck(payload: nil))
+
+    await expect(task2.clientSentMessages(ofType: "subscribe").count).toEventually(equal(1))
+
+    _ = subscription
+  }
+
   // MARK: - Client Awareness Headers
 
   func testClientAwarenessHeaders__withMetadata__shouldApplyHeadersToConnectionRequest() async throws {
