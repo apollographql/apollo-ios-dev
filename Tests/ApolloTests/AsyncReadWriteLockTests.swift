@@ -24,19 +24,18 @@ final class AsyncReadWriteLockTests: XCTestCase {
       tasks.append(Task.detached(priority: .userInitiated) {
         try? await lock.read { tracker.read {} }
       })
-      try await Task.sleep(nanoseconds: 500_000)
-
-      for _ in 0..<2 {
-        tasks.append(Task.detached(priority: .high) {
-          try? await lock.write { tracker.write { usleep(2_000) } }
-        })
-      }
-      try await Task.sleep(nanoseconds: 500_000)
 
       // Keep the actor busy so the background reader resumes after the high priority reader finishes.
       for _ in 0..<50 {
         tasks.append(Task.detached(priority: .userInitiated) {
           try? await lock.read { tracker.read {} }
+        })
+      }
+      try await Task.sleep(nanoseconds: 500_000)
+
+      for _ in 0..<2 {
+        tasks.append(Task.detached(priority: .high) {
+          try? await lock.write { tracker.write { usleep(2_000) } }
         })
       }
 
