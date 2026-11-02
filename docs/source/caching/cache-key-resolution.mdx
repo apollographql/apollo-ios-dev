@@ -157,7 +157,7 @@ The `@fieldPolicy` directive supports fields that return a list. When using list
 
 - If a field has a list return type, exactly one of its key arguments must resolve to a list. This can be a list input parameter, or a list inside an input object that the key argument reaches using [dot notation](#object-arguments).
 - Conversely, if a key argument resolves to a list, the field must return a list.
-- A list can only be the last value of a key argument. A key argument can't use dot notation to traverse a list of input objects, such as `inputs.id` for an `inputs: [AnimalInput!]` argument.
+- A key argument can traverse a [list of input objects](#lists-of-input-objects), but a key argument's path can only pass through one list.
 - Nested lists are not supported, either as an input parameter or as the return type. Code generation fails with a validation error if a field policy is applied to a field with a nested list input parameter or return type.
 - Partial cache hits are not supported, so every cache key created from the input parameters must have a cache hit or the cache read will fail.
 
@@ -215,3 +215,35 @@ extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "input.species")
 ```
 
 This results in cache keys such as `Animal:Lion` or `Animal:Elephant`.
+
+#### Lists of input objects
+
+A key argument can use dot notation to traverse a list of input objects to a scalar or enum field. This creates one cache key for each input object in the list.
+
+With a field like this:
+```graphql
+type Query {
+  animals(inputs: [AnimalInput!]!, habitat: String!): [Animal!]
+}
+
+type Animal {
+  id: ID!
+  name: String!
+  habitat: String!
+}
+
+input AnimalInput {
+  id: ID!
+}
+```
+
+Apply this field policy like this:
+```graphql
+extend type Query @fieldPolicy(forField: "animals", keyArgs: "inputs.id habitat")
+```
+
+If your inputs are `[{ id: "1" }, { id: "2" }]` and `Savanna`, your cache keys are `Animal:1+Savanna` and `Animal:2+Savanna`.
+
+The key argument's path can only pass through one list. Code generation fails with a validation error if the path passes through a list inside a list of input objects, such as `inputs.ids` where `ids` is also a list.
+
+If any input object in the list doesn't have a value for the key argument's field, no cache keys are created for the field, and the field is read from the cache by its arguments instead.

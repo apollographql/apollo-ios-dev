@@ -1832,6 +1832,156 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting, @unchecked Send
     expect(graphQLResult?.data?.heroes.map(\.name)) == ["Luke", "Leia"]
   }
 
+  // MARK: - Key Paths Through a List of Input Objects
+
+  struct HeroInput: InputObject {
+    public private(set) var __data: InputDict
+
+    public init(_ data: InputDict) {
+      __data = data
+    }
+
+    public init(id: String) {
+      __data = InputDict(["id": id])
+    }
+  }
+
+  struct HeroesInput: InputObject {
+    public private(set) var __data: InputDict
+
+    public init(_ data: InputDict) {
+      __data = data
+    }
+
+    public init(heroes: [HeroInput]) {
+      __data = InputDict(["heroes": heroes])
+    }
+  }
+
+  class HeroListItem: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+    override class var __parentType: any ParentType {
+      Object(typename: "Hero", implementedInterfaces: [])
+    }
+    override class var __selections: [Selection] { [
+      .field("__typename", String.self),
+      .field("name", String.self)
+    ]}
+  }
+
+  class HeroesByInputsSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+    override class var __selections: [Selection] { [
+      .field(
+        "heroes",
+        [HeroListItem].self,
+        arguments: ["inputs": .variable("inputs"), "isJedi": .variable("isJedi")],
+        fieldPolicy: .init(keyArgs: ["inputs.id", "isJedi"])
+      )
+    ]}
+    var heroes: [HeroListItem] { __data["heroes"] }
+  }
+
+  private func publishJediHeroRecords() async throws {
+    try await store.publish(records: [
+      "QUERY_ROOT": [:],
+      "Hero:1+true": ["name": "Luke", "__typename": "Hero"],
+      "Hero:2+true": ["name": "Obi-Wan", "__typename": "Hero"]
+    ])
+  }
+
+  func test_fieldPolicy__withKeyPathThroughLiteralListOfInputObjects_andScalarKeyArgument__resolvesRecordForEachElementInOrder() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field(
+          "heroes",
+          [HeroListItem].self,
+          arguments: ["inputs": [["id": "2"], ["id": "1"]], "isJedi": true],
+          fieldPolicy: .init(keyArgs: ["inputs.id", "isJedi"])
+        )
+      ]}
+      var heroes: [HeroListItem] { __data["heroes"] }
+    }
+
+    try await publishJediHeroRecords()
+
+    let graphQLResult = try await client.fetch(query: MockQuery<HeroSelectionSet>(), cachePolicy: .cacheOnly)
+
+    expect(graphQLResult?.source) == .cache
+    expect(graphQLResult?.errors).to(beNil())
+    expect(graphQLResult?.data?.heroes.map(\.name)) == ["Obi-Wan", "Luke"]
+  }
+
+  func test_fieldPolicy__withKeyPathThroughVariableListOfInputObjects_andScalarKeyArgument__resolvesRecordForEachElementInOrder() async throws {
+    let query = MockQuery<HeroesByInputsSelectionSet>()
+    query.__variables = ["inputs": [HeroInput(id: "2"), HeroInput(id: "1")], "isJedi": true]
+
+    try await publishJediHeroRecords()
+
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    expect(graphQLResult?.source) == .cache
+    expect(graphQLResult?.errors).to(beNil())
+    expect(graphQLResult?.data?.heroes.map(\.name)) == ["Obi-Wan", "Luke"]
+  }
+
+  func test_fieldPolicy__withKeyPathThroughListOfInputObjectsInsideInputObject__resolvesRecordForEachElementInOrder() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field(
+          "heroes",
+          [HeroListItem].self,
+          arguments: ["input": .variable("input"), "isJedi": .variable("isJedi")],
+          fieldPolicy: .init(keyArgs: ["input.heroes.id", "isJedi"])
+        )
+      ]}
+      var heroes: [HeroListItem] { __data["heroes"] }
+    }
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = [
+      "input": HeroesInput(heroes: [HeroInput(id: "1"), HeroInput(id: "2")]),
+      "isJedi": true
+    ]
+
+    try await publishJediHeroRecords()
+
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    expect(graphQLResult?.source) == .cache
+    expect(graphQLResult?.errors).to(beNil())
+    expect(graphQLResult?.data?.heroes.map(\.name)) == ["Luke", "Obi-Wan"]
+  }
+
+  func test_fieldPolicy__withKeyPathThroughLiteralListOfInputObjects__givenElementMissingLeafField__isACacheMiss() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field(
+          "heroes",
+          [HeroListItem].self,
+          arguments: ["inputs": [["id": "1"], ["name": "Obi-Wan"]], "isJedi": true],
+          fieldPolicy: .init(keyArgs: ["inputs.id", "isJedi"])
+        )
+      ]}
+      var heroes: [HeroListItem] { __data["heroes"] }
+    }
+
+    try await publishJediHeroRecords()
+
+    let graphQLResult = try await client.fetch(query: MockQuery<HeroSelectionSet>(), cachePolicy: .cacheOnly)
+
+    expect(graphQLResult).to(beNil())
+  }
+
+  func test_fieldPolicy__withKeyPathThroughVariableListOfInputObjects__givenElementMissingLeafField__isACacheMiss() async throws {
+    let query = MockQuery<HeroesByInputsSelectionSet>()
+    query.__variables = ["inputs": [HeroInput(id: "1"), HeroInput(InputDict([:]))], "isJedi": true]
+
+    try await publishJediHeroRecords()
+
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    expect(graphQLResult).to(beNil())
+  }
+
   // MARK: - Nested List Return Types
 
   class NestedHeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
