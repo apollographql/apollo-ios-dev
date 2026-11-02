@@ -16,8 +16,16 @@ public class ApolloFileManager {
   /// The normalized paths for the files written to by the ``ApolloFileManager``.
   public var writtenFiles: Set<String> = []
 
-  nonisolated init(base: FileManager) {
+  /// Canonicalizes every path before it is written or recorded in ``writtenFiles``.
+  /// Replaceable in tests to keep path handling off the real file system.
+  nonisolated let filePathNormalizer: @Sendable (_ path: String) -> String
+
+  nonisolated init(
+    base: FileManager,
+    filePathNormalizer: @escaping @Sendable (_ path: String) -> String = { $0.normalizedFilePath }
+  ) {
     self.base = base
+    self.filePathNormalizer = filePathNormalizer
   }
 
   // MARK: Presence
@@ -92,7 +100,7 @@ public class ApolloFileManager {
   /// `path` only by case first renames the file so its directory entry adopts the casing of
   /// `path`.
   public func createFile(atPath path: String, data: Data? = nil, overwrite: Bool = true) throws {
-    let path = path.normalizedFilePath
+    let path = filePathNormalizer(path)
     try createContainingDirectoryIfNeeded(forPath: path)
 
     if !overwrite && doesFileExist(atPath: path) {
@@ -110,8 +118,8 @@ public class ApolloFileManager {
   }
 
   public func renameFile(atPath oldPath: String, toPath newPath: String) throws {
-    let oldPath = oldPath.normalizedFilePath
-    let newPath = newPath.normalizedFilePath
+    let oldPath = filePathNormalizer(oldPath)
+    let newPath = filePathNormalizer(newPath)
 
     guard doesFileExist(atPath: oldPath) else { return }
 

@@ -2,7 +2,7 @@ import XCTest
 import Nimble
 @testable import CodegenCLI
 import ArgumentParser
-@testable import ApolloCodegenLib
+import ApolloCodegenLib
 
 class InitializeTests: XCTestCase {
 
@@ -162,7 +162,7 @@ class InitializeTests: XCTestCase {
 
     await mockFileManager.mock(closure: .createFile({ path, data, fileAttributes in
       let actualPath = URL(fileURLWithPath: path).standardizedFileURL.path
-      let expectedPath = outputPath.normalizedFilePath
+      let expectedPath = URL(fileURLWithPath: outputPath).standardizedFileURL.path
 
       expect(actualPath).to(equal(expectedPath))
       expect(data?.asString).to(equal(
@@ -232,7 +232,7 @@ class InitializeTests: XCTestCase {
 
     await mockFileManager.mock(closure: .createFile({ path, data, fileAttributes in
       let actualPath = URL(fileURLWithPath: path).standardizedFileURL.path
-      let expectedPath = outputPath.normalizedFilePath
+      let expectedPath = URL(fileURLWithPath: outputPath).standardizedFileURL.path
 
       expect(actualPath).to(equal(expectedPath))
       expect(data?.asString).to(equal(

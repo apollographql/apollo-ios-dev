@@ -30,10 +30,10 @@ extension URL {
       .path
   }
 
-  /// The canonical form of the path to a file that exists on disk, also resolving a symlink at the
+  /// The path to a file that exists on disk with all symlinks resolved, including a symlink at the
   /// file itself. Used for files found by searching the file system.
   var symlinkResolvedFilePath: String {
-    URL(fileURLWithPath: normalizedFilePath).resolvingSymlinksInPath().path
+    resolvingSymlinksInPath().path
   }
 
   private func resolvingSymlinksInExistingPath() -> URL {

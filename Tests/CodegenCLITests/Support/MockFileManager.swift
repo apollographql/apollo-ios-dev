@@ -44,7 +44,7 @@ public class MockApolloFileManager: ApolloFileManager {
   ///  When `false` any called closure that is not mocked will fall through to `super`. As a
   ///  byproduct of `false`, all mocked closures must be called otherwise the test will fail.
   public nonisolated init(strict: Bool = true) {
-    super.init(base: MockFileManager(strict: strict))
+    super.init(base: MockFileManager(strict: strict), filePathNormalizer: { $0 })
   }
 
   /// Provide a mock closure for the `FileManager` function.
