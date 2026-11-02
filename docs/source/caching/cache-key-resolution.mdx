@@ -218,7 +218,7 @@ This results in cache keys such as `Animal:Lion` or `Animal:Elephant`.
 
 #### Lists of input objects
 
-A key argument can use dot notation to traverse a list of input objects to a scalar or enum field. This creates one cache key for each input object in the list.
+A key argument can use dot notation to traverse a list of input objects to a scalar or enum field. This creates one cache key for each input object in your list.
 
 With a field like this:
 ```graphql
@@ -246,4 +246,4 @@ If your inputs are `[{ id: "1" }, { id: "2" }]` and `Savanna`, your cache keys a
 
 The key argument's path can only pass through one list. Code generation fails with a validation error if the path passes through a list inside a list of input objects, such as `inputs.ids` where `ids` is also a list.
 
-If any input object in the list doesn't have a value for the key argument's field, no cache keys are created for the field, and the field is read from the cache by its arguments instead.
+If any input object in your list doesn't have a value for the key argument's field, Apollo iOS doesn't create cache keys for the field. Instead, it reads the field from the cache by its arguments.
