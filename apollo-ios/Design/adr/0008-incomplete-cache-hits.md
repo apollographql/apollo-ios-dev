@@ -23,6 +23,8 @@ A `.policyReferenceList` cache read fails entirely if any one of the N policy-de
 
 The target model is the web client's partial-result behavior: return the records that exist up to the first missing one, drop the rest, and mark the result **incomplete** so the request chain knows to fetch the remainder from the server despite having returned cache data.
 
+[ADR 0009](./0009-field-policy-read-semantics.md) narrows this symptom: a list field fetched before with the same arguments is read from its stored value, so all-or-nothing policy reads only apply to argument values that were never fetched.
+
 ### Symptom 3 — Deferred-fragment load *errors* masquerade as `.pending`
 
 On a cache read, each `@defer`red fragment executes in an isolated `do`/`catch`; *any* error marks the fragment `.pending` and the read continues. That is correct when the fragment's data is genuinely uncached, but it also swallows infrastructure failures: a SQLite IO error or a decode failure during one fragment's load is converted into the same `.pending` state as "the server hasn't delivered this yet."
