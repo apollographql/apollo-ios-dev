@@ -96,6 +96,8 @@ The `@fieldPolicy` directive enables you to specify how cache keys should be res
 
 When fetching a field with an argument, you can use a field policy to configure an expected cache key for the object that is derived from the values of the field's arguments. Field policies are designed to be used in combination with type policies. When the cache key for an object derived by the type policy is the same as the one derived by the field policy, the field can use the cached object.
 
+A field policy is only used for argument values that haven't been fetched yet. When the field has already been fetched with the same arguments, the cache reads the value it stored from that response, including a `null` value, and doesn't apply the field policy.
+
 
 ### Directive usage
 
