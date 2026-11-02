@@ -204,12 +204,6 @@ function validateKeyArgPath(
 
   for (let i = 0; i < path.length; i++) {
     const segment = path[i];
-    if (isListValued) {
-      throw new GraphQLError(
-        `@fieldPolicy key "${keyArg}" traverses "${segment}" through a list. A list is only supported as the last value of a key argument.`,
-        { nodes: field.astNode }
-      );
-    }
     if (!isInputObjectType(currentType)) {
       throw new GraphQLError(
         `@fieldPolicy key "${keyArg}" traverses "${segment}" on non-object input type "${String(currentType)}".`,
@@ -231,8 +225,14 @@ function validateKeyArgPath(
         { nodes: field.astNode }
       );
     }
+    if (isListValued && isList(nextField.type)) {
+      throw new GraphQLError(
+        `@fieldPolicy does not allow nested lists in a key argument. Key "${keyArg}" traverses list input field "${segment}" through another list.`,
+        { nodes: field.astNode }
+      );
+    }
     currentType = getBaseInputType(nextField.type);
-    isListValued = isList(nextField.type);
+    isListValued = isListValued || isList(nextField.type);
   }
 
   if (!parts.length || isInputObjectType(currentType)) {
