@@ -155,6 +155,8 @@ The `@fieldPolicy` directive supports fields that return a list. When using list
 
 - If a field has a list return type, it must contain exactly one list input parameter.
 - Conversely, if a field has a list input parameter, it must return a list.
+- Only one key argument can resolve to a list, and only a field with a list return type can have one. This includes key arguments that use [dot notation](#object-arguments) to reach a list inside an input object.
+- A list can only be the last value of a key argument. A key argument can't use dot notation to traverse a list of input objects, such as `inputs.id` for an `inputs: [AnimalInput!]` argument.
 - Nested lists are not supported, either as an input parameter or as the return type. Code generation fails with a validation error if a field policy is applied to a field with a nested list input parameter or return type.
 - Partial cache hits are not supported, so every cache key created from the input parameters must have a cache hit or the cache read will fail.
 

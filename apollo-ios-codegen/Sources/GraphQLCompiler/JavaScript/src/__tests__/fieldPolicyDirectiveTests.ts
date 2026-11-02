@@ -548,3 +548,149 @@ describe("given field policy with input object", () => {
     }
   });
 });
+describe("given field policy with list inside input object and non-list return type", () => {
+  const schemaSDL: string = `
+  type Query {
+    animal(input: AnimalInput!): Animal!
+  }
+
+  input AnimalInput {
+    names: [String!]!
+  }
+
+  type Animal {
+    id: ID!
+    name: String!
+  }
+
+  extend type Query @fieldPolicy(forField: "animal", keyArgs: "input.names")
+  `;
+
+  it("should throw error for list key on non-list return type", () => {
+    expect(() =>
+      loadSchemaFromSources([
+        new Source(schemaSDL, "Test Schema", { line: 1, column: 1 }),
+      ])
+    ).toThrow(
+      '@fieldPolicy key "input.names" resolves to a list, which requires a List return type. Field "animal" has type "Animal!".'
+    );
+  });
+});
+
+describe("given field policy with key path through list of input objects", () => {
+  const schemaSDL: string = `
+  type Query {
+    allAnimals(inputs: [AnimalInput!]!): [Animal!]
+  }
+
+  input AnimalInput {
+    id: ID!
+  }
+
+  type Animal {
+    id: ID!
+    name: String!
+  }
+
+  extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "inputs.id")
+  `;
+
+  it("should throw error for key path through a list", () => {
+    expect(() =>
+      loadSchemaFromSources([
+        new Source(schemaSDL, "Test Schema", { line: 1, column: 1 }),
+      ])
+    ).toThrow(
+      '@fieldPolicy key "inputs.id" traverses "id" through a list. A list is only supported as the last value of a key argument.'
+    );
+  });
+});
+
+describe("given field policy with nested list inside input object", () => {
+  const schemaSDL: string = `
+  type Query {
+    allAnimals(withIds: [ID!]!, input: AnimalInput!): [Animal!]
+  }
+
+  input AnimalInput {
+    species: [[String!]!]!
+  }
+
+  type Animal {
+    id: ID!
+    name: String!
+  }
+
+  extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "withIds input.species")
+  `;
+
+  it("should throw error for nested list input field", () => {
+    expect(() =>
+      loadSchemaFromSources([
+        new Source(schemaSDL, "Test Schema", { line: 1, column: 1 }),
+      ])
+    ).toThrow(
+      '@fieldPolicy does not allow nested list input parameters. Input field "species" of key "input.species" has type "[[String!]!]!".'
+    );
+  });
+});
+
+describe("given field policy with list argument and list inside input object", () => {
+  const schemaSDL: string = `
+  type Query {
+    allAnimals(withIds: [ID!]!, input: AnimalInput!): [Animal!]
+  }
+
+  input AnimalInput {
+    species: [String!]!
+  }
+
+  type Animal {
+    id: ID!
+    name: String!
+  }
+
+  extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "withIds input.species")
+  `;
+
+  it("should throw error for multiple list keys", () => {
+    expect(() =>
+      loadSchemaFromSources([
+        new Source(schemaSDL, "Test Schema", { line: 1, column: 1 }),
+      ])
+    ).toThrow(
+      '@fieldPolicy can only have 1 key argument that resolves to a list. Key arguments "withIds", "input.species" all resolve to lists.'
+    );
+  });
+});
+
+describe("given field policy with list argument and scalar inside input object", () => {
+  const schemaSDL: string = `
+  type Query {
+    allAnimals(withIds: [ID!]!, input: AnimalInput!): [Animal!]
+  }
+
+  input AnimalInput {
+    species: String!
+  }
+
+  type Animal {
+    id: ID!
+    name: String!
+  }
+
+  extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "withIds input.species")
+  `;
+
+  it("should set _apolloFieldPolicies on field", () => {
+    const schema: GraphQLSchema = loadSchemaFromSources([
+      new Source(schemaSDL, "Test Schema", { line: 1, column: 1 }),
+    ]);
+
+    const queryType = schema.getTypeMap()["Query"];
+    if (!queryType || !("getFields" in queryType)) throw new Error("Missing Query type.");
+
+    const field = queryType.getFields()["allAnimals"] as FieldWithMeta;
+    expect(field._apolloFieldPolicies).toEqual(["withIds", "input.species"]);
+  });
+});

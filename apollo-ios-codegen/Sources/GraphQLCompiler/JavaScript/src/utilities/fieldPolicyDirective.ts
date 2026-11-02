@@ -172,15 +172,29 @@ function validateKeyArgs(
   actualField: GraphQLField<any, any>,
   keyArgs: string[]
 ): void {
-  for (const keyArg of keyArgs) {
-    validateKeyArgPath(actualField, keyArg);
+  const listKeyArgs = keyArgs.filter((keyArg) => validateKeyArgPath(actualField, keyArg));
+
+  if (listKeyArgs.length > 1) {
+    throw new GraphQLError(
+      `@fieldPolicy can only have 1 key argument that resolves to a list. Key arguments "${listKeyArgs.join('", "')}" all resolve to lists.`,
+      { nodes: actualField.astNode }
+    );
+  }
+
+  const listKeyArg = listKeyArgs[0];
+  if (listKeyArg && !isListType(getNullableType(actualField.type))) {
+    throw new GraphQLError(
+      `@fieldPolicy key "${listKeyArg}" resolves to a list, which requires a List return type. Field "${actualField.name}" has type "${String(actualField.type)}".`,
+      { nodes: actualField.astNode }
+    );
   }
 }
 
+/** Validates the key argument's path and returns whether it resolves to a list of values. */
 function validateKeyArgPath(
   field: GraphQLField<any, any>,
   keyArg: string
-): void {
+): boolean {
   const parts = keyArg.split(".").filter(Boolean);
   const [argName, ...path] = parts;
 
@@ -193,9 +207,16 @@ function validateKeyArgPath(
   }
 
   let currentType: GraphQLInputType = getBaseInputType(arg.type);
+  let isListValued = isListArg(arg.type);
 
   for (let i = 0; i < path.length; i++) {
     const segment = path[i];
+    if (isListValued) {
+      throw new GraphQLError(
+        `@fieldPolicy key "${keyArg}" traverses "${segment}" through a list. A list is only supported as the last value of a key argument.`,
+        { nodes: field.astNode }
+      );
+    }
     if (!isInputObjectType(currentType)) {
       throw new GraphQLError(
         `@fieldPolicy key "${keyArg}" traverses "${segment}" on non-object input type "${String(currentType)}".`,
@@ -211,7 +232,14 @@ function validateKeyArgPath(
         { nodes: field.astNode }
       );
     }
+    if (hasNestedList(nextField.type)) {
+      throw new GraphQLError(
+        `@fieldPolicy does not allow nested list input parameters. Input field "${segment}" of key "${keyArg}" has type "${String(nextField.type)}".`,
+        { nodes: field.astNode }
+      );
+    }
     currentType = getBaseInputType(nextField.type);
+    isListValued = isListArg(nextField.type);
   }
 
   if (!parts.length || isInputObjectType(currentType)) {
@@ -220,6 +248,8 @@ function validateKeyArgPath(
       { nodes: field.astNode }
     );
   }
+
+  return isListValued;
 }
 
 function getBaseInputType(type: GraphQLInputType): GraphQLInputType {
