@@ -48,6 +48,53 @@ final class AsyncReadWriteLockTests: XCTestCase {
     expect(tracker.overlapCount).to(equal(0))
   }
 
+  func testQueue__readerArrivesAfterQueuedWriter__runsAfterThatWriter() async throws {
+    let lock = AsyncReadWriteLock()
+    let recorder = EventRecorder()
+    let (release, releaseContinuation) = AsyncStream<Void>.makeStream()
+
+    let firstWriter = Task {
+      try await lock.write {
+        await recorder.record("firstWriter")
+        for await _ in release { break }
+      }
+    }
+    try await Task.sleep(nanoseconds: 20_000_000)
+
+    let firstReader = Task {
+      try await lock.read { await recorder.record("firstReader") }
+    }
+    try await Task.sleep(nanoseconds: 20_000_000)
+
+    let secondWriter = Task {
+      try await lock.write { await recorder.record("secondWriter") }
+    }
+    try await Task.sleep(nanoseconds: 20_000_000)
+
+    let secondReader = Task {
+      try await lock.read { await recorder.record("secondReader") }
+    }
+    try await Task.sleep(nanoseconds: 20_000_000)
+
+    releaseContinuation.yield()
+
+    try await firstWriter.value
+    try await firstReader.value
+    try await secondWriter.value
+    try await secondReader.value
+
+    let events = await recorder.events
+    expect(events).to(equal(["firstWriter", "firstReader", "secondWriter", "secondReader"]))
+  }
+
+}
+
+private actor EventRecorder {
+  private(set) var events: [String] = []
+
+  func record(_ event: String) {
+    events.append(event)
+  }
 }
 
 private final class AccessTracker: @unchecked Sendable {
