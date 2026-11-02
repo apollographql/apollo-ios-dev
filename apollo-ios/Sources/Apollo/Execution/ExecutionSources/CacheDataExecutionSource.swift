@@ -53,31 +53,41 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     with info: FieldExecutionInfo,
     on object: Record
   ) throws -> JSONValue? {
-    if let fieldPolicyResult = resolveProgrammaticFieldPolicy(with: info, and: info.field.type) ??
-        FieldPolicyDirectiveEvaluator(field: info.field, variables: info.parentInfo.variables)?.resolveFieldPolicy(),
-       let returnTypename = typename(for: info.field) {
-      
-      switch fieldPolicyResult {
-      case .single(let key):
-        let reference = CacheReference(formatCacheKey(withInfo: key, andTypename: returnTypename))
-        switch info.field.type {
-        case .list, .nonNull(.list):
-          return [reference] as [JSONValue] as JSONValue
-        default:
-          return reference
-        }
-      case .list(let keys):
-        let references: [JSONValue] = keys.map {
-          CacheReference(formatCacheKey(withInfo: $0, andTypename: returnTypename))
-        }
-        return references as JSONValue
-      }
+    if let fieldPolicyValue = resolveFieldPolicyValue(with: info) {
+      return fieldPolicyValue
     }
-    
+
     let key = try info.cacheKeyForField()
     return object[key]
   }
-  
+
+  /// Field policies resolve to a single object or a flat list of objects. Fields returning nested
+  /// lists, and policy results that don't match the shape of the field's type, are read from the
+  /// parent record like any other field.
+  private func resolveFieldPolicyValue(with info: FieldExecutionInfo) -> JSONValue? {
+    let depth = listDepth(of: info.field.type)
+
+    guard depth <= 1,
+          let returnTypename = typename(for: info.field),
+          let fieldPolicyResult = resolveProgrammaticFieldPolicy(with: info, and: info.field.type) ??
+            FieldPolicyDirectiveEvaluator(field: info.field, variables: info.parentInfo.variables)?.resolveFieldPolicy()
+    else {
+      return nil
+    }
+
+    switch fieldPolicyResult {
+    case .single(let key):
+      let reference = CacheReference(formatCacheKey(withInfo: key, andTypename: returnTypename))
+      return depth == 1 ? [reference] as [JSONValue] as JSONValue : reference
+
+    case .list(let keys):
+      guard depth == 1 else { return nil }
+      return keys.map {
+        CacheReference(formatCacheKey(withInfo: $0, andTypename: returnTypename))
+      } as [JSONValue] as JSONValue
+    }
+  }
+
   private func resolveProgrammaticFieldPolicy(
     with info: FieldExecutionInfo,
     and type: Selection.Field.OutputType
@@ -117,6 +127,14 @@ struct CacheDataExecutionSource: GraphQLExecutionSource {
     return "\(info.uniqueKeyGroup ?? typename):\(info.id)"
   }
   
+  private func listDepth(of type: Selection.Field.OutputType) -> Int {
+    switch type {
+    case .nonNull(let innerType): return listDepth(of: innerType)
+    case .list(let elementType): return 1 + listDepth(of: elementType)
+    default: return 0
+    }
+  }
+
   private func typename(for field: Selection.Field) -> String? {
     switch field.type.namedType {
     case .object(let selectionSetType):

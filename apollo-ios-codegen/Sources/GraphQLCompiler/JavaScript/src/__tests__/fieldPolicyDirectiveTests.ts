@@ -483,6 +483,31 @@ describe("given field policy with nested list parameter", () => {
   });
 });
 
+describe("given field policy with nested list return type", () => {
+  const schemaSDL: string = `
+  type Query {
+    allAnimals(withIds: [ID!]!): [[Animal!]!]
+  }
+
+  type Animal {
+    id: ID!
+    name: String!
+  }
+
+  extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "withIds")
+  `;
+
+  it("should throw error for nested list return type", () => {
+    expect(() =>
+      loadSchemaFromSources([
+        new Source(schemaSDL, "Test Schema", { line: 1, column: 1 }),
+      ])
+    ).toThrow(
+      '@fieldPolicy does not allow nested list return types. Field "allAnimals" has type "[[Animal!]!]".'
+    );
+  });
+});
+
 describe("given field policy with input object", () => {
   const schemaSDL: string = `
   type Query {

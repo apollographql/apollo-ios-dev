@@ -8,6 +8,7 @@ import {
   GraphQLInputType,
   GraphQLInterfaceType,
   GraphQLObjectType,
+  GraphQLOutputType,
   GraphQLSchema,
   isInputObjectType,
   isInterfaceType,
@@ -229,7 +230,7 @@ function isListArg(t: GraphQLInputType): boolean {
   return isListType(getNullableType(t));
 }
 
-function hasNestedList(t: GraphQLInputType): boolean {
+function hasNestedList(t: GraphQLInputType | GraphQLOutputType): boolean {
   let outer: any = isNonNullType(t) ? t.ofType : t;
   if (!isListType(outer)) return false;
 
@@ -239,6 +240,13 @@ function hasNestedList(t: GraphQLInputType): boolean {
 
 function validateListRules(field: GraphQLField<any, any>) {
   const hasListReturnType = isListType(getNullableType(field.type));
+
+  if (hasNestedList(field.type)) {
+    throw new GraphQLError(
+      `@fieldPolicy does not allow nested list return types. Field "${field.name}" has type "${String(field.type)}".`,
+      { nodes: field.astNode }
+    );
+  }
 
   let numListInputs = 0;
 
