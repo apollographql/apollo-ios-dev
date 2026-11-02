@@ -694,3 +694,86 @@ describe("given field policy with list argument and scalar inside input object",
     expect(field._apolloFieldPolicies).toEqual(["withIds", "input.species"]);
   });
 });
+
+describe("given field with list return type and list input that is not a key argument", () => {
+  const schemaSDL: string = `
+  type Query {
+    allAnimals(withIds: [ID!]!, species: String!): [Animal!]
+  }
+
+  type Animal {
+    id: ID!
+    name: String!
+  }
+
+  extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "species")
+  `;
+
+  it("should throw error requiring a list key argument", () => {
+    expect(() =>
+      loadSchemaFromSources([
+        new Source(schemaSDL, "Test Schema", { line: 1, column: 1 }),
+      ])
+    ).toThrow(
+      '@fieldPolicy on a field with a List return type requires a key argument that resolves to a list. Field "allAnimals" has type "[Animal!]".'
+    );
+  });
+});
+
+describe("given field with list return type and list key inside input object", () => {
+  const schemaSDL: string = `
+  type Query {
+    allAnimals(input: AnimalInput!): [Animal!]
+  }
+
+  input AnimalInput {
+    ids: [ID!]!
+  }
+
+  type Animal {
+    id: ID!
+    name: String!
+  }
+
+  extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "input.ids")
+  `;
+
+  it("should set _apolloFieldPolicies on field", () => {
+    const schema: GraphQLSchema = loadSchemaFromSources([
+      new Source(schemaSDL, "Test Schema", { line: 1, column: 1 }),
+    ]);
+
+    const queryType = schema.getTypeMap()["Query"];
+    if (!queryType || !("getFields" in queryType)) throw new Error("Missing Query type.");
+
+    const field = queryType.getFields()["allAnimals"] as FieldWithMeta;
+    expect(field._apolloFieldPolicies).toEqual(["input.ids"]);
+  });
+});
+
+describe("given field with non-list return type and list input that is not a key argument", () => {
+  const schemaSDL: string = `
+  type Query {
+    animal(withIds: [ID!]!, species: String!): Animal
+  }
+
+  type Animal {
+    id: ID!
+    name: String!
+  }
+
+  extend type Query @fieldPolicy(forField: "animal", keyArgs: "species")
+  `;
+
+  it("should set _apolloFieldPolicies on field", () => {
+    const schema: GraphQLSchema = loadSchemaFromSources([
+      new Source(schemaSDL, "Test Schema", { line: 1, column: 1 }),
+    ]);
+
+    const queryType = schema.getTypeMap()["Query"];
+    if (!queryType || !("getFields" in queryType)) throw new Error("Missing Query type.");
+
+    const field = queryType.getFields()["animal"] as FieldWithMeta;
+    expect(field._apolloFieldPolicies).toEqual(["species"]);
+  });
+});

@@ -1669,6 +1669,42 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting, @unchecked Send
     XCTAssertNil(graphQLResult)
   }
 
+  func test_fieldPolicy_withListReturnType__givenOnlyScalarKeyArguments__doesNotResolveOneElementList() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field(
+          "heroes",
+          [Hero].self,
+          arguments: ["ids": .variable("ids"), "faction": .variable("faction")],
+          fieldPolicy: .init(keyArgs: ["faction"])
+        )
+      ]}
+      var heroes: [Hero] { __data["heroes"] }
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("name", String.self)
+        ]}
+      }
+    }
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = ["ids": ["1", "2", "3"], "faction": "Rebels"]
+
+    try await store.publish(records: [
+      "QUERY_ROOT": [:],
+      "Hero:Rebels": ["name": "Rebels", "__typename": "Hero"]
+    ])
+
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    expect(graphQLResult).to(beNil())
+  }
+
   // MARK: - Nested List Return Types
 
   class NestedHeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
