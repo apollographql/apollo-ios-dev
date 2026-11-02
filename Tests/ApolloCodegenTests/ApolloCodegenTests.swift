@@ -3331,4 +3331,93 @@ class ApolloCodegenTests: XCTestCase {
     await fulfillment(of: [expectation], timeout: 1)
   }
 
+  // MARK: - Symlinked Output Directory Tests
+
+  @discardableResult
+  private func createSymbolicLink(named linkName: String, toDirectory destination: String) throws -> URL {
+    let destinationURL = directoryURL.appendingPathComponent(destination, isDirectory: true)
+    try FileManager.default.createDirectory(at: destinationURL, withIntermediateDirectories: true)
+
+    let linkURL = directoryURL.appendingPathComponent(linkName, isDirectory: true)
+    try FileManager.default.createSymbolicLink(at: linkURL, withDestinationURL: destinationURL)
+    return linkURL
+  }
+
+  private func embeddedInTargetConfig(schemaTypesPath: String) -> ApolloCodegenConfiguration {
+    .mock(
+      input: .init(
+        schemaSearchPaths: ["schema*.graphqls"],
+        operationSearchPaths: ["*.graphql"]
+      ),
+      output: .init(
+        schemaTypes: .init(
+          path: schemaTypesPath,
+          moduleType: .embeddedInTarget(name: "TestTarget")
+        ),
+        operations: .inSchemaModule
+      )
+    )
+  }
+
+  func test__fileDeletion__givenEmbeddedInTargetModule_outputDirectoryReachedThroughSymlink_regeneration_doesNotDeleteGeneratedFiles() async throws {
+    // given
+    try await createFile(containing: schemaData, named: "schema.graphqls")
+    try await createOperationFile(
+      type: .query,
+      named: "TestQuery",
+      filename: "TestQuery.graphql"
+    )
+    try createSymbolicLink(named: "Linked", toDirectory: "Real")
+
+    let config = embeddedInTargetConfig(schemaTypesPath: "Linked/Schema")
+
+    let moduleFilePath = directoryURL
+      .appendingPathComponent("Real/Schema/TestSchema.graphql.swift").path
+    let operationFilePath = directoryURL
+      .appendingPathComponent("Real/Schema/Operations/Queries/TestQuery.graphql.swift").path
+
+    // when
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
+
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: moduleFilePath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: operationFilePath) }.to(beTrue())
+
+    try await ApolloCodegen.build(with: config, withRootURL: directoryURL)
+
+    // then
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: moduleFilePath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: operationFilePath) }.to(beTrue())
+  }
+
+  func test__fileDeletion__givenEmbeddedInTargetModule_rootURLReachedThroughSymlink_regeneration_doesNotDeleteGeneratedFiles() async throws {
+    // given
+    try await createFile(containing: schemaData, named: "schema.graphqls", inDirectory: "Real")
+    try await createOperationFile(
+      type: .query,
+      named: "TestQuery",
+      filename: "TestQuery.graphql",
+      inDirectory: "Real"
+    )
+    let linkedRootURL = try createSymbolicLink(named: "LinkedRoot", toDirectory: "Real")
+
+    let config = embeddedInTargetConfig(schemaTypesPath: "Schema")
+
+    let moduleFilePath = directoryURL
+      .appendingPathComponent("Real/Schema/TestSchema.graphql.swift").path
+    let operationFilePath = directoryURL
+      .appendingPathComponent("Real/Schema/Operations/Queries/TestQuery.graphql.swift").path
+
+    // when
+    try await ApolloCodegen.build(with: config, withRootURL: linkedRootURL)
+
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: moduleFilePath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: operationFilePath) }.to(beTrue())
+
+    try await ApolloCodegen.build(with: config, withRootURL: linkedRootURL)
+
+    // then
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: moduleFilePath) }.to(beTrue())
+    await expect { await ApolloFileManager.default.doesFileExist(atPath: operationFilePath) }.to(beTrue())
+  }
+
 }
