@@ -153,9 +153,10 @@ extend type Query @fieldPolicy(forField: "allAnimals", keyArgs: "habitat species
 
 The `@fieldPolicy` directive supports fields that return a list. When using lists, note the following requirements:
 
-- If a field has a list return type, it must contain exactly one list input parameter.
-- Conversely, if a field has a list input parameter, it must return a list.
-- Nested lists are not supported.
+- If a field has a list return type, exactly one of its key arguments must resolve to a list. This can be a list input parameter, or a list inside an input object that the key argument reaches using [dot notation](#object-arguments).
+- Conversely, if a key argument resolves to a list, the field must return a list.
+- A list can only be the last value of a key argument. A key argument can't use dot notation to traverse a list of input objects, such as `inputs.id` for an `inputs: [AnimalInput!]` argument.
+- Nested lists are not supported, either as an input parameter or as the return type. Code generation fails with a validation error if a field policy is applied to a field with a nested list input parameter or return type.
 - Partial cache hits are not supported, so every cache key created from the input parameters must have a cache hit or the cache read will fail.
 
 If you need to apply a field policy to a field that is not supported by these restrictions, you can use [programmatic field policy configuration](./programmatic-cache-keys#programmatic-field-policy-usage).
