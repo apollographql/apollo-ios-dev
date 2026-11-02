@@ -30,7 +30,6 @@ extension FileGenerator {
     let filename = resolveFilename(forConfig: config)
     let directoryPath = target.resolvePath(forConfig: config)
     let filePath = URL(fileURLWithPath: directoryPath)
-      .resolvingSymlinksInPath()
       .appendingPathComponent(filename)
       .appendingPathExtension(fileExtension)
       .path
@@ -40,7 +39,6 @@ extension FileGenerator {
     if !self.overwrite, let _ = fileSuffix {
       let preSuffixFilename = fileName.firstUppercased
       let preSuffixFilePath = URL(fileURLWithPath: directoryPath)
-        .resolvingSymlinksInPath()
         .appendingPathComponent(preSuffixFilename)
         .appendingPathExtension(fileExtension)
         .path

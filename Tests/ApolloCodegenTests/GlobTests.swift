@@ -611,4 +611,50 @@ class GlobTests: XCTestCase {
     ]))
   }
 
+  // MARK: Symlinks
+
+  private func createSymbolicLink(named linkName: String, toDirectory destination: String) throws {
+    let destinationURL = baseURL.appendingPathComponent(destination, isDirectory: true)
+    try FileManager.default.createDirectory(at: destinationURL, withIntermediateDirectories: true)
+
+    try FileManager.default.createSymbolicLink(
+      at: baseURL.appendingPathComponent(linkName, isDirectory: true),
+      withDestinationURL: destinationURL
+    )
+  }
+
+  func test_match_givenPatternThroughSymlinkedDirectory_shouldReturnPathsWithSymlinkResolved() async throws {
+    // given
+    try await create(files: [baseURL.appendingPathComponent("Real/file.one").path])
+    try createSymbolicLink(named: "Linked", toDirectory: "Real")
+
+    // then
+    let results = try Glob([baseURL.appendingPathComponent("Linked/**/*.one").path]).match()
+
+    expect(results).to(equal([
+      baseURL.appendingPathComponent("Real/file.one").resolvingSymlinksInPath().path
+    ]))
+  }
+
+  func test_match_givenExcludePatternThroughSymlinkedDirectory_shouldExclude() async throws {
+    // given
+    try await create(files: [
+      baseURL.appendingPathComponent("Real/file.one").path,
+      baseURL.appendingPathComponent("Real/file.two").path
+    ])
+    try createSymbolicLink(named: "Linked", toDirectory: "Real")
+
+    let pattern = [
+      baseURL.appendingPathComponent("Linked/**/file.*").path,
+      "!" + baseURL.appendingPathComponent("Linked/**/file.two").path
+    ]
+
+    // then
+    let results = try Glob(pattern).match()
+
+    expect(results).to(equal([
+      baseURL.appendingPathComponent("Real/file.one").resolvingSymlinksInPath().path
+    ]))
+  }
+
 }

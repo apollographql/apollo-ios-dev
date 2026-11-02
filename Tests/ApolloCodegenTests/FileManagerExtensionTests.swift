@@ -933,4 +933,54 @@ class FileManagerExtensionTests: XCTestCase {
       .to(throwError(self.uniqueError))
     await expect { await mocked.allClosuresCalled }.to(beTrue())
   }
+
+  // MARK: Path Normalization
+
+  private func createSymbolicLinkDirectory() throws -> (realPath: String, linkedPath: String) {
+    let directoryURL = URL(fileURLWithPath: uniquePath)
+    let realURL = directoryURL.appendingPathComponent("Real", isDirectory: true)
+    let linkURL = directoryURL.appendingPathComponent("Linked", isDirectory: true)
+
+    try FileManager.default.createDirectory(at: realURL, withIntermediateDirectories: true)
+    try FileManager.default.createSymbolicLink(at: linkURL, withDestinationURL: realURL)
+
+    addTeardownBlock { [uniquePath] in
+      try? FileManager.default.removeItem(atPath: uniquePath)
+    }
+
+    return (realURL.resolvingSymlinksInPath().path, linkURL.path)
+  }
+
+  func test_createFile_givenPathThroughSymlink_shouldRecordNormalizedPathInWrittenFiles() async throws {
+    // given
+    let subject = ApolloFileManager(base: FileManager.default)
+    let (realPath, linkedPath) = try createSymbolicLinkDirectory()
+
+    // when
+    try await subject.createFile(atPath: linkedPath + "/File.swift", data: uniqueData)
+
+    // then
+    await expect { await subject.writtenFiles }.to(equal([realPath + "/File.swift"]))
+    expect(FileManager.default.fileExists(atPath: realPath + "/File.swift")).to(beTrue())
+  }
+
+  func test_renameFile_givenPathsThroughSymlink_shouldRecordNormalizedNewPathInWrittenFiles() async throws {
+    // given
+    let subject = ApolloFileManager(base: FileManager.default)
+    let (realPath, linkedPath) = try createSymbolicLinkDirectory()
+
+    FileManager.default.createFile(atPath: realPath + "/Old.swift", contents: uniqueData)
+
+    // when
+    try await subject.renameFile(
+      atPath: linkedPath + "/Old.swift",
+      toPath: linkedPath + "/New.swift"
+    )
+
+    // then
+    await expect { await subject.writtenFiles }.to(equal([realPath + "/New.swift"]))
+    expect(FileManager.default.fileExists(atPath: realPath + "/New.swift")).to(beTrue())
+    expect(FileManager.default.fileExists(atPath: realPath + "/Old.swift")).to(beFalse())
+  }
+
 }

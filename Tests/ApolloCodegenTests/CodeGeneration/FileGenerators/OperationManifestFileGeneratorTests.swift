@@ -90,7 +90,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     await fileManager.mock(closure: .createFile({ path, data, attributes in
-      expect(path).to(equal("\(filePath).json"))
+      expect(path).to(equal("\(filePath).json".normalizedFilePath))
 
       return true
     }))
@@ -129,7 +129,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     await fileManager.mock(closure: .createFile({ path, data, attributes in
-      expect(path).to(equal("\(filePath).json"))
+      expect(path).to(equal("\(filePath).json".normalizedFilePath))
 
       return true
     }))
@@ -168,9 +168,8 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     let expectedPath = URL(fileURLWithPath: String(filePath.dropFirst(2)), relativeTo: self.subject.config.rootURL)
-      .resolvingSymlinksInPath()
       .appendingPathExtension("json")
-      .path
+      .normalizedFilePath
 
     await fileManager.mock(closure: .createFile({ path, data, attributes in
       expect(path).to(equal(expectedPath))
@@ -212,9 +211,8 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     let expectedPath = URL(fileURLWithPath: String(filePath.dropFirst(2)), relativeTo: self.subject.config.rootURL)
-      .resolvingSymlinksInPath()
       .appendingPathExtension("json")
-      .path
+      .normalizedFilePath
     
     await fileManager.mock(closure: .createFile({ path, data, attributes in
       expect(path).to(equal(expectedPath))
@@ -256,7 +254,7 @@ class OperationManifestFileGeneratorTests: XCTestCase {
     }))
 
     await fileManager.mock(closure: .createFile({ path, data, attributes in
-      expect(path).to(equal("\(filePath).json"))
+      expect(path).to(equal("\(filePath).json".normalizedFilePath))
 
       expect(String(data: data!, encoding: .utf8)).to(equal(
         """

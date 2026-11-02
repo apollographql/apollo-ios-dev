@@ -50,9 +50,7 @@ struct OperationManifestFileGenerator {
     // if path begins with './' the path should be relative to the config.rootURL
     if manifestPath.hasPrefix(relativePrefix) {
       let fileURL = URL(fileURLWithPath: String(manifestPath.dropFirst(relativePrefix.count)), relativeTo: config.rootURL)
-      manifestPath = fileURL
-          .resolvingSymlinksInPath()
-          .path
+      manifestPath = fileURL.path
     }
     
     if !manifestPath.hasSuffix(".json") {
