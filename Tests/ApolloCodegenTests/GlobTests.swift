@@ -379,6 +379,65 @@ class GlobTests: XCTestCase {
     ]))
   }
 
+  func test_match_givenPathExclude_withoutGlobstar_shouldExclude() async throws {
+    // given
+    let pattern = [
+      baseURL.appendingPathComponent("file.*").path,
+      "!" + baseURL.appendingPathComponent("file.two").path,
+    ]
+
+    // when
+    try await create(files: [
+      baseURL.appendingPathComponent("file.one").path,
+      baseURL.appendingPathComponent("file.two").path,
+      baseURL.appendingPathComponent("file.ext").path
+    ])
+
+    // then
+    expect(try Glob(pattern).match()).to(equal([
+      baseURL.appendingPathComponent("file.ext").path,
+      baseURL.appendingPathComponent("file.one").path,
+    ]))
+  }
+
+  func test_match_givenRelativePathExclude_withoutGlobstar_andRootURL_shouldExclude_usingNoPrefix() async throws {
+    // given
+    let pattern = ["file.*", "!file.two"]
+    let rootURL = baseURL.appendingPathComponent("root/", isDirectory: true).standardizedFileURL
+
+    // when
+    try await create(files: [
+      rootURL.appendingPathComponent("file.one").path,
+      rootURL.appendingPathComponent("file.two").path,
+      rootURL.appendingPathComponent("file.ext").path
+    ])
+
+    // then
+    expect(try Glob(pattern, relativeTo: rootURL).match()).to(equal([
+      rootURL.appendingPathComponent("file.ext").path,
+      rootURL.appendingPathComponent("file.one").path,
+    ]))
+  }
+
+  func test_match_givenRelativePathExclude_withoutGlobstar_andRootURL_shouldExclude_usingDotSlashPrefix() async throws {
+    // given
+    let pattern = ["file.*", "!./file.two"]
+    let rootURL = baseURL.appendingPathComponent("root/", isDirectory: true).standardizedFileURL
+
+    // when
+    try await create(files: [
+      rootURL.appendingPathComponent("file.one").path,
+      rootURL.appendingPathComponent("file.two").path,
+      rootURL.appendingPathComponent("file.ext").path
+    ])
+
+    // then
+    expect(try Glob(pattern, relativeTo: rootURL).match()).to(equal([
+      rootURL.appendingPathComponent("file.ext").path,
+      rootURL.appendingPathComponent("file.one").path,
+    ]))
+  }
+
   func test_match_givenRelativePattern_usingNoPrefix_andRootCurrentDirectory_shouldUseCurrentDirectory() async throws {
     // given
     let pattern = ["**/*.one"]
