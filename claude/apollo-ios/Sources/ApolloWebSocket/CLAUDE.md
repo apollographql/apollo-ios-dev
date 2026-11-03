@@ -59,7 +59,8 @@ Tests live in `Tests/ApolloTests/WebSocket/`. Mock infrastructure in `Tests/Apol
 
 `setUp()` creates a factory with one default task, a session, transport, and client. Tests access the default task via the `mockTask` computed property. Three patterns:
 - **Default config**: Use setUp's transport directly; append extra tasks to `factory.tasks` if reconnection is needed
-- **Custom config**: Recreate `factory` (with a fresh `MockWebSocketTaskFactory`) and `session` before creating new `networkTransport` and `client`. The setUp transport consumes factory index 0, so reusing the old session causes the new transport to get the wrong task or crash.
+- **Custom config**: Recreate `factory` (with a fresh `MockWebSocketTaskFactory`) and `session` before creating new `networkTransport` and `client`. A transport takes a task from the factory only when it opens a connection (never in `init`), so sharing a factory between transports makes them consume each other's tasks.
+- **Lazy tasks**: `WebSocketTransport` creates each `URLSessionWebSocketTask` immediately before resuming it, and `connection` is `nil` until the first connection attempt. `factory.capturedRequests` is empty until then; `factory.currentTask` returns the first task before any is vended, so messages can be emitted on it ahead of connecting.
 - **`self.` requirement**: `mockTask` is a computed property — use `self.mockTask` inside `expect()` closures. Capture `self.client!` in a local `let` before `Task { }` closures to avoid `sending` parameter data race errors.
 
 ### Running WebSocket tests
