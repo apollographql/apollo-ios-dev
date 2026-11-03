@@ -473,11 +473,6 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
       break
     }
 
-    guard let connection else {
-      assertionFailure("Cannot pause before a connection has been opened.")
-      return
-    }
-
     connectionState = .paused
     stopPingTimer()
 
@@ -491,7 +486,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     // Close the underlying WebSocket task. This causes the receive loop's stream to
     // end, at which point the loop checks connectionState, sees `.paused`, and exits
     // without triggering auto-reconnection or finishing subscriber streams.
-    connection.close()
+    connection?.close()
   }
 
   /// Re-establishes the WebSocket connection after a ``pause()``, or opens a new connection
