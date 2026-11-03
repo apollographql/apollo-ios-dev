@@ -121,7 +121,11 @@ public struct Glob {
     excludingDirectories excluded: [String]?
   ) throws -> OrderedSet<String> {
     guard pattern.includesGlobstar else {
-      return [URL(fileURLWithPath: pattern, relativeTo: rootURL).path]
+      let path = URL(
+        fileURLWithPath: pattern.isExclude ? String(pattern.dropFirst()) : pattern,
+        relativeTo: rootURL
+      ).path
+      return [pattern.isExclude ? "!" + path : path]
     }
 
     CodegenLogger.log("Expanding globstar \(pattern)", logLevel: .debug)
