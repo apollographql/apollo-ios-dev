@@ -400,7 +400,26 @@ class GlobTests: XCTestCase {
     ]))
   }
 
-  func test_match_givenRelativePathExclude_withoutGlobstar_andRootURL_shouldExclude() async throws {
+  func test_match_givenRelativePathExclude_withoutGlobstar_andRootURL_shouldExclude_usingNoPrefix() async throws {
+    // given
+    let pattern = ["file.*", "!file.two"]
+    let rootURL = baseURL.appendingPathComponent("root/", isDirectory: true).standardizedFileURL
+
+    // when
+    try await create(files: [
+      rootURL.appendingPathComponent("file.one").path,
+      rootURL.appendingPathComponent("file.two").path,
+      rootURL.appendingPathComponent("file.ext").path
+    ])
+
+    // then
+    expect(try Glob(pattern, relativeTo: rootURL).match()).to(equal([
+      rootURL.appendingPathComponent("file.ext").path,
+      rootURL.appendingPathComponent("file.one").path,
+    ]))
+  }
+
+  func test_match_givenRelativePathExclude_withoutGlobstar_andRootURL_shouldExclude_usingDotSlashPrefix() async throws {
     // given
     let pattern = ["file.*", "!./file.two"]
     let rootURL = baseURL.appendingPathComponent("root/", isDirectory: true).standardizedFileURL
