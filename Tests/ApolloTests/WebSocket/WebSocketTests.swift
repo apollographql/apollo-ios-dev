@@ -108,6 +108,13 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     return (stream, operationID)
   }
 
+  // MARK: - Lazy Connection
+
+  func testInit__shouldNotCreateWebSocketTask() async throws {
+    expect(self.factory.capturedRequests).to(beEmpty())
+    await expect { await self.networkTransport.connection }.to(beNil())
+  }
+
   // MARK: - Connecting Payload
 
   func testConnectionInit__withDefaultConfiguration__shouldSendNoPayload() async throws {
@@ -1507,7 +1514,7 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     // Update headers without reconnect (default).
     await networkTransport.updateHeaderValues(["Authorization": "Bearer token123"])
 
-    // Should still be connected — only 1 task was created (the init task).
+    // Should still be connected on the only task created.
     expect(self.factory.capturedRequests.count).to(equal(1))
     await expect { await self.networkTransport.connectionState }.to(equal(.connected))
 
@@ -1521,8 +1528,21 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
       reconnectIfConnected: true
     )
 
-    // No reconnection should happen — still only the init task.
+    // Nothing has connected, so no WebSocket task should have been created.
+    expect(self.factory.capturedRequests).to(beEmpty())
+  }
+
+  func testUpdateHeaderValues__beforeFirstConnection__shouldApplyToFirstConnection() async throws {
+    await networkTransport.updateHeaderValues(["Authorization": "Bearer token123"])
+
+    mockTask.emit(.connectionAck(payload: nil))
+    let (subscription, _) = try await subscribe(on: mockTask, using: client)
+
     expect(self.factory.capturedRequests.count).to(equal(1))
+    expect(self.factory.capturedRequests.first?.value(forHTTPHeaderField: "Authorization"))
+      .to(equal("Bearer token123"))
+
+    _ = subscription
   }
 
   func testUpdateHeaderValues__withNilValue__shouldRemoveHeader() async throws {
@@ -1703,8 +1723,8 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
       reconnectIfConnected: true
     )
 
-    // No reconnection should happen — still only the init task.
-    expect(self.factory.capturedRequests.count).to(equal(1))
+    // Nothing has connected, so no WebSocket task should have been created.
+    expect(self.factory.capturedRequests).to(beEmpty())
   }
 
   func testUpdateConnectingPayload__withNilPayload__shouldClearPayload() async throws {
@@ -1957,6 +1977,9 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
   func testResume__whenNotStarted__shouldOpenConnection() async throws {
     // Transport starts in .notStarted state. Resume should open the connection eagerly.
     await networkTransport.resume()
+
+    // The WebSocket task is created by resume(), not by the transport's initializer.
+    expect(self.factory.capturedRequests.count).to(equal(1))
 
     // The mock task should have been resumed (connection opened).
     await expect(self.mockTask.isResumed).toEventually(beTrue())
@@ -2355,7 +2378,8 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     let (subscription, operationID) = try await subscribe(on: task1, using: client)
 
-    let pausedConnection = await networkTransport.connection
+    let currentConnection = await networkTransport.connection
+    let pausedConnection = try XCTUnwrap(currentConnection)
     await networkTransport.pause()
     await networkTransport.resume()
 
@@ -2384,7 +2408,8 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
 
     let (subscription, operationID) = try await subscribe(on: task1, using: client)
 
-    let pausedConnection = await networkTransport.connection
+    let currentConnection = await networkTransport.connection
+    let pausedConnection = try XCTUnwrap(currentConnection)
     await networkTransport.pause()
     await networkTransport.resume()
 
@@ -2412,7 +2437,8 @@ class WebSocketTests: XCTestCase, MockResponseProvider {
     let subscription = try client.subscribe(subscription: MockSubscription<ReviewAddedData>())
     await expect { await self.networkTransport.connectionState }.toEventually(equal(.connecting))
 
-    let pausedConnection = await networkTransport.connection
+    let currentConnection = await networkTransport.connection
+    let pausedConnection = try XCTUnwrap(currentConnection)
     await networkTransport.pause()
 
     // pause() keeps the closed connection current, so an ack it received before closing can still
