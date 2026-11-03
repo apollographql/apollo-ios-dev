@@ -87,11 +87,8 @@ public struct Glob {
       }
     }
 
-    // Resolve symlinks in any included paths
-    includeMatches = includeMatches.compactMap({ path in
-      return URL(fileURLWithPath: path).resolvingSymlinksInPath().path
-    })
-    return OrderedSet<String>(includeMatches).subtracting(excludeMatches)
+    return OrderedSet<String>(includeMatches.map(\.symlinkResolvedFilePath))
+      .subtracting(excludeMatches.map(\.symlinkResolvedFilePath))
   }
 
   /// Separates a comma-delimited string into paths, expanding any globstars and removes duplicates.

@@ -13,7 +13,7 @@ public class ApolloFileManager {
 
   public let base: FileManager
 
-  /// The paths for the files written to by the ``ApolloFileManager``.
+  /// The normalized paths for the files written to by the ``ApolloFileManager``.
   public var writtenFiles: Set<String> = []
 
   nonisolated init(base: FileManager) {
@@ -92,12 +92,17 @@ public class ApolloFileManager {
   /// `path` only by case first renames the file so its directory entry adopts the casing of
   /// `path`.
   public func createFile(atPath path: String, data: Data? = nil, overwrite: Bool = true) throws {
+    let path = path.normalizedFilePath
     try createContainingDirectoryIfNeeded(forPath: path)
 
-    if !overwrite && doesFileExist(atPath: path) { return }
+    if !overwrite && doesFileExist(atPath: path) {
+      CodegenLogger.log("Not overwriting \(path)", logLevel: .debug)
+      return
+    }
 
     adoptFileNameCasingIfNeeded(atPath: path)
 
+    CodegenLogger.log("Generating \(path)", logLevel: .debug)
     guard base.createFile(atPath: path, contents: data, attributes: nil) else {
       throw FileManagerPathError.cannotCreateFile(at: path)
     }
@@ -105,6 +110,9 @@ public class ApolloFileManager {
   }
 
   public func renameFile(atPath oldPath: String, toPath newPath: String) throws {
+    let oldPath = oldPath.normalizedFilePath
+    let newPath = newPath.normalizedFilePath
+
     guard doesFileExist(atPath: oldPath) else { return }
 
     try base.moveItem(atPath: oldPath, toPath: newPath)
