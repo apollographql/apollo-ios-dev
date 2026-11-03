@@ -439,7 +439,12 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   /// (it will see that `self.connection` no longer matches and exit). Active subscribers will
   /// be resubscribed when the new `connection_ack` arrives.
   private func disconnectAndReconnect() {
-    connection?.close()
+    guard let connection else {
+      assertionFailure("Cannot disconnect and reconnect before a connection has been opened.")
+      openNewConnection()
+      return
+    }
+    connection.close()
     openNewConnection()
   }
 
@@ -473,6 +478,11 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
       break
     }
 
+    guard let connection else {
+      assertionFailure("Cannot pause before a connection has been opened.")
+      return
+    }
+
     connectionState = .paused
     stopPingTimer()
 
@@ -486,7 +496,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     // Close the underlying WebSocket task. This causes the receive loop's stream to
     // end, at which point the loop checks connectionState, sees `.paused`, and exits
     // without triggering auto-reconnection or finishing subscriber streams.
-    connection?.close()
+    connection.close()
   }
 
   /// Re-establishes the WebSocket connection after a ``pause()``, or opens a new connection
@@ -530,9 +540,14 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   private func cancelSubscription(operationID: OperationID) {
     guard subscriberRegistry.finish(operationID, reason: .cancelled) else { return }
 
+    guard let connection else {
+      assertionFailure("A subscriber was registered before a connection was opened.")
+      return
+    }
+
     let message = Message.Outgoing.complete(id: operationID)
     if let wsMessage = try? message.toWebSocketMessage() {
-      connection?.send(wsMessage)
+      connection.send(wsMessage)
     }
   }
 
@@ -547,13 +562,20 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     operationID: OperationID,
     operation: Operation
   ) throws {
+    // Throw rather than drop the message: a subscriber that is marked subscribed without
+    // its message having been sent would wait forever.
+    guard let connection else {
+      assertionFailure("Attempted to subscribe before a connection was opened.")
+      throw Error.connectionClosed
+    }
+
     let payload = configuration.requestBodyCreator.requestBody(
       for: operation,
       sendQueryDocument: true,
       autoPersistQuery: false
     )
     let message = Message.Outgoing.subscribe(id: operationID, payload: payload)
-    connection?.send(try message.toWebSocketMessage())
+    connection.send(try message.toWebSocketMessage())
     subscriberRegistry.markSubscribed(operationID)
   }
 
