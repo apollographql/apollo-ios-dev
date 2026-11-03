@@ -439,12 +439,7 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   /// (it will see that `self.connection` no longer matches and exit). Active subscribers will
   /// be resubscribed when the new `connection_ack` arrives.
   private func disconnectAndReconnect() {
-    guard let connection else {
-      assertionFailure("Cannot disconnect and reconnect before a connection has been opened.")
-      openNewConnection()
-      return
-    }
-    connection.close()
+    connection?.close()
     openNewConnection()
   }
 
