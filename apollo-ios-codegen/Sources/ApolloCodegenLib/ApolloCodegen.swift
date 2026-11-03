@@ -656,10 +656,9 @@ public final class ApolloCodegen: Sendable {
     from oldGeneratedFilePaths: Set<String>,
     afterCodeGenerationUsing fileManager: ApolloFileManager
   ) async throws {
-    let normalize = fileManager.filePathNormalizer
-    let writtenFiles = Set(await fileManager.writtenFiles.map(normalize))
+    let writtenFiles = Set(await fileManager.writtenFiles.map(\.normalizedFilePath))
     let caseFoldedWrittenFiles = Set(writtenFiles.map { $0.lowercased() })
-    let oldGeneratedFilePaths = Set(oldGeneratedFilePaths.map(normalize))
+    let oldGeneratedFilePaths = Set(oldGeneratedFilePaths.map(\.normalizedFilePath))
 
     for path in oldGeneratedFilePaths.subtracting(writtenFiles) {
       // On a case-insensitive volume, a path differing from a written file only by case refers

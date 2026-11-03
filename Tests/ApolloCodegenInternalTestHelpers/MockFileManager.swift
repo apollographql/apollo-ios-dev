@@ -49,13 +49,10 @@ public class MockApolloFileManager: ApolloFileManager {
     strict: Bool = true,
     requireAllClosuresCalled: Bool = true
   ) {
-    super.init(
-      base: MockFileManager(
-        strict: strict,
-        requireAllClosuresCalled: requireAllClosuresCalled
-      ),
-      filePathNormalizer: { $0 }
-    )
+    super.init(base: MockFileManager(
+      strict: strict,
+      requireAllClosuresCalled: requireAllClosuresCalled
+    ))
   }
 
   /// Provide a mock closure for the `FileManager` function.
