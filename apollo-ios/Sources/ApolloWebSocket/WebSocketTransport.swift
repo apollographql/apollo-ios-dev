@@ -530,14 +530,9 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
   private func cancelSubscription(operationID: OperationID) {
     guard subscriberRegistry.finish(operationID, reason: .cancelled) else { return }
 
-    guard let connection else {
-      assertionFailure("A subscriber was registered before a connection was opened.")
-      return
-    }
-
     let message = Message.Outgoing.complete(id: operationID)
     if let wsMessage = try? message.toWebSocketMessage() {
-      connection.send(wsMessage)
+      connection?.send(wsMessage)
     }
   }
 
@@ -555,7 +550,6 @@ public actor WebSocketTransport: SubscriptionNetworkTransport, NetworkTransport 
     // Throw rather than drop the message: a subscriber that is marked subscribed without
     // its message having been sent would wait forever.
     guard let connection else {
-      assertionFailure("Attempted to subscribe before a connection was opened.")
       throw Error.connectionClosed
     }
 
