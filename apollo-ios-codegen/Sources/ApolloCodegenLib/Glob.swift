@@ -120,17 +120,18 @@ public struct Glob {
     _ pattern: String,
     excludingDirectories excluded: [String]?
   ) throws -> OrderedSet<String> {
+    let isExclude = pattern.isExclude
+
     guard pattern.includesGlobstar else {
       let path = URL(
-        fileURLWithPath: pattern.isExclude ? String(pattern.dropFirst()) : pattern,
+        fileURLWithPath: isExclude ? String(pattern.dropFirst()) : pattern,
         relativeTo: rootURL
       ).path
-      return [pattern.isExclude ? "!" + path : path]
+      return [isExclude ? "!" + path : path]
     }
 
     CodegenLogger.log("Expanding globstar \(pattern)", logLevel: .debug)
 
-    let isExclude = pattern.isExclude
     var parts = pattern.components(separatedBy: String.Globstar)
     var firstPart = parts.removeFirst()
     let lastPart = parts.joined(separator: String.Globstar)

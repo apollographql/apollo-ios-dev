@@ -402,7 +402,7 @@ class GlobTests: XCTestCase {
 
   func test_match_givenRelativePathExclude_withoutGlobstar_andRootURL_shouldExclude() async throws {
     // given
-    let pattern = ["file.*", "!file.two"]
+    let pattern = ["file.*", "!./file.two"]
     let rootURL = baseURL.appendingPathComponent("root/", isDirectory: true).standardizedFileURL
 
     // when
