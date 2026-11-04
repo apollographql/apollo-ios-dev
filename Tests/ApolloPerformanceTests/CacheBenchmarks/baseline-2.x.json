@@ -1,0 +1,178 @@
+{
+  "version": "2.x",
+  "captured_at": "2026-05-19T18:05:58Z",
+  "git_sha": "c3ed76fd91ab404c321a1cd6a574789074ac8752",
+  "device": "macOS 26.4.1 (MacBook Pro M1 Pro, arm64)",
+  "results": [
+    {
+      "iterations": 50,
+      "mean_ms": 0.2943150599999999,
+      "p50_ms": 0.28412499999999996,
+      "p95_ms": 0.38920189999999993,
+      "p99_ms": 0.43746807999999987,
+      "scenario": "tier1.cache_and_network",
+      "std_ms": 0.04824122328144473,
+      "tier": 1
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.2762991799999999,
+      "p50_ms": 0.27083349999999995,
+      "p95_ms": 0.34439404999999995,
+      "p99_ms": 0.36066974,
+      "scenario": "tier1.cache_first_miss_network_fallback",
+      "std_ms": 0.03842766114731227,
+      "tier": 1
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.20843082000000007,
+      "p50_ms": 0.1951255,
+      "p95_ms": 0.30764739999999985,
+      "p99_ms": 0.36278215999999996,
+      "scenario": "tier1.cold_cache_network_only",
+      "std_ms": 0.047423537916932934,
+      "tier": 1
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.10161255999999998,
+      "p50_ms": 0.09181249999999999,
+      "p95_ms": 0.13639549999999995,
+      "p99_ms": 0.23093716999999978,
+      "scenario": "tier1.warm_cache_first_hit",
+      "std_ms": 0.033197520971596534,
+      "tier": 1
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.7211,
+      "p50_ms": 0.6888955,
+      "p95_ms": 0.8740106,
+      "p99_ms": 0.95869825,
+      "scenario": "tier1.warm_cache_first_hit_array_of_refs_20",
+      "std_ms": 0.07595628571965939,
+      "tier": 1
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.1202075,
+      "p50_ms": 0.11456250000000001,
+      "p95_ms": 0.15084794999999995,
+      "p99_ms": 0.19324149999999984,
+      "scenario": "tier1.warm_cache_first_hit_nested_object",
+      "std_ms": 0.019257472863058345,
+      "tier": 1
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 1.36967412,
+      "p50_ms": 1.335792,
+      "p95_ms": 1.5869583,
+      "p99_ms": 1.6687849199999998,
+      "scenario": "tier1.warm_cache_first_hit_shared_records_20_friends_3_homeworlds",
+      "std_ms": 0.12066024983138839,
+      "tier": 1
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.02812414,
+      "p50_ms": 0.027958,
+      "p95_ms": 0.02875,
+      "p99_ms": 0.030532499999999994,
+      "scenario": "tier2.inmemory.batch_load_100_records",
+      "std_ms": 0.0006466977027758104,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 6.7017583400000005,
+      "p50_ms": 6.659708,
+      "p95_ms": 7.31552325,
+      "p99_ms": 7.887077999999999,
+      "scenario": "tier2.inmemory.many_record_merge_1000_records",
+      "std_ms": 0.3997772763671992,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 5.60135742,
+      "p50_ms": 5.4993545,
+      "p95_ms": 6.31913925,
+      "p99_ms": 6.6827517499999995,
+      "scenario": "tier2.inmemory.pattern_delete_10k_records",
+      "std_ms": 0.41843806930107574,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.0005727200000000004,
+      "p50_ms": 0.000583,
+      "p95_ms": 0.000584,
+      "p99_ms": 0.0007093299999999998,
+      "scenario": "tier2.inmemory.single_key_load_10_fields",
+      "std_ms": 0.00003650833843809116,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.015515760000000003,
+      "p50_ms": 0.0125625,
+      "p95_ms": 0.02569754999999999,
+      "p99_ms": 0.06842191999999986,
+      "scenario": "tier2.inmemory.single_record_merge_10_fields",
+      "std_ms": 0.013159113819427698,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 2.950800880000001,
+      "p50_ms": 2.9601045,
+      "p95_ms": 3.16007675,
+      "p99_ms": 3.2261975,
+      "scenario": "tier2.sqlite.batch_load_100_records",
+      "std_ms": 0.12519300774708156,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 56.663738460000005,
+      "p50_ms": 55.079500499999995,
+      "p95_ms": 57.7287663,
+      "p99_ms": 93.72824632999999,
+      "scenario": "tier2.sqlite.many_record_merge_1000_records",
+      "std_ms": 7.764093012148371,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 12.173480780000004,
+      "p50_ms": 11.9349585,
+      "p95_ms": 13.4756981,
+      "p99_ms": 16.264947239999998,
+      "scenario": "tier2.sqlite.pattern_delete_10k_records",
+      "std_ms": 0.970686536545756,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 0.045938400000000004,
+      "p50_ms": 0.0457705,
+      "p95_ms": 0.0478372,
+      "p99_ms": 0.04816817,
+      "scenario": "tier2.sqlite.single_key_load_10_fields",
+      "std_ms": 0.0008060563103842094,
+      "tier": 2
+    },
+    {
+      "iterations": 50,
+      "mean_ms": 2.06498762,
+      "p50_ms": 0.636667,
+      "p95_ms": 4.20499794999999,
+      "p99_ms": 31.56355490999995,
+      "scenario": "tier2.sqlite.single_record_merge_10_fields",
+      "std_ms": 6.5726935179914365,
+      "tier": 2
+    }
+  ]
+}

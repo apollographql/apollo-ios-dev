@@ -13,6 +13,12 @@
   },
   "testTargets" : [
     {
+      "skippedTests" : [
+        "Tier1FetchBenchmarks",
+        "Tier2CacheBenchmarksBase",
+        "Tier2InMemoryCacheBenchmarks",
+        "Tier2SQLiteCacheBenchmarks"
+      ],
       "target" : {
         "containerPath" : "container:ApolloDev.xcodeproj",
         "identifier" : "577B6E7422ED2B73EDB53D3F",

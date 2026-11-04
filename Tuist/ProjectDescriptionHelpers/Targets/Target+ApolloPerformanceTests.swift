@@ -43,7 +43,8 @@ extension Scheme {
       ]),
       testAction: .testPlans(
         [
-          ApolloTestPlan.performanceTest.path
+          ApolloTestPlan.performanceTest.path,
+          ApolloTestPlan.cacheBenchmarkTest.path,
         ],
         configuration: .debug
       )
