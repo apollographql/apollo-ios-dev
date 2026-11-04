@@ -12,7 +12,7 @@
 use std::collections::BTreeMap;
 use std::fmt;
 use std::path::{Path, PathBuf};
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use apollo_compiler::{executable, schema, validation::Valid};
 use bitflags::bitflags;
@@ -74,26 +74,58 @@ pub enum GenerationFilter {
 
 impl GenerationFilter {
     /// Whether a definition found in `file_path` is selected.
+    ///
+    /// Use [`Self::matcher`] to test many definitions.
     pub fn matches(&self, file_path: &str) -> bool {
+        self.matcher().matches(file_path)
+    }
+
+    /// Prepares the filter for testing many definitions: the current directory is
+    /// read and the filter's files are normalized once, instead of once per
+    /// comparison. A request tests every definition the compilation sees, which for
+    /// test mocks is every operation of the app.
+    pub fn matcher(&self) -> GenerationMatcher<'_> {
         match self {
-            GenerationFilter::Prefix(prefix) => matches_prefix(file_path, Some(prefix)),
+            GenerationFilter::Prefix(prefix) => GenerationMatcher::Prefix(prefix),
             GenerationFilter::Files(files) => {
-                let candidate = normalize_file_path(file_path);
-                files.iter().any(|f| normalize_file_path(f) == candidate)
+                let cwd = std::env::current_dir().unwrap_or_default();
+                let files = files.iter().map(|f| normalize_file_path(f, &cwd)).collect();
+                GenerationMatcher::Files { cwd, files }
             }
         }
     }
 }
 
-/// Makes a path absolute against the current directory (without touching the file system)
-/// and removes `.` components so that `./a/b.graphql`, `a/b.graphql` and `<cwd>/a/./b.graphql`
-/// compare equal.
-fn normalize_file_path(path: &str) -> PathBuf {
+/// A [`GenerationFilter`] prepared by [`GenerationFilter::matcher`].
+pub enum GenerationMatcher<'a> {
+    Prefix(&'a str),
+    Files {
+        cwd: PathBuf,
+        files: indexmap::IndexSet<PathBuf>,
+    },
+}
+
+impl GenerationMatcher<'_> {
+    /// Whether a definition found in `file_path` is selected.
+    pub fn matches(&self, file_path: &str) -> bool {
+        match self {
+            GenerationMatcher::Prefix(prefix) => matches_prefix(file_path, Some(prefix)),
+            GenerationMatcher::Files { cwd, files } => {
+                files.contains(&normalize_file_path(file_path, cwd))
+            }
+        }
+    }
+}
+
+/// Makes a path absolute against `cwd` (without touching the file system) and
+/// removes `.` components so that `./a/b.graphql`, `a/b.graphql` and
+/// `<cwd>/a/./b.graphql` compare equal.
+fn normalize_file_path(path: &str, cwd: &Path) -> PathBuf {
     let path = Path::new(path);
     let absolute = if path.is_absolute() {
         path.to_path_buf()
     } else {
-        std::env::current_dir().unwrap_or_default().join(path)
+        cwd.join(path)
     };
     let mut normalized = PathBuf::new();
     for component in absolute.components() {
@@ -157,6 +189,11 @@ pub struct CompileResult {
 /// `compile_operations_with_schema()` calls in worker mode.
 pub struct CompiledSchema {
     parsed_schema: Valid<schema::Schema>,
+    /// The schema's types, converted once (it takes ~25ms on large schemas, more
+    /// than compiling a module's operations) and shared by every compilation
+    /// without schema customizations. Customizations write to the types, so
+    /// those compilations convert their own copy.
+    registry: OnceLock<TypeRegistry>,
 }
 
 // MARK: - ApolloCodegen
@@ -228,7 +265,12 @@ impl ApolloCodegen {
         let parsed_schema = parse_schema(&schema_matches)?;
 
         // Stage 4-5: Operation parsing + CompilationResult construction
-        let compilation_result = compile_graphql(&parsed_schema, &operation_matches, config)?;
+        let compilation_result = compile_graphql(
+            &parsed_schema,
+            &TypeRegistry::from_schema(&parsed_schema),
+            &operation_matches,
+            config,
+        )?;
 
         let compilation_result = Arc::new(compilation_result);
 
@@ -263,7 +305,10 @@ impl ApolloCodegen {
         schema_matches: &indexmap::IndexSet<String>,
     ) -> Result<CompiledSchema, CodegenError> {
         let parsed_schema = parse_schema(schema_matches)?;
-        Ok(CompiledSchema { parsed_schema })
+        Ok(CompiledSchema {
+            parsed_schema,
+            registry: OnceLock::new(),
+        })
     }
 
     /// Stages 4-7: Operation parsing, compilation, validation, IR construction.
@@ -276,7 +321,23 @@ impl ApolloCodegen {
         operation_matches: &indexmap::IndexSet<String>,
         config: &ConfigurationContext,
     ) -> Result<CompileResult, CodegenError> {
-        let compilation_result = compile_graphql(&schema.parsed_schema, operation_matches, config)?;
+        let own_registry;
+        let registry = if config
+            .config
+            .options
+            .schema_customization
+            .custom_type_names
+            .is_empty()
+        {
+            schema
+                .registry
+                .get_or_init(|| TypeRegistry::from_schema(&schema.parsed_schema))
+        } else {
+            own_registry = TypeRegistry::from_schema(&schema.parsed_schema);
+            &own_registry
+        };
+        let compilation_result =
+            compile_graphql(&schema.parsed_schema, registry, operation_matches, config)?;
         let compilation_result = Arc::new(compilation_result);
         validate_against_schema(config, &compilation_result)?;
         let ir = IRBuilder::new(compilation_result.clone());
@@ -410,13 +471,34 @@ impl ApolloCodegen {
         config: &ConfigurationContext,
         filter: Option<&GenerationFilter>,
     ) -> Result<(), CodegenError> {
-        let file_manager = ApolloFileManager::new();
+        Self::collect_mock_fields(compile_result, config);
+        Self::generate_test_mocks_from_collected_fields(compile_result, config, filter)
+    }
+
+    /// Fills `compile_result.ir`'s field collector with the fields every compiled
+    /// operation and fragment selects, which is what the `<Object>+Mock` files
+    /// contain.
+    ///
+    /// The result only depends on the compilation, so the worker collects it once
+    /// per compilation and shares the `CompileResult` between test mock requests.
+    pub fn collect_mock_fields(compile_result: &CompileResult, config: &ConfigurationContext) {
         process_schema_customizations(&compile_result.ir, config);
         build_definition_ir_for_mock_fields(
             &compile_result.compilation_result,
             &compile_result.ir,
             "test_mocks",
         );
+    }
+
+    /// Like `generate_from_ir_test_mocks_only` for a `compile_result` that went
+    /// through [`Self::collect_mock_fields`], which also applied the schema
+    /// customizations: concurrent requests sharing `compile_result` only read it.
+    pub fn generate_test_mocks_from_collected_fields(
+        compile_result: &CompileResult,
+        config: &ConfigurationContext,
+        filter: Option<&GenerationFilter>,
+    ) -> Result<(), CodegenError> {
+        let file_manager = ApolloFileManager::new();
 
         let generators = test_mock_file_generators(
             &compile_result.compilation_result,
@@ -706,6 +788,7 @@ fn prepend_custom_directive_stubs(schema_sdl: &str) -> String {
 /// collect referenced types, assemble into CompilationResult.
 fn compile_graphql(
     schema: &Valid<schema::Schema>,
+    registry: &TypeRegistry,
     operation_matches: &indexmap::IndexSet<String>,
     config: &ConfigurationContext,
 ) -> Result<CompilationResult, CodegenError> {
@@ -749,19 +832,16 @@ fn compile_graphql(
         })
         .collect::<Result<Vec<_>, CodegenError>>()?;
 
-    // Build TypeRegistry
-    let registry = TypeRegistry::from_schema(schema);
-
     // Build root type definitions
-    let schema_root_types = build_root_types(schema, &registry)?;
+    let schema_root_types = build_root_types(schema, registry)?;
 
     // Build fragment definitions (two-pass: stubs then full)
-    let fragment_defs = build_fragment_definitions(&parsed_files, &registry, legacy_safelisting)?;
+    let fragment_defs = build_fragment_definitions(&parsed_files, registry, legacy_safelisting)?;
 
     // Build operation definitions
     let operation_defs = build_operation_definitions(
         &parsed_files,
-        &registry,
+        registry,
         schema,
         &fragment_defs,
         legacy_safelisting,
@@ -771,7 +851,7 @@ fn compile_graphql(
     let fragment_defs_vec: Vec<FragmentDefinition> =
         fragment_defs.values().map(|f| (**f).clone()).collect();
     let all_types = collect_referenced_types(
-        &registry,
+        registry,
         &operation_defs,
         &fragment_defs_vec,
         config.config.options.reduce_generated_schema_types,
@@ -1353,9 +1433,14 @@ fn generate_graph_ql_definition_files(
     let mut fragment_count = 0u32;
     let mut operation_count = 0u32;
 
+    let matcher = filter.map(GenerationFilter::matcher);
+
     // Build fragment file generators
     for fragment in &compilation_result.fragments {
-        if !filter.is_none_or(|f| f.matches(&fragment.file_path)) {
+        if !matcher
+            .as_ref()
+            .is_none_or(|m| m.matches(&fragment.file_path))
+        {
             continue;
         }
 
@@ -1378,7 +1463,10 @@ fn generate_graph_ql_definition_files(
 
     // Build operation file generators
     for operation in &compilation_result.operations {
-        if !filter.is_none_or(|f| f.matches(&operation.file_path)) {
+        if !matcher
+            .as_ref()
+            .is_none_or(|m| m.matches(&operation.file_path))
+        {
             continue;
         }
 

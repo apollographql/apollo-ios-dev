@@ -256,6 +256,19 @@ impl Generate {
         config: &ConfigurationContext,
         items_to_generate: ItemsToGenerate,
     ) -> Result<(), CliError> {
+        self.generate_bazel_with(compile_result, config, items_to_generate, false)
+    }
+
+    /// Like `generate_bazel`. `mock_fields_collected` says that `compile_result`
+    /// went through `ApolloCodegen::collect_mock_fields` already (the worker shares
+    /// one such result between test mock requests).
+    pub fn generate_bazel_with(
+        &self,
+        compile_result: &CompileResult,
+        config: &ConfigurationContext,
+        items_to_generate: ItemsToGenerate,
+        mock_fields_collected: bool,
+    ) -> Result<(), CliError> {
         match self.bazel_mode.as_str() {
             "operations" => match self.generation_filter() {
                 Some(filter) => ApolloCodegen::generate_from_ir_filtered(
@@ -275,6 +288,13 @@ impl Generate {
                 config,
                 items_to_generate,
             )?,
+            "test_mocks" if mock_fields_collected => {
+                ApolloCodegen::generate_test_mocks_from_collected_fields(
+                    compile_result,
+                    config,
+                    self.generation_filter().as_ref(),
+                )?
+            }
             "test_mocks" => ApolloCodegen::generate_from_ir_test_mocks_only(
                 compile_result,
                 config,

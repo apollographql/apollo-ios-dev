@@ -12,7 +12,8 @@
 //! so a multiplex worker parses each schema once. The compilation result is
 //! cached per config digest (the raw config text) + schema digests + operation
 //! digests, so two targets with different configs never serve each other's
-//! compilation.
+//! compilation. Concurrent requests for the same compilation wait for one
+//! compile, and test mock requests also share the operations' collected fields.
 //!
 //! Nothing a request does can take the worker down: validation and I/O errors
 //! are returned as a `WorkResponse` with `exit_code = 1`, and a panic inside a
@@ -26,12 +27,14 @@ use indexmap::{IndexMap, IndexSet};
 use std::io::{self, BufReader};
 use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, OnceLock};
 
 use clap::Parser;
 use sha2::{Digest as _, Sha256};
 
-use apollo_codegen_lib::codegen::{ApolloCodegen, CompilationResult, CompiledSchema};
+use apollo_codegen_lib::codegen::{
+    ApolloCodegen, CompilationResult, CompileResult, CompiledSchema,
+};
 use apollo_codegen_lib::codegen_logger::CodegenLogger;
 use apollo_codegen_lib::templates::ConfigurationContext;
 
@@ -49,8 +52,15 @@ type DigestMap = BTreeMap<String, Vec<u8>>;
 /// deeply, and spawned threads default to 512 KiB on macOS.
 const REQUEST_THREAD_STACK_SIZE: usize = 64 * 1024 * 1024;
 
-/// Upper bound on cached compilation results (one per config digest).
-const MAX_CACHED_COMPILATIONS: usize = 8;
+/// Compilations seen by one request so far, oldest first. Under rules_apollo most
+/// are operations targets whose config (their own `operationSearchPaths`) no other
+/// request shares.
+const MAX_PROBATION_COMPILATIONS: usize = 8;
+
+/// Compilations that served more than one request (test mocks and the schema
+/// types share the whole app's compilation). Probation entries never evict these,
+/// so hundreds of one-off operations requests cannot push them out.
+const MAX_PROTECTED_COMPILATIONS: usize = 4;
 
 /// Cached parsed schema (the expensive part, ~5s on large schemas).
 ///
@@ -64,16 +74,22 @@ struct CachedSchema {
     compiled_schema: Arc<CompiledSchema>,
 }
 
-/// Cached compilation result for one config digest.
+/// One compilation, shared by every request with the same config digest, schema
+/// digests and operation digests.
 ///
-/// Hit only when the config, the schema digests and the operation digests all
-/// match: `compile_graphql`/`validate_against_schema` read the config (schema
-/// namespace, experimental features), so a different config must recompile even
-/// for identical operation files.
-struct CachedCompilation {
+/// Hit only when all three match: `compile_graphql`/`validate_against_schema` read
+/// the config (schema namespace, experimental features), so a different config
+/// must recompile even for identical operation files.
+pub struct CompilationSlot {
     schema_digests: DigestMap,
     operation_digests: DigestMap,
-    compilation_result: Arc<CompilationResult>,
+    /// Set by the first request. Concurrent requests for the same slot wait for
+    /// it instead of compiling the same operations again.
+    result: OnceLock<Result<Arc<CompilationResult>, String>>,
+    /// The compilation's IR with the fields of every operation collected, shared
+    /// by test mock requests. Collecting walks every operation of the app, and
+    /// the result is the same for every request of this slot.
+    mock_ir: OnceLock<Arc<CompileResult>>,
 }
 
 /// Caches shared by every request of the worker process.
@@ -82,9 +98,12 @@ pub struct WorkerCache {
     /// sorted schema paths -> parsed schema
     schemas: IndexMap<Vec<String>, CachedSchema>,
     /// config digest -> compilation
-    compilations: IndexMap<String, CachedCompilation>,
-    /// insertion order of `compilations`, oldest first (for eviction)
-    compilation_order: VecDeque<String>,
+    compilations: IndexMap<String, Arc<CompilationSlot>>,
+    /// config digests of compilations used by one request, oldest first
+    probation: VecDeque<String>,
+    /// config digests of compilations used by several requests, least recently
+    /// used first
+    protected: VecDeque<String>,
 }
 
 impl WorkerCache {
@@ -107,48 +126,68 @@ impl WorkerCache {
         );
     }
 
-    fn compilation(
-        &self,
+    /// Returns the slot for this config, schema and operations, creating an empty
+    /// one on a miss. A hit moves the slot to the protected list.
+    fn compilation_slot(
+        &mut self,
         config_digest: &str,
         schema_digests: &DigestMap,
         operation_digests: &DigestMap,
-    ) -> Option<Arc<CompilationResult>> {
-        self.compilations
-            .get(config_digest)
-            .filter(|cached| {
-                cached.schema_digests == *schema_digests
-                    && cached.operation_digests == *operation_digests
-            })
-            .map(|cached| Arc::clone(&cached.compilation_result))
-    }
-
-    fn insert_compilation(
-        &mut self,
-        config_digest: String,
-        schema_digests: DigestMap,
-        operation_digests: DigestMap,
-        compilation_result: Arc<CompilationResult>,
-    ) {
-        if self.compilations.swap_remove(&config_digest).is_some() {
-            self.compilation_order.retain(|d| *d != config_digest);
-        }
-        while self.compilations.len() >= MAX_CACHED_COMPILATIONS {
-            match self.compilation_order.pop_front() {
-                Some(oldest) => {
-                    self.compilations.swap_remove(&oldest);
+    ) -> Arc<CompilationSlot> {
+        if let Some(slot) = self.compilations.get(config_digest) {
+            if slot.schema_digests == *schema_digests
+                && slot.operation_digests == *operation_digests
+            {
+                let slot = Arc::clone(slot);
+                self.probation.retain(|d| d != config_digest);
+                self.protected.retain(|d| d != config_digest);
+                self.protected.push_back(config_digest.to_string());
+                while self.protected.len() > MAX_PROTECTED_COMPILATIONS {
+                    if let Some(oldest) = self.protected.pop_front() {
+                        self.compilations.swap_remove(&oldest);
+                    }
                 }
-                None => break,
+                return slot;
             }
         }
-        self.compilation_order.push_back(config_digest.clone());
-        self.compilations.insert(
-            config_digest,
-            CachedCompilation {
-                schema_digests,
-                operation_digests,
-                compilation_result,
-            },
-        );
+
+        // Miss, or the schema or operations changed: start over in probation.
+        self.forget(config_digest);
+        while self.probation.len() >= MAX_PROBATION_COMPILATIONS {
+            if let Some(oldest) = self.probation.pop_front() {
+                self.compilations.swap_remove(&oldest);
+            }
+        }
+        let slot = Arc::new(CompilationSlot {
+            schema_digests: schema_digests.clone(),
+            operation_digests: operation_digests.clone(),
+            result: OnceLock::new(),
+            mock_ir: OnceLock::new(),
+        });
+        self.probation.push_back(config_digest.to_string());
+        self.compilations
+            .insert(config_digest.to_string(), Arc::clone(&slot));
+        slot
+    }
+
+    /// Drops the compilation of `config_digest`, if any.
+    fn forget(&mut self, config_digest: &str) {
+        if self.compilations.swap_remove(config_digest).is_some() {
+            self.probation.retain(|d| d != config_digest);
+            self.protected.retain(|d| d != config_digest);
+        }
+    }
+
+    /// Drops `slot` if it is still the cached one (a failed compilation is not
+    /// kept: the next request retries it).
+    fn forget_slot(&mut self, config_digest: &str, slot: &Arc<CompilationSlot>) {
+        if self
+            .compilations
+            .get(config_digest)
+            .is_some_and(|cached| Arc::ptr_eq(cached, slot))
+        {
+            self.forget(config_digest);
+        }
     }
 }
 
@@ -356,90 +395,82 @@ fn handle_request(request: &WorkRequest, cache: &Mutex<WorkerCache>) -> WorkResp
 
     let config_ms = t0.elapsed().as_secs_f64() * 1000.0;
 
-    // Step 1: cache lookups (cheap BTreeMap comparisons) before any file discovery.
+    // Step 1: cache lookup (cheap BTreeMap comparisons) before any file discovery.
     let t1 = std::time::Instant::now();
     let schema_digests = extract_schema_digests(&request.inputs, &config);
     let operation_digests = extract_operation_digests(&request.inputs);
+    let slot = lock(cache).compilation_slot(&config_digest, &schema_digests, &operation_digests);
 
-    let (cached_schema, cached_compilation) = {
-        let cache = lock(cache);
-        (
-            cache.schema(&schema_digests),
-            cache.compilation(&config_digest, &schema_digests, &operation_digests),
-        )
-    };
-
-    // Step 2: discover files only when something has to be parsed or compiled
-    // (globbing the source tree costs ~400-900ms on large trees).
+    // Step 2: compile, unless another request did or is doing it. Files are
+    // discovered only when something has to be parsed or compiled (globbing the
+    // source tree costs ~400-900ms on large trees).
     let mut discover_ms = 0.0;
-    let compilation_result = match cached_compilation {
-        Some(result) => result,
-        None => {
-            let t_discover = std::time::Instant::now();
-            let (schema_matches, operation_matches) = match ApolloCodegen::discover_files(&config) {
-                Ok(result) => result,
-                Err(e) => return failure(request, e.to_string()),
-            };
-            discover_ms = t_discover.elapsed().as_secs_f64() * 1000.0;
+    let compiled = slot.result.get_or_init(|| {
+        let t_discover = std::time::Instant::now();
+        let (schema_matches, operation_matches) =
+            ApolloCodegen::discover_files(&config).map_err(|e| e.to_string())?;
+        discover_ms = t_discover.elapsed().as_secs_f64() * 1000.0;
 
-            let compiled_schema = match cached_schema {
-                Some(schema) => schema,
-                None => {
-                    // Parse under the cache lock: concurrent multiplex requests for
-                    // the same schema wait for this parse instead of repeating it.
-                    let mut cache = lock(cache);
-                    match cache.schema(&schema_digests) {
-                        Some(schema) => schema,
-                        None => {
-                            eprintln!("Schema cache miss -- parsing schema");
-                            match ApolloCodegen::parse_schema_files(&schema_matches) {
-                                Ok(compiled) => {
-                                    let compiled = Arc::new(compiled);
-                                    cache.insert_schema(
-                                        schema_digests.clone(),
-                                        Arc::clone(&compiled),
-                                    );
-                                    compiled
-                                }
-                                Err(e) => return failure(request, e.to_string()),
-                            }
-                        }
+        let cached_schema = lock(cache).schema(&schema_digests);
+        let compiled_schema = match cached_schema {
+            Some(schema) => schema,
+            None => {
+                // Parse under the cache lock: concurrent multiplex requests for
+                // the same schema wait for this parse instead of repeating it.
+                let mut cache = lock(cache);
+                match cache.schema(&schema_digests) {
+                    Some(schema) => schema,
+                    None => {
+                        eprintln!("Schema cache miss -- parsing schema");
+                        let compiled = Arc::new(
+                            ApolloCodegen::parse_schema_files(&schema_matches)
+                                .map_err(|e| e.to_string())?,
+                        );
+                        cache.insert_schema(schema_digests.clone(), Arc::clone(&compiled));
+                        compiled
                     }
                 }
-            };
-
-            eprintln!("Compilation cache miss -- compiling operations");
-            match ApolloCodegen::compile_operations_with_schema(
-                &compiled_schema,
-                &operation_matches,
-                &config,
-            ) {
-                Ok(result) => {
-                    let compilation_result = Arc::clone(&result.compilation_result);
-                    lock(cache).insert_compilation(
-                        config_digest,
-                        schema_digests,
-                        operation_digests,
-                        Arc::clone(&compilation_result),
-                    );
-                    compilation_result
-                }
-                Err(e) => return failure(request, e.to_string()),
             }
+        };
+
+        eprintln!("Compilation cache miss -- compiling operations");
+        ApolloCodegen::compile_operations_with_schema(&compiled_schema, &operation_matches, &config)
+            .map(|result| Arc::clone(&result.compilation_result))
+            .map_err(|e| e.to_string())
+    });
+    let compilation_result = match compiled {
+        Ok(result) => Arc::clone(result),
+        Err(message) => {
+            lock(cache).forget_slot(&config_digest, &slot);
+            return failure(request, message.clone());
         }
     };
     let schema_ms = t1.elapsed().as_secs_f64() * 1000.0;
 
-    // Step 3: fresh IR builder over the (shared) compilation result
+    // Step 3: IR builder over the (shared) compilation result. Test mocks share
+    // one with the fields of every operation collected; everything else gets a
+    // fresh one.
     let t3 = std::time::Instant::now();
-    let compile_result = ApolloCodegen::compile_result_from_cached(compilation_result);
+    let shares_mock_ir = generate_cmd.bazel_mode == "test_mocks" && config.output_root().is_some();
+    let compile_result = if shares_mock_ir {
+        Arc::clone(slot.mock_ir.get_or_init(|| {
+            let compile_result =
+                ApolloCodegen::compile_result_from_cached(Arc::clone(&compilation_result));
+            ApolloCodegen::collect_mock_fields(&compile_result, &config);
+            Arc::new(compile_result)
+        }))
+    } else {
+        Arc::new(ApolloCodegen::compile_result_from_cached(
+            compilation_result,
+        ))
+    };
     let compile_ms = t3.elapsed().as_secs_f64() * 1000.0;
 
     // Step 4: generate
     let t4 = std::time::Instant::now();
     let generate_result = if config.output_root().is_some() {
         generate_cmd
-            .generate_bazel(&compile_result, &config, items_to_generate)
+            .generate_bazel_with(&compile_result, &config, items_to_generate, shares_mock_ir)
             .map_err(|e| e.to_string())
     } else {
         ApolloCodegen::generate_from_ir(&compile_result, &config, items_to_generate)
@@ -457,8 +488,8 @@ fn handle_request(request: &WorkRequest, cache: &Mutex<WorkerCache>) -> WorkResp
                 .or(generate_cmd.bazel_framework_path.as_deref())
                 .unwrap_or(&generate_cmd.bazel_mode);
             eprintln!(
-                "[perf] #{} {} | total={:.1}ms config={:.1}ms discover={:.1}ms schema+compile={:.1}ms ir={:.1}ms generate={:.1}ms",
-                request.request_id, target_label, total_ms, config_ms, discover_ms, schema_ms, compile_ms, generate_ms
+                "[perf] #{} {} {} | total={:.1}ms config={:.1}ms discover={:.1}ms schema+compile={:.1}ms ir={:.1}ms generate={:.1}ms",
+                request.request_id, generate_cmd.bazel_mode, target_label, total_ms, config_ms, discover_ms, schema_ms, compile_ms, generate_ms
             );
             WorkResponse {
                 exit_code: 0,
@@ -700,35 +731,120 @@ mod tests {
         );
         let schema = digests(&[("schema.graphqls", 1)]);
         let ops = digests(&[("A.graphql", 1), ("B.graphql", 2)]);
-        cache.insert_compilation(
-            "cfg-a".to_string(),
-            schema.clone(),
-            ops.clone(),
-            Arc::clone(&result),
-        );
+        let filled = |cache: &mut WorkerCache, key: &str| {
+            let slot = cache.compilation_slot(key, &schema, &ops);
+            slot.result.get_or_init(|| Ok(Arc::clone(&result)));
+            slot
+        };
+        let slot = filled(&mut cache, "cfg-a");
 
-        assert!(cache.compilation("cfg-a", &schema, &ops).is_some());
+        let hit = cache.compilation_slot("cfg-a", &schema, &ops);
+        assert!(Arc::ptr_eq(&hit, &slot));
+        assert!(hit.result.get().is_some());
         // a different config never serves the cached compilation
-        assert!(cache.compilation("cfg-b", &schema, &ops).is_none());
+        assert!(cache
+            .compilation_slot("cfg-b", &schema, &ops)
+            .result
+            .get()
+            .is_none());
         // changed schema or operations miss
         assert!(cache
-            .compilation("cfg-a", &digests(&[("schema.graphqls", 9)]), &ops)
+            .compilation_slot("cfg-c", &schema, &ops)
+            .result
+            .get()
             .is_none());
-        assert!(cache
-            .compilation("cfg-a", &schema, &digests(&[("A.graphql", 1)]))
-            .is_none());
+        let changed = cache.compilation_slot("cfg-a", &digests(&[("schema.graphqls", 9)]), &ops);
+        assert!(!Arc::ptr_eq(&changed, &slot));
+        assert!(changed.result.get().is_none());
+        let changed = cache.compilation_slot("cfg-a", &schema, &digests(&[("A.graphql", 1)]));
+        assert!(changed.result.get().is_none());
+    }
 
-        // bounded: the oldest config is evicted first
-        for i in 0..MAX_CACHED_COMPILATIONS {
-            cache.insert_compilation(
-                format!("cfg-{}", i),
-                schema.clone(),
-                ops.clone(),
-                Arc::clone(&result),
-            );
+    #[test]
+    fn test_one_off_compilations_do_not_evict_shared_ones() {
+        let mut cache = WorkerCache::default();
+        let schema = digests(&[("schema.graphqls", 1)]);
+        let ops = digests(&[("A.graphql", 1)]);
+
+        // "app" serves two requests (e.g. two mocks targets): protected.
+        let app = cache.compilation_slot("app", &schema, &ops);
+        assert!(Arc::ptr_eq(
+            &cache.compilation_slot("app", &schema, &ops),
+            &app
+        ));
+
+        // Many operations targets, each seen once.
+        for i in 0..(MAX_PROBATION_COMPILATIONS * 4) {
+            cache.compilation_slot(&format!("ops-{}", i), &schema, &ops);
         }
-        assert!(cache.compilation("cfg-a", &schema, &ops).is_none());
-        assert_eq!(cache.compilations.len(), MAX_CACHED_COMPILATIONS);
+        assert!(Arc::ptr_eq(
+            &cache.compilation_slot("app", &schema, &ops),
+            &app
+        ));
+        assert_eq!(cache.probation.len(), MAX_PROBATION_COMPILATIONS);
+        // the oldest one-off entries are gone
+        let first = cache.compilation_slot("ops-0", &schema, &ops);
+        assert!(first.result.get().is_none());
+
+        // protected entries are bounded too, least recently used first
+        for i in 0..MAX_PROTECTED_COMPILATIONS {
+            let key = format!("shared-{}", i);
+            cache.compilation_slot(&key, &schema, &ops);
+            cache.compilation_slot(&key, &schema, &ops);
+        }
+        assert_eq!(cache.protected.len(), MAX_PROTECTED_COMPILATIONS);
+        assert!(!cache.protected.contains(&"app".to_string()));
+        assert_eq!(
+            cache.compilations.len(),
+            cache.probation.len() + cache.protected.len()
+        );
+    }
+
+    #[test]
+    fn test_failed_compilations_are_not_kept() {
+        let mut cache = WorkerCache::default();
+        let schema = digests(&[("schema.graphqls", 1)]);
+        let ops = digests(&[("A.graphql", 1)]);
+        let slot = cache.compilation_slot("cfg", &schema, &ops);
+        slot.result.get_or_init(|| Err("boom".to_string()));
+        cache.forget_slot("cfg", &slot);
+        assert!(cache
+            .compilation_slot("cfg", &schema, &ops)
+            .result
+            .get()
+            .is_none());
+    }
+
+    #[test]
+    fn test_concurrent_misses_compile_once() {
+        let cache = Arc::new(Mutex::new(WorkerCache::default()));
+        let schema = digests(&[("schema.graphqls", 1)]);
+        let ops = digests(&[("A.graphql", 1)]);
+        let compiles = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let threads: Vec<_> = (0..8)
+            .map(|_| {
+                let (cache, schema, ops, compiles) = (
+                    Arc::clone(&cache),
+                    schema.clone(),
+                    ops.clone(),
+                    Arc::clone(&compiles),
+                );
+                std::thread::spawn(move || {
+                    let slot = lock(&cache).compilation_slot("cfg", &schema, &ops);
+                    slot.result
+                        .get_or_init(|| {
+                            compiles.fetch_add(1, Ordering::SeqCst);
+                            std::thread::sleep(std::time::Duration::from_millis(50));
+                            Err("compiled".to_string())
+                        })
+                        .clone()
+                })
+            })
+            .collect();
+        for thread in threads {
+            assert_eq!(thread.join().unwrap().err(), Some("compiled".to_string()));
+        }
+        assert_eq!(compiles.load(Ordering::SeqCst), 1);
     }
 
     #[test]

@@ -32,9 +32,13 @@ pub fn referenced_object_types(
     filter: Option<&GenerationFilter>,
 ) -> IndexSet<String> {
     let mut walker = ReferencedObjectWalker::new(compilation_result);
+    let matcher = filter.map(GenerationFilter::matcher);
 
     for operation in &compilation_result.operations {
-        if !filter.is_none_or(|f| f.matches(&operation.file_path)) {
+        if !matcher
+            .as_ref()
+            .is_none_or(|m| m.matches(&operation.file_path))
+        {
             continue;
         }
         for variable in &operation.variables {
@@ -44,7 +48,10 @@ pub fn referenced_object_types(
         walker.walk_selection_set(&operation.selection_set);
     }
     for fragment in &compilation_result.fragments {
-        if !filter.is_none_or(|f| f.matches(&fragment.file_path)) {
+        if !matcher
+            .as_ref()
+            .is_none_or(|m| m.matches(&fragment.file_path))
+        {
             continue;
         }
         walker.walk_fragment(fragment);
