@@ -1,0 +1,19 @@
+[package]
+name = "codegen-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+apollo-codegen-lib = { path = "../apollo-codegen-lib" }
+clap = { workspace = true }
+regex = "1"
+serde_json = { workspace = true }
+
+[dev-dependencies]
+assert_cmd = "2.0"
+predicates = "3"
+tempfile = "3"
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

@@ -1,0 +1,70 @@
+# Operations exercising all @defer directive argument combinations per D-27.
+#
+# Coverage:
+# - @defer(label: "x") -- label only (always deferred)
+# - @defer(label: "x", if: $var) -- with variable condition
+# - @defer(label: "x", if: true) -- static true (always deferred)
+# - @defer(label: "x", if: false) -- static false (NOT deferred)
+# - @defer on inline fragments and fragment spreads
+
+fragment DeferredCharacterFields on Character {
+  name
+  appearsIn
+}
+
+# Inline fragment with @defer label only
+query DeferLabelOnly {
+  hero {
+    name
+    ... on Character @defer(label: "friendsDefer") {
+      friends {
+        name
+      }
+    }
+  }
+}
+
+# Inline fragment with @defer label + variable condition
+query DeferWithVariable($loadDetails: Boolean!) {
+  hero {
+    name
+    ... on Character @defer(label: "detailsDefer", if: $loadDetails) {
+      friends {
+        name
+      }
+      appearsIn
+    }
+  }
+}
+
+# Inline fragment with @defer if: true (always deferred)
+query DeferAlwaysTrue {
+  hero {
+    name
+    ... on Character @defer(label: "alwaysDefer", if: true) {
+      friends {
+        name
+      }
+    }
+  }
+}
+
+# Inline fragment with @defer if: false (should NOT be deferred)
+query DeferAlwaysFalse {
+  hero {
+    name
+    ... on Character @defer(label: "neverDefer", if: false) {
+      friends {
+        name
+      }
+    }
+  }
+}
+
+# Fragment spread with @defer
+query DeferFragmentSpread {
+  hero {
+    name
+    ...DeferredCharacterFields @defer(label: "fragDefer")
+  }
+}

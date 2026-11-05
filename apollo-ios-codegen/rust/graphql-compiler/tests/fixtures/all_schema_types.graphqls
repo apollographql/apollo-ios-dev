@@ -1,0 +1,48 @@
+# Minimal schema exercising all type definition kinds.
+# Used for schema-only parsing tests to verify ExtendedType variant coverage.
+#
+# Type kinds covered:
+# 1. Custom scalar
+# 2. Enum
+# 3. Interface
+# 4. Object (implementing interface)
+# 5. Union
+# 6. Input object
+
+scalar Timestamp
+
+enum Color {
+  RED
+  GREEN
+  BLUE
+}
+
+interface Identifiable {
+  id: ID!
+}
+
+type Item implements Identifiable {
+  id: ID!
+  name: String!
+  color: Color
+  created: Timestamp
+}
+
+type Category implements Identifiable {
+  id: ID!
+  label: String!
+  items: [Item!]!
+}
+
+union Entity = Item | Category
+
+input CreateItemInput {
+  name: String!
+  color: Color = RED
+}
+
+type Query {
+  item(id: ID!): Item
+  items(filter: CreateItemInput): [Item!]!
+  entity(id: ID!): Entity
+}

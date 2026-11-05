@@ -1,0 +1,72 @@
+# Operations exercising all @skip/@include directive combinations per D-27.
+#
+# Coverage:
+# - @include(if: true), @include(if: false), @include(if: $var)
+# - @skip(if: true), @skip(if: false), @skip(if: $var)
+# - Combined @skip + @include on same field
+# - Directives on fields, inline fragments, and fragment spreads
+
+fragment ConditionalCharacterFields on Character {
+  name
+  appearsIn
+}
+
+# Static include/skip on fields
+query StaticInclusions {
+  hero {
+    name
+    friends @include(if: true) {
+      name
+    }
+    appearsIn @include(if: false)
+  }
+}
+
+query StaticSkips {
+  hero {
+    name
+    friends @skip(if: true) {
+      name
+    }
+    appearsIn @skip(if: false)
+  }
+}
+
+# Variable-based include/skip on fields
+query VariableInclusion($showFriends: Boolean!, $showEpisodes: Boolean!) {
+  hero {
+    name
+    friends @include(if: $showFriends) {
+      name
+    }
+    appearsIn @skip(if: $showEpisodes)
+  }
+}
+
+# Combined @skip and @include on same field
+query CombinedDirectives($a: Boolean!, $b: Boolean!) {
+  hero {
+    name
+    friends @skip(if: $a) @include(if: $b) {
+      name
+    }
+  }
+}
+
+# Directive on inline fragment
+query InlineFragmentInclusion($showHuman: Boolean!) {
+  hero {
+    name
+    ... on Human @include(if: $showHuman) {
+      homePlanet
+    }
+  }
+}
+
+# Directive on fragment spread
+query FragmentSpreadSkip($hideFields: Boolean!) {
+  hero {
+    name
+    ...ConditionalCharacterFields @skip(if: $hideFields)
+  }
+}
