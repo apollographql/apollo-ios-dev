@@ -1,0 +1,12 @@
+pub mod capitalization_rule;
+pub mod capitalizer;
+pub mod codegen;
+pub mod codegen_logger;
+pub mod config;
+pub mod file_discovery;
+pub mod file_generators;
+pub mod inflection_rule;
+pub mod inflector;
+pub mod pluralizer;
+pub mod templates;
+pub mod test_mock_scope;

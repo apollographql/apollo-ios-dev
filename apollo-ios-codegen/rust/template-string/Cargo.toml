@@ -1,0 +1,10 @@
+[package]
+name = "template-string"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+template-string-macros = { path = "../template-string-macros" }
+
+[lints]
+workspace = true

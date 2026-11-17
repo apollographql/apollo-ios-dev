@@ -1,0 +1,87 @@
+name: "Rust Codegen"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "apollo-ios-codegen/rust/**"
+      - "apollo-ios-codegen/Sources/**"
+      - "Sources/AnimalKingdomAPI/animalkingdom-graphql/**"
+      - ".github/workflows/rust-codegen.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apollo-ios-codegen/rust/**"
+      - ".github/workflows/rust-codegen.yml"
+
+env:
+  XCODE_VERSION: "26.5"
+  CARGO_TERM_COLOR: always
+
+defaults:
+  run:
+    working-directory: apollo-ios-codegen/rust
+
+jobs:
+  lint:
+    name: rustfmt and clippy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apollo-ios-codegen/rust
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+
+  test:
+    name: build and test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-26, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apollo-ios-codegen/rust
+      - run: cargo build --workspace --release
+      - run: cargo test --workspace --release
+      - name: Upload CLI binary
+        if: matrix.os == 'macos-26'
+        uses: actions/upload-artifact@v4
+        with:
+          name: apollo-ios-cli-rust-macos
+          path: apollo-ios-codegen/rust/target/release/apollo-ios-cli
+
+  parity-smoke:
+    name: parity smoke (Swift CLI vs Rust CLI)
+    runs-on: macos-26
+    timeout-minutes: 40
+    steps:
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apollo-ios-codegen/rust
+      - name: Build the Swift CLI
+        working-directory: apollo-ios-codegen
+        run: swift build -c release --product apollo-ios-cli
+      - name: Build the Rust CLI
+        run: cargo build --release -p apollo-ios-cli
+      - name: Generate AnimalKingdom with both CLIs and diff
+        working-directory: .
+        run: |
+          apollo-ios-codegen/rust/scripts/parity-smoke.sh \
+            apollo-ios-codegen/.build/release/apollo-ios-cli \
+            apollo-ios-codegen/rust/target/release/apollo-ios-cli

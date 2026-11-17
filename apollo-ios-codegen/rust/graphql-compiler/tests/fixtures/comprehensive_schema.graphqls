@@ -1,0 +1,146 @@
+# Comprehensive GraphQL schema exercising every valid GraphQL construct per D-27.
+#
+# Type coverage:
+# - Custom scalars with @specifiedBy
+# - Enums with @deprecated values
+# - Interfaces (including interface-implementing-interface)
+# - Objects implementing multiple interfaces with field arguments and defaults
+# - Unions
+# - Input objects with default values
+# - Root types: Query, Mutation, Subscription
+# - Deprecation on fields and enum values
+# - Field arguments with default values and enum defaults
+
+# -- Custom Scalars --
+
+scalar DateTime @specifiedBy(url: "https://scalars.graphql.org/andimarek/date-time")
+scalar JSON
+scalar URL @specifiedBy(url: "https://tools.ietf.org/html/rfc3986")
+
+# -- Enums --
+
+enum Episode {
+  NEWHOPE
+  EMPIRE
+  JEDI @deprecated(reason: "No longer in canon")
+}
+
+enum LengthUnit {
+  METER
+  FOOT
+}
+
+enum SearchCategory {
+  CHARACTER
+  STARSHIP
+  FILM
+}
+
+# -- Interfaces --
+
+interface Node {
+  id: ID!
+}
+
+interface Character {
+  id: ID!
+  name: String!
+  friends: [Character]
+  appearsIn: [Episode!]!
+}
+
+"An entity that tracks creation and update times."
+interface Timestamped {
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+# -- Objects --
+
+type Human implements Node & Character & Timestamped {
+  id: ID!
+  name: String!
+  friends: [Character]
+  appearsIn: [Episode!]!
+  homePlanet: String
+  height(unit: LengthUnit = METER): Float
+  "Use mass_kg instead."
+  mass: Float @deprecated(reason: "Use mass_kg")
+  mass_kg: Float
+  starships: [Starship]
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+type Droid implements Node & Character {
+  id: ID!
+  name: String!
+  friends: [Character]
+  appearsIn: [Episode!]!
+  primaryFunction: String
+}
+
+type Starship implements Node {
+  id: ID!
+  name: String!
+  length(unit: LengthUnit = METER): Float
+  "Nested array type: coordinates as list of 2D points."
+  coordinates: [[Float!]!]
+}
+
+type Review implements Node & Timestamped {
+  id: ID!
+  stars: Int!
+  commentary: String
+  episode: Episode
+  reviewer: Human
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+# -- Union --
+
+union SearchResult = Human | Droid | Starship
+
+# -- Input Objects --
+
+input ReviewInput {
+  stars: Int!
+  commentary: String
+  favorite_episode: Episode = NEWHOPE
+  tags: [String!]
+  metadata: JSON
+}
+
+input PaginationInput {
+  first: Int = 10
+  after: String
+}
+
+input FilterInput {
+  name: String
+  episodes: [Episode!]
+  minRating: Float = 0.0
+}
+
+# -- Root Types --
+
+type Query {
+  hero(episode: Episode): Character
+  search(text: String!, category: SearchCategory, pagination: PaginationInput): [SearchResult!]!
+  character(id: ID!): Character
+  node(id: ID!): Node
+  reviews(episode: Episode!): [Review!]!
+  human(id: ID!): Human
+  droid(id: ID!): Droid
+  starship(id: ID!): Starship
+}
+
+type Mutation {
+  createReview(episode: Episode!, review: ReviewInput!): Review
+  updateCharacterName(id: ID!, name: String!): Character
+}
+
+type Subscription {
+  reviewAdded(episode: Episode!): Review!
+}

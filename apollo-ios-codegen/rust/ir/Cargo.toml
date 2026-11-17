@@ -1,0 +1,16 @@
+[package]
+name = "ir"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+graphql-compiler = { path = "../graphql-compiler" }
+template-string = { path = "../template-string" }
+utilities = { path = "../utilities" }
+indexmap = { workspace = true }
+bitflags = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

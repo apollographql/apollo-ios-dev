@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package blaze.worker;
+
+option java_package = "com.google.devtools.build.lib.worker";
+
+message Input {
+  string path = 1;
+  bytes digest = 2;
+}
+
+message WorkRequest {
+  repeated string arguments = 1;
+  repeated Input inputs = 2;
+  int32 request_id = 3;
+  bool cancel = 4;
+  int32 verbosity = 5;
+  string sandbox_dir = 6;
+}
+
+message WorkResponse {
+  int32 exit_code = 1;
+  string output = 2;
+  int32 request_id = 3;
+  bool was_cancelled = 4;
+}

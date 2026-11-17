@@ -1,0 +1,19 @@
+[package]
+name = "graphql-compiler"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+template-string = { path = "../template-string" }
+indexmap = { workspace = true }
+serde = { workspace = true }
+apollo-compiler = { workspace = true }
+walkdir = "2.5"
+globset = "0.4"
+
+[dev-dependencies]
+serde_json = { workspace = true }
+insta = { version = "1.47", features = ["json"] }
+
+[lints]
+workspace = true
