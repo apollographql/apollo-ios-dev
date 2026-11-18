@@ -87,14 +87,108 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
   public func createRecordsTableIfNeeded() throws {
     try performSync {
       let sql = """
-      CREATE TABLE IF NOT EXISTS "records" (
-        "_id"  INTEGER,
-        "key"  TEXT UNIQUE,
-        "record"  TEXT,
-        PRIMARY KEY("_id" AUTOINCREMENT)
+      CREATE TABLE IF NOT EXISTS "\(SQLiteSchema.recordsTableName)" (
+        "\(SQLiteSchema.LegacyRecords.id)"      INTEGER,
+        "\(SQLiteSchema.LegacyRecords.key)"     TEXT UNIQUE,
+        "\(SQLiteSchema.LegacyRecords.record)"  TEXT,
+        PRIMARY KEY("\(SQLiteSchema.LegacyRecords.id)" AUTOINCREMENT)
       );
       """
-      try exec(sql, errorMessage: "Failed to create 'records' database table")
+      try exec(sql, errorMessage: "Failed to create '\(SQLiteSchema.recordsTableName)' database table")
+    }
+  }
+
+  public func createNewRecordsTableIfNeeded() throws {
+    try performSync {
+      let sql = """
+      CREATE TABLE IF NOT EXISTS "\(SQLiteSchema.recordsTableName)" (
+        "\(SQLiteSchema.Records.cacheKey)"           TEXT NOT NULL,
+        "\(SQLiteSchema.Records.fieldName)"          TEXT NOT NULL,
+        "\(SQLiteSchema.Records.position)"           INTEGER NOT NULL DEFAULT \(SQLiteSchema.Records.defaultPositionValue),
+        "\(SQLiteSchema.Records.intValue)"           INTEGER,
+        "\(SQLiteSchema.Records.stringValue)"        TEXT,
+        "\(SQLiteSchema.Records.floatValue)"         REAL,
+        "\(SQLiteSchema.Records.boolValue)"          INTEGER,
+        "\(SQLiteSchema.Records.childKeyValue)"      TEXT,
+        "\(SQLiteSchema.Records.customScalarValue)"  TEXT,
+        "\(SQLiteSchema.Records.writtenAt)"          INTEGER NOT NULL,
+        PRIMARY KEY (
+          "\(SQLiteSchema.Records.cacheKey)",
+          "\(SQLiteSchema.Records.fieldName)",
+          "\(SQLiteSchema.Records.position)"
+        )
+      ) WITHOUT ROWID;
+      """
+      try exec(sql, errorMessage: "Failed to create row-per-element '\(SQLiteSchema.recordsTableName)' database table")
+    }
+    try writeSchemaVersion(SQLiteSchema.currentVersion)
+  }
+
+  public func createSchemaMetadataTableIfNeeded() throws {
+    try performSync {
+      let sql = """
+      CREATE TABLE IF NOT EXISTS "\(SQLiteSchema.Metadata.tableName)" (
+        "\(SQLiteSchema.Metadata.keyColumn)"   TEXT PRIMARY KEY,
+        "\(SQLiteSchema.Metadata.valueColumn)" TEXT
+      );
+      """
+      try exec(sql, errorMessage: "Failed to create '\(SQLiteSchema.Metadata.tableName)' database table")
+    }
+  }
+
+  public func readSchemaVersion() throws -> SchemaVersion? {
+    try performSync {
+      let sql = """
+      SELECT \(SQLiteSchema.Metadata.valueColumn)
+      FROM \(SQLiteSchema.Metadata.tableName)
+      WHERE \(SQLiteSchema.Metadata.keyColumn) = ?
+      """
+
+      let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare schema-version read")
+      defer { sqlite3_finalize(stmt) }
+
+      sqlite3_bind_text(stmt, 1, SQLiteSchema.Metadata.versionKey, -1, SQLITE_TRANSIENT)
+
+      let stepResult = sqlite3_step(stmt)
+      switch stepResult {
+      case SQLITE_DONE:
+        // No row stored for the schema-version key.
+        return nil
+      case SQLITE_ROW:
+        guard let textPtr = sqlite3_column_text(stmt, 0) else {
+          return nil
+        }
+        return SchemaVersion(String(cString: textPtr))
+      default:
+        throw SQLiteError.step(
+          message: "Schema-version read failed: \(sqliteErrorMessage())",
+          resultCode: stepResult
+        )
+      }
+    }
+  }
+
+  public func writeSchemaVersion(_ version: SchemaVersion) throws {
+    try performSync {
+      let sql = """
+      INSERT INTO \(SQLiteSchema.Metadata.tableName) (\(SQLiteSchema.Metadata.keyColumn), \(SQLiteSchema.Metadata.valueColumn))
+      VALUES (?, ?)
+      ON CONFLICT(\(SQLiteSchema.Metadata.keyColumn)) DO UPDATE SET \(SQLiteSchema.Metadata.valueColumn) = excluded.\(SQLiteSchema.Metadata.valueColumn)
+      """
+
+      let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare schema-version write")
+      defer { sqlite3_finalize(stmt) }
+
+      sqlite3_bind_text(stmt, 1, SQLiteSchema.Metadata.versionKey, -1, SQLITE_TRANSIENT)
+      sqlite3_bind_text(stmt, 2, version.description, -1, SQLITE_TRANSIENT)
+
+      let stepResult = sqlite3_step(stmt)
+      if stepResult != SQLITE_DONE {
+        throw SQLiteError.step(
+          message: "Schema-version write failed: \(sqliteErrorMessage())",
+          resultCode: stepResult
+        )
+      }
     }
   }
 
@@ -109,9 +203,9 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
         let rows = try performSync {
           let placeholders = batch.map { _ in "?" }.joined(separator: ", ")
           let sql = """
-          SELECT \(Self.keyColumnName), \(Self.recordColumName)
-          FROM \(Self.tableName)
-          WHERE \(Self.keyColumnName) IN (\(placeholders))
+          SELECT \(SQLiteSchema.LegacyRecords.key), \(SQLiteSchema.LegacyRecords.record)
+          FROM \(SQLiteSchema.recordsTableName)
+          WHERE \(SQLiteSchema.LegacyRecords.key) IN (\(placeholders))
           """
 
           let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare select statement")
@@ -149,9 +243,9 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
 
     try performSync {
       let sql = """
-      INSERT INTO \(Self.tableName) (\(Self.keyColumnName), \(Self.recordColumName))
+      INSERT INTO \(SQLiteSchema.recordsTableName) (\(SQLiteSchema.LegacyRecords.key), \(SQLiteSchema.LegacyRecords.record))
       VALUES (?, ?)
-      ON CONFLICT(\(Self.keyColumnName)) DO UPDATE SET \(Self.recordColumName) = excluded.\(Self.recordColumName)
+      ON CONFLICT(\(SQLiteSchema.LegacyRecords.key)) DO UPDATE SET \(SQLiteSchema.LegacyRecords.record) = excluded.\(SQLiteSchema.LegacyRecords.record)
       """
 
       try exec("BEGIN TRANSACTION", errorMessage: "Failed to begin insert/update transaction")
@@ -162,7 +256,7 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
       for (key, record) in records {
         sqlite3_bind_text(stmt, 1, key, -1, SQLITE_TRANSIENT)
         sqlite3_bind_text(stmt, 2, record, -1, SQLITE_TRANSIENT)
-        
+
         let result = sqlite3_step(stmt)
         if result != SQLITE_DONE {
           rollbackTransaction()
@@ -184,7 +278,7 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
 
   public func deleteRecord(for cacheKey: CacheKey) throws {
     try performSync {
-      let sql = "DELETE FROM \(Self.tableName) WHERE \(Self.keyColumnName) = ?"
+      let sql = "DELETE FROM \(SQLiteSchema.recordsTableName) WHERE \(SQLiteSchema.LegacyRecords.key) = ?"
       let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare delete statement")
       defer { sqlite3_finalize(stmt) }
 
@@ -201,7 +295,7 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
     let wildcardPattern = "%\(pattern)%"
 
     try performSync {
-      let sql = "DELETE FROM \(Self.tableName) WHERE \(Self.keyColumnName) LIKE ? COLLATE NOCASE"
+      let sql = "DELETE FROM \(SQLiteSchema.recordsTableName) WHERE \(SQLiteSchema.LegacyRecords.key) LIKE ? COLLATE NOCASE"
       let stmt = try prepareStatement(sql, errorMessage: "Failed to prepare delete pattern statement")
       defer { sqlite3_finalize(stmt) }
 
@@ -215,7 +309,7 @@ public final class ApolloSQLiteDatabase: SQLiteDatabase {
 
   public func clearDatabase(shouldVacuumOnClear: Bool) throws {
     try performSync {
-      try exec("DELETE FROM \(Self.tableName)", errorMessage: "Failed to clear database")
+      try exec("DELETE FROM \(SQLiteSchema.recordsTableName)", errorMessage: "Failed to clear database")
       if shouldVacuumOnClear {
         try exec("VACUUM;", errorMessage: "Failed to vacuum database")
       }

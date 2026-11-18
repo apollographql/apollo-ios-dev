@@ -1749,7 +1749,7 @@ class ReadWriteFromStoreTests: XCTestCase, CacheDependentTesting, StoreLoading {
     let heroKey = "QUERY_ROOT.hero"
     let heroRecord = try await self.store.loadRecord(forKey: heroKey)
 
-    expect(heroRecord.fields["name"] as? String).to(equal("Han Solo"))
+    expect(heroRecord["name"] as? String).to(equal("Han Solo"))
   }
 
   @MainActor func test_writeDataForOperation_givenSelectionSetManuallyInitializedWithNamedFragmentInInclusionConditionIsFulfilled_writesFieldsForNamedFragment() async throws {

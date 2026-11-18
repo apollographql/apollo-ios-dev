@@ -6,7 +6,9 @@ private let serializedReferenceKey = "$reference"
 
 enum SQLiteSerialization {
   static func serialize(fields: Record.Fields) throws -> Data {
-    let jsonObject = try fields.compactMapValues(serialize(fieldValue:))
+    // Serializes only the field value; the row schema does not carry a
+    // per-field `writtenAt` column, so `CachedField.writtenAt` is omitted.
+    let jsonObject = try fields.compactMapValues { try serialize(fieldValue: $0.value) }
     return try JSONSerialization.data(withJSONObject: jsonObject, options: [])
   }
 
@@ -22,10 +24,13 @@ enum SQLiteSerialization {
   }
 
   static func deserialize(data: Data) throws -> Record.Fields {
-    let jsonObject = try JSONSerializationFormat.deserialize(data: data) as JSONObject    
+    let jsonObject = try JSONSerializationFormat.deserialize(data: data) as JSONObject
     var fields = Record.Fields()
     for (key, value) in jsonObject {
-      fields[key] = try deserialize(fieldJSONValue: value)
+      // The row schema does not carry a per-field `writtenAt`; each
+      // value is wrapped in a `CachedField` stamped with `0`.
+      let parsed = try deserialize(fieldJSONValue: value)
+      fields[key] = CachedField(value: parsed, writtenAt: 0)
     }
     return fields
   }

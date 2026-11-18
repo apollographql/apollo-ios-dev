@@ -1,0 +1,29 @@
+{
+  "configurations" : [
+    {
+      "id" : "F8A7E920-D54E-4D6E-8C7D-CA8B5C9D6E91",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "selectedTests" : [
+        "Tier1FetchBenchmarks",
+        "Tier2InMemoryCacheBenchmarks",
+        "Tier2SQLiteCacheBenchmarks"
+      ],
+      "target" : {
+        "containerPath" : "container:ApolloDev.xcodeproj",
+        "identifier" : "577B6E7422ED2B73EDB53D3F",
+        "name" : "ApolloPerformanceTests"
+      }
+    }
+  ],
+  "version" : 1
+}

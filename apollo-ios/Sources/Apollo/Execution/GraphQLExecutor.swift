@@ -44,7 +44,11 @@ public class ObjectExecutionInfo {
   func runtimeObjectType(
     for json: JSONObject
   ) -> Object? {
-    guard let __typename = json["__typename"] as? String else {
+    return runtimeObjectType(forTypename: json["__typename"] as? String)
+  }
+
+  func runtimeObjectType(forTypename __typename: String?) -> Object? {
+    guard let __typename else {
       guard let objectType = rootType.__parentType as? Object else {
         return nil
       }
