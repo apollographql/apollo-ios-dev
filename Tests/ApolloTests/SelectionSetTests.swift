@@ -593,6 +593,70 @@ class SelectionSetTests: XCTestCase {
     expect(actual.nestedList).to(equal([[expected]]))
   }
 
+  // MARK: - CustomDebugStringConvertible Tests
+
+  func test__debugDescription__selectionSet_returnsDataDescription() async throws {
+    // given
+    class Hero: MockSelectionSet, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self),
+        .field("name", String?.self)
+      ]}
+    }
+
+    let object: JSONObject = [
+      "__typename": "Human",
+      "name": "Johnny Tsunami"
+    ]
+
+    // when
+    let actual = try await Hero(data: object)
+
+    // then
+    expect(actual.debugDescription).to(contain("Johnny Tsunami"))
+  }
+
+  func test__debugDescription__selectionSet_declaringConformance_isCustomDebugStringConvertible() async throws {
+    // given
+    class Hero: MockSelectionSet, CustomDebugStringConvertible, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self)
+      ]}
+    }
+
+    let object: JSONObject = ["__typename": "Human"]
+
+    // when
+    let actual = try await Hero(data: object)
+
+    // then
+    expect(actual as? CustomDebugStringConvertible).toNot(beNil())
+    expect(String(describing: actual)).to(equal(actual.debugDescription))
+  }
+
+  func test__debugDescription__selectionSet_withoutDeclaredConformance_isNotCustomDebugStringConvertible() async throws {
+    // given
+    class Hero: MockSelectionSet, @unchecked Sendable {
+      typealias Schema = MockSchemaMetadata
+
+      override class var __selections: [Selection] {[
+        .field("__typename", String.self)
+      ]}
+    }
+
+    let object: JSONObject = ["__typename": "Human"]
+
+    // when
+    let actual = try await Hero(data: object)
+
+    // then
+    expect(actual as? CustomDebugStringConvertible).to(beNil())
+  }
+
   // MARK: - TypeCase Conversion Tests
 
   @MainActor

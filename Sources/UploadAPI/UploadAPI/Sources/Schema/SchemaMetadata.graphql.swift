@@ -3,16 +3,16 @@
 
 import ApolloAPI
 
-nonisolated public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet
+nonisolated public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet & Swift.CustomDebugStringConvertible
 where Schema == UploadAPI.SchemaMetadata {}
 
-nonisolated public protocol InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment
+nonisolated public protocol InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
 where Schema == UploadAPI.SchemaMetadata {}
 
-nonisolated public protocol MutableSelectionSet: ApolloAPI.MutableRootSelectionSet
+nonisolated public protocol MutableSelectionSet: ApolloAPI.MutableRootSelectionSet & Swift.CustomDebugStringConvertible
 where Schema == UploadAPI.SchemaMetadata {}
 
-nonisolated public protocol MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment
+nonisolated public protocol MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
 where Schema == UploadAPI.SchemaMetadata {}
 
 nonisolated public enum SchemaMetadata: ApolloAPI.SchemaMetadata {

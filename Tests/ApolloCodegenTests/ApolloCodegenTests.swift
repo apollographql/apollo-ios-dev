@@ -2652,6 +2652,47 @@ class ApolloCodegenTests: XCTestCase {
       })
   }
 
+  func test__validation__givenEmptyDebugDescriptionCompilationCondition_shouldThrow() throws {
+    // given
+    let config = ApolloCodegenConfiguration.mock(
+      options: .init(selectionSetDebugDescriptionConformance: .compilationCondition("  "))
+    )
+
+    // then
+    expect(try ApolloCodegen._validate(config: config))
+      .to(throwError { error in
+        guard case ApolloCodegen.Error.invalidConfiguration = error else {
+          return fail("Expected .invalidConfiguration, got \(error)")
+        }
+      })
+  }
+
+  func test__validation__givenInvalidDebugDescriptionCompilationConditionCharacters_shouldThrow() throws {
+    // given
+    let config = ApolloCodegenConfiguration.mock(
+      options: .init(selectionSetDebugDescriptionConformance: .compilationCondition("DEBUG;import Foo"))
+    )
+
+    // then
+    expect(try ApolloCodegen._validate(config: config))
+      .to(throwError { error in
+        guard case ApolloCodegen.Error.invalidConfiguration = error else {
+          return fail("Expected .invalidConfiguration, got \(error)")
+        }
+      })
+  }
+
+  func test__validation__givenValidDebugDescriptionCompilationCondition_shouldNotThrow() throws {
+    // given
+    let config = ApolloCodegenConfiguration.mock(
+      options: .init(selectionSetDebugDescriptionConformance: .compilationCondition("DEBUG && !BETA"))
+    )
+
+    // then
+    expect(try ApolloCodegen._validate(config: config))
+      .notTo(throwError())
+  }
+
   let conflictingSchemaNames = ["rocket", "Rocket"]
 
   func test__validation__givenSchemaName_matchingObjectName_shouldThrow() throws {

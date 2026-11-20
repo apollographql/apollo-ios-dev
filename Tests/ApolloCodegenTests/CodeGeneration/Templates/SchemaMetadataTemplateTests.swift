@@ -58,16 +58,16 @@ class SchemaMetadataTemplateTests: XCTestCase {
     """
 
     let expectedDetached = """
-    protocol AName_SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet
+    protocol AName_SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet & Swift.CustomDebugStringConvertible
     where Schema == AName.SchemaMetadata {}
 
-    protocol AName_InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment
+    protocol AName_InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
     where Schema == AName.SchemaMetadata {}
 
-    protocol AName_MutableSelectionSet: ApolloAPI.MutableRootSelectionSet
+    protocol AName_MutableSelectionSet: ApolloAPI.MutableRootSelectionSet & Swift.CustomDebugStringConvertible
     where Schema == AName.SchemaMetadata {}
 
-    protocol AName_MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment
+    protocol AName_MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
     where Schema == AName.SchemaMetadata {}
     """
 
@@ -103,16 +103,16 @@ class SchemaMetadataTemplateTests: XCTestCase {
     """
 
     let expectedDetached = """
-    public protocol AName_SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet
+    public protocol AName_SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet & Swift.CustomDebugStringConvertible
     where Schema == AName.SchemaMetadata {}
 
-    public protocol AName_InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment
+    public protocol AName_InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
     where Schema == AName.SchemaMetadata {}
 
-    public protocol AName_MutableSelectionSet: ApolloAPI.MutableRootSelectionSet
+    public protocol AName_MutableSelectionSet: ApolloAPI.MutableRootSelectionSet & Swift.CustomDebugStringConvertible
     where Schema == AName.SchemaMetadata {}
 
-    public protocol AName_MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment
+    public protocol AName_MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
     where Schema == AName.SchemaMetadata {}
     """
 
@@ -137,16 +137,16 @@ class SchemaMetadataTemplateTests: XCTestCase {
     )
 
     let expectedTemplate = """
-    public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet
+    public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet & Swift.CustomDebugStringConvertible
     where Schema == AName.SchemaMetadata {}
 
-    public protocol InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment
+    public protocol InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
     where Schema == AName.SchemaMetadata {}
 
-    public protocol MutableSelectionSet: ApolloAPI.MutableRootSelectionSet
+    public protocol MutableSelectionSet: ApolloAPI.MutableRootSelectionSet & Swift.CustomDebugStringConvertible
     where Schema == AName.SchemaMetadata {}
 
-    public protocol MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment
+    public protocol MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
     where Schema == AName.SchemaMetadata {}
     """
 
@@ -166,6 +166,43 @@ class SchemaMetadataTemplateTests: XCTestCase {
     buildSubject(
       config: .mock(
         .other,
+        schemaNamespace: "aName"
+      )
+    )
+
+    let expectedTemplate = """
+    public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol MutableSelectionSet: ApolloAPI.MutableRootSelectionSet & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+    """
+
+    // when
+    let actualTemplate = renderTemplate()
+    let actualDetached = renderDetachedTemplate()
+
+    // then
+    expect(actualTemplate)
+      .to(equalLineByLine(expectedTemplate, ignoringExtraLines: true))
+    expect(actualDetached)
+      .to(beNil())
+  }
+
+  // MARK: Selection Set Debug Description Conformance Tests
+
+  func test__render__givenDebugDescriptionConformanceExclude_shouldGenerateProtocols_withoutCustomDebugStringConvertible() {
+    // given
+    buildSubject(
+      config: .mock(
+        .swiftPackage(),
+        options: .init(markTypesNonisolated: false, selectionSetDebugDescriptionConformance: .exclude),
         schemaNamespace: "aName"
       )
     )
@@ -193,6 +230,191 @@ class SchemaMetadataTemplateTests: XCTestCase {
       .to(equalLineByLine(expectedTemplate, ignoringExtraLines: true))
     expect(actualDetached)
       .to(beNil())
+  }
+
+  func test__render__givenDebugDescriptionConformanceExclude_embeddedInTarget_shouldGenerateDetachedProtocols_withoutCustomDebugStringConvertible() {
+    // given
+    buildSubject(
+      config: .mock(
+        .embeddedInTarget(name: "CustomTarget", accessModifier: .internal),
+        options: .init(markTypesNonisolated: false, selectionSetDebugDescriptionConformance: .exclude),
+        schemaNamespace: "aName"
+      )
+    )
+
+    let expectedDetached = """
+    protocol AName_SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet
+    where Schema == AName.SchemaMetadata {}
+
+    protocol AName_InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment
+    where Schema == AName.SchemaMetadata {}
+
+    protocol AName_MutableSelectionSet: ApolloAPI.MutableRootSelectionSet
+    where Schema == AName.SchemaMetadata {}
+
+    protocol AName_MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment
+    where Schema == AName.SchemaMetadata {}
+    """
+
+    // when
+    let actualDetached = renderDetachedTemplate()
+
+    // then
+    expect(actualDetached)
+      .to(equalLineByLine(expectedDetached))
+  }
+
+  func test__render__givenDebugDescriptionConformanceInclude_shouldGenerateProtocols_withCustomDebugStringConvertible() {
+    // given
+    buildSubject(
+      config: .mock(
+        .swiftPackage(),
+        options: .init(markTypesNonisolated: false, selectionSetDebugDescriptionConformance: .include),
+        schemaNamespace: "aName"
+      )
+    )
+
+    let expectedTemplate = """
+    public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol MutableSelectionSet: ApolloAPI.MutableRootSelectionSet & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+    """
+
+    // when
+    let actualTemplate = renderTemplate()
+
+    // then
+    expect(actualTemplate)
+      .to(equalLineByLine(expectedTemplate, ignoringExtraLines: true))
+  }
+
+  func test__render__givenDebugDescriptionConformanceCompilationCondition_shouldGenerateProtocols_wrappedInConditionalCompilation() {
+    // given
+    buildSubject(
+      config: .mock(
+        .swiftPackage(),
+        options: .init(
+          markTypesNonisolated: false,
+          selectionSetDebugDescriptionConformance: .compilationCondition("DEBUG")
+        ),
+        schemaNamespace: "aName"
+      )
+    )
+
+    let expectedTemplate = """
+    #if DEBUG
+    public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol MutableSelectionSet: ApolloAPI.MutableRootSelectionSet & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+    #else
+    public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol MutableSelectionSet: ApolloAPI.MutableRootSelectionSet
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment
+    where Schema == AName.SchemaMetadata {}
+    #endif
+    """
+
+    // when
+    let actualTemplate = renderTemplate()
+
+    // then
+    expect(actualTemplate)
+      .to(equalLineByLine(expectedTemplate, ignoringExtraLines: true))
+  }
+
+  func test__render__givenDebugDescriptionConformanceCompilationCondition_embeddedInTarget_shouldGenerateDetachedProtocols_wrappedInConditionalCompilation() {
+    // given
+    buildSubject(
+      config: .mock(
+        .embeddedInTarget(name: "CustomTarget", accessModifier: .public),
+        options: .init(
+          markTypesNonisolated: false,
+          selectionSetDebugDescriptionConformance: .compilationCondition("DEBUG")
+        ),
+        schemaNamespace: "aName"
+      )
+    )
+
+    let expectedDetached = """
+    #if DEBUG
+    public protocol AName_SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol AName_InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol AName_MutableSelectionSet: ApolloAPI.MutableRootSelectionSet & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol AName_MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment & Swift.CustomDebugStringConvertible
+    where Schema == AName.SchemaMetadata {}
+    #else
+    public protocol AName_SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol AName_InlineFragment: ApolloAPI.SelectionSet & ApolloAPI.InlineFragment
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol AName_MutableSelectionSet: ApolloAPI.MutableRootSelectionSet
+    where Schema == AName.SchemaMetadata {}
+
+    public protocol AName_MutableInlineFragment: ApolloAPI.MutableSelectionSet & ApolloAPI.InlineFragment
+    where Schema == AName.SchemaMetadata {}
+    #endif
+    """
+
+    // when
+    let actualDetached = renderDetachedTemplate()
+
+    // then
+    expect(actualDetached)
+      .to(equalLineByLine(expectedDetached))
+  }
+
+  func test__render__givenDebugDescriptionConformanceExclude_withNonisolated_shouldGenerateProtocols_withoutCustomDebugStringConvertible_withNonisolated() {
+    // given
+    buildSubject(
+      config: .mock(
+        .swiftPackage(),
+        options: .init(markTypesNonisolated: true, selectionSetDebugDescriptionConformance: .exclude),
+        schemaNamespace: "aName"
+      )
+    )
+
+    let expectedTemplate = """
+    nonisolated public protocol SelectionSet: ApolloAPI.SelectionSet & ApolloAPI.RootSelectionSet
+    where Schema == AName.SchemaMetadata {}
+    """
+
+    // when
+    let actualTemplate = renderTemplate()
+
+    // then
+    expect(actualTemplate)
+      .to(equalLineByLine(expectedTemplate, ignoringExtraLines: true))
   }
 
   // MARK: Schema Tests

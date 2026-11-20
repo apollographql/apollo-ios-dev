@@ -392,6 +392,116 @@ class ApolloCodegenConfigurationCodableTests: XCTestCase {
     expect(actual).to(equal(expected))
   }
 
+  // MARK: - SelectionSetDebugDescriptionConformance Tests
+
+  func test__decodeOutputOptions__withoutSelectionSetDebugDescriptionConformance_defaultsToInclude() throws {
+    let options = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.OutputOptions.self,
+      from: "{}".asData
+    )
+
+    expect(options.selectionSetDebugDescriptionConformance)
+      .to(equal(.include))
+  }
+
+  func test__decodeOutputOptions__withSelectionSetDebugDescriptionConformanceInclude_shouldReturnInclude() throws {
+    let options = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.OutputOptions.self,
+      from: """
+        {
+          "selectionSetDebugDescriptionConformance" : "include"
+        }
+        """.asData
+    )
+
+    expect(options.selectionSetDebugDescriptionConformance)
+      .to(equal(.include))
+  }
+
+  func test__decodeOutputOptions__withSelectionSetDebugDescriptionConformanceExclude_shouldReturnExclude() throws {
+    let options = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.OutputOptions.self,
+      from: """
+        {
+          "selectionSetDebugDescriptionConformance" : "exclude"
+        }
+        """.asData
+    )
+
+    expect(options.selectionSetDebugDescriptionConformance)
+      .to(equal(.exclude))
+  }
+
+  func test__decodeOutputOptions__withSelectionSetDebugDescriptionConformanceCompilationCondition_shouldReturnCondition() throws {
+    let options = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.OutputOptions.self,
+      from: """
+        {
+          "selectionSetDebugDescriptionConformance" : {
+            "compilationCondition" : "DEBUG"
+          }
+        }
+        """.asData
+    )
+
+    expect(options.selectionSetDebugDescriptionConformance)
+      .to(equal(.compilationCondition("DEBUG")))
+  }
+
+  func test__decodeOutputOptions__withInvalidSelectionSetDebugDescriptionConformance_shouldThrow() throws {
+    expect(try JSONDecoder().decode(
+      ApolloCodegenConfiguration.OutputOptions.self,
+      from: """
+        {
+          "selectionSetDebugDescriptionConformance" : "sometimes"
+        }
+        """.asData
+    )).to(throwError())
+  }
+
+  func test__encodeOutputOptions__withSelectionSetDebugDescriptionConformanceInclude_omitsDefaultValue() throws {
+    let options = ApolloCodegenConfiguration.OutputOptions(
+      markTypesNonisolated: false,
+      selectionSetDebugDescriptionConformance: .include
+    )
+
+    let encoded = try testJSONEncoder.encode(options)
+
+    expect(encoded.asString).toNot(contain("\"selectionSetDebugDescriptionConformance\""))
+  }
+
+  func test__encodeOutputOptions__withSelectionSetDebugDescriptionConformanceExclude_roundTrips() throws {
+    let expected = ApolloCodegenConfiguration.OutputOptions(
+      markTypesNonisolated: false,
+      selectionSetDebugDescriptionConformance: .exclude
+    )
+
+    let encoded = try testJSONEncoder.encode(expected)
+    let actual = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.OutputOptions.self,
+      from: encoded
+    )
+
+    expect(encoded.asString).to(contain("\"selectionSetDebugDescriptionConformance\" : \"exclude\""))
+    expect(actual).to(equal(expected))
+  }
+
+  func test__encodeOutputOptions__withSelectionSetDebugDescriptionConformanceCompilationCondition_roundTrips() throws {
+    let expected = ApolloCodegenConfiguration.OutputOptions(
+      markTypesNonisolated: false,
+      selectionSetDebugDescriptionConformance: .compilationCondition("DEBUG")
+    )
+
+    let encoded = try testJSONEncoder.encode(expected)
+    let actual = try JSONDecoder().decode(
+      ApolloCodegenConfiguration.OutputOptions.self,
+      from: encoded
+    )
+
+    expect(encoded.asString).to(contain("\"compilationCondition\" : \"DEBUG\""))
+    expect(actual).to(equal(expected))
+  }
+
   // MARK: - Composition Tests
 
   func encodedValue(_ case: ApolloCodegenConfiguration.Composition) -> String {

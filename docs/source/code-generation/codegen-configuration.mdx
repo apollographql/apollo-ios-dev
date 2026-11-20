@@ -464,6 +464,7 @@ The top-level properties are:
 | [`appendSchemaTypeFilenameSuffix`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/appendSchemaTypeFilenameSuffix) | `true` will add a filename suffix matching the schema type, the default is `false`. This can be used to avoid filename conflicts when operation type names match schema type names. |
 | [`reduceGeneratedSchemaTypes`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/reducegeneratedschematypes) | Defaults to `false` which generates `Object` types for all objects that implement any `Interface` referenced in operation documents. Setting this to `true` will only generate `Object` types for objects that are referenced in an operation document or have a `@typePolicy` |
 | [`requireNonOptionalMockFields`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/requirenonoptionalmockfields) | When `true`, test mock convenience initializer parameters for non-null schema fields are non-optional and use schema-appropriate defaults. If `reduceGeneratedSchemaTypes` removes every concrete type for an abstract field, its parameter remains non-optional but has no default. Defaults to `true`. Set it to `false` to make all parameters optional for partial test data. |
+| [`selectionSetDebugDescriptionConformance`](https://www.apollographql.com/docs/ios/docc/documentation/apollocodegenlib/apollocodegenconfiguration/outputoptions/selectionsetdebugdescriptionconformance) | Whether the generated schema-level selection set protocols conform to `CustomDebugStringConvertible`. Defaults to `"include"`. Set it to `"exclude"` or `{ "compilationCondition": "<condition>" }` to reduce binary conformance records. |
 
 <MultiCodeBlock>
 
@@ -501,6 +502,7 @@ The top-level properties are:
   "markOperationDefinitionsAsFinal": true,
   "reduceGeneratedSchemaTypes": false,
   "requireNonOptionalMockFields": true,
+  "selectionSetDebugDescriptionConformance": "include",
   "schemaCustomization" : {
     "customTypeNames" : {
       "MyEnum" : {
@@ -557,6 +559,7 @@ let configuration = ApolloCodegenConfiguration(
     markOperationDefinitionsAsFinal: true,
     reduceGeneratedSchemaTypes: false,
     requireNonOptionalMockFields: true,
+    selectionSetDebugDescriptionConformance: .include,
     schemaCustomization: .init(
       customTypeNames: [
         "MyEnum" : .enum(
@@ -601,6 +604,37 @@ let configuration = ApolloCodegenConfiguration(
   // ... other properties not shown
   options: ApolloCodegenConfiguration.OutputOptions(
     requireNonOptionalMockFields: false
+  )
+)
+```
+
+</MultiCodeBlock>
+
+### Selection set debug description conformance
+
+Generated selection set types get their `CustomDebugStringConvertible` conformance from the schema-level selection set protocols (`SelectionSet`, `InlineFragment`, `MutableSelectionSet`, and `MutableInlineFragment`) emitted in the generated schema module.
+
+Every protocol conformance declared in a generated type emits a Swift protocol conformance record into your binary. For large schemas with many generated selection set types, these records can measurably increase app launch time. The `selectionSetDebugDescriptionConformance` option lets you control whether these protocols — and therefore every generated selection set type — conform to `CustomDebugStringConvertible`:
+
+* `"include"` (default) — generated selection set types always conform to `CustomDebugStringConvertible`.
+* `"exclude"` — generated selection set types never conform to `CustomDebugStringConvertible`.
+* `{ "compilationCondition": "<condition>" }` — generated selection set types conform to `CustomDebugStringConvertible` only when the given Swift compilation condition (for example `DEBUG`) is active. The `#if` is evaluated in the module that compiles the generated `SchemaMetadata` file, not in each module that consumes the generated operations.
+
+The `debugDescription` property remains available on all selection set types regardless of this option; only the protocol conformance — and behaviors that depend on it, such as `String(describing:)` output and `as? CustomDebugStringConvertible` casts — is affected.
+
+<MultiCodeBlock>
+
+```json title="CLI Configuration JSON"
+"options": {
+  "selectionSetDebugDescriptionConformance": { "compilationCondition": "DEBUG" }
+}
+```
+
+```swift title="Swift Codegen Setup"
+let configuration = ApolloCodegenConfiguration(
+  // ... other properties not shown
+  options: ApolloCodegenConfiguration.OutputOptions(
+    selectionSetDebugDescriptionConformance: .compilationCondition("DEBUG")
   )
 )
 ```

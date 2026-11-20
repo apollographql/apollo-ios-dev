@@ -55,6 +55,22 @@ extension ApolloCodegen.ConfigurationContext {
       try validate(inputSearchPath: searchPath)
     }
 
+    if case let .compilationCondition(condition) =
+        self.options.selectionSetDebugDescriptionConformance {
+      let allowed = CharacterSet.alphanumerics
+        .union(CharacterSet(charactersIn: "_.!&|()<>= \t"))
+      guard
+        !condition.trimmingCharacters(in: .whitespaces).isEmpty,
+        condition.unicodeScalars.allSatisfy({ allowed.contains($0) })
+      else {
+        throw ApolloCodegen.Error.invalidConfiguration(message: """
+          Invalid compilation condition '\(condition)' in \
+          selectionSetDebugDescriptionConformance. Provide a non-empty Swift compilation \
+          condition such as "DEBUG".
+          """)
+      }
+    }
+
     for rule in self.options.additionalCapitalizationRules {
       guard case let .regex(pattern) = rule.term else { continue }
       do {
