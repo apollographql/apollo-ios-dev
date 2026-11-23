@@ -460,7 +460,10 @@ public final class ApolloCodegen: Sendable {
           )
 
           if config.output.testMocks != .none {
-            let fields = await ir.fieldCollector.collectedFields(for: graphqlObject)
+            let fields = await ir.fieldCollector.collectedFields(
+              for: graphqlObject,
+              referencedTypes: ir.schema.referencedTypes
+            )
             addFileGenerationTask(
               for: MockObjectFileGenerator(
                 graphqlObject: graphqlObject,

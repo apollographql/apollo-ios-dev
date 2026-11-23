@@ -724,7 +724,9 @@ public struct ApolloCodegenConfiguration: Codable, Equatable, Sendable {
     /// When `true`, generated test mock convenience initializers use non-optional parameters for
     /// non-null schema fields and provide schema-appropriate default values for those parameters.
     /// If `reduceGeneratedSchemaTypes` removes every concrete type for an abstract field, its
-    /// parameter remains non-optional but does not receive a default value.
+    /// parameter remains non-optional but does not receive a default value. A response key whose
+    /// selected fields differ by more than nullability always has an optional parameter that
+    /// defaults to `nil`.
     ///
     /// Set this to `false` to make all test mock initializer parameters optional and default them
     /// to `nil`. This can be useful for tests that explicitly pass `nil` or construct partial

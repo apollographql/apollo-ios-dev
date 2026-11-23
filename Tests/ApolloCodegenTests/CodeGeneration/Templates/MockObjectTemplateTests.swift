@@ -24,6 +24,7 @@ class MockObjectTemplateTests: XCTestCase {
     customName: String? = nil,
     interfaces: [GraphQLInterfaceType] = [],
     fields: [String : GraphQLField] = [:],
+    joinedFields: [(String, TestMockFieldType, deprecationReason: String?)] = [],
     schemaNamespace: String = "TestSchema",
     moduleType: ApolloCodegenConfiguration.SchemaTypesFileOutput.ModuleType = .swiftPackage(),
     testMocks: ApolloCodegenConfiguration.TestMockFileOutput = .swiftPackage(),
@@ -54,7 +55,8 @@ class MockObjectTemplateTests: XCTestCase {
     subject = MockObjectTemplate(
       graphqlObject: objectType,
       fields: fields
-        .map { ($0.key, $0.value.type, $0.value.deprecationReason) },
+        .map { ($0.key, TestMockFieldType($0.value.type), $0.value.deprecationReason) }
+        + joinedFields,
       config: ApolloCodegen.ConfigurationContext(config: config),
       ir: ir
     )
@@ -427,7 +429,192 @@ class MockObjectTemplateTests: XCTestCase {
     expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
   }
 
+  // MARK: Joined Field Type Tests
+
+  func test__render__givenJoinedFieldTypes__generatesInterfaceAndAnyFieldValueFieldsWithOptionalParameters() {
+    // given
+    buildSubject(
+      joinedFields: [
+        ("cover", .anyEntity, nil),
+        ("count", .nonNull(.anyValue), nil),
+        ("grid", .list(.anyValue), nil),
+        ("nested", .list(.nonNull(.list(.anyEntity))), nil),
+        ("pics", .nonNull(.list(.nonNull(.anyEntity))), nil)
+      ],
+      moduleType: .swiftPackage()
+    )
+
+    let expected = """
+    public final class Dog: MockObject {
+      public static let objectType: ApolloAPI.Object = TestSchema.Objects.Dog
+      public static let _mockFields = MockFields()
+      public typealias MockValueCollectionType = Array<Mock<Dog>>
+
+      public struct MockFields: Sendable {
+        @Field<ApolloTestSupport.AnyFieldValue>("count") public var count
+        @Field<ApolloAPI.Interface>("cover") public var cover
+        @Field<[ApolloTestSupport.AnyFieldValue?]>("grid") public var grid
+        @Field<[[ApolloAPI.Interface?]]>("nested") public var nested
+        @Field<[ApolloAPI.Interface]>("pics") public var pics
+      }
+    }
+
+    public extension Mock where O == Dog {
+      convenience init(
+        count: Swift.AnyHashable? = nil,
+        cover: (any AnyMock)? = nil,
+        grid: [Swift.AnyHashable?]? = nil,
+        nested: [[(any AnyMock)?]]? = nil,
+        pics: [(any AnyMock)]? = nil
+      ) {
+        self.init()
+        _setAnyValue(count, for: \\.count)
+        _setEntity(cover, for: \\.cover)
+        _setAnyValue(grid, for: \\.grid)
+        _setList(nested, for: \\.nested)
+        _setList(pics, for: \\.pics)
+      }
+    }
+
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected))
+  }
+
+  func test__render__givenJoinedFieldTypes_requireNonOptionalMockFieldsFalse__generatesOptionalParameters() {
+    // given
+    buildSubject(
+      joinedFields: [
+        ("cover", .nonNull(.anyEntity), nil),
+        ("count", .nonNull(.anyValue), nil)
+      ],
+      moduleType: .swiftPackage(),
+      requireNonOptionalMockFields: false
+    )
+
+    let expected = """
+      convenience init(
+        count: Swift.AnyHashable? = nil,
+        cover: (any AnyMock)? = nil
+      ) {
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 13, ignoringExtraLines: true))
+  }
+
+  func test__render__givenJoinedFieldTypeWithSameNamedTypes__generatesFieldFromNamedType() {
+    // given
+    let Cat = GraphQLObjectType.mock("Cat")
+
+    buildSubject(
+      joinedFields: [
+        ("cat", TestMockFieldType(.entity(Cat)).joined(with: TestMockFieldType(.nonNull(.entity(Cat)))), nil),
+        ("title", TestMockFieldType(.nonNull(.string())).joined(with: TestMockFieldType(.string())), nil)
+      ],
+      moduleType: .swiftPackage()
+    )
+
+    let expected = """
+      public struct MockFields: Sendable {
+        @Field<Cat>("cat") public var cat
+        @Field<String>("title") public var title
+      }
+    }
+
+    public extension Mock where O == Dog {
+      convenience init(
+        cat: Mock<Cat>? = nil,
+        title: String? = nil
+      ) {
+        self.init()
+        _setEntity(cat, for: \\.cat)
+        _setScalar(title, for: \\.title)
+      }
+    }
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 6, ignoringExtraLines: true))
+  }
+
   // MARK: Conflicting Field Name Tests
+
+  func test__render__givenConflictingFieldName_withAnyValueType__generatesPropertyWithAnyHashableType() {
+    // given
+    buildSubject(joinedFields: [
+      ("hash", .nonNull(.anyValue), nil)
+    ])
+
+    let expected = """
+      var hash: Swift.AnyHashable? {
+        get { _data["hash"] }
+        set { _setAnyValue(newValue, for: \\.hash) }
+      }
+
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render__givenConflictingFieldName_withListOfAnyValueType__generatesPropertyWithAnyHashableType() {
+    // given
+    buildSubject(joinedFields: [
+      ("hash", .list(.nonNull(.anyValue)), nil)
+    ])
+
+    let expected = """
+      var hash: Swift.AnyHashable? {
+        get { _data["hash"] }
+        set { _setAnyValue(newValue, for: \\.hash) }
+      }
+
+      convenience init(
+        hash: [Swift.AnyHashable]? = nil
+      ) {
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
+
+  func test__render__givenConflictingFieldName_withAnyEntityType__generatesPropertyWithAnyMockType() {
+    // given
+    buildSubject(joinedFields: [
+      ("hash", .anyEntity, nil)
+    ])
+
+    let expected = """
+      var hash: (any AnyMock)? {
+        get { _data["hash"] as? (any AnyMock) }
+        set { _setEntity(newValue, for: \\.hash) }
+      }
+
+    """
+
+    // when
+    let actual = renderSubject()
+
+    // then
+    expect(actual).to(equalLineByLine(expected, atLine: 12, ignoringExtraLines: true))
+  }
 
   func test_render_givenConflictingFieldName_generatesPropertyWithFieldName() {
     // given

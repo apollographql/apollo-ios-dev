@@ -7,7 +7,7 @@ import IR
 
 class IRFieldCollectorTests: XCTestCase {
 
-  typealias ReferencedFields = [(String, GraphQLType, deprecationReason: String?)]
+  typealias ReferencedFields = [(String, TestMockFieldType, deprecationReason: String?)]
 
   var schemaSDL: String!
   var document: String!
@@ -70,7 +70,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = await subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog, referencedTypes: schema.referencedTypes)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -107,7 +107,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[interface: "Dog"].xctUnwrapped()
-    let actual = await subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog, referencedTypes: schema.referencedTypes)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -143,7 +143,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = await subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog, referencedTypes: schema.referencedTypes)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -186,7 +186,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = await subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog, referencedTypes: schema.referencedTypes)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -227,7 +227,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = await subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog, referencedTypes: schema.referencedTypes)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -274,7 +274,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = await subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog, referencedTypes: schema.referencedTypes)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -321,7 +321,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = await subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog, referencedTypes: schema.referencedTypes)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -357,7 +357,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = await subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog, referencedTypes: schema.referencedTypes)
 
     let expected: ReferencedFields = [
       ("aliasedA", .string(), nil),
@@ -390,7 +390,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = await subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog, referencedTypes: schema.referencedTypes)
 
     let expected: ReferencedFields = [
       ("a", .string(), nil),
@@ -424,7 +424,7 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let actual = await subject.collectedFields(for: Dog)
+    let actual = await subject.collectedFields(for: Dog, referencedTypes: schema.referencedTypes)
 
     let expected: ReferencedFields = [
       ("field1", .string(), nil),
@@ -476,14 +476,14 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let PetRock = try schema[object: "PetRock"].xctUnwrapped()
-    let petRockActual = await subject.collectedFields(for: PetRock)
+    let petRockActual = await subject.collectedFields(for: PetRock, referencedTypes: schema.referencedTypes)
 
     let petRockExpected: ReferencedFields = [
       ("b", .string(), nil),
     ]
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let dogActual = await subject.collectedFields(for: Dog)
+    let dogActual = await subject.collectedFields(for: Dog, referencedTypes: schema.referencedTypes)
 
     let dogExpected: ReferencedFields = [
       ("a", .string(), nil),
@@ -538,14 +538,14 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
 
     let PetRock = try schema[object: "PetRock"].xctUnwrapped()
-    let petRockActual = await subject.collectedFields(for: PetRock)
+    let petRockActual = await subject.collectedFields(for: PetRock, referencedTypes: schema.referencedTypes)
 
     let petRockExpected: ReferencedFields = [
       ("b", .string(), nil),
     ]
 
     let Dog = try schema[object: "Dog"].xctUnwrapped()
-    let dogActual = await subject.collectedFields(for: Dog)
+    let dogActual = await subject.collectedFields(for: Dog, referencedTypes: schema.referencedTypes)
 
     let dogExpected: ReferencedFields = [
       ("a", .string(), nil),
@@ -556,7 +556,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(dogActual).to(equal(dogExpected))
   }
 
-  func test__collectedFields__givenResponseKeySelectedWithDifferentTypes_collectsSameTypeRegardlessOfBuildOrder() async throws {
+  func test__collectedFields__givenResponseKeySelectedWithDifferentNullability__joinsToNullableTypeRegardlessOfBuildOrder() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -618,18 +618,18 @@ class IRFieldCollectorTests: XCTestCase {
     // when
     try await buildIR()
     let Book = try schema[object: "Book"].xctUnwrapped()
-    let documentOrderActual = await subject.collectedFields(for: Book)
+    let documentOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
 
     try await buildIR(reverseOperationOrder: true)
-    let reverseOrderActual = await subject.collectedFields(for: Book)
+    let reverseOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
 
     // then
     let Image = try schema[object: "Image"].xctUnwrapped()
 
     let expected: ReferencedFields = [
-      ("cover", .entity(Image), nil),
+      ("cover", .anyEntity, nil),
       ("gallery", .list(.entity(Image)), nil),
-      ("thumbnails", .list(.nonNull(.entity(Image))), nil),
+      ("thumbnails", .list(.entity(Image)), nil),
       ("title", .string(), nil)
     ]
 
@@ -637,7 +637,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(reverseOrderActual).to(equal(expected))
   }
 
-  func test__collectedFields__givenResponseKeySelectedWithDifferentDeprecationReasons_collectsSameDeprecationReasonRegardlessOfBuildOrder() async throws {
+  func test__collectedFields__givenResponseKeySelectedWithDeprecatedFields__isDeprecatedOnlyIfAllFieldsAreDeprecated() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -675,15 +675,15 @@ class IRFieldCollectorTests: XCTestCase {
     // when
     try await buildIR()
     let Book = try schema[object: "Book"].xctUnwrapped()
-    let documentOrderActual = await subject.collectedFields(for: Book)
+    let documentOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
 
     try await buildIR(reverseOperationOrder: true)
-    let reverseOrderActual = await subject.collectedFields(for: Book)
+    let reverseOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
 
     // then
     let expected: ReferencedFields = [
-      ("label", .string(), "Use caption."),
-      ("status", .string(), "Use state."),
+      ("label", .string(), "Use heading."),
+      ("status", .string(), nil),
       ("title", .string(), nil)
     ]
 
@@ -691,7 +691,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(reverseOrderActual).to(equal(expected))
   }
 
-  func test__collectedFields__givenResponseKeySelectedWithCanonicallyEquivalentDeprecationReasons_collectsSameReasonRegardlessOfBuildOrder() async throws {
+  func test__collectedFields__givenResponseKeySelectedWithDeprecatedFields__usesDeprecationReasonOfFirstFieldByName() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -721,10 +721,10 @@ class IRFieldCollectorTests: XCTestCase {
     // when
     try await buildIR()
     let Book = try schema[object: "Book"].xctUnwrapped()
-    let documentOrderActual = await subject.collectedFields(for: Book)
+    let documentOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
 
     try await buildIR(reverseOperationOrder: true)
-    let reverseOrderActual = await subject.collectedFields(for: Book)
+    let reverseOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
 
     // then
     let expected: ReferencedFields = [
@@ -735,7 +735,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(reverseOrderActual).to(equal(expected))
   }
 
-  func test__collectedFields__givenResponseKeySelectedOnObjectAndInterfacesWithDifferentTypes_collectsSameTypeRegardlessOfWhereSelected() async throws {
+  func test__collectedFields__givenResponseKeySelectedOnObjectAndInterfacesWithDifferentFields__joinsTypesRegardlessOfWhereSelected() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -789,12 +789,12 @@ class IRFieldCollectorTests: XCTestCase {
     try await buildIR()
     let Book = try schema[object: "Book"].xctUnwrapped()
     let Magazine = try schema[object: "Magazine"].xctUnwrapped()
-    let documentOrderBookActual = await subject.collectedFields(for: Book)
-    let documentOrderMagazineActual = await subject.collectedFields(for: Magazine)
+    let documentOrderBookActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
+    let documentOrderMagazineActual = await subject.collectedFields(for: Magazine, referencedTypes: schema.referencedTypes)
 
     try await buildIR(reverseOperationOrder: true)
-    let reverseOrderBookActual = await subject.collectedFields(for: Book)
-    let reverseOrderMagazineActual = await subject.collectedFields(for: Magazine)
+    let reverseOrderBookActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
+    let reverseOrderMagazineActual = await subject.collectedFields(for: Magazine, referencedTypes: schema.referencedTypes)
 
     // then
     let expected: ReferencedFields = [
@@ -807,7 +807,7 @@ class IRFieldCollectorTests: XCTestCase {
     expect(reverseOrderMagazineActual).to(equal(expected))
   }
 
-  func test__collectedFields__givenInterfaceFieldNarrowedByObject_selectedOnObjectAndInterface_collectsObjectFieldType() async throws {
+  func test__collectedFields__givenInterfaceFieldNarrowedByObject_selectedOnObjectAndInterface__usesObjectFieldType() async throws {
     // given
     schemaSDL = """
     type Query {
@@ -857,10 +857,10 @@ class IRFieldCollectorTests: XCTestCase {
     // when
     try await buildIR()
     let Book = try schema[object: "Book"].xctUnwrapped()
-    let documentOrderActual = await subject.collectedFields(for: Book)
+    let documentOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
 
     try await buildIR(reverseOperationOrder: true)
-    let reverseOrderActual = await subject.collectedFields(for: Book)
+    let reverseOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
 
     // then
     let Photo = try schema[object: "Photo"].xctUnwrapped()
@@ -872,6 +872,410 @@ class IRFieldCollectorTests: XCTestCase {
 
     expect(documentOrderActual).to(equal(expected))
     expect(reverseOrderActual).to(equal(expected))
+  }
+
+  func test__collectedFields__givenFieldSelectedOnlyThroughInterfacesWithDifferentTypes__usesObjectFieldType() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      titled: Titled!
+      named: Named!
+    }
+
+    interface Titled {
+      title: String
+    }
+
+    interface Named {
+      title: String!
+    }
+
+    type Book implements Titled & Named {
+      title: String!
+    }
+    """
+
+    document = """
+    query TitledQuery {
+      titled {
+        title
+      }
+    }
+
+    query NamedQuery {
+      named {
+        title
+      }
+    }
+    """
+
+    // when
+    try await buildIR()
+    let Book = try schema[object: "Book"].xctUnwrapped()
+    let documentOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
+
+    try await buildIR(reverseOperationOrder: true)
+    let reverseOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
+
+    // then
+    let expected: ReferencedFields = [
+      ("title", .nonNull(.string()), nil)
+    ]
+
+    expect(documentOrderActual).to(equal(expected))
+    expect(reverseOrderActual).to(equal(expected))
+  }
+
+  func test__collectedFields__givenResponseKeySelectedWithDifferentCompositeTypes__joinsToAnyEntity() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      book: Book!
+    }
+
+    interface Picture {
+      url: String
+    }
+
+    type Book {
+      cover: Image
+      legacyCover: LegacyImage
+      picture: Picture
+      images: [Image]
+      legacyImages: [LegacyImage]
+      strictImages: [Image!]!
+      strictLegacyImages: [LegacyImage!]!
+    }
+
+    type Image implements Picture {
+      url: String
+    }
+
+    type LegacyImage {
+      url: String
+    }
+    """
+
+    document = """
+    query BookQuery {
+      book {
+        cover { url }
+        art: cover { url }
+        images { url }
+        strictImages { url }
+      }
+    }
+
+    query LegacyBookQuery {
+      book {
+        cover: legacyCover { url }
+        art: picture { url }
+        images: legacyImages { url }
+        strictImages: strictLegacyImages { url }
+      }
+    }
+    """
+
+    // when
+    try await buildIR()
+    let Book = try schema[object: "Book"].xctUnwrapped()
+    let documentOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
+
+    try await buildIR(reverseOperationOrder: true)
+    let reverseOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
+
+    // then
+    let expected: ReferencedFields = [
+      ("art", .anyEntity, nil),
+      ("cover", .anyEntity, nil),
+      ("images", .list(.anyEntity), nil),
+      ("strictImages", .nonNull(.list(.nonNull(.anyEntity))), nil)
+    ]
+
+    expect(documentOrderActual).to(equal(expected))
+    expect(reverseOrderActual).to(equal(expected))
+  }
+
+  func test__collectedFields__givenResponseKeySelectedWithIncompatibleTypes__joinsToAnyValue() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      book: Book!
+    }
+
+    enum Color {
+      RED
+    }
+
+    enum Shade {
+      DARK
+    }
+
+    type Book {
+      count: Int!
+      label: String!
+      color: Color
+      shade: Shade
+      cover: Image
+      coverURL: String
+      images: [Image]
+      imageGrid: [[Image]]
+      tags: [String]
+      numbers: [Int]
+    }
+
+    type Image {
+      url: String
+    }
+    """
+
+    document = """
+    query BookQuery {
+      book {
+        count
+        tone: color
+        cover { url }
+        shape: cover { url }
+        grid: imageGrid { url }
+        values: tags
+      }
+    }
+
+    query OtherBookQuery {
+      book {
+        count: label
+        tone: shade
+        cover: coverURL
+        shape: images { url }
+        grid: images { url }
+        values: numbers
+      }
+    }
+    """
+
+    // when
+    try await buildIR()
+    let Book = try schema[object: "Book"].xctUnwrapped()
+    let documentOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
+
+    try await buildIR(reverseOperationOrder: true)
+    let reverseOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
+
+    // then
+    let expected: ReferencedFields = [
+      ("count", .nonNull(.anyValue), nil),
+      ("cover", .anyValue, nil),
+      ("grid", .list(.anyValue), nil),
+      ("shape", .anyValue, nil),
+      ("tone", .anyValue, nil),
+      ("values", .list(.anyValue), nil)
+    ]
+
+    expect(documentOrderActual).to(equal(expected))
+    expect(reverseOrderActual).to(equal(expected))
+  }
+
+  func test__collectedFields__givenResponseKeySelectedWithIDAndString__joinsToString() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      book: Book!
+    }
+
+    type Book {
+      id: ID!
+      isbn: ID!
+      name: String!
+      identifiers: [ID]
+      names: [String!]
+    }
+    """
+
+    document = """
+    query BookQuery {
+      book {
+        id
+        key: id
+        keys: identifiers
+      }
+    }
+
+    query OtherBookQuery {
+      book {
+        id: isbn
+        key: name
+        keys: names
+      }
+    }
+    """
+
+    // when
+    try await buildIR()
+    let Book = try schema[object: "Book"].xctUnwrapped()
+    let documentOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
+
+    try await buildIR(reverseOperationOrder: true)
+    let reverseOrderActual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
+
+    // then
+    let ID = GraphQLScalarType.mock(name: "ID")
+
+    let expected: ReferencedFields = [
+      ("id", .nonNull(.named(.scalar(ID))), nil),
+      ("key", .nonNull(.string()), nil),
+      ("keys", .list(.string()), nil)
+    ]
+
+    expect(documentOrderActual).to(equal(expected))
+    expect(reverseOrderActual).to(equal(expected))
+  }
+
+  func test__collectedFields__givenDeprecatedFieldSelectedThroughInterface__usesDeprecationOfSelectedField() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      titled: Titled!
+    }
+
+    interface Titled {
+      title: String @deprecated(reason: "Interface title deprecated.")
+      label: String
+    }
+
+    type Item implements Titled {
+      title: String
+      label: String @deprecated(reason: "Object label deprecated.")
+    }
+    """
+
+    document = """
+    query TitledQuery {
+      titled {
+        title
+        label
+      }
+    }
+    """
+
+    // when
+    try await buildIR()
+    let Item = try schema[object: "Item"].xctUnwrapped()
+    let actual = await subject.collectedFields(for: Item, referencedTypes: schema.referencedTypes)
+
+    // then
+    let expected: ReferencedFields = [
+      ("label", .string(), nil),
+      ("title", .string(), "Interface title deprecated.")
+    ]
+
+    expect(actual).to(equal(expected))
+  }
+
+  func test__collectedFields__givenInterfaceFieldNarrowedByObjectToUngeneratedType__usesSelectedTypeWithObjectNullability() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      titled: Titled!
+    }
+
+    interface Image {
+      url: String
+    }
+
+    interface HiResImage implements Image {
+      url: String
+    }
+
+    interface Titled {
+      cover: Image
+    }
+
+    type Book implements Titled {
+      cover: HiResImage!
+    }
+    """
+
+    document = """
+    query TitledQuery {
+      titled {
+        cover {
+          url
+        }
+      }
+    }
+    """
+
+    // when
+    try await buildIR()
+    let Book = try schema[object: "Book"].xctUnwrapped()
+    let actual = await subject.collectedFields(for: Book, referencedTypes: schema.referencedTypes)
+
+    // then
+    let Image = try schema[interface: "Image"].xctUnwrapped()
+
+    let expected: ReferencedFields = [
+      ("cover", .nonNull(.entity(Image)), nil)
+    ]
+
+    expect(self.schema[interface: "HiResImage"]).to(beNil())
+    expect(actual).to(equal(expected))
+  }
+
+  func test__collectedFields__givenInterfaceFieldNarrowedByObjectToGeneratedType_selectedOnlyThroughInterface__usesObjectFieldType() async throws {
+    // given
+    schemaSDL = """
+    type Query {
+      edges: [Edge!]!
+      users: [User!]!
+    }
+
+    interface Node {
+      id: ID!
+    }
+
+    type User implements Node {
+      id: ID!
+      name: String
+    }
+
+    interface Edge {
+      node: Node
+    }
+
+    type UserEdge implements Edge {
+      node: User
+    }
+    """
+
+    document = """
+    query EdgesQuery {
+      edges {
+        node {
+          id
+        }
+      }
+    }
+
+    query UsersQuery {
+      users {
+        name
+      }
+    }
+    """
+
+    // when
+    try await buildIR()
+    let UserEdge = try schema[object: "UserEdge"].xctUnwrapped()
+    let actual = await subject.collectedFields(for: UserEdge, referencedTypes: schema.referencedTypes)
+
+    // then
+    let User = try schema[object: "User"].xctUnwrapped()
+
+    let expected: ReferencedFields = [
+      ("node", .entity(User), nil)
+    ]
+
+    expect(actual).to(equal(expected))
   }
 
   /// MARK: - Custom Matchers
@@ -906,3 +1310,8 @@ class IRFieldCollectorTests: XCTestCase {
   }
 }
 
+
+private extension TestMockFieldType {
+  static func string() -> Self { .named(.string()) }
+  static func entity(_ type: GraphQLCompositeType) -> Self { .named(.entity(type)) }
+}
