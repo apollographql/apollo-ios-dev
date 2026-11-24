@@ -1705,6 +1705,75 @@ final class FieldPolicyTests: XCTestCase, CacheDependentTesting, @unchecked Send
     expect(graphQLResult).to(beNil())
   }
 
+  // MARK: - No Root Record
+
+  func test_schemaConfiguration_givenFieldPolicyProvider__givenNoRootRecord__resolvesRecordStoredUnderItsOwnCacheKey() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("hero", Hero.self, arguments: ["name": .variable("name")])
+      ]}
+      var hero: Hero { __data["hero"] }
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("name", String.self)
+        ]}
+      }
+    }
+
+    await FieldPolicySchemaMetadata.stub_cacheKeyForField_SingleReturn { _, inputData, _ in
+      guard let name = inputData["name"] as? String else {
+        return nil
+      }
+      return CacheKeyInfo(id: name)
+    }
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = ["name": "Luke"]
+
+    try await store.publish(records: [
+      "Hero:Luke": ["name": "Luke", "__typename": "Hero"]
+    ])
+
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    expect(graphQLResult?.source) == .cache
+    expect(graphQLResult?.data?.hero.name) == "Luke"
+  }
+
+  func test_fieldPolicy__givenNoRootRecord_andNoFieldPolicy__isACacheMiss() async throws {
+    class HeroSelectionSet: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+      override class var __selections: [Selection] { [
+        .field("hero", Hero.self, arguments: ["name": .variable("name")])
+      ]}
+
+      class Hero: AbstractMockSelectionSet<NoFragments, FieldPolicySchemaMetadata>, @unchecked Sendable {
+        override class var __parentType: any ParentType {
+          Object(typename: "Hero", implementedInterfaces: [])
+        }
+        override class var __selections: [Selection] { [
+          .field("__typename", String.self),
+          .field("name", String.self)
+        ]}
+      }
+    }
+
+    let query = MockQuery<HeroSelectionSet>()
+    query.__variables = ["name": "Luke"]
+
+    try await store.publish(records: [
+      "Hero:Luke": ["name": "Luke", "__typename": "Hero"]
+    ])
+
+    let graphQLResult = try await client.fetch(query: query, cachePolicy: .cacheOnly)
+
+    expect(graphQLResult).to(beNil())
+  }
+
   // MARK: - Stored Field Values
 
   private func fetchFromServer<Root: RootSelectionSet>(
