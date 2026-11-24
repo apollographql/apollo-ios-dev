@@ -54,6 +54,10 @@ public struct CacheReference: Sendable, Hashable {
     }
   }
 
+  var isRoot: Bool {
+    self == .RootQuery || self == .RootMutation || self == .RootSubscription
+  }
+
   /// The unique identifier for the referenced object.
   ///
   /// # See Also
