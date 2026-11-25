@@ -7,7 +7,7 @@ struct MockObjectFileGenerator: FileGenerator {
   /// Source GraphQL object.
   let graphqlObject: GraphQLObjectType
 
-  let fields: [(String, GraphQLType, deprecationReason: String?)]
+  let fields: [(String, TestMockFieldType, deprecationReason: String?)]
 
   let ir: IRBuilder
 

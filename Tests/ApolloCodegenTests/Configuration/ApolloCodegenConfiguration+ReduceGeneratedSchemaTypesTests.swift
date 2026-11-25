@@ -210,6 +210,67 @@ final class ApolloCodegenConfiguration_ReduceGeneratedSchemaTypesTests: XCTestCa
     }.to(beFalse())
   }
   
+  func test__generateFiles__givenObjectNarrowingInterfaceFieldToPrunedType_reducingGeneratedSchemaTypes__mockUsesInterfaceFieldType() async throws {
+    try await createFile(
+      body: """
+      extend type Query {
+        owner: Owner
+      }
+
+      interface Owner {
+        pet: Animal
+      }
+
+      type CatOwner implements Owner {
+        pet: Cat!
+      }
+      """,
+      filename: "owners.graphqls"
+    )
+    try await createFile(
+      body: """
+      query OwnerQuery {
+        owner {
+          pet {
+            id
+          }
+          ... on CatOwner {
+            __typename
+          }
+        }
+      }
+      """,
+      filename: "OwnerQuery.graphql"
+    )
+
+    let testMocksURL = directoryURL.appendingPathComponent("TestMocks")
+    let subject = createSubject(
+      testMocks: .absolute(path: testMocksURL.path),
+      requireNonOptionalMockFields: true
+    )
+    let compilationResult = try await subject.compileGraphQLResult()
+    let ir = IRBuilder(compilationResult: compilationResult)
+
+    try await subject.generateFiles(
+      compilationResult: compilationResult,
+      ir: ir,
+      fileManager: ApolloFileManager.default
+    )
+
+    let catOwnerMock = try String(
+      contentsOf: testMocksURL.appendingPathComponent("CatOwner+Mock.graphql.swift"),
+      encoding: .utf8
+    )
+
+    expect(catOwnerMock).to(contain("@Field<Animal>(\"pet\") public var pet"))
+    expect(catOwnerMock).toNot(contain("Cat>"))
+    await expect {
+      await ApolloFileManager.default.doesFileExist(
+        atPath: testMocksURL.appendingPathComponent("Cat+Mock.graphql.swift").path
+      )
+    }.to(beFalse())
+  }
+
   func test_givenSchemaAndOperationDocuments_andInterfaceWithTypePolicy_reducingGeneratedSchemaTypes_generatesOnlyReferencedObjects() async throws {
     try await createFile(
       body: """

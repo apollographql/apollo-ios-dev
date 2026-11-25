@@ -94,6 +94,39 @@ public class Mock<O: MockObject>: AnyMock, Hashable {
     _data[field.key.description] = value?._unsafelyConvertToMockValue()
   }
 
+  public subscript<T: ErasedMockFieldValue>(
+    dynamicMember keyPath: KeyPath<O.MockFields, Field<T>>
+  ) -> AnyHashable? {
+    get {
+      let field = O._mockFields[keyPath: keyPath]
+      return _data[field.key.description]
+    }
+    set {
+      _setAnyValue(newValue, for: keyPath)
+    }
+  }
+
+  public func _setAnyValue<T: ErasedMockFieldValue>(
+    _ value: AnyHashable?,
+    for keyPath: KeyPath<O.MockFields, Field<T>>
+  ) {
+    let field = O._mockFields[keyPath: keyPath]
+    guard let value, let unwrappedValue = unwrappedMockValue(value) else {
+      _data[field.key.description] = nil
+      return
+    }
+
+    precondition(
+      T._isValidMockValue(value),
+      """
+      Mock<\(O.self)> field "\(field.key)" can't be set to a value of type \
+      \(type(of: unwrappedValue)). It accepts \(T._mockValueDescription).
+      """
+    )
+
+    _data[field.key.description] = normalizedMockValue(value)
+  }
+
   public var _selectionSetMockData: JSONObject {
     _data.mapValues { Self._selectionSetMockDataValue(from: $0.base) }
   }

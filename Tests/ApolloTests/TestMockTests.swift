@@ -536,6 +536,183 @@ class TestMockTests: XCTestCase {
     expect(selectionSet.nestedListOfObjects[0].count).to(equal(3))
   }
 
+  func test__mock__setAnyValueField_toScalar__fieldIsSet() throws {
+    // given
+    let mock = Mock<Dog>()
+
+    // when
+    mock.anyValue = 42
+
+    // then
+    expect(mock._data["anyValue"]).to(equal(42))
+    expect(mock.anyValue).to(equal(42))
+  }
+
+  func test__mock__setAnyValueField_toObject__fieldIsSet() throws {
+    // given
+    let mock = Mock<Dog>()
+    let cat = Mock<Cat>()
+
+    // when
+    mock.anyValue = cat
+
+    // then
+    expect(mock.anyValue as? Mock<Cat>).to(beIdenticalTo(cat))
+  }
+
+  func test__mock__setAnyValueField_toNil__fieldIsSetToNil() throws {
+    // given
+    let mock = Mock<Dog>()
+
+    // when
+    mock.anyValue = "a"
+    mock.anyValue = nil
+
+    // then
+    expect(mock._data["anyValue"]).to(beNil())
+    expect(mock.anyValue).to(beNil())
+  }
+
+  func test__mock__setListOfAnyValuesField_withNestedListsAndNils__fieldIsSet() throws {
+    // given
+    let mock = Mock<Dog>()
+    let cat = Mock<Cat>()
+
+    // when
+    mock.listOfAnyValues = [1, nil, [cat]] as [AnyHashable?]
+
+    // then
+    let list = mock._data["listOfAnyValues"] as? [AnyHashable?]
+    expect(list?.count).to(equal(3))
+    expect(list?[0]).to(equal(1))
+    expect(list?[1]).to(beNil())
+    expect(list?[2] as? [AnyHashable?]).to(equal([cat]))
+  }
+
+  func test__mock__setAnyValueField_toIntegerNSNumber__fieldIsSet() throws {
+    // given
+    let mock = Mock<Dog>()
+
+    // when
+    mock.anyValue = NSNumber(value: 3)
+
+    // then
+    expect(mock.anyValue).to(equal(AnyHashable(NSNumber(value: 3))))
+  }
+
+  func test__mock__setListOfAnyValuesField_withTypedNils__storesNilElements() throws {
+    // given
+    let mock = Mock<Dog>()
+    let expected = Mock<Dog>()
+
+    // when
+    mock.listOfAnyValues = ["a", nil] as [String?]
+    expected.listOfAnyValues = ["a", nil] as [AnyHashable?]
+
+    // then
+    let list = mock.listOfAnyValues as? [AnyHashable?]
+    expect(list?.count).to(equal(2))
+    expect(list?[1]).to(beNil())
+    expect(mock).to(equal(expected))
+  }
+
+  func test__mock__setAnyValueField_toHashableNil__fieldIsSetToNil() throws {
+    // given
+    let mock = Mock<Dog>()
+    mock.anyValue = 1
+
+    // when
+    mock.anyValue = AnyHashable(Optional<Int>.none)
+
+    // then
+    expect(mock._data["anyValue"]).to(beNil())
+  }
+
+  func test___mockValueDescription__givenListOfOptionalAnyFieldValue__describesEachLevel() throws {
+    expect(AnyFieldValue._mockValueDescription).to(equal("a scalar, a Mock, or a list of them"))
+    expect([AnyFieldValue?]._mockValueDescription)
+      .to(equal("a list whose elements are each nil or a scalar, a Mock, or a list of them"))
+  }
+
+  func test___selectionSetMockData__givenListOfAnyValuesFieldSetWithObjects__convertsObjectsToDict() throws {
+    // given
+    let mock = Mock<Dog>()
+    let cat = Mock<Cat>()
+    cat.species = "Feline"
+
+    // when
+    mock.listOfAnyValues = [cat, nil] as [AnyHashable?]
+    let actual = mock._selectionSetMockData["listOfAnyValues"] as? [JSONValue?]
+
+    // then
+    expect(actual?.count).to(equal(2))
+    expect((actual?[0] as? JSONObject)?["species"] as? String).to(equal("Feline"))
+  }
+
+  func test__isValidMockValue__givenAnyFieldValue__acceptsScalarsMocksAndLists() throws {
+    struct NotAFieldValue: Hashable {}
+
+    expect(AnyFieldValue._isValidMockValue("a")).to(beTrue())
+    expect(AnyFieldValue._isValidMockValue(1)).to(beTrue())
+    expect(AnyFieldValue._isValidMockValue(GraphQLEnum<Species>.case(.canine))).to(beTrue())
+    expect(AnyFieldValue._isValidMockValue(MockCustomScalar(value: 1))).to(beTrue())
+    expect(AnyFieldValue._isValidMockValue(Mock<Cat>())).to(beTrue())
+    expect(AnyFieldValue._isValidMockValue([1, nil, [Mock<Cat>()]] as [AnyHashable?])).to(beTrue())
+    expect(AnyFieldValue._isValidMockValue(AnyHashable(1))).to(beTrue())
+    expect(AnyFieldValue._isValidMockValue(AnyHashable(NSNumber(value: 3)))).to(beTrue())
+
+    expect(AnyFieldValue._isValidMockValue(NotAFieldValue())).to(beFalse())
+    expect(AnyFieldValue._isValidMockValue([AnyHashable(NotAFieldValue())])).to(beFalse())
+    expect(AnyFieldValue._isValidMockValue(Optional<Int>.none as Any)).to(beFalse())
+  }
+
+  func test__isValidMockValue__givenListOfAnyFieldValue__requiresListAtThatDepth() throws {
+    expect([AnyFieldValue?]._isValidMockValue([1, nil] as [AnyHashable?])).to(beTrue())
+    expect([AnyFieldValue]._isValidMockValue([1, "a"] as [AnyHashable])).to(beTrue())
+
+    expect([AnyFieldValue?]._isValidMockValue(1)).to(beFalse())
+    expect([AnyFieldValue]._isValidMockValue([1, nil] as [AnyHashable?])).to(beFalse())
+    expect([[AnyFieldValue]]._isValidMockValue([1] as [AnyHashable])).to(beFalse())
+  }
+
+  func test__convertToSelectionSet__setAnyValueFieldsToDifferentTypes__canAccessFields() async throws {
+    // given
+    final class Animal: TestMockSchema.MockSelectionSet, @unchecked Sendable {
+      override class var __parentType: any ParentType { TestMockSchema.Interfaces.Animal }
+      override class var __selections: [Selection] {[
+        .field("anyValue", String.self),
+        .field("listOfAnyValues", [CatData?].self),
+      ]}
+
+      var anyValue: String { __data["anyValue"] }
+      var listOfAnyValues: [CatData?] { __data["listOfAnyValues"] }
+
+      final class CatData: TestMockSchema.MockSelectionSet, @unchecked Sendable {
+        override class var __parentType: any ParentType { TestMockSchema.Types.Cat }
+        override class var __selections: [Selection] {[
+          .field("species", String?.self),
+        ]}
+
+        var species: String? { __data["species"] }
+      }
+    }
+
+    let mock = Mock<Dog>()
+    let cat = Mock<Cat>()
+    cat.species = "Feline"
+    mock.anyValue = "Canine"
+    mock.listOfAnyValues = [cat, nil] as [AnyHashable?]
+
+    // when
+    let selectionSet = await Animal.from(mock)
+
+    // then
+    expect(selectionSet.anyValue).to(equal("Canine"))
+    expect(selectionSet.listOfAnyValues.count).to(equal(2))
+    expect(selectionSet.listOfAnyValues[0]?.species).to(equal("Feline"))
+    expect(selectionSet.listOfAnyValues[1]).to(beNil())
+  }
+
   func test__convertToSelectionSet__setListOfScalarsField__canAccessField() async throws {
     // given
     final class Animal: TestMockSchema.MockSelectionSet, @unchecked Sendable {
@@ -630,6 +807,8 @@ final class Dog: MockObject {
     @Field<[[Animal]]>("nestedListOfInterfaces") public var nestedListOfInterfaces
     @Field<[Animal?]>("listOfOptionalInterfaces") public var listOfOptionalInterfaces
     @Field<String>("hash") public var hash
+    @Field<AnyFieldValue>("anyValue") public var anyValue
+    @Field<[AnyFieldValue?]>("listOfAnyValues") public var listOfAnyValues
   }
 }
 
